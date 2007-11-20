@@ -37,12 +37,12 @@
 #define CMD_WRITEBYTETOOFFSET       0x11 //C,D byte(1) addr(4)
 #define CMD_LOADBYTEFROMPOINTER     0x12 //C,D byte(1) addr(4)
 #define CMD_COPYSCRIPTBANKS         0x14 //C,D bank(1) bank(1)
-#define CMD_COPYBYTE                0x15 // ,D addr(4) addr(4)
-#define CMD_SETVAR                  0x16 // ,D var(2) val(2)
+#define CMD_COPYBYTE                0x15 //C,D addr(4) addr(4)
+#define CMD_SETVAR                  0x16 //C,D var(2) val(2)
 #define CMD_COPYVAR                 0x19 //C,D var(2) val(2)
-#define CMD_COPYVARIFNOTZERO        0x1A // ,D var(2) val(2)
-#define CMD_COMPAREVARTOBYTE        0x1C // ,D var(2) byte(1)
-#define CMD_COMPAREVARTOFARBYTE     0x1D // ,D var(2) addr(4)
+#define CMD_COPYVARIFNOTZERO        0x1A //C,D var(2) val(2)
+#define CMD_COMPAREVARTOBYTE        0x1C //C,D var(2) byte(1)
+#define CMD_COMPAREVARTOFARBYTE     0x1D //C,D var(2) addr(4)
 #define CMD_COMPAREFARBYTETOVAR     0x1E // ,D addr(4) var(2)
 #define CMD_COMPAREFARBYTETOBYTE    0x1F // ,D addr(4) byte(1)
 #define CMD_COMPAREFARBYTETOFARBYTE 0x20 // ,D fb(4) fb(4)
@@ -56,6 +56,7 @@
 #define CMD_SETFLAG                 0x29 // ,D flag(2)
 #define CMD_CLEARFLAG               0x2A // ,D flag(2)
 #define CMD_CHECKFLAG               0x2B // ,D flag(2)
+#define CMD_2F                      0x2F // ,? ??(2)
 #define CMD_CRY                     0x30 // ,D bank(1) poke(2)
 #define CMD_FANFARE                 0x31 // ,D snd(2)
 #define CMD_WAITFANFARE             0x32 //C,D
@@ -100,6 +101,7 @@
 #define CMD_DOWEATHER               0xA5 //C,D
 #define CMD_BATTLE                  0xB6 // ,D poke(2) lvl(1)
 #define CMD_C3                      0xC3 // ,? ??????
+#define CMD_D3                      0xD3 // ,? Braille(4)
 #define CMD_FB                      0xFB // ,? ADDR4?
 
 /*

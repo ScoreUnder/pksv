@@ -20,7 +20,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
   unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6,arg7;
   DWORD read;
   unsigned char command;
-  char buf[1024];
+  char buf[1024],buf2[1024];
   printf("\n#org 0x%X\n",FileZoomPos);
   printf("'-----------------------------------\n");
   SetFilePointer(fileM,FileZoomPos&0x00ffffff,NULL,FILE_BEGIN);
@@ -47,6 +47,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
           printf("storetext 0x%X 0x%X ' %s\n",arg1,arg2,transtxt(arg2,filename));
           DoText(arg1);
         }
+        break;
+      case CMD_2F:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,4,&read,NULL);
+        printf("CMD_2F 0x%X 0x%X\n",arg1,arg2);
         break;
       case CMD_STOREVAR:
         arg1=0;
@@ -308,25 +315,31 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         strcpy(buf,"");
+        sprintf(buf2,"0x%X",arg1);
         switch(arg1)
         {
           case 0:
+            strcpy(buf2,"MSG_OBTAIN");
             strcpy(buf,"Obtained the XXXXXX!");
             break;
           case 1:
+            strcpy(buf2,"MSG_FIND");
             strcpy(buf,"PLAYER found one XXXXXX!");
             break;
           case 4:
+            strcpy(buf2,"MSG_NOCLOSE");
             strcpy(buf,"Non-closing msg");
             break;
           case 5:
+            strcpy(buf2,"MSG_YESNO");
             strcpy(buf,"Yes/No msg");
             break;
           case 6:
+            strcpy(buf2,"MSG_NORMAL");
             strcpy(buf,"Normal msg");
             break;
         }
-        printf("callstd 0x%X ' %s\n",arg1,buf);
+        printf("callstd %s ' %s\n",buf2,buf);
         break;
       case CMD_MSGBOX:
         arg1=0;
@@ -390,6 +403,19 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         printf("braille 0x%X\n",arg1);
+        if((arg1&0xff000000)==0x08000000)
+        {
+          transbrl(arg1,filename);
+        }
+        else
+        {
+          printf("          'Braille not in ROM area\n");
+        }
+        break;
+      case CMD_D3:
+        arg1=0;
+        ReadFile(fileM,&arg1,4,&read,NULL);
+        printf("CMD_D3 0x%X\n",arg1);
         if((arg1&0xff000000)==0x08000000)
         {
           transbrl(arg1,filename);

@@ -17,6 +17,7 @@
 */
 char IsVerbose=1;
 char filearg;
+char type=0;
 //Sorry for the horrible code.
 #include <stdio.h>
 #include <windows.h>
@@ -65,6 +66,18 @@ under certain conditions; read the license for details.\n\
 The license should be stored in license.txt. If not, go to\n<http://www.gnu.org/licenses/gpl.html>");
       return 0;
     }
+    else if(!strcmp(av[tmp],"-t"))
+    {
+      type=1;
+    }
+    else if(!strcmp(av[tmp],"-b"))
+    {
+      type=2;
+    }
+    else if(!strcmp(av[tmp],"-m"))
+    {
+      type=3;
+    }
     else if(!strcmp(av[tmp],"-q"))
     {
       IsVerbose=0;
@@ -107,7 +120,8 @@ Usage:\n\t\
 -q                  Quiet compile mode (show only errors)\n\t\
 -r SCRIPT [FILE]    Recompile SCRIPT into FILE or to stdout.\n\t\
 FILE ADDRESS        Decompile FILE at ADDRESS.\n\t\
-FILE                Using FILE, ask for address to decompile at.");
+FILE                Using FILE, ask for address to decompile at.\n\t\
+[-t|-b|-m]          Decode as [text|braille|movements]");
     return 0;
   }
   if(cline&8)
@@ -166,7 +180,23 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
       {
         FileZoomPos=FileZoomPos&0x00ffffff;
         if(!pspec)printf("You chose 0x%X\n",FileZoomPos);
-        DecodeProc(fileM,FileZoomPos,ofn.lpstrFile);
+        if(type==0)
+        {
+          DecodeProc(fileM,FileZoomPos,ofn.lpstrFile);
+        }
+        else if(type==1)
+        {
+          transtxt(FileZoomPos,ofn.lpstrFile);
+        }
+        else if(type==2)
+        {
+          transbrl(FileZoomPos,ofn.lpstrFile);
+        }
+        else if(type==3)
+        {
+          transmove(FileZoomPos,ofn.lpstrFile);
+        }
+        if(type>0){puts(trans);}
       }
       else
       {

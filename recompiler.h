@@ -449,6 +449,54 @@ void RecodeProc(char*script,char*rom)
             rom(arg2,1);
             ec();
           }
+          aa("copybyte")
+          {
+            vlog("COPYBYTE\r\n",10);
+            arg1=GetNum("COPYBYTE");
+            if(!gffs){return;}
+            arg2=GetNum("COPYBYTE");
+            if(!gffs){return;}
+            BASIC(CMD_COPYBYTE);
+            rom(arg1,4);
+            rom(arg2,4);
+            ec();
+          }
+          aa("setvar")
+          {
+            vlog("SETVAR\r\n",8);
+            arg1=GetNum("SETVAR");
+            if(!gffs){return;}
+            arg2=GetNum("SETVAR");
+            if(!gffs){return;}
+            BASIC(CMD_SETVAR);
+            rom(arg1,2);
+            rom(arg2,2);
+            ec();
+          }
+          aa("comparevartobyte")
+          {
+            vlog("COMPAREVARTOBYTE\r\n",18);
+            arg1=GetNum("COMPAREVARTOBYTE");
+            if(!gffs){return;}
+            arg2=GetNum("COMPAREVARTOBYTE");
+            if(!gffs){return;}
+            BASIC(CMD_COMPAREVARTOBYTE);
+            rom(arg1,2);
+            rom(arg2,1);
+            ec();
+          }
+          aa("comparevartofarbyte")
+          {
+            vlog("COMPAREVARTOFARBYTE\r\n",21);
+            arg1=GetNum("COMPAREVARTOFARBYTE");
+            if(!gffs){return;}
+            arg2=GetNum("COMPAREVARTOFARBYTE");
+            if(!gffs){return;}
+            BASIC(CMD_COMPAREVARTOFARBYTE);
+            rom(arg1,2);
+            rom(arg2,4);
+            ec();
+          }
           aa("fadescreen")
           {
             vlog("FADESCREEN\r\n",9);

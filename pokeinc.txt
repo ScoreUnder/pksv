@@ -1,2 +1,7 @@
 #define LASTRESULT 0x800D
 #define PLAYER 0xFF
+#define MSG_YESNO 0x5
+#define MSG_NORMAL 0x6
+#define MSG_NOCLOSE 0x4
+#define MSG_FIND 0x1
+#define MSG_OBTAIN 0x0
