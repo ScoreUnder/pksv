@@ -497,13 +497,94 @@ void RecodeProc(char*script,char*rom)
             rom(arg2,4);
             ec();
           }
+          aa("comparefarbytetovar")
+          {
+            vlog("COMPAREFARBYTETOVAR\r\n",21);
+            arg1=GetNum("COMPAREFARBYTETOVAR");
+            if(!gffs){return;}
+            arg2=GetNum("COMPAREFARBYTETOVAR");
+            if(!gffs){return;}
+            BASIC(CMD_COMPAREFARBYTETOVAR);
+            rom(arg1,4);
+            rom(arg2,2);
+            ec();
+          }
+          aa("comparefarbytetobyte")
+          {
+            vlog("COMPAREFARBYTETOBYTE\r\n",22);
+            arg1=GetNum("COMPAREFARBYTETOBYTE");
+            if(!gffs){return;}
+            arg2=GetNum("COMPAREFARBYTETOBYTE");
+            if(!gffs){return;}
+            BASIC(CMD_COMPAREFARBYTETOBYTE);
+            rom(arg1,4);
+            rom(arg2,1);
+            ec();
+          }
+          aa("comparefarbytetofarbyte")
+          {
+            vlog("COMPAREFARBYTETOFARBYTE\r\n",25);
+            arg1=GetNum("COMPAREFARBYTETOFARBYTE");
+            if(!gffs){return;}
+            arg2=GetNum("COMPAREFARBYTETOFARBYTE");
+            if(!gffs){return;}
+            BASIC(CMD_COMPAREFARBYTETOFARBYTE);
+            rom(arg1,4);
+            rom(arg2,4);
+            ec();
+          }
           aa("fadescreen")
           {
-            vlog("FADESCREEN\r\n",9);
+            vlog("FADESCREEN\r\n",12);
             arg1=GetNum("FADESCREEN");
             if(!gffs){return;}
             BASIC(CMD_FADESCREEN);
             rom(arg1,1);
+            ec();
+          }
+          aa("callasm")
+          {
+            vlog("CALLASM\r\n",9);
+            arg1=GetNum("CALLASM");
+            if(!gffs){return;}
+            BASIC(CMD_CALLASM);
+            rom(arg1,4);
+            ec();
+          }
+          aa("pause")
+          {
+            vlog("PAUSE\r\n",7);
+            arg1=GetNum("PAUSE");
+            if(!gffs){return;}
+            BASIC(CMD_PAUSE);
+            rom(arg1,2);
+            ec();
+          }
+          aa("setflag")
+          {
+            vlog("SETFLAG\r\n",9);
+            arg1=GetNum("SETFLAG");
+            if(!gffs){return;}
+            BASIC(CMD_SETFLAG);
+            rom(arg1,2);
+            ec();
+          }
+          aa("clearflag")
+          {
+            vlog("CLEARFLAG\r\n",11);
+            arg1=GetNum("CLEARFLAG");
+            if(!gffs){return;}
+            BASIC(CMD_CLEARFLAG);
+            rom(arg1,2);
+            ec();
+          }
+          aa("checkflag")
+          {
+            vlog("CHECKFLAG\r\n",11);
+            arg1=GetNum("CHECKFLAG");
+            if(!gffs){return;}
+            BASIC(CMD_CHECKFLAG);
+            rom(arg1,2);
             ec();
           }
           else
