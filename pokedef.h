@@ -56,23 +56,23 @@
 #define CMD_SETFLAG                 0x29 //C,D flag(2)
 #define CMD_CLEARFLAG               0x2A //C,D flag(2)
 #define CMD_CHECKFLAG               0x2B //C,D flag(2)
-#define CMD_2F                      0x2F // ,? ??(2)
-#define CMD_CRY                     0x30 // ,D bank(1) poke(2)
-#define CMD_FANFARE                 0x31 // ,D snd(2)
+#define CMD_2F                      0x2F //?,? ??(2)
+#define CMD_CRY                     0x30 //C,D bank(1) poke(2)
+#define CMD_FANFARE                 0x31 //C,D snd(2)
 #define CMD_WAITFANFARE             0x32 //C,D
-#define CMD_PLAYSOUND               0x33 // ,D snd(2)
-#define CMD_FADEDEFAULT             0x34 // ,D
-#define CMD_FADESOUND               0x35 // ,D snd(2)
-#define CMD_FADEOUT                 0x37 // ,D
-#define CMD_FADEIN                  0x38 // ,D
-#define CMD_WARP                    0x39 // ,D bank map exit - ALL 1 BYTE
-#define CMD_COUNTPOKEMON            0x43 // ,D
-#define CMD_REMOVEITEM              0x45 // ,D item(2) num(2)
-#define CMD_CHECKITEM               0x47 // ,D item(2)
-#define CMD_APPLYMOVEMENT           0x4F // ,D spr(2) addr(4)
-#define CMD_PAUSEEVENT              0x51 // ,D event(2)
+#define CMD_PLAYSOUND               0x33 //C,D snd(2)
+#define CMD_FADEDEFAULT             0x34 //C,D
+#define CMD_FADESOUND               0x35 //C,D snd(2)
+#define CMD_FADEOUT                 0x37 //C,D
+#define CMD_FADEIN                  0x38 //C,D
+#define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE
+#define CMD_COUNTPOKEMON            0x43 //C,D
+#define CMD_REMOVEITEM              0x45 //C,D item(2) num(2)
+#define CMD_CHECKITEM               0x47 //C,D item(2)
+#define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
+#define CMD_PAUSEEVENT              0x51 //C,D event(2)
 #define CMD_FACEPLAYER              0x5A //C,D
-#define CMD_TRAINERBATTLE           0x5C // ,D kind(1) num(2) ???(2) start(4) defeat(4)
+#define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_SHOWMSG                 0x66 //C,D
 #define CMD_MESSAGE                 0x67 //C,D addr(4)
 #define CMD_CLOSEMSG2               0x68 //C,D
@@ -81,16 +81,16 @@
 #define CMD_CLOSEMSG                0x6B //C,D
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
-#define CMD_MULTICHOICE             0x6F // ,D x(1) y(1) list(1) AbleToCancel(1)
-#define CMD_PICTURE                 0x77 // ,D num(1)
-#define CMD_BRAILLE                 0x78 // ,D addr(4)
-#define CMD_ADDPOKEMON              0x79 // ,D poke(2) lvl(1) item(2)
-// GivePokemon copyvar 0x8004 0x800d addpokemon X Y Z waitspecial
+#define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
+#define CMD_PICTURE                 0x77 //C,D num(1)
+#define CMD_BRAILLE                 0x78 //C,D addr(4)
+#define CMD_ADDPOKEMON              0x79 //C,D poke(2) lvl(1) item(2)
+// GivePokemon copyvar 0x8004 0x800d addpokemon X Y Z hashpoke 0x1901 0x0
 // SelectPokemon special 0x73 copyvar 0x800a 0x8004
 // WildBattle Battle X Y 0x0000 special 0x(143|137|138|139)
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
-#define CMD_HASHPOKE                0x7D // ,D (2)(1)
+#define CMD_HASHPOKE                0x7D //C,D (2)(1)
 #define CMD_STOREVAR                0x83 // ,D TXT_VAR(1) VAR(2)
 #define CMD_STORETEXT               0x85 // ,D TXT_VAR(1) TXT(4)
 #define CMD_POKEMART                0x86 // ,D mart(4)
@@ -100,7 +100,7 @@
 #define CMD_SETWEATHER              0xA4 // ,D weather(1)
 #define CMD_DOWEATHER               0xA5 //C,D
 #define CMD_BATTLE                  0xB6 // ,D poke(2) lvl(1)
-#define CMD_C3                      0xC3 // ,? ??????
+#define CMD_C3                      0xC3 //?,? ??????(1)
 #define CMD_D3                      0xD3 // ,? Braille(4)
 #define CMD_FB                      0xFB // ,? ADDR4?
 
