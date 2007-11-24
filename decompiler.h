@@ -45,7 +45,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         else
         {
           printf("storetext 0x%X 0x%X ' %s\n",arg1,arg2,transtxt(arg2,filename));
-          DoText(arg1);
+          DoText(arg2);
         }
         break;
       case CMD_2F:
@@ -354,7 +354,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
           else
           {
             printf("msgbox 0x%X ' %s\n",arg2,transtxt(arg2,filename));
-            DoText(arg1);
+            DoText(arg2);
           }
         }
         else
@@ -619,12 +619,12 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
   {
     nl();
     arg1=DoneText(FindNotDoneText());
-    printf("#org 0x%X\n= %s\n",arg1,transtxt(arg1,filename));
+    printf("#org 0x%X\n= %s\n",arg1,transtxt(arg1&0x00ffffff,filename));
   }
   while(!AllDoneMove())
   {
     nl();
     arg1=DoneMove(FindNotDoneMove());
-    printf("#org 0x%X\nM %s\n",arg1,transmove(arg1,filename));
+    printf("#org 0x%X\nM %s\n",arg1,transmove(arg1&0x00ffffff,filename));
   }
 }

@@ -271,12 +271,31 @@ char*transmove(int howfar,HANDLE file)
 }
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-void transbackstr(HANDLE romfile,char*str)
+void transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
 {
   char*NewSpace;
+  char cch;
+  char str[65536];
   unsigned int i=0,j=0,k;
+  DWORD read;
+  HANDLE scrfile;
   char lb[5]; //Little Buffer
   
+  scrfile=CreateFile(scrfn,GENERIC_READ,FILE_SHARE_WRITE|FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  if(pos!=0xFFFFFFFF)SetFilePointer(scrfile,pos,NULL,FILE_BEGIN);
+  else              {MessageBox(NULL,"Darn file pointers. Always spoiling the fun.","Error",0x10);return;}
+  if(scrfile==INVALID_HANDLE_VALUE){MessageBox(NULL,"Darn file handles. Always being complicated on purpose.","Error",0x10);return;}
+  k=0;
+  while(1)
+  {
+    ReadFile(scrfile,&cch,1,&read,NULL);
+    if(read==0){MessageBox(0,"EOF","",0x40);break;}
+    if(cch=='\n')break;
+    if(cch=='\r')break;
+    str[k]=cch;
+    k++;
+  }
+  str[k]=0;
   NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
   while(i<strlen(str))
   {
@@ -296,15 +315,14 @@ void transbackstr(HANDLE romfile,char*str)
       else if (str[i]=='p'){NewSpace[j]=0xFB;}
       else if (str[i]=='v'){NewSpace[j]=0xFD;}
       else if (str[i]=='h'){
-        i++;lb[0]=str[i];i++;lb[1]==str[i];lb[2]=0;
-        sscanf(lb,"%x",k);
+        i++;lb[0]=str[i];i++;lb[1]=str[i];lb[2]=0;
+        sscanf(lb,"%x",&k);
         k=k&0xff;
         NewSpace[j]=k;
       }
       else
       {
         i--;
-        j--;
       }
     }
     else if(str[i]==':'){NewSpace[j]=0xF0;}
@@ -325,5 +343,9 @@ void transbackstr(HANDLE romfile,char*str)
     j++;
   }
   NewSpace[j]=0xFF;
+  j++;
+  WriteFile(romfile,NewSpace,j,&read,NULL);
+  GlobalFree(NewSpace);
+  CloseHandle(scrfile);
   return;
 }

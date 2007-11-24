@@ -27,7 +27,7 @@ void vlogProc(HANDLE LogFile,char*x,unsigned int y)
   if (IsVerbose){log(x,y);}
   return;
 }
-void RecodeProc(char*script,char*rom)
+void RecodeProc(char*script,char*romfn)
 {
   HANDLE CurrFile,LogFile,IncFile,RomFile;
   char*Script;             //Whoops, used the same name for the filename.
@@ -37,7 +37,7 @@ void RecodeProc(char*script,char*rom)
   DWORD read;
   SetLastError(0);
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  RomFile=CreateFile(rom,GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  RomFile=CreateFile(romfn,GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   la=GetLastError();
   IncFile=CreateFile("pokeinc.txt",GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(IncFile==INVALID_HANDLE_VALUE)
@@ -818,7 +818,7 @@ void RecodeProc(char*script,char*rom)
             if(!gffs){return;}
             arg2=GetNum("STORETEXT");
             if(!gffs){return;}
-            BASIC(CMD_STOREVAR);
+            BASIC(CMD_STORETEXT);
             rom(arg1,1);
             rom(arg2,4);
             ec();
@@ -876,6 +876,7 @@ void RecodeProc(char*script,char*rom)
             vlog("[STRING]\r\n",10);
             if(chr==' '){i++;}
             else{log("Should have a space after the =\r\n",33);}
+            transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-1,RomFile);
             j=0;
             while(chr!='\n'&&chr!=0)
             {
@@ -886,7 +887,6 @@ void RecodeProc(char*script,char*rom)
             buf[j]=0;
             sprintf(buf2,"   -> %s\r\n",buf);
             vlog(buf2,strlen(buf2));
-            transbackstr(RomFile,buf);
           }
           else
           {
