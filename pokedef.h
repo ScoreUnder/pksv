@@ -91,18 +91,18 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_HASHPOKE                0x7D //C,D (2)(1)
-#define CMD_STOREVAR                0x83 // ,D TXT_VAR(1) VAR(2)
-#define CMD_STORETEXT               0x85 // ,D TXT_VAR(1) TXT(4)
-#define CMD_POKEMART                0x86 // ,D mart(4)
+#define CMD_STOREVAR                0x83 //C,D TXT_VAR(1) VAR(2)
+#define CMD_STORETEXT               0x85 //C,D TXT_VAR(1) TXT(4)
+#define CMD_POKEMART                0x86 //C,D mart(4)
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
 #define CMD_CHECKGENDER             0xA0 //C,D
-#define CMD_SETMAPTILE              0xA2 // ,D X(2) Y(2) tile(2) attr(2)
-#define CMD_SETWEATHER              0xA4 // ,D weather(1)
+#define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
+#define CMD_SETWEATHER              0xA4 //C,D weather(1)
 #define CMD_DOWEATHER               0xA5 //C,D
-#define CMD_BATTLE                  0xB6 // ,D poke(2) lvl(1)
+#define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1)
 #define CMD_C3                      0xC3 //?,? ??????(1)
-#define CMD_D3                      0xD3 // ,? Braille(4)
-#define CMD_FB                      0xFB // ,? ADDR4?
+#define CMD_D3                      0xD3 //?,? Braille(4)
+#define CMD_FB                      0xFB //?,? ADDR4?
 
 /*
 storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument 1.

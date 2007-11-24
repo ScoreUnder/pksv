@@ -762,6 +762,24 @@ void RecodeProc(char*script,char*rom)
             rom(arg1,4);
             ec();
           }
+          aa("cmd_d3")
+          {
+            vlog("CMD_D3\r\n",8);
+            arg1=GetNum("CMD_D3");
+            if(!gffs){return;}
+            BASIC(CMD_D3);
+            rom(arg1,4);
+            ec();
+          }
+          aa("cmd_fb")
+          {
+            vlog("CMD_FB\r\n",8);
+            arg1=GetNum("CMD_FB");
+            if(!gffs){return;}
+            BASIC(CMD_FB);
+            rom(arg1,4);
+            ec();
+          }
           aa("addpokemon")
           {
             vlog("ADDPOKEMON\r\n",12);
@@ -785,6 +803,78 @@ void RecodeProc(char*script,char*rom)
             arg2=GetNum("HASHPOKE");
             if(!gffs){return;}
             BASIC(CMD_HASHPOKE);
+            rom(arg1,2);
+            rom(arg2,1);
+            ec();
+          }
+          aa("storevar")
+          {
+            vlog("STOREVAR\r\n",10);
+            arg1=GetNum("STOREVAR");
+            if(!gffs){return;}
+            arg2=GetNum("STOREVAR");
+            if(!gffs){return;}
+            BASIC(CMD_STOREVAR);
+            rom(arg1,1);
+            rom(arg2,2);
+            ec();
+          }
+          aa("storetext")
+          {
+            vlog("STORETEXT\r\n",11);
+            arg1=GetNum("STORETEXT");
+            if(!gffs){return;}
+            arg2=GetNum("STORETEXT");
+            if(!gffs){return;}
+            BASIC(CMD_STOREVAR);
+            rom(arg1,1);
+            rom(arg2,4);
+            ec();
+          }
+          aa("pokemart")
+          {
+            vlog("POKEMART\r\n",10);
+            arg1=GetNum("POKEMART");
+            if(!gffs){return;}
+            BASIC(CMD_POKEMART);
+            rom(arg1,4);
+            ec();
+          }
+          aa("setmaptile")
+          {
+            vlog("SETMAPTILE\r\n",12);
+            arg1=GetNum("SETMAPTILE");
+            if(!gffs){return;}
+            arg2=GetNum("SETMAPTILE");
+            if(!gffs){return;}
+            arg3=GetNum("SETMAPTILE");
+            if(!gffs){return;}
+            arg4=GetNum("SETMAPTILE");
+            if(!gffs){return;}
+            BASIC(CMD_SETMAPTILE);
+            rom(arg1,2);
+            rom(arg2,2);
+            rom(arg3,2);
+            rom(arg4,2);
+            ec();
+          }
+          aa("setweather")
+          {
+            vlog("SETWEATHER\r\n",12);
+            arg1=GetNum("SETWEATHER");
+            if(!gffs){return;}
+            BASIC(CMD_SETWEATHER);
+            rom(arg1,1);
+            ec();
+          }
+          aa("battle")
+          {
+            vlog("BATTLE\r\n",8);
+            arg1=GetNum("BATTLE");
+            if(!gffs){return;}
+            arg2=GetNum("BATTLE");
+            if(!gffs){return;}
+            BASIC(CMD_BATTLE);
             rom(arg1,2);
             rom(arg2,1);
             ec();
