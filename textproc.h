@@ -269,3 +269,61 @@ char*transmove(int howfar,HANDLE file)
   }
   return trans;
 }
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+void transbackstr(HANDLE romfile,char*str)
+{
+  char*NewSpace;
+  unsigned int i=0,j=0,k;
+  char lb[5]; //Little Buffer
+  
+  NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
+  while(i<strlen(str))
+  {
+    if(str[i]>='A'&&str[i]<='Z'){NewSpace[j]=str[i]+0x7a;}
+    else if(str[i]>='a'&&str[i]<='z'){NewSpace[j]=str[i]+0x74;}
+    else if(str[i]==' '){NewSpace[j]=0;}
+    else if(str[i]=='é'){NewSpace[j]=0x1B;}
+    else if(str[i]=='?'){NewSpace[j]=0xAC;}
+    else if(str[i]=='.'){NewSpace[j]=0xAD;}
+    else if(str[i]==','){NewSpace[j]=0xB8;}
+    else if(str[i]=='\''){NewSpace[j]=0xB4;}
+    else if(str[i]=='\\')
+    {
+      i++;
+      if(str[i]=='n'){NewSpace[j]=0xFE;}
+      else if (str[i]=='l'){NewSpace[j]=0xFA;}
+      else if (str[i]=='p'){NewSpace[j]=0xFB;}
+      else if (str[i]=='v'){NewSpace[j]=0xFD;}
+      else if (str[i]=='h'){
+        i++;lb[0]=str[i];i++;lb[1]==str[i];lb[2]=0;
+        sscanf(lb,"%x",k);
+        k=k&0xff;
+        NewSpace[j]=k;
+      }
+      else
+      {
+        i--;
+        j--;
+      }
+    }
+    else if(str[i]==':'){NewSpace[j]=0xF0;}
+    else if(str[i]=='!'){NewSpace[j]=0xAB;}
+    else if(str[i]=='[')
+    {
+      i++;
+      if(str[i]=='.')
+      {
+        i++;
+        if(str[i]==']')
+        {
+          NewSpace[j]=0xB0;
+        }else{i--;i--;}
+      }else{i--;}
+    }
+    i++;
+    j++;
+  }
+  NewSpace[j]=0xFF;
+  return;
+}

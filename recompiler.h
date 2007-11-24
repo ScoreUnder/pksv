@@ -33,7 +33,7 @@ void RecodeProc(char*script,char*rom)
   char*Script;             //Whoops, used the same name for the filename.
                            //Use caps-lock carefully.
   char buf[1024],buf2[1024],buf3[1024];
-  unsigned int fs,la,fst,i,line,j,k,l,organised=0,arg1,arg2,arg3,arg4,arg5;
+  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5;
   DWORD read;
   SetLastError(0);
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -153,7 +153,6 @@ void RecodeProc(char*script,char*rom)
             k=GetNum("#ORG");
             if(!gffs){return;}
             SetFilePointer(RomFile,k&0x00ffffff,NULL,FILE_BEGIN);
-            organised=1;
             ec();
           }
           aa("#raw")
@@ -871,6 +870,23 @@ void RecodeProc(char*script,char*rom)
             rom(arg1,2);
             rom(arg2,1);
             ec();
+          }
+          aa("=")
+          {
+            vlog("[STRING]\r\n",10);
+            if(chr==' '){i++;}
+            else{log("Should have a space after the =\r\n",33);}
+            j=0;
+            while(chr!='\n'&&chr!=0)
+            {
+              buf[j]=chr;
+              i++;
+              j++;
+            }
+            buf[j]=0;
+            sprintf(buf2,"   -> %s\r\n",buf);
+            vlog(buf2,strlen(buf2));
+            transbackstr(RomFile,buf);
           }
           else
           {
