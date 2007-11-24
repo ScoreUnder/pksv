@@ -143,10 +143,11 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script) //
         return 0;
       }
       k=atoi(buf2);
-#ifdef VERBOSE_RECOMPILE
-      sprintf(buf3,"   -> 0x%X\r\n",k);
-      WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
-#endif
+      if(IsVerbose)
+      {
+        sprintf(buf3,"   -> 0x%X\r\n",k);
+        WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+      }
     }
   }
   else
@@ -162,10 +163,11 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script) //
     if(Defined(buf3)){
       gffs=1;
       *ii=i;
-#ifdef VERBOSE_RECOMPILE
-      sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,WhatIs(buf3));
-      WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
-#endif
+      if(IsVerbose)
+      {
+        sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,WhatIs(buf3));
+        WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
+      }
       return WhatIs(buf3);
     }
     sprintf(buf2,"Unknown value in %s (Value must be integer)\r\n",func);
