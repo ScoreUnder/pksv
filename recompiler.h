@@ -150,7 +150,7 @@ void RecodeProc(char*script,char*rom)
           aa("#org")
           {
             vlog("#ORG\r\n",6);
-            k=GetNum("#org");
+            k=GetNum("#ORG");
             if(!gffs){return;}
             SetFilePointer(RomFile,k&0x00ffffff,NULL,FILE_BEGIN);
             organised=1;
@@ -159,7 +159,7 @@ void RecodeProc(char*script,char*rom)
           aa("#raw")
           {
             vlog("#RAW\r\n",6);
-            k=GetNum("#raw");
+            k=GetNum("#RAW");
             if(!gffs){return;}
             BASIC(k);
             if(k>255)
@@ -200,8 +200,8 @@ void RecodeProc(char*script,char*rom)
           aa("countpokemon")    {BASIC(CMD_COUNTPOKEMON); ec();}
           aa("msgbox")
           {
-            vlog("Msgbox\r\n",8);
-            arg1=GetNum("msgbox");
+            vlog("MSGBOX\r\n",8);
+            arg1=GetNum("MSGBOX");
             if(!gffs){return;}
             if((arg1&0xff000000)==0)
             {
@@ -209,7 +209,6 @@ void RecodeProc(char*script,char*rom)
               sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
               vlog(buf3,strlen(buf3));
             }
-            vlog("Finished msgbox\r\n",17);
             BASIC(CMD_MSGBOX);
             BASIC(0);
             rom(arg1,4);
@@ -217,10 +216,10 @@ void RecodeProc(char*script,char*rom)
           }
           aa("loadpointer")
           {
-            vlog("Loadpointer\r\n",13);
-            arg1=GetNum("loadpointer");
+            vlog("LOADPOINTER\r\n",13);
+            arg1=GetNum("LOADPOINTER");
             if(!gffs){return;}
-            arg2=GetNum("loadpointer");
+            arg2=GetNum("LOADPOINTER");
             if(!gffs){return;}
             if((arg2&0xff000000)==0)
             {
@@ -228,7 +227,6 @@ void RecodeProc(char*script,char*rom)
               sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
               vlog(buf3,strlen(buf3));
             }
-            vlog("Finished Loadpointer\r\n",22);
             BASIC(CMD_MSGBOX);
             BASIC(arg1);
             rom(arg2,4);
@@ -236,8 +234,8 @@ void RecodeProc(char*script,char*rom)
           }
           aa("call")
           {
-            vlog("Call\r\n",6);
-            arg1=GetNum("call");
+            vlog("CALL\r\n",6);
+            arg1=GetNum("CALL");
             if(!gffs){return;}
             if((arg1&0xff000000)==0)
             {
@@ -245,15 +243,14 @@ void RecodeProc(char*script,char*rom)
               sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
               vlog(buf3,strlen(buf3));
             }
-            vlog("Finished Call\r\n",15);
             BASIC(CMD_CALL);
             rom(arg1,4);
             ec();
           }
           aa("jump")
           {
-            vlog("Jump\r\n",6);
-            arg1=GetNum("jump");
+            vlog("JUMP\r\n",6);
+            arg1=GetNum("JUMP");
             if(!gffs){return;}
             if((arg1&0xff000000)==0)
             {
@@ -261,45 +258,41 @@ void RecodeProc(char*script,char*rom)
               sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
               vlog(buf3,strlen(buf3));
             }
-            vlog("Finished Jump\r\n",15);
             BASIC(CMD_JUMP);
             rom(arg1,4);
             ec();
           }
           aa("setbyte")
           {
-            vlog("Setbyte\r\n",9);
-            arg1=GetNum("setbyte");
+            vlog("SETBYTE\r\n",9);
+            arg1=GetNum("SETBYTE");
             if(!gffs){return;}
-            vlog("Finished Setbyte\r\n",18);
             BASIC(CMD_SETBYTE);
             BASIC(arg1);
             ec();
           }
           aa("callstd")
           {
-            vlog("Callstd\r\n",9);
-            arg1=GetNum("callstd");
+            vlog("CALLSTD\r\n",9);
+            arg1=GetNum("CALLSTD");
             if(!gffs){return;}
-            vlog("Finished Callstd\r\n",18);
             BASIC(CMD_CALLSTD);
             BASIC(arg1);
             ec();
           }
           aa("jumpstd")
           {
-            vlog("Jumpstd\r\n",9);
-            arg1=GetNum("jumpstd");
+            vlog("JUMPSTD\r\n",9);
+            arg1=GetNum("JUMPSTD");
             if(!gffs){return;}
-            vlog("Finished Jumpstd\r\n",18);
             BASIC(CMD_JUMPSTD);
             BASIC(arg1);
             ec();
           }
           aa("if")
           {
-            vlog("If\r\n",4);
-            arg1=GetNum("if");
+            vlog("IF\r\n",4);
+            arg1=GetNum("IF");
             if(!gffs){return;}
             while(chr==' '){i++;}
             j=0;
@@ -313,7 +306,7 @@ void RecodeProc(char*script,char*rom)
             if(!strcmp(buf,"jump")||!strcmp(buf,"goto"))
             {
               vlog("   -> JUMP\r\n",12);
-              arg2=GetNum("if (jump)");
+              arg2=GetNum("IF (JUMP)");
               if(!gffs){return;}
               if((arg2&0xff000000)==0)
               {
@@ -326,7 +319,7 @@ void RecodeProc(char*script,char*rom)
             else if(!strcmp(buf,"call"))
             {
               vlog("   -> CALL\r\n",12);
-              arg2=GetNum("if (call)");
+              arg2=GetNum("IF (CALL)");
               if(!gffs){return;}
               if((arg2&0xff000000)==0)
               {
