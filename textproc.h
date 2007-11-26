@@ -271,9 +271,9 @@ char*transmove(int howfar,HANDLE file)
 }
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-void transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
+char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
 {
-  char*NewSpace;
+  char*NewSpace,*ret;
   char cch;
   char str[65536];
   unsigned int i=0,j=0,k;
@@ -296,6 +296,8 @@ void transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
     k++;
   }
   str[k]=0;
+  ret=GlobalAlloc(GPTR,strlen(str)+1);
+  strcpy(ret,str);
   NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
   while(i<strlen(str))
   {
@@ -347,5 +349,5 @@ void transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   WriteFile(romfile,NewSpace,j,&read,NULL);
   GlobalFree(NewSpace);
   CloseHandle(scrfile);
-  return;
+  return ret;
 }

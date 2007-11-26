@@ -33,6 +33,7 @@ void RecodeProc(char*script,char*romfn)
   char*Script;             //Whoops, used the same name for the filename.
                            //Use caps-lock carefully.
   char buf[1024],buf2[1024],buf3[1024];
+  void*temp_ptr;
   unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5;
   DWORD read;
   SetLastError(0);
@@ -876,16 +877,12 @@ void RecodeProc(char*script,char*romfn)
             vlog("[STRING]\r\n",10);
             if(chr==' '){i++;}
             else{log("Should have a space after the =\r\n",33);}
-            transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-1,RomFile);
-            j=0;
-            while(chr!='\n'&&chr!=0)
-            {
-              buf[j]=chr;
-              i++;
-              j++;
-            }
-            buf[j]=0;
-            sprintf(buf2,"   -> %s\r\n",buf);
+            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-1,RomFile);
+            while(chr!='\n'&&chr!=0){i++;}
+            sprintf(buf2,"   -> %s\r\n",temp_ptr);
+            //Spidey sense : Incoming memory leak...
+            GlobalFree(temp_ptr);
+            //Disaster averted.
             vlog(buf2,strlen(buf2));
           }
           else
