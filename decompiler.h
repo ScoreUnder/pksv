@@ -33,6 +33,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) printf("%s\n",x)
       switch(command)
       {
+      case CMD_73:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        printf("CMD_73 0x%X 0x%X\n",arg1,arg2);
+        break;
       case CMD_STORETEXT:
         arg1=0;
         arg2=0;

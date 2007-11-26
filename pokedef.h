@@ -82,6 +82,7 @@
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
+#define CMD_73                      0x73 // ,? ?(2) ?(2)
 #define CMD_PICTURE                 0x77 //C,D num(1)
 #define CMD_BRAILLE                 0x78 //C,D addr(4)
 #define CMD_ADDPOKEMON              0x79 //C,D poke(2) lvl(1) item(2)

@@ -821,6 +821,12 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             BASIC(CMD_STORETEXT);
             rom(arg1,1);
+            if((arg2&0xff000000)==0)
+            {
+              arg2|=0x08000000;
+              sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+              vlog(buf3,strlen(buf3));
+            }
             rom(arg2,4);
             ec();
           }

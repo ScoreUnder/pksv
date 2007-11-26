@@ -1,3 +1,37 @@
 #org 0x6B09F8
-special 0x2E
+lock
+faceplayer
+checkflag 0xE000
+if 0x1 call 0x6b0C50
+if 0x0 call 0x6b0C30
+end
+
+#org 0x6B0B00
+= Dude, where's my \v\h02?\p...
+
+#org 0x6b0C00
+= car
+
+#org 0x6b0C10
+= burrito of doom?!
+
+#org 0x6b0c30
+setflag 0xE000
+storetext 0x0 0x86b0C00 'storetext 0x0 ADDR means store ADDR into \v\h02.
+                        'likewise, storetext 0x1 ADDR means store ADDR into \v\h03.
+                        'storetext 0x50 ADDR means store ADDR into \v\h52.
+                        'Get it?
+jump 0x6b0d00
+
+#org 0x6b0c50
+clearflag 0xE000
+storetext 0x0 0x86b0c10
+jump 0x6b0d00
+
+#org 0x6b0d00
+message 0x6B0B00
+showmsg
+waitbutton
+closemsg
+release
 end
