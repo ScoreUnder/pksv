@@ -17,6 +17,7 @@
 */
 char IsVerbose=1;
 char filearg;
+char asdasd=0;
 char type=0;
 //Sorry for the horrible code.
 #include <stdio.h>
@@ -59,7 +60,7 @@ int main(int ac,char**av)
     if(!strcmp(av[tmp],"-ver")||!strcmp(av[tmp],"--ver")||!strcmp(av[tmp],"--version"))
     {
 printf("Charles Daffern (Score_Under)'s PKSV:\n\tPokemon Script Viewer\n\
-Version 2007/11/26 20:00\n\n\
+Version 2007/11/26 22:16\n\n\
 This program is licensed under the GNU General Public License version 3.\n\
 This is free software, and you are welcome to redistribute it\n\
 under certain conditions; read the license for details.\n\
@@ -69,6 +70,10 @@ The license should be stored in license.txt. If not, go to\n<http://www.gnu.org/
     else if(!strcmp(av[tmp],"-t"))
     {
       type=1;
+    }
+    else if(!strcmp(av[tmp],"-noshowtext"))
+    {
+      asdasd=1;
     }
     else if(!strcmp(av[tmp],"-b"))
     {
@@ -151,7 +156,8 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     }
     if(filearg==ac){printf("Not enough arguments");return 0;}
     RecodeProc(av[filearg],av[filearg+1]);
-    ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
+    if(!asdasd)
+      ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
     return 0;
   }
   else if(cline&2) //if there was a syntax error

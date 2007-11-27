@@ -17,7 +17,7 @@
 */
 //PokeDef.h by Charles Daffern
 //Here come the defs!              Compile,Decompile, Args
-//      Text   (#org xx\n= asdfg)           ,D
+//      Text   (#org xx\n= asdfg)          C,D
 //      Moves  (#org xx\nM x)               ,D
 //      Braille (Used as #raw in compiler) C,D
 #define CMD_NOP0                    0x00 //C,D
@@ -82,7 +82,7 @@
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
-#define CMD_73                      0x73 // ,? ?(2) ?(2)
+#define CMD_73                      0x73 //?,? ?(2) ?(2)
 #define CMD_PICTURE                 0x77 //C,D num(1)
 #define CMD_BRAILLE                 0x78 //C,D addr(4)
 #define CMD_ADDPOKEMON              0x79 //C,D poke(2) lvl(1) item(2)
@@ -92,15 +92,22 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_HASHPOKE                0x7D //C,D (2)(1)
+#define CMD_STOREITEM               0x80 // ,  TXT_VAR(1) ITM(2)
+#define CMD_STOREFURNITURE          0x81 // ,  TXT_VAR(1) ITM(2)
+#define CMD_STOREATK                0x82 // ,  TXT_VAR(1) ATK(2)
 #define CMD_STOREVAR                0x83 //C,D TXT_VAR(1) VAR(2)
+#define CMD_STORECOMP               0x84 // ,  TXT_VAR(1) COMP(2)
 #define CMD_STORETEXT               0x85 //C,D TXT_VAR(1) TXT(4)
 #define CMD_POKEMART                0x86 //C,D mart(4)
+#define CMD_SLOTMACHINE             0x89 // ,  ??(2)
+#define CMD_GETITEM                 0x8A // , 
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
+#define CMD_9D                      0x9D // ,? (2)(1) or (1)(2)??
 #define CMD_CHECKGENDER             0xA0 //C,D
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
 #define CMD_SETWEATHER              0xA4 //C,D weather(1)
 #define CMD_DOWEATHER               0xA5 //C,D
-#define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1)
+#define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1) item(2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?
@@ -108,4 +115,5 @@
 /*
 storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
 storevar  Converts the var (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
+storecomp Stores a competition name (eg.  0x4 == TOUGH)
 */

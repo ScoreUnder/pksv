@@ -1,13 +1,26 @@
 #org 0x6B09F8
 lock
 faceplayer
+copyvarifnotzero 0x8000 0x1
+copyvarifnotzero 0x8001 0x1
+callstd MSG_OBTAIN
+battle 0x195 0x1 0x1
+special 0x143
+waitspecial
+storevar 0x0 2
+storevar 0x1 3
+storevar 0x2 4
+storevar 0x3 5
+storevar 0x4 6
+storevar 0x5 7
+storevar 0x6 8
+storevar 0x7 9
 checkflag 0xE000
-if 0x1 call 0x6b0C50
-if 0x0 call 0x6b0C30
-end
+if 0x1 jump 0x6b0C50
+jump 0x6b0C30
 
 #org 0x6B0B00
-= Dude, where's my \v\h02?\p...
+= Dude, where's my \v\h02?\p\v\h03\p\v\h04\p\v\h05\p\v\h06\p\v\h07\p\v\h08\p\v\h09...
 
 #org 0x6b0C00
 = car
@@ -25,7 +38,13 @@ jump 0x6b0d00
 
 #org 0x6b0c50
 clearflag 0xE000
-storetext 0x0 0x86b0c10
+#raw 0x9D
+nop
+nop
+'cmd_84 0x0 0x1 Dude wheres my beauty
+'0x90 returned 1...... 5 arg
+'storetext 0x0 0x86b0c10
+storevar 0x1 LASTRESULT
 jump 0x6b0d00
 
 #org 0x6b0d00

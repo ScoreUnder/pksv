@@ -873,9 +873,24 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             arg2=GetNum("BATTLE");
             if(!gffs){return;}
+            arg3=GetNum("BATTLE");
+            if(!gffs){return;}
             BASIC(CMD_BATTLE);
             rom(arg1,2);
             rom(arg2,1);
+            rom(arg3,2);
+            ec();
+          }
+          aa("cmd_73")
+          {
+            vlog("CMD_73\r\n",8);
+            arg1=GetNum("CMD_73");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_73");
+            if(!gffs){return;}
+            BASIC(CMD_73);
+            rom(arg1,2);
+            rom(arg2,2);
             ec();
           }
           aa("=")

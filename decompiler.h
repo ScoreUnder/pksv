@@ -33,6 +33,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) printf("%s\n",x)
       switch(command)
       {
+      case CMD_9D:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        printf("CMD_9D 0x%X 0x%X\n",arg1,arg2);
+        break;
       case CMD_73:
         arg1=0;
         arg2=0;
@@ -57,10 +64,8 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case CMD_2F:
         arg1=0;
-        arg2=0;
-        ReadFile(fileM,&arg1,1,&read,NULL);
-        ReadFile(fileM,&arg2,4,&read,NULL);
-        printf("CMD_2F 0x%X 0x%X\n",arg1,arg2);
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        printf("CMD_2F 0x%X\n",arg1);
         break;
       case CMD_STOREVAR:
         arg1=0;
@@ -80,9 +85,11 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_BATTLE:
         arg1=0;
         arg2=0;
+        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
-        printf("battle 0x%X 0x%X\n");
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        printf("battle 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
         break;
       case CMD_SETMAPTILE:
         arg1=0;
