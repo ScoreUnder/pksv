@@ -893,6 +893,75 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,2);
             ec();
           }
+          aa("storeitem")
+          {
+            vlog("STOREITEM\r\n",11);
+            arg1=GetNum("STOREITEM");
+            if(!gffs){return;}
+            arg2=GetNum("STOREITEM");
+            if(!gffs){return;}
+            BASIC(CMD_STOREITEM);
+            rom(arg1,1);
+            rom(arg2,2);
+            ec();
+          }
+          aa("storeatk")
+          {
+            vlog("STOREATK\r\n",10);
+            arg1=GetNum("STOREATK");
+            if(!gffs){return;}
+            arg2=GetNum("STOREATK");
+            if(!gffs){return;}
+            BASIC(CMD_STOREATK);
+            rom(arg1,1);
+            rom(arg2,2);
+            ec();
+          }
+          aa("storefurniture")
+          {
+            vlog("STOREFURNITURE\r\n",16);
+            arg1=GetNum("STOREFURNITURE");
+            if(!gffs){return;}
+            arg2=GetNum("STOREFURNITURE");
+            if(!gffs){return;}
+            BASIC(CMD_STOREFURNITURE);
+            rom(arg1,1);
+            rom(arg2,2);
+            ec();
+          }
+          aa("storecomp")
+          {
+            vlog("STORECOMP\r\n",11);
+            arg1=GetNum("STORECOMP");
+            if(!gffs){return;}
+            arg2=GetNum("STORECOMP");
+            if(!gffs){return;}
+            BASIC(CMD_STORECOMP);
+            rom(arg1,1);
+            rom(arg2,2);
+            ec();
+          }
+          aa("cmd_9d")
+          {
+            vlog("CMD_9D\r\n",8);
+            arg1=GetNum("CMD_9D");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_9D");
+            if(!gffs){return;}
+            BASIC(CMD_9D);
+            rom(arg1,2);
+            rom(arg2,1);
+            ec();
+          }
+          aa("slotmachine")
+          {
+            vlog("SLOTMACHINE\r\n",13);
+            arg1=GetNum("SLOTMACHINE");
+            if(!gffs){return;}
+            BASIC(CMD_SLOTMACHINE);
+            rom(arg1,2);
+            ec();
+          }
           aa("=")
           {
             vlog("[STRING]\r\n",10);

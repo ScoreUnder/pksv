@@ -33,6 +33,39 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) printf("%s\n",x)
       switch(command)
       {
+      case CMD_STOREFURNITURE:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        printf("storefurniture 0x%X 0x%X\n",arg1,arg2);
+        break;
+      case CMD_STOREATK:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        printf("storeatk 0x%X 0x%X\n",arg1,arg2);
+        break;
+      case CMD_STORECOMP:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        printf("storecomp 0x%X 0x%X\n",arg1,arg2);
+        break;
+      case CMD_SLOTMACHINE:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        printf("slotmachine 0x%X\n",arg1);
+        break;
+      case CMD_STOREITEM:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        printf("storeitem 0x%X 0x%X\n",arg1,arg2);
+        break;
       case CMD_9D:
         arg1=0;
         arg2=0;

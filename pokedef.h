@@ -92,17 +92,16 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_HASHPOKE                0x7D //C,D (2)(1)
-#define CMD_STOREITEM               0x80 // ,  TXT_VAR(1) ITM(2)
-#define CMD_STOREFURNITURE          0x81 // ,  TXT_VAR(1) ITM(2)
-#define CMD_STOREATK                0x82 // ,  TXT_VAR(1) ATK(2)
+#define CMD_STOREITEM               0x80 //C,D TXT_VAR(1) ITM(2)
+#define CMD_STOREFURNITURE          0x81 //C,D TXT_VAR(1) ITM(2)
+#define CMD_STOREATK                0x82 //C,D TXT_VAR(1) ATK(2)
 #define CMD_STOREVAR                0x83 //C,D TXT_VAR(1) VAR(2)
-#define CMD_STORECOMP               0x84 // ,  TXT_VAR(1) COMP(2)
+#define CMD_STORECOMP               0x84 //C,D TXT_VAR(1) COMP(2)
 #define CMD_STORETEXT               0x85 //C,D TXT_VAR(1) TXT(4)
 #define CMD_POKEMART                0x86 //C,D mart(4)
-#define CMD_SLOTMACHINE             0x89 // ,  ??(2)
-#define CMD_GETITEM                 0x8A // , 
+#define CMD_SLOTMACHINE             0x89 //C,D ??(2)
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
-#define CMD_9D                      0x9D // ,? (2)(1) or (1)(2)??
+#define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??
 #define CMD_CHECKGENDER             0xA0 //C,D
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
 #define CMD_SETWEATHER              0xA4 //C,D weather(1)
