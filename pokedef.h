@@ -52,6 +52,8 @@
 #define CMD_SPECIAL2                0x26 //C,D var(2) type(2)
 #define CMD_WAITSPECIAL             0x27 //C,D
 // NamePokemon fadescreen 1 special 0x9E waitspecial
+// Don't decompile this. Put it in code    C,X
+//   cleaner program. 0x8004 is number in party. (eg. 0 is the 1st poke, 1 is 2nd etc)
 #define CMD_PAUSE                   0x28 //C,D time(2)
 #define CMD_SETFLAG                 0x29 //C,D flag(2)
 #define CMD_CLEARFLAG               0x2A //C,D flag(2)
@@ -71,6 +73,7 @@
 #define CMD_CHECKITEM               0x47 //C,D item(2)
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
 #define CMD_PAUSEEVENT              0x51 //C,D event(2)
+#define CMD_DISAPPEAR               0x53 //C,D sprite(2)
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_SHOWMSG                 0x66 //C,D
@@ -91,6 +94,7 @@
 // WildBattle Battle X Y 0x0000 special 0x(143|137|138|139)
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
+#define CMD_GIVEEGG                 0x7A //C,D poke(2)
 #define CMD_HASHPOKE                0x7D //C,D (2)(1)
 #define CMD_STOREITEM               0x80 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D TXT_VAR(1) ITM(2)

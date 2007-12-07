@@ -953,12 +953,39 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,1);
             ec();
           }
+          aa("namepokemon")
+          {
+            BASIC(CMD_FADESCREEN);
+            BASIC(1);
+            BASIC(CMD_SPECIAL);
+            rom(0x9E,2);
+            BASIC(CMD_WAITSPECIAL);
+            ec();
+          }
           aa("slotmachine")
           {
             vlog("SLOTMACHINE\r\n",13);
             arg1=GetNum("SLOTMACHINE");
             if(!gffs){return;}
             BASIC(CMD_SLOTMACHINE);
+            rom(arg1,2);
+            ec();
+          }
+          aa("giveegg")
+          {
+            vlog("GIVEEGG\r\n",9);
+            arg1=GetNum("GIVEEGG");
+            if(!gffs){return;}
+            BASIC(CMD_GIVEEGG);
+            rom(arg1,2);
+            ec();
+          }
+          aa("disappear")
+          {
+            vlog("DISAPPEAR\r\n",11);
+            arg1=GetNum("DISAPPEAR");
+            if(!gffs){return;}
+            BASIC(CMD_DISAPPEAR);
             rom(arg1,2);
             ec();
           }
