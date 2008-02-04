@@ -1,4 +1,8 @@
 #org 0x6B09F8
+givetocoincase 0x0100 'Stock up!
+setvar 0x8004 0x33
+special 0xA2
+end
 lock
 faceplayer
 copyvarifnotzero 0x8000 0x1

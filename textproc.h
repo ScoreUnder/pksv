@@ -42,6 +42,7 @@ char*transtxt(int howfar,char*file)
       {
         if(p>=0xbb&&p<=0xd4) {p-=0x7a;} //capital letter
         else if(p>=0xd5&&p<=0xee) {p-=0x74;} //lower letter
+        else if(p>=0xA1&&p<=0xAA) {p-=0x71;}
         else if(p==0) {p=0x20;} //space
         else if(p==0x1b){p='é';}
         else if(p==0xac){p='?';}
@@ -53,6 +54,14 @@ char*transtxt(int howfar,char*file)
           trans[pt]='\\';
           pt++;
           p='n';
+        }
+        else if(p==0xb7) // [p]
+        {
+          trans[pt]='[';
+          pt++;
+          trans[pt]='p';
+          pt++;
+          p=']';
         }
         else if(p==0xfa) // \l
         {
@@ -303,6 +312,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   {
     if(str[i]>='A'&&str[i]<='Z'){NewSpace[j]=str[i]+0x7a;}
     else if(str[i]>='a'&&str[i]<='z'){NewSpace[j]=str[i]+0x74;}
+    else if(str[i]>='0'&&str[i]<='9'){NewSpace[j]=str[i]+0x71;}
     else if(str[i]==' '){NewSpace[j]=0;}
     else if(str[i]=='é'){NewSpace[j]=0x1B;}
     else if(str[i]=='?'){NewSpace[j]=0xAC;}
@@ -338,6 +348,14 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
         if(str[i]==']')
         {
           NewSpace[j]=0xB0;
+        }else{i--;i--;}
+      }
+      else if(str[i]=='p')
+      {
+        i++;
+        if(str[i]==']')
+        {
+          NewSpace[j]=0xB7;
         }else{i--;i--;}
       }else{i--;}
     }

@@ -39,6 +39,7 @@
 #define CMD_COPYSCRIPTBANKS         0x14 //C,D bank(1) bank(1)
 #define CMD_COPYBYTE                0x15 //C,D addr(4) addr(4)
 #define CMD_SETVAR                  0x16 //C,D var(2) val(2)
+#define CMD_17                      0x17 //?,? var(2) val(2)
 #define CMD_COPYVAR                 0x19 //C,D var(2) val(2)
 #define CMD_COPYVARIFNOTZERO        0x1A //C,D var(2) val(2)
 #define CMD_COMPAREVARTOBYTE        0x1C //C,D var(2) byte(1)
@@ -70,7 +71,7 @@
 #define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE
 #define CMD_COUNTPOKEMON            0x43 //C,D
 #define CMD_REMOVEITEM              0x45 //C,D item(2) num(2)
-#define CMD_CHECKITEM               0x47 //C,D item(2)
+#define CMD_CHECKITEM               0x47 //C,D item(2) num(2)
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
 #define CMD_PAUSEEVENT              0x51 //C,D event(2)
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
@@ -85,6 +86,7 @@
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
+#define CMD_MULTICHOICE2            0x70 //C,D x(1) y(1) list(1) ??(2)
 #define CMD_73                      0x73 //?,? ?(2) ?(2)
 #define CMD_PICTURE                 0x77 //C,D num(1)
 #define CMD_BRAILLE                 0x78 //C,D addr(4)
@@ -105,12 +107,21 @@
 #define CMD_POKEMART                0x86 //C,D mart(4)
 #define CMD_SLOTMACHINE             0x89 //C,D ??(2)
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
+#define CMD_91                      0x91 //?,? (1)(2)(2)
+#define CMD_92                      0x92 //?,? (1)(2)(2)
+#define CMD_93                      0x93 //?,? (2)x3
+#define CMD_94                      0x94 //?,? (2)
+#define CMD_95                      0x95 //?,? (2)x3
+#define CMD_96                      0x96 //?,? (2)
 #define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??
 #define CMD_CHECKGENDER             0xA0 //C,D
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
 #define CMD_SETWEATHER              0xA4 //C,D weather(1)
 #define CMD_DOWEATHER               0xA5 //C,D
+#define CMD_COINCASETOVAR           0xB3 //C,D var(2)
+#define CMD_GIVETOCOINCASE          0xB4 //C,D coins(2)
 #define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1) item(2)
+#define CMD_C1                      0xC1 //?,? (2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?

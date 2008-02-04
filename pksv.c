@@ -24,6 +24,7 @@ char type=0;
 #include <windows.h>
 #include "pokedef.h"
 #include "textproc.h" //ORDER IS IMPORTANT
+char fsend[65536];
 #include "codeproc.h"
 
 //If you don't like this, just
@@ -60,7 +61,7 @@ int main(int ac,char**av)
     if(!strcmp(av[tmp],"-ver")||!strcmp(av[tmp],"--ver")||!strcmp(av[tmp],"--version"))
     {
 printf("Charles Daffern (Score_Under)'s PKSV:\n\tPokemon Script Viewer\n\
-Version 2007/11/26 22:16\n\n\
+Version 2008/02/04 22:08\n\n\
 This program is licensed under the GNU General Public License version 3.\n\
 This is free software, and you are welcome to redistribute it\n\
 under certain conditions; read the license for details.\n\
@@ -143,6 +144,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
   strcpy(fileName,av[1]);
   if(pspec)
   sscanf(av[2],"%x",&FileZoomPos);
+  
   if((cline&2)&&ac>3) //If bit 2 of cline is set and arg count is larger than 3
   {
     filearg=1;
@@ -154,7 +156,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
       }
       filearg++;
     }
-    if(filearg==ac){printf("Not enough arguments");return 0;}
+    if(filearg==ac){printf("Not enough arguments\n");return 0;}
     RecodeProc(av[filearg],av[filearg+1]);
     if(!asdasd)
       ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
@@ -162,13 +164,20 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
   }
   else if(cline&2) //if there was a syntax error
   {
-    printf("Syntax error: use syntax pokescriptview -r SCRIPT FILE");
+    printf("Syntax error: use syntax pokescriptview -r SCRIPT FILE\n");
     return 0;
   }
   if(!fspec)puts("Pokemon Script Viewer - Designed for Pokemon Fire Red\nBy Charles Daffern.\n\n\
 This program comes with ABSOLUTELY NO WARRANTY; for details pass argument `--ver'.\n\
 This is free software, and you are welcome to redistribute it\n\
-under certain conditions; pass argument `--ver' for details.\n\nPass argument --help for help.\n\nPlease choose a file to open.\n");
+under certain conditions; pass argument `--ver' for details.\n\nPass argument --help for help.\n\n");
+  if(!fspec)
+  { //Not likely to be using cmd line.
+    printf("Enter a file to send the script to, (relative to PKSV folder)\nor leave blank to see on-screen: ");
+    gets(fsend); //waah not the gets! NOT THE GETS!!!!!!!!oneone
+    if(strcmp(fsend,""))scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+  }
+  printf("Please choose a file to open.\n");
   if(fspec!=0||GetOpenFileName(&ofn))
   {
     if(!fspec)puts("Ok...");
@@ -178,7 +187,7 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
     {
       if(!pspec)
       {
-        printf("File opened, preparing for scan.\nPlease enter the address to scan: ");
+        printf("File opened, preparing for scan.\nWithout typing the $ before the number,\nPlease enter the address to scan: ");
         FileZoomPos=0xffffffff;
         scanf("%x",&FileZoomPos);
       }
@@ -219,6 +228,11 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   else
   {
     puts("Ok, DON'T choose a file, then. See if I care.");
+  }
+  if(strcmp(fsend,""))
+  {
+    CloseHandle(scrf);
+    printf("Press any key to exit.\n");
   }
   if(!pspec)
   getch();

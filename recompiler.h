@@ -673,8 +673,11 @@ void RecodeProc(char*script,char*romfn)
             vlog("CHECKITEM\r\n",11);
             arg1=GetNum("CHECKITEM");
             if(!gffs){return;}
+            arg2=GetNum("CHECKITEM");
+            if(!gffs){return;}
             BASIC(CMD_CHECKITEM);
             rom(arg1,2);
+            rom(arg2,2);
             ec();
           }
           aa("applymovement")
@@ -987,6 +990,141 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             BASIC(CMD_DISAPPEAR);
             rom(arg1,2);
+            ec();
+          }
+          aa("cmd_93")
+          {
+            vlog("CMD_93\r\n",8);
+            arg1=GetNum("CMD_93");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_93");
+            if(!gffs){return;}
+            arg3=GetNum("CMD_93");
+            if(!gffs){return;}
+            BASIC(CMD_93);
+            rom(arg1,2);
+            rom(arg2,2);
+            rom(arg3,2);
+            ec();
+          }
+          aa("multichoice2")
+          {
+            vlog("MULTICHOICE2\r\n",8);
+            arg1=GetNum("MULTICHOICE2");
+            if(!gffs){return;}
+            arg2=GetNum("MULTICHOICE2");
+            if(!gffs){return;}
+            arg3=GetNum("MULTICHOICE2");
+            if(!gffs){return;}
+            arg4=GetNum("MULTICHOICE2");
+            if(!gffs){return;}
+            BASIC(CMD_MULTICHOICE2);
+            rom(arg1,1);
+            rom(arg2,1);
+            rom(arg3,1);
+            rom(arg4,2);
+            ec();
+          }
+          aa("cmd_c1")
+          {
+            vlog("CMD_C1\r\n",8);
+            arg1=GetNum("CMD_C1");
+            if(!gffs){return;}
+            BASIC(CMD_C1);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_94")
+          {
+            vlog("CMD_94\r\n",8);
+            arg1=GetNum("CMD_94");
+            if(!gffs){return;}
+            BASIC(CMD_94);
+            rom(arg1,2);
+            ec();
+          }
+          aa("coincasetovar")
+          {
+            vlog("CoinCaseToVar\r\n",15);
+            arg1=GetNum("COINCASETOVAR");
+            if(!gffs){return;}
+            BASIC(CMD_COINCASETOVAR);
+            rom(arg1,2);
+            ec();
+          }
+          aa("givetocoincase")
+          {
+            vlog("GIVETOCOINCASE\r\n",16);
+            arg1=GetNum("GIVETOCOINCASE");
+            if(!gffs){return;}
+            BASIC(CMD_GIVETOCOINCASE);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_95")
+          {
+            vlog("CMD_95\r\n",8);
+            arg1=GetNum("CMD_95");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_95");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_95");
+            if(!gffs){return;}
+            BASIC(CMD_95);
+            rom(arg1,2);
+            rom(arg2,2);
+            rom(arg3,2);
+            ec();
+          }
+          aa("cmd_92")
+          {
+            vlog("CMD_92\r\n",8);
+            arg1=GetNum("CMD_92");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_92");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_92");
+            if(!gffs){return;}
+            BASIC(CMD_95);
+            rom(arg1,1);
+            rom(arg2,2);
+            rom(arg3,2);
+            ec();
+          }
+          aa("cmd_91")
+          {
+            vlog("CMD_91\r\n",8);
+            arg1=GetNum("CMD_91");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_91");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_91");
+            if(!gffs){return;}
+            BASIC(CMD_95);
+            rom(arg1,1);
+            rom(arg2,2);
+            rom(arg3,2);
+            ec();
+          }
+          aa("cmd_96")
+          {
+            vlog("CMD_96\r\n",8);
+            arg1=GetNum("CMD_96");
+            if(!gffs){return;}
+            BASIC(CMD_96);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_17")
+          {
+            vlog("CMD_17\r\n",8);
+            arg1=GetNum("CMD_17");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_17");
+            if(!gffs){return;}
+            BASIC(CMD_17);
+            rom(arg1,2);
+            rom(arg2,2);
             ec();
           }
           aa("=")
