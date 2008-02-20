@@ -34,11 +34,11 @@ void RecodeProc(char*script,char*romfn)
                            //Use caps-lock carefully.
   char buf[1024],buf2[1024],buf3[1024];
   void*temp_ptr;
-  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5;
+  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6;
   DWORD read;
   SetLastError(0);
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  RomFile=CreateFile(romfn,GENERIC_WRITE,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   la=GetLastError();
   IncFile=CreateFile("pokeinc.txt",GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(IncFile==INVALID_HANDLE_VALUE)
@@ -545,6 +545,12 @@ void RecodeProc(char*script,char*romfn)
             arg1=GetNum("CALLASM");
             if(!gffs){return;}
             BASIC(CMD_CALLASM);
+            if((arg1&0xff000000)==0)
+            {
+              arg1|=0x08000000;
+              sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+              vlog(buf3,strlen(buf3));
+            }
             rom(arg1,4);
             ec();
           }
@@ -720,6 +726,12 @@ void RecodeProc(char*script,char*romfn)
             rom(arg3,2);
             rom(arg4,4);
             rom(arg5,4);
+            if(arg1==1)
+            {
+              arg6=GetNum("TRAINERBATTLE");
+              if(!gffs){return;}
+              rom(arg6,4);
+            }
             ec();
           }
           aa("multichoice")
@@ -755,6 +767,12 @@ void RecodeProc(char*script,char*romfn)
             arg1=GetNum("BRAILLE");
             if(!gffs){return;}
             BASIC(CMD_BRAILLE);
+            if((arg1&0xff000000)==0)
+            {
+              arg1|=0x08000000;
+              sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+              vlog(buf3,strlen(buf3));
+            }
             rom(arg1,4);
             ec();
           }
@@ -791,16 +809,16 @@ void RecodeProc(char*script,char*romfn)
             rom(arg3,2);
             ec();
           }
-          aa("hashpoke")
+          aa("storepokemon")
           {
-            vlog("HASHPOKE\r\n",10);
-            arg1=GetNum("HASHPOKE");
+            vlog("STOREPOKEMON\r\n",14);
+            arg1=GetNum("STOREPOKEMON");
             if(!gffs){return;}
-            arg2=GetNum("HASHPOKE");
+            arg2=GetNum("STOREPOKEMON");
             if(!gffs){return;}
-            BASIC(CMD_HASHPOKE);
-            rom(arg1,2);
-            rom(arg2,1);
+            BASIC(CMD_STOREPOKEMON);
+            rom(arg1,1);
+            rom(arg2,2);
             ec();
           }
           aa("storevar")
@@ -999,12 +1017,9 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             arg2=GetNum("CMD_93");
             if(!gffs){return;}
-            arg3=GetNum("CMD_93");
-            if(!gffs){return;}
             BASIC(CMD_93);
             rom(arg1,2);
-            rom(arg2,2);
-            rom(arg3,2);
+            rom(arg2,1);
             ec();
           }
           aa("multichoice2")
@@ -1031,6 +1046,15 @@ void RecodeProc(char*script,char*romfn)
             arg1=GetNum("CMD_C1");
             if(!gffs){return;}
             BASIC(CMD_C1);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_c0")
+          {
+            vlog("CMD_C0\r\n",8);
+            arg1=GetNum("CMD_C0");
+            if(!gffs){return;}
+            BASIC(CMD_C0);
             rom(arg1,2);
             ec();
           }
@@ -1068,12 +1092,9 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             arg2=GetNum("CMD_95");
             if(!gffs){return;}
-            arg2=GetNum("CMD_95");
-            if(!gffs){return;}
             BASIC(CMD_95);
-            rom(arg1,2);
+            rom(arg1,1);
             rom(arg2,2);
-            rom(arg3,2);
             ec();
           }
           aa("cmd_92")
@@ -1127,6 +1148,45 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,2);
             ec();
           }
+          aa("cmd_fe")
+          {
+            vlog("CMD_FE\r\n",8);
+            arg1=GetNum("CMD_FE");
+            if(!gffs){return;}
+            BASIC(CMD_FE);
+            rom(arg1,1);
+            ec();
+          }
+          aa("cmd_61")
+          {
+            vlog("CMD_61\r\n",8);
+            arg1=GetNum("CMD_61");
+            if(!gffs){return;}
+            BASIC(CMD_61);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_22")
+          {
+            vlog("CMD_22\r\n",8);
+            arg1=GetNum("CMD_22");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_22");
+            if(!gffs){return;}
+            BASIC(CMD_22);
+            rom(arg1,2);
+            rom(arg2,2);
+            ec();
+          }
+          aa("cmd_c7")
+          {
+            vlog("CMD_C7\r\n",8);
+            arg1=GetNum("CMD_C7");
+            if(!gffs){return;}
+            BASIC(CMD_C7);
+            rom(arg1,1);
+            ec();
+          }
           aa("=")
           {
             vlog("[STRING]\r\n",10);
@@ -1139,6 +1199,49 @@ void RecodeProc(char*script,char*romfn)
             GlobalFree(temp_ptr);
             //Disaster averted.
             vlog(buf2,strlen(buf2));
+          }
+          aa(".")
+          {
+            vlog("[BINARY]\r\n   ->",15);
+            while(chr==' '){i++;}
+            k=0;
+            while(chr!='\n'&&chr!=0)
+            {
+              k=1-k;
+              while(chr==' ')
+              {i++;}
+              j=0;
+              while(((char*)("0123456789abcdef"))[j]!=0)
+              {
+                if(((char*)("0123456789abcdef"))[j]==chr)
+                {
+                  break;
+                }
+                j+=1;
+              }
+              if(((char*)("0123456789abcdef"))[j]==0)
+              {
+                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                log(buf2,strlen(buf2));
+                return;
+              }
+              if(k==0)
+              {
+                l|=j;
+                rom(j,1);
+                if(IsVerbose)
+                {
+                  sprintf(buf2," %02X",l);
+                  log(buf2,strlen(buf2));
+                }
+              }
+              else
+              {
+                l=j<<4;
+              }
+              i++;
+            }
+            vlog("\r\n",2);
           }
           else
           {

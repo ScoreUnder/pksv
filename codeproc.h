@@ -73,12 +73,34 @@ char* RemAll0D(char*scr)
   }
   return scr;
 }
+unsigned int ffoff=0;
+unsigned int FindFreeSpace(char*romname,unsigned int len)
+{
+  HANDLE RomFile;
+  unsigned int i,j=0;
+  unsigned char cr;
+  DWORD read;
+  RomFile=CreateFile(romname,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  i=WhatIs("findfrom")+ffoff;
+  SetFilePointer(RomFile,i,NULL,FILE_BEGIN);
+  ffoff+=len;
+  while(i<0x1000000)
+  {
+    ReadFile(RomFile,&cr,1,&read,NULL);
+    if(cr==0xff)
+    {j++;}else{j=0;}
+    i++;
+    if(j>=len){break;}
+  }
+  i-=j;
+  return (0x08000000|i);
+}
 
 #define Defined(thing) ((WhatIs(thing)&&0)||!fail)
 #define chr Script[i]
-#define GetNum(x) GenForFunc(x,&i,LogFile,Script)
+#define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn)
 unsigned char gffs;
-unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script) //Generates number for function
+unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,char*romfn) //Generates number for function
 {
   unsigned int j=0,k=0,l=0,i;
   DWORD read;
@@ -89,13 +111,14 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script) //
   {
     i++;
   }
-  if((chr>0x2F&&chr<0x3A)||chr=='$')
+  if((chr>0x2F&&chr<0x3A)||chr=='$'||chr=='f')
   {
     i++;
-    if((chr=='x'&&Script[i-1]=='0')||Script[i-1]=='$')
+    if((chr=='x'&&Script[i-1]=='0')||Script[i-1]=='$'||(chr=='r'&&Script[i-1]=='f'&&Script[i+1]=='e'&&Script[i+2]=='e'&&Script[i+3]=='s'&&Script[i+4]=='p'&&Script[i+5]=='a'&&Script[i+6]=='c'&&Script[i+7]=='e'))
     {
-      if(chr=='x'){i++;}
       j=0;
+      if(chr=='r'){i--;}
+      if(chr=='x'){i++;}
       while(chr!=' '&&chr!='\n'&&chr!=0)
       {
         buf[j]=chr;
@@ -105,8 +128,47 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script) //
       buf[j]=0;
       j=0;
       k=0;
-      l=0;
+      l=buf[9];
+      buf[9]=0;
       strcpy(buf2,"0123456789abcdef");
+      if(!strcmp(buf,"freespace")) // freespace(.*)?
+      {
+        buf[9]=l;
+        if(l==0)
+        {
+          strcpy(buf3,"You did not specify the free space length - defaulting to 0x100");
+          WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+          k=0x100;
+        }
+        else
+        {
+          l=9;
+          while(buf[l]!=0)
+          {
+            k=k<<4;
+            j=0;
+            while(buf2[j]!=0&&buf2[j]!=buf[l])
+            {
+              j++;
+            }
+            if(buf2[j]==0||j>15){break;}
+            k|=j;
+            l++;
+          }
+        }
+        k=FindFreeSpace(romfn,k);
+        gffs=1;
+        *ii=i;
+        if(!Defined("findfrom"))
+        {gffs=0;}
+        if (IsVerbose)
+        {
+          sprintf(buf3,"FS -> 0x%X\r\n",k);
+          WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+        }
+        return k;
+      }
+      l=0;
       while(buf[l]!=0)
       {
         k=k<<4;

@@ -18,6 +18,7 @@
 char IsVerbose=1;
 char filearg;
 char asdasd=0;
+char error=0;
 char type=0;
 //Sorry for the horrible code.
 #include <stdio.h>
@@ -165,7 +166,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
   else if(cline&2) //if there was a syntax error
   {
     printf("Syntax error: use syntax pokescriptview -r SCRIPT FILE\n");
-    return 0;
+    return 1;
   }
   if(!fspec)puts("Pokemon Script Viewer - Designed for Pokemon Fire Red\nBy Charles Daffern.\n\n\
 This program comes with ABSOLUTELY NO WARRANTY; for details pass argument `--ver'.\n\
@@ -173,13 +174,15 @@ This is free software, and you are welcome to redistribute it\n\
 under certain conditions; pass argument `--ver' for details.\n\nPass argument --help for help.\n\n");
   if(!fspec)
   { //Not likely to be using cmd line.
+  
     printf("Enter a file to send the script to, (relative to PKSV folder)\nor leave blank to see on-screen: ");
     gets(fsend); //waah not the gets! NOT THE GETS!!!!!!!!oneone
     if(strcmp(fsend,""))scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    printf("Please choose a file to open.\n");
   }
-  printf("Please choose a file to open.\n");
   if(fspec!=0||GetOpenFileName(&ofn))
   {
+    
     if(!fspec)puts("Ok...");
     fileM=CreateFile(ofn.lpstrFile,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     //Wow, opening a file is complicated.
@@ -223,11 +226,13 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
     else
     {
       puts("o.O! Could not open file.");
+      error=1;
     }
   }
   else
   {
     puts("Ok, DON'T choose a file, then. See if I care.");
+    error=1;
   }
   if(strcmp(fsend,""))
   {
@@ -236,6 +241,6 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   }
   if(!pspec)
   getch();
-  return 0;
+  return error;
 }
 

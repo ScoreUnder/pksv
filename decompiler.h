@@ -61,6 +61,17 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
   {
     func=writescr;
   }
+  if((FileZoomPos&0x0000ffff)==0x1337||(FileZoomPos&0x00ffffff)==1337||(FileZoomPos&0x0000ffff)==0x1EE7)
+  {
+    if((FileZoomPos&0x00ffffff)==1337)
+    {
+      func("'Address 1337 is officially L33T!\n");
+    }
+    else
+    {
+      func("'Address 0x%X is officially L33T!\n",(FileZoomPos&0x00ffffff));
+    }
+  }
   func("\n#org 0x%X\n",FileZoomPos);
   func("'-----------------------------------\n");
   while (still_going)
@@ -71,6 +82,33 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) func("%s\n",x)
       switch(command)
       {
+      case CMD_C2:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("CMD_C2 0x%X\n",arg1);
+        break;
+      case CMD_C7:
+        arg1=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("CMD_C7 0x%X\n",arg1);
+        break;
+      case CMD_22:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("CMD_22 0x%X 0x%X\n",arg1,arg2);
+        break;
+      case CMD_61:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("CMD_61 0x%X\n",arg1);
+        break;
+      case CMD_FE:
+        arg1=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("CMD_FE 0x%X\n",arg1);
+        break;
       case CMD_17:
         arg1=0;
         arg2=0;
@@ -114,11 +152,9 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_95:
         arg1=0;
         arg2=0;
-        arg3=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_95 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("CMD_95 0x%X 0x%X\n",arg1,arg2);
         break;
       case CMD_94:
         arg1=0;
@@ -129,6 +165,11 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("CMD_C1 0x%X\n",arg1);
+        break;
+      case CMD_C0:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("CMD_C0 0x%X\n",arg1);
         break;
       case CMD_MULTICHOICE2:
         arg1=0;
@@ -144,11 +185,9 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_93:
         arg1=0;
         arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
-        ReadFile(fileM,&arg2,2,&read,NULL);
-        ReadFile(fileM,&arg3,2,&read,NULL);
-        func("CMD_93 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("CMD_93 0x%X 0x%X\n",arg1,arg2);
         break;
       case CMD_DISAPPEAR:
         arg1=0;
@@ -588,12 +627,12 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
           func("          'Pointer not in ROM area\n");
         }
         break;
-      case CMD_HASHPOKE:
+      case CMD_STOREPOKEMON:
         arg1=0;
         arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
-        func("hashpoke 0x%X 0x%X\n",arg1,arg2);
+        func("storepokemon 0x%X 0x%X\n",arg1,arg2);
         break;
       case CMD_SPECIAL:
         arg1=0;
@@ -765,12 +804,24 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         arg3=0;
         arg4=0;
         arg5=0;
+        arg6=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         ReadFile(fileM,&arg4,4,&read,NULL);
         ReadFile(fileM,&arg5,4,&read,NULL);
-        func("trainerbattle 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
+        if(arg1==1||arg1==2){
+          ReadFile(fileM,&arg6,4,&read,NULL);
+          func("trainerbattle 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5,arg6);
+          if((arg6&0x08000000)!=0)
+          {
+            Do(arg6);
+          }
+        }
+        else
+        {
+          func("trainerbattle 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
+        }
         if((arg4&0x08000000)!=0)
         {
           DoText(arg4);

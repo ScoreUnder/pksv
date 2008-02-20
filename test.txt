@@ -1,4 +1,12 @@
+#define test FREESPACEA0
 #org 0x6B09F8
+msgbox test
+callstd msg_normal
+end
+''''
+setflag 0x807
+setflag 0x808
+'call 0x81a01c0
 givetocoincase 0x0100 'Stock up!
 setvar 0x8004 0x33
 special 0xA2
@@ -58,3 +66,9 @@ waitbutton
 closemsg
 release
 end
+
+#org 0x6b0d50
+= I Score Under.
+
+#org test
+= Testing

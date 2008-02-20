@@ -1,3 +1,4 @@
+#define FINDFROM 0x6B0000 'This is where to start looking for free space
 #define LASTRESULT 0x800D
 #define PLAYER 0xFF
 #define MSG_YESNO 0x5

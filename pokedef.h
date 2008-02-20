@@ -48,6 +48,7 @@
 #define CMD_COMPAREFARBYTETOBYTE    0x1F //C,D addr(4) byte(1)
 #define CMD_COMPAREFARBYTETOFARBYTE 0x20 //C,D fb(4) fb(4)
 #define CMD_COMPARE                 0x21 //C,D var(2) val(2)
+#define CMD_22                      0x22 //?,? var(2) val(2)
 #define CMD_CALLASM                 0x23 //C,D addr(4)
 #define CMD_SPECIAL                 0x25 //C,D type(2)
 #define CMD_SPECIAL2                0x26 //C,D var(2) type(2)
@@ -77,6 +78,7 @@
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
+#define CMD_61                      0x61 //?,? (2)
 #define CMD_SHOWMSG                 0x66 //C,D
 #define CMD_MESSAGE                 0x67 //C,D addr(4)
 #define CMD_CLOSEMSG2               0x68 //C,D
@@ -97,7 +99,7 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_GIVEEGG                 0x7A //C,D poke(2)
-#define CMD_HASHPOKE                0x7D //C,D (2)(1)
+#define CMD_STOREPOKEMON            0x7D //C,D TXT_VAR(1) POKE(2)
 #define CMD_STOREITEM               0x80 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREATK                0x82 //C,D TXT_VAR(1) ATK(2)
@@ -109,9 +111,9 @@
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
 #define CMD_91                      0x91 //?,? (1)(2)(2)
 #define CMD_92                      0x92 //?,? (1)(2)(2)
-#define CMD_93                      0x93 //?,? (2)x3
+#define CMD_93                      0x93 //?,? (2)(1)
 #define CMD_94                      0x94 //?,? (2)
-#define CMD_95                      0x95 //?,? (2)x3
+#define CMD_95                      0x95 //?,? (1)
 #define CMD_96                      0x96 //?,? (2)
 #define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??
 #define CMD_CHECKGENDER             0xA0 //C,D
@@ -121,10 +123,14 @@
 #define CMD_COINCASETOVAR           0xB3 //C,D var(2)
 #define CMD_GIVETOCOINCASE          0xB4 //C,D coins(2)
 #define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1) item(2)
+#define CMD_C0                      0xC0 //?,? (2)
 #define CMD_C1                      0xC1 //?,? (2)
+#define CMD_C2                      0xC2 //?,? (2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
+#define CMD_C7                      0xC7 //?,? (1)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?
+#define CMD_FE                      0xFE //?,? (1)
 
 /*
 storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
