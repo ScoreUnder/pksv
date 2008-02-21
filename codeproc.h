@@ -83,7 +83,6 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
   RomFile=CreateFile(romname,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   i=WhatIs("findfrom")+ffoff;
   SetFilePointer(RomFile,i,NULL,FILE_BEGIN);
-  ffoff+=len;
   while(i<0x1000000)
   {
     ReadFile(RomFile,&cr,1,&read,NULL);
@@ -92,6 +91,7 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
     i++;
     if(j>=len){break;}
   }
+  ffoff=i-WhatIs("findfrom");
   i-=j;
   return (0x08000000|i);
 }

@@ -62,7 +62,7 @@ int main(int ac,char**av)
     if(!strcmp(av[tmp],"-ver")||!strcmp(av[tmp],"--ver")||!strcmp(av[tmp],"--version"))
     {
 printf("Charles Daffern (Score_Under)'s PKSV:\n\tPokemon Script Viewer\n\
-Version 2008/02/04 22:08\n\n\
+Version 2008/02/21 18:25\n\n\
 This program is licensed under the GNU General Public License version 3.\n\
 This is free software, and you are welcome to redistribute it\n\
 under certain conditions; read the license for details.\n\
