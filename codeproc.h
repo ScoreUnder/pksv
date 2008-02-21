@@ -89,10 +89,11 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
     if(cr==0xff)
     {j++;}else{j=0;}
     i++;
-    if(j>=len){break;}
+    if(j>len){break;} //Yes, larger than
   }
   ffoff=i-WhatIs("findfrom");
   i-=j;
+  i++;
   return (0x08000000|i);
 }
 
