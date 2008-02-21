@@ -280,6 +280,15 @@ void RecodeProc(char*script,char*romfn)
             BASIC(arg1);
             ec();
           }
+          aa("boxset")
+          {
+            vlog("BOXSET\r\n",8);
+            arg1=GetNum("BOXSET");
+            if(!gffs){return;}
+            BASIC(CMD_CALLSTD);
+            BASIC(arg1);
+            ec();
+          }
           aa("jumpstd")
           {
             vlog("JUMPSTD\r\n",9);
