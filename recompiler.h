@@ -409,7 +409,7 @@ void RecodeProc(char*script,char*romfn)
           }
           aa("copyvarifnotzero")
           {
-            vlog("COPYVARIFNOTZERO\r\n",9);
+            vlog("COPYVARIFNOTZERO\r\n",18);
             arg1=GetNum("COPYVARIFNOTZERO");
             if(!gffs){return;}
             arg2=GetNum("COPYVARIFNOTZERO");
