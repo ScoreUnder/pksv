@@ -157,7 +157,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
       }
       filearg++;
     }
-    if(filearg==ac)
+    if(filearg+1==ac)
     {
       printf("Please enter the file to compile to: ");
       gets(fileName);
