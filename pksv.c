@@ -71,7 +71,7 @@ int main(int ac,char**av)
     if(!strcmp(av[tmp],"-ver")||!strcmp(av[tmp],"--ver")||!strcmp(av[tmp],"--version"))
     {
 printf("Charles Daffern (Score_Under)'s PKSV:\n\tPokemon Script Viewer\n\
-Version 2008/02/21 19:50\n\n\
+Version 2008/02/22 23:09\n\n\
 This program is licensed under the GNU General Public License version 3.\n\
 This is free software, and you are welcome to redistribute it\n\
 under certain conditions; read the license for details.\n\
@@ -192,7 +192,11 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   
     printf("Enter a file to send the script to, (relative to PKSV folder)\nor leave blank to see on-screen: ");
     gets(fsend); //waah not the gets! NOT THE GETS!!!!!!!!oneone
-    if(strcmp(fsend,""))scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    if(strcmp(fsend,""))
+    {
+      strcat(fsend,".pks");
+      scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    }
     printf("Please choose a file to open.\n");
   }
   if(fspec!=0||GetOpenFileName(&ofn))
