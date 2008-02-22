@@ -79,6 +79,8 @@
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_61                      0x61 //?,? (2)
+#define CMD_63                      0x63 //?,? (2)(2)(2)
+#define CMD_65                      0x65 //?,? (2)(2)
 #define CMD_SHOWMSG                 0x66 //C,D
 #define CMD_MESSAGE                 0x67 //C,D addr(4)
 #define CMD_CLOSEMSG2               0x68 //C,D

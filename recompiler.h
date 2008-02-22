@@ -1175,6 +1175,33 @@ void RecodeProc(char*script,char*romfn)
             rom(arg1,2);
             ec();
           }
+          aa("cmd_63")
+          {
+            vlog("CMD_63\r\n",8);
+            arg1=GetNum("CMD_63");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_63");
+            if(!gffs){return;}
+            arg3=GetNum("CMD_63");
+            if(!gffs){return;}
+            BASIC(CMD_63);
+            rom(arg1,2);
+            rom(arg2,2);
+            rom(arg3,2);
+            ec();
+          }
+          aa("cmd_65")
+          {
+            vlog("CMD_65\r\n",8);
+            arg1=GetNum("CMD_65");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_65");
+            if(!gffs){return;}
+            BASIC(CMD_65);
+            rom(arg1,2);
+            rom(arg2,2);
+            ec();
+          }
           aa("cmd_22")
           {
             vlog("CMD_22\r\n",8);

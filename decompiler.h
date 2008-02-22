@@ -72,7 +72,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       func("'Address 0x%X is officially L33T!\n",(FileZoomPos&0x00ffffff));
     }
   }
-  func("\n#org 0x%X\n",FileZoomPos);
+  func("\n#org 0x%X\n",(FileZoomPos|0x08000000));
   func("'-----------------------------------\n");
   while (still_going)
   {
@@ -82,6 +82,22 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) func("%s\n",x)
       switch(command)
       {
+      case CMD_63:
+        arg1=0;
+        arg2=0;
+        arg3=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        func("CMD_63 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
+        break;
+      case CMD_65:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("CMD_65 0x%X 0x%X\n",arg1,arg2);
+        break;
       case CMD_C2:
         arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
