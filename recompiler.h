@@ -40,9 +40,11 @@ void RecodeProc(char*script,char*romfn)
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   la=GetLastError();
-  IncFile=CreateFile("pokeinc.txt",GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  strcat(GlobBuf,"pokeinc.txt");
+  IncFile=CreateFile(GlobBuf,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(IncFile==INVALID_HANDLE_VALUE)
   {
+    printf(GlobBuf);
     MessageBox(NULL,"The default includes (pokeinc.txt) could not be opened","Error",0x10);
     CloseHandle(CurrFile);
     return;

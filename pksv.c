@@ -20,6 +20,7 @@ char filearg;
 char DontShowLog=0;
 char error=0;
 char type=0;
+char GlobBuf[65536];
 //Sorry for the horrible code.
 #include <stdio.h>
 #include <windows.h>
@@ -38,13 +39,21 @@ int main(int ac,char**av)
   char fileName[65536];
   OPENFILENAME ofn;
   unsigned int FileZoomPos;
-  int read;
+  int read,i;
   unsigned int tmp;
   unsigned char pspec,fspec,cline;
   fileName[0]=(char)0;
   pspec=0;
   fspec=0;
   initDoneProcs();
+  i=strlen(av[0]);
+  while(av[0][i]!='\\'&&av[0][i]!='/'&&i!=0)
+  {
+    i--;
+  }
+  if(i==0){av[0][i]=0;}
+  av[0][i+1]=0;
+  strcpy(GlobBuf,av[0]);
   ZeroMemory(&ofn,sizeof(OPENFILENAME));
   ofn.lStructSize=sizeof(OPENFILENAME);
   ofn.hInstance=GetModuleHandle(NULL);
