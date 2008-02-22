@@ -22,6 +22,7 @@ unsigned int means[512];
 int pos;
 void Define(char*thing,unsigned int otherthing)
 {
+  if(pos>512){MessageBox(NULL,"Overflow of #DEFINEs - ask Score_Under for custom build\nto handle more #defines.","Error",0x10);return;}
   strcpy(defs[pos],thing);
   means[pos]=otherthing;
   pos++;

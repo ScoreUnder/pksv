@@ -17,7 +17,7 @@
 */
 char IsVerbose=1;
 char filearg;
-char asdasd=0;
+char DontShowLog=0;
 char error=0;
 char type=0;
 //Sorry for the horrible code.
@@ -75,7 +75,7 @@ The license should be stored in license.txt. If not, go to\n<http://www.gnu.org/
     }
     else if(!strcmp(av[tmp],"-noshowtext"))
     {
-      asdasd=1;
+      DontShowLog=1;
     }
     else if(!strcmp(av[tmp],"-b"))
     {
@@ -146,7 +146,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
   if(pspec)
   sscanf(av[2],"%x",&FileZoomPos);
   
-  if((cline&2)&&ac>3) //If bit 2 of cline is set and arg count is larger than 3
+  if((cline&2)&&ac>2) //If bit 2 of cline is set and arg count is larger than 2
   {
     filearg=1;
     while(filearg<ac)
@@ -157,9 +157,15 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
       }
       filearg++;
     }
-    if(filearg==ac){printf("Not enough arguments\n");return 0;}
-    RecodeProc(av[filearg],av[filearg+1]);
-    if(!asdasd)
+    if(filearg==ac)
+    {
+      printf("Please enter the file to compile to: ");
+      gets(fileName);
+    }else{
+      strcpy(fileName,av[filearg+1]);
+    }
+    RecodeProc(av[filearg],fileName);
+    if(!DontShowLog)
       ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
     return 0;
   }
