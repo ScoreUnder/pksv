@@ -1,3 +1,4 @@
 1 ICON "main.ico"
 2 ICON "ball.ico"
+3 ICON "script.ico"
 1 RT_MANIFEST "windowsxp.manifest"

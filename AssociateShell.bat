@@ -7,7 +7,7 @@ reg add HKCR\.pks /f
 reg add HKCR\.pks /d PKSVScript /t REG_SZ /ve /f
 reg add HKCR\PKSVScript /f
 reg add HKCR\PKSVScript /ve /d "PKSV Compiler Script" /t REG_SZ /f
-reg add HKCR\PKSVScript\DefaultIcon /ve /d "%0\..\ball.ico,0" /t REG_SZ /f
+reg add HKCR\PKSVScript\DefaultIcon /ve /d "%0\..\pksv.exe,2" /t REG_SZ /f
 
 REM Batch script is so limiting - look at that pathetic
 REM excuse for a path name :(
