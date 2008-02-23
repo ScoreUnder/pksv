@@ -40,6 +40,12 @@ void RecodeProc(char*script,char*romfn)
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   la=GetLastError();
+  if(la)
+  {
+    strcat(romfn,".gba");
+    RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    la=GetLastError();
+  }
   strcat(GlobBuf,"pokeinc.txt");
   IncFile=CreateFile(GlobBuf,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(IncFile==INVALID_HANDLE_VALUE)
