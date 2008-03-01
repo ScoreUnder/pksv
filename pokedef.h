@@ -135,7 +135,106 @@
 #define CMD_FE                      0xFE //?,? (1)
 
 /*
-storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
-storevar  Converts the var (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
+nop0 Does Nothing
+nop1 Does Nothing
+end Stops the script
+return Goes back to last "call" statement
+call Goes to another portion of the script, which can be returned to
+jump Goes to another portion of the script.
+if ?? jump ???????? Checks previously compared values, and might jump, depending on what they are.
+(That was /so/ hard to explain)
+if ?? call ???????? same as the jumping if, except it can be returned to
+jumpstd is like "boxset", except it ends the script too.
+callstd is "boxset", and is returned to when it finishes.
+killscript I'm not sure what this does, but it clears some stuff to do with the script.
+setbyte I'm not sure what this is used for, but it sets a byte [somewhere in RAM-find out] to a value.
+(You could use it for callasm)
+msgbox Loads a message into memory, ready to be displayed by callstd.
+loadpointer Loads anything into memory, for various uses.
+writebytetooffset writes a byte to an address in memory.
+loadbytefrompointer ...er - not sure
+copyscriptbanks Copies a bank of scripts from one bank to another. God knows what you could use this for.
+copybyte copies one place in RAM to another.
+setvar Sets a variable to some value.
+cmd_17 I really have no idea.
+copyvar Copies one variable to another.
+Copyvarifnotzero Copies one variable to another, if the value is not zero, else it does nothing. ( if(b>0)a=b; )
+comparevartobyte Compares a variable to a byte. ( var(a)==b )
+comparevartofarbyte Compares a variable to a byte at a certain offset.( var(a)==*b )
+comparefarbytetovar Exactly the same, the other way round. ( *a==var(b) )
+comparefarbytetobyte Compares a byte at an offset to another byte. ( *a==b )
+comparefarbytetofarbyte Compares the value of 2 offsets ( *a==*b )
+compare Compares a variable to another, or to a number.
+cmd_22 No idea
+callasm Calls a code in ARM or THUMB format for direct access to the game. The most powerful command.
+special Calls a predefined routine
+special2 Calls a predefined routine and stores the result in a variable.
+waitspecial Waits for either of these commands to complete
+(does not decompile correctly in pokescript)
+pause Waits a certain amount of time
+Setflag Sets a flag to 1 (a flag is a variable that can be only 1 or 0)
+clearflag Sets a flag to 0
+checkflag Checks if a flag is 1
+cmd_2f Seriously, why do nintendo make such cryptic commands. WHAT DOES IT MEAN? What's the significance of MR. Bean?
+cry Makes the same sound a pokemon (that you decide) makes when it comes into battle.
+fanfare Plays any pre-defined sound
+waitfanfare Waits for that command to complete
+playsound Plays a pre-defined sound.
+fadedefault Fades into the normal bg music.
+fadesound Fades into a pre-defined sound.
+fadeout Fades out of music
+fadein Fades into music
+warp Teleports the player
+countpokemon Counts the player's party. (0-6) Stored in LASTRESULT
+removeitem Ebil-ly steals an item from the player!
+checkitem Checks if a player has an item
+applymovement Applies movement commands to any sprite.
+pauseevent Pauses and waits for an event (usually the end of applymovement.)
+disappear Causes a sprite to magically disappear.
+faceplayer Causes the sprite that called the script to face the protagonist.
+trainerbattle Initiates a ferocious battle with powerful trainers and their tank-like superpokes!
+cmd_61 \
+cmd_63  |- Don't know
+cmd_65 /
+showmsg Shows a message (usually stored by MESSAGE)
+message Gets ready to show a message
+closemsg2 One of the commands to close a message on-screen
+(don't you hate it when "you obtained ultra ball" stays on-screen?)
+jingle Makes that tinny "clink" sound that happens when you press A while someone is talking.
+lock Stops the calling sprite from wandering off.
+closemsg Another one of those message-closing commands
+release Gives the calling sprite free will again (opposite of lock)
+waitbutton Waits for a button to be pressed before continuing.
+multichoice Brings up a multiple-choice menu.
+multichoice2 The same.
+cmd_73 I still don't know
+picture Shows a picture.
+braille Shows a message in binary-encoded-braille.
+addpokemon Adds a pokemon to the player's party.
+giveegg Exactly the same, but with an egg.
+storepokemon Stores a pokemon's name into a text-var
+storeitem The same, but with an item.
+storefurniture The same, but with furniture (for secret base)
+storeatk The same, but with an attack name (0=="POUND")
+storevar The same, but with the value of a variable (eg. 103 or 59, etc)
 storecomp Stores a competition name (eg.  0x4 == TOUGH)
+storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument 1.
+pokemart Opens up a pokemon-mart screen.
+slotmachine Whee, fun! It's the slots!
+fadescreen Fades in or out.
+cmd_91 ¯\
+cmd_92  |
+cmd_93  |
+cmd_94  >- I have no clue. PS, to do overscore, do ALT+0175. Yes, I remember that off the top of my head
+cmd_95  |
+cmd_96  |
+cmd_9D _/
+checkgender Checks whether you're a lad or a lass.
+setmaptile Sets a tile on the map to something different. May be used for making a tile walkable-across.
+setweather Sets a new weather (snow :oD )
+doweather Applies the weather change
+coincasetovar Copies the amount of coins in the coin case (even if you don't have one) to a variable.
+givetocoincase Gives money to a coin-case, even if you don't have one.
+battle Stores the variables necessary for having a wild pokemon battle.
+cmd_XX Don't know
 */
