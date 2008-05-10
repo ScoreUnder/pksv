@@ -1222,13 +1222,61 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,2);
             ec();
           }
-          aa("cmd_c7")
+          aa("textcolor")
           {
-            vlog("CMD_C7\r\n",8);
-            arg1=GetNum("CMD_C7");
+            vlog("TEXTCOLOR\r\n",11);
+            arg1=GetNum("TEXTCOLOR");
             if(!gffs){return;}
-            BASIC(CMD_C7);
+            BASIC(CMD_TEXTCOLOR);
             rom(arg1,1);
+            ec();
+          }
+          aa("textcolour")
+          {
+            vlog("TEXTCOLOR\r\n",11);
+            arg1=GetNum("TEXTCOLOR");
+            if(!gffs){return;}
+            BASIC(CMD_TEXTCOLOR);
+            rom(arg1,1);
+            ec();
+          }
+          aa("cmd_44")
+          {
+            vlog("CMD_44\r\n",8);
+            arg1=GetNum("CMD_44");
+            if(!gffs){return;}
+            arg2=GetNum("CMD_44");
+            if(!gffs){return;}
+            BASIC(CMD_44);
+            rom(arg1,2);
+            rom(arg2,2);
+            ec();
+          }
+          aa("cmd_99")
+          {
+            vlog("CMD_99\r\n",8);
+            arg1=GetNum("CMD_99");
+            if(!gffs){return;}
+            BASIC(CMD_99);
+            rom(arg1,2);
+            ec();
+          }
+          aa("cmd_9A")
+          {
+            vlog("CMD_9A\r\n",8);
+            arg1=GetNum("CMD_9A");
+            if(!gffs){return;}
+            BASIC(CMD_9A);
+            rom(arg1,1);
+            ec();
+          }
+          aa("cmd_60")
+          {
+            vlog("CMD_60\r\n",8);
+            arg1=GetNum("CMD_60");
+            if(!gffs){return;}
+            BASIC(CMD_60);
+            rom(arg1,2);
             ec();
           }
           aa("=")

@@ -71,6 +71,7 @@
 #define CMD_FADEIN                  0x38 //C,D
 #define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE
 #define CMD_COUNTPOKEMON            0x43 //C,D
+#define CMD_44                      0x44 //?,? (2) (2)
 #define CMD_REMOVEITEM              0x45 //C,D item(2) num(2)
 #define CMD_CHECKITEM               0x47 //C,D item(2) num(2)
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
@@ -78,6 +79,7 @@
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
+#define CMD_60                      0x60 //?,? (2)
 #define CMD_61                      0x61 //?,? (2)
 #define CMD_63                      0x63 //?,? (2)(2)(2)
 #define CMD_65                      0x65 //?,? (2)(2)
@@ -117,6 +119,8 @@
 #define CMD_94                      0x94 //?,? (2)
 #define CMD_95                      0x95 //?,? (1)
 #define CMD_96                      0x96 //?,? (2)
+#define CMD_99                      0x99 //?,? (2)
+#define CMD_9A                      0x9A //?,? (1)
 #define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??
 #define CMD_CHECKGENDER             0xA0 //C,D
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
@@ -129,7 +133,7 @@
 #define CMD_C1                      0xC1 //?,? (2)
 #define CMD_C2                      0xC2 //?,? (2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
-#define CMD_C7                      0xC7 //?,? (1)
+#define CMD_TEXTCOLOR               0xC7 //?,? colour(1)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?
 #define CMD_FE                      0xFE //?,? (1)

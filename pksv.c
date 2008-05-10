@@ -68,6 +68,14 @@ int main(int ac,char**av)
   cline=0;
   while(tmp<ac)
   {
+    if(strcmp(av[tmp],"\"")&&strcmp(av[tmp],""))
+    {
+      if(av[tmp][0]=='"')
+      {
+        av[tmp]++;
+        av[tmp][strlen(av[tmp])-1]=0;
+      }
+    }
     if(!strcmp(av[tmp],"-ver")||!strcmp(av[tmp],"--ver")||!strcmp(av[tmp],"--version"))
     {
 printf("Charles Daffern (Score_Under)'s PKSV:\n\tPokemon Script Viewer\n\
@@ -190,12 +198,18 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   if(!fspec)
   { //Not likely to be using cmd line.
   
-    printf("Enter a file to send the script to, (relative to PKSV folder)\nor leave blank to see on-screen: ");
+    printf("Enter a file to send the script to, (relative to PKSV folder, w/o extension please)\nor leave blank to see on-screen: ");
     gets(fsend); //waah not the gets! NOT THE GETS!!!!!!!!oneone
-    if(strcmp(fsend,""))
+    if(strcmp(fsend,"")&&strcmp(fsend,"\""))
     {
       strcat(fsend,".pks");
-      scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+      if(fsend[0]=='"'&&fsend[strlen(fsend)-1]=='"')
+      {
+        fsend[strlen(fsend)-1]=0;
+        scrf=CreateFile(fsend+1,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+      }
+      else
+        scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
     }
     printf("Please choose a file to open.\n");
   }
@@ -215,6 +229,9 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
       }
       if(FileZoomPos!=0xffffffff)
       {
+        if(ac>3){
+          strcpy(fsend,av[3]);
+          scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);}
         FileZoomPos=FileZoomPos&0x00ffffff;
         if(!pspec)printf("You chose 0x%X\n",FileZoomPos);
         if(type==0)

@@ -72,7 +72,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       func("'Address 0x%X is officially L33T!\r\n",(FileZoomPos&0x00ffffff));
     }
   }
-  func("\r\n#org 0x%X\r\n",(FileZoomPos|0x08000000));
+  func("#org 0x%X\r\n",(FileZoomPos|0x08000000));
   func("'-----------------------------------\r\n");
   while (still_going)
   {
@@ -82,6 +82,21 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 #define GENERIC(x) func("%s\r\n",x)
       switch(command)
       {
+      case CMD_60:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("CMD_60 0x%X\r\n",arg1);
+        break;
+      case CMD_9A:
+        arg1=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("CMD_9A 0x%X\r\n",arg1);
+        break;
+      case CMD_99:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("CMD_99 0x%X\r\n",arg1);
+        break;
       case CMD_63:
         arg1=0;
         arg2=0;
@@ -90,6 +105,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         func("CMD_63 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_44:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("CMD_44 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_65:
         arg1=0;
@@ -103,10 +125,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("CMD_C2 0x%X\r\n",arg1);
         break;
-      case CMD_C7:
+      case CMD_TEXTCOLOR:
         arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
-        func("CMD_C7 0x%X\r\n",arg1);
+        func("TEXTCOLOR 0x%X 'Sets text color (Fire Red).\r\n",arg1);
         break;
       case CMD_22:
         arg1=0;
@@ -901,6 +923,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       still_going=0;
     }
   }
+  func("\r\n");
   while(!AllDone())
   {
     DecodeProc(fileM,Done(FindNotDone()),filename);

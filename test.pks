@@ -1,5 +1,6 @@
-#define test FREESPACEA0
+#define test 0x86B0D88 'FREESPACEA0
 #org 0x6B09F8
+cmd_c7 1
 msgbox test
 callstd msg_normal
 end

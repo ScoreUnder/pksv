@@ -70,6 +70,10 @@ char* RemAll0D(char*scr)
     {
       scr[i]=0x0a;
     }
+    if(scr[i]=='\r')
+    {
+      scr[i]=0x20;
+    }
     i++;
   }
   return scr;
@@ -95,6 +99,7 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
   ffoff=i-WhatIs("findfrom");
   i-=j;
   i++;
+  CloseHandle(RomFile);
   return (0x08000000|i);
 }
 
