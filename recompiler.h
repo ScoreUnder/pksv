@@ -1231,6 +1231,24 @@ void RecodeProc(char*script,char*romfn)
             rom(arg1,1);
             ec();
           }
+          aa("fakejumpstd")
+          {
+            vlog("FAKEJUMPSTD\r\n",13);
+            arg1=GetNum("FAKEJUMPSTD");
+            if(!gffs){return;}
+            BASIC(CMD_FAKEJUMPSTD);
+            rom(arg1,1);
+            ec();
+          }
+          aa("fakecallstd")
+          {
+            vlog("FAKECALLSTD\r\n",13);
+            arg1=GetNum("FAKECALLSTD");
+            if(!gffs){return;}
+            BASIC(CMD_FAKECALLSTD);
+            rom(arg1,1);
+            ec();
+          }
           aa("textcolour")
           {
             vlog("TEXTCOLOR\r\n",11);

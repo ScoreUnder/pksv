@@ -111,14 +111,16 @@
 #define CMD_STORECOMP               0x84 //C,D TXT_VAR(1) COMP(2)
 #define CMD_STORETEXT               0x85 //C,D TXT_VAR(1) TXT(4)
 #define CMD_POKEMART                0x86 //C,D mart(4)
-#define CMD_SLOTMACHINE             0x89 //C,D ??(2)
-#define CMD_FADESCREEN              0x97 //C,D blk(1)
+#define CMD_FAKEJUMPSTD             0x88 //C,D FR type(1)Does not affect actual gameplay
+#define CMD_FAKECALLSTD             0x89 //C,D FR type(1)Ditto
+#define CMD_SLOTMACHINE             0x89 //C,D RS ??(2)
 #define CMD_91                      0x91 //?,? (1)(2)(2)
 #define CMD_92                      0x92 //?,? (1)(2)(2)
 #define CMD_93                      0x93 //?,? (2)(1)
 #define CMD_94                      0x94 //?,? (2)
 #define CMD_95                      0x95 //?,? (1)
 #define CMD_96                      0x96 //?,? (2)
+#define CMD_FADESCREEN              0x97 //C,D blk(1)
 #define CMD_99                      0x99 //?,? (2)
 #define CMD_9A                      0x9A //?,? (1)
 #define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??

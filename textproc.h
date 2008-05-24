@@ -215,58 +215,108 @@ char*transmove(int howfar,HANDLE file)
     while(still_going)
     {
       ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
-      switch(p)
+      if(mode==FIRE_RED)
       {
-        case 254:strcat(trans,"end");still_going=0;break;
-        case 0x1:strcat(trans,"look_up");break;
-        case 0x2:strcat(trans,"look_left");break;
-        case 0x3:strcat(trans,"look_right");break;
-        case 0x4:strcat(trans,"look_down");break;
-        case 0x8:strcat(trans,"walk_down_vslow");break;
-        case 0x9:strcat(trans,"walk_up_vslow");break;
-        case 0xA:strcat(trans,"walk_left_vslow");break;
-        case 0xB:strcat(trans,"walk_right_vslow");break;
-        case 0xC:strcat(trans,"walk_down_slow");break;
-        case 0xD:strcat(trans,"walk_up_slow");break;
-        case 0xE:strcat(trans,"walk_left_slow");break;
-        case 0xF:strcat(trans,"walk_right_slow");break;
-        case 0x10:strcat(trans,"walk_down");break;
-        case 0x11:strcat(trans,"walk_up");break;
-        case 0x12:strcat(trans,"walk_left");break;
-        case 0x13:strcat(trans,"walk_right");break;
-        case 0x14:strcat(trans,"jump_down2");break;
-        case 0x15:strcat(trans,"jump_up2");break;
-        case 0x16:strcat(trans,"jump_left2");break;
-        case 0x17:strcat(trans,"jump_right2");break;
-        case 0x1D:strcat(trans,"run_down");break;
-        case 0x1E:strcat(trans,"run_up");break;
-        case 0x1F:strcat(trans,"run_left");break;
-        case 0x20:strcat(trans,"run_right");break;
-        case 0x46:strcat(trans,"look_left_jump_down");break;
-        case 0x47:strcat(trans,"look_down_jump_up");break;
-        case 0x48:strcat(trans,"look_up_jump_left");break;
-        case 0x49:strcat(trans,"look_left_jump_right");break;
-        case 0x4A:strcat(trans,"faceplayer");break;
-        case 0x4B:strcat(trans,"face_away");break;
-        case 0x4E:strcat(trans,"jump_down1");break;
-        case 0x4F:strcat(trans,"jump_up1");break;
-        case 0x50:strcat(trans,"jump_left1");break;
-        case 0x51:strcat(trans,"jump_right1");break;
-        case 0x52:strcat(trans,"jump_down");break;
-        case 0x53:strcat(trans,"jump_up");break;
-        case 0x54:strcat(trans,"jump_left");break;
-        case 0x55:strcat(trans,"jump_right");break;
-        case 0x56:strcat(trans,"jump_downup");break;
-        case 0x57:strcat(trans,"jump_updown");break;
-        case 0x58:strcat(trans,"jump_leftright");break;
-        case 0x59:strcat(trans,"jump_rightleft");break;
-        case 0x60:strcat(trans,"invisible");break;
-        case 0x62:strcat(trans,"say_!");break;
-        case 0x63:strcat(trans,"say_?");break;
-        case 0x64:strcat(trans,"say_X");break;
-        case 0x65:strcat(trans,"say_!!");break;
-        case 0x66:strcat(trans,"say_:)");break;
-        default:sprintf(buf,"raw_%X",p);strcat(trans,buf);break;
+        switch(p)
+        {
+          case 254:strcat(trans,"end");still_going=0;break;
+          case 0x1:strcat(trans,"look_up");break;
+          case 0x2:strcat(trans,"look_left");break;
+          case 0x3:strcat(trans,"look_right");break;
+          case 0x4:strcat(trans,"look_down");break;
+          case 0x8:strcat(trans,"walk_down_vslow");break;
+          case 0x9:strcat(trans,"walk_up_vslow");break;
+          case 0xA:strcat(trans,"walk_left_vslow");break;
+          case 0xB:strcat(trans,"walk_right_vslow");break;
+          case 0xC:strcat(trans,"walk_down_slow");break;
+          case 0xD:strcat(trans,"walk_up_slow");break;
+          case 0xE:strcat(trans,"walk_left_slow");break;
+          case 0xF:strcat(trans,"walk_right_slow");break;
+          case 0x10:strcat(trans,"walk_down");break;
+          case 0x11:strcat(trans,"walk_up");break;
+          case 0x12:strcat(trans,"walk_left");break;
+          case 0x13:strcat(trans,"walk_right");break;
+          case 0x14:strcat(trans,"jump_down2");break;
+          case 0x15:strcat(trans,"jump_up2");break;
+          case 0x16:strcat(trans,"jump_left2");break;
+          case 0x17:strcat(trans,"jump_right2");break;
+          case 0x1D:strcat(trans,"run_down");break;
+          case 0x1E:strcat(trans,"run_up");break;
+          case 0x1F:strcat(trans,"run_left");break;
+          case 0x20:strcat(trans,"run_right");break;
+          case 0x46:strcat(trans,"look_left_jump_down");break;
+          case 0x47:strcat(trans,"look_down_jump_up");break;
+          case 0x48:strcat(trans,"look_up_jump_left");break;
+          case 0x49:strcat(trans,"look_left_jump_right");break;
+          case 0x4A:strcat(trans,"faceplayer");break;
+          case 0x4B:strcat(trans,"face_away");break;
+          case 0x4E:strcat(trans,"jump_down1");break;
+          case 0x4F:strcat(trans,"jump_up1");break;
+          case 0x50:strcat(trans,"jump_left1");break;
+          case 0x51:strcat(trans,"jump_right1");break;
+          case 0x52:strcat(trans,"jump_down");break;
+          case 0x53:strcat(trans,"jump_up");break;
+          case 0x54:strcat(trans,"jump_left");break;
+          case 0x55:strcat(trans,"jump_right");break;
+          case 0x56:strcat(trans,"jump_downup");break;
+          case 0x57:strcat(trans,"jump_updown");break;
+          case 0x58:strcat(trans,"jump_leftright");break;
+          case 0x59:strcat(trans,"jump_rightleft");break;
+          case 0x60:strcat(trans,"invisible");break;
+          case 0x62:strcat(trans,"say_!");break;
+          case 0x63:strcat(trans,"say_?");break;
+          case 0x64:strcat(trans,"say_X");break;
+          case 0x65:strcat(trans,"say_!!");break;
+          case 0x66:strcat(trans,"say_:)");break;
+          default:sprintf(buf,"raw_%X",p);strcat(trans,buf);break;
+        }
+      }
+      else
+      {
+        switch(p)
+        {
+          case 254:strcat(trans,"end");still_going=0;break;
+          case 0x54:strcat(trans,"hide");break;
+          case 0x55:strcat(trans,"show");break;
+          case 0x56:strcat(trans,"alert");break;
+          case 0x57:strcat(trans,"question");break;
+          case 0x58:strcat(trans,"love");break;
+          case 0x5A:strcat(trans,"pokeball");break;
+          case 0x10:strcat(trans,"pause0");break;
+          case 0x11:strcat(trans,"pause1");break;
+          case 0x12:strcat(trans,"pause2");break;
+          case 0x13:strcat(trans,"pause3");break;
+          case 0x14:strcat(trans,"pause4");break;
+          case 0x00:strcat(trans,"look_down");break;
+          case 0x01:strcat(trans,"look_up");break;
+          case 0x02:strcat(trans,"look_left");break;
+          case 0x03:strcat(trans,"look_right");break;
+          case 0x04:strcat(trans,"walk_down_vslow");break;
+          case 0x05:strcat(trans,"walk_up_vslow");break;
+          case 0x06:strcat(trans,"walk_left_vslow");break;
+          case 0x07:strcat(trans,"walk_right_vslow");break;
+          case 0x08:strcat(trans,"walk_down_slow");break;
+          case 0x09:strcat(trans,"walk_up_slow");break;
+          case 0x0A:strcat(trans,"walk_left_slow");break;
+          case 0x0B:strcat(trans,"walk_right_slow");break;
+          case 0x17:strcat(trans,"walk_down");break;
+          case 0x18:strcat(trans,"walk_up");break;
+          case 0x15:strcat(trans,"walk_left");break;
+          case 0x16:strcat(trans,"walk_right");break;
+          case 0x2D:strcat(trans,"walk_down_fast");break;
+          case 0x2E:strcat(trans,"walk_up_fast");break;
+          case 0x2F:strcat(trans,"walk_left_fast");break;
+          case 0x30:strcat(trans,"walk_right_fast");break;
+          case 0x35:strcat(trans,"run_down");break;
+          case 0x36:strcat(trans,"run_up");break;
+          case 0x37:strcat(trans,"run_left");break;
+          case 0x38:strcat(trans,"run_right");break;
+          case 0x7e:strcat(trans,"run_down_fast");break;
+          case 0x7f:strcat(trans,"run_up_fast");break;
+          case 0x80:strcat(trans,"run_left_fast");break;
+          case 0x81:strcat(trans,"run_right_fast");break;
+          default:sprintf(buf,"raw_%X",p);strcat(trans,buf);break;
+        }
       }
       strcat(trans," ");
     }

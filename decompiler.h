@@ -128,7 +128,19 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_TEXTCOLOR:
         arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
-        func("TEXTCOLOR 0x%X 'Sets text color (Fire Red).\r\n",arg1);
+        func("textcolor 0x%X 'Sets text color (Fire Red).\r\n",arg1);
+        break;
+      case CMD_FAKEJUMPSTD:
+        if(mode==FIRE_RED)
+        {
+          arg1=0;
+          ReadFile(fileM,&arg1,1,&read,NULL);
+          func("fakejumpstd 0x%X\r\n",arg1);
+        }
+        else
+        {
+          func("#raw 0x%X\r\n",CMD_FAKEJUMPSTD);
+        }
         break;
       case CMD_22:
         arg1=0;
@@ -259,9 +271,18 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("storecomp 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SLOTMACHINE:
-        arg1=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("slotmachine 0x%X\r\n",arg1);
+        if(mode==FIRE_RED)
+        {
+          arg1=0;
+          ReadFile(fileM,&arg1,1,&read,NULL);
+          func("fakecallstd 0x%X\r\n",arg1);
+        }
+        else if(mode==RUBY)
+        {
+          arg1=0;
+          ReadFile(fileM,&arg1,2,&read,NULL);
+          func("slotmachine 0x%X\r\n",arg1);
+        }
         break;
       case CMD_STOREITEM:
         arg1=0;

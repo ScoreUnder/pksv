@@ -15,12 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define FIRE_RED 0
+#define RUBY     1
 char IsVerbose=1;
 char filearg;
 char DontShowLog=0;
 char error=0;
 char type=0;
 char GlobBuf[65536];
+char mode=FIRE_RED;
 //Sorry for the horrible code.
 #include <stdio.h>
 #include <windows.h>
@@ -39,9 +42,11 @@ int main(int ac,char**av)
   char fileName[65536];
   OPENFILENAME ofn;
   unsigned int FileZoomPos;
-  int read,i;
+  int i;
   unsigned int tmp;
   unsigned char pspec,fspec,cline;
+  char determineMode[3];
+  DWORD read;
   fileName[0]=(char)0;
   pspec=0;
   fspec=0;
@@ -162,7 +167,6 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
   strcpy(fileName,av[1]);
   if(pspec)
   sscanf(av[2],"%x",&FileZoomPos);
-  
   if((cline&2)&&ac>2) //If bit 2 of cline is set and arg count is larger than 2
   {
     filearg=1;
@@ -181,6 +185,15 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     }else{
       strcpy(fileName,av[filearg+1]);
     }
+    fileM=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
+    ZeroMemory(determineMode,sizeof(determineMode));
+    ReadFile(fileM,&determineMode,3,&read,NULL);
+    if(!strcmp(determineMode,"AX"))
+    {
+      mode=RUBY;
+    }
+    CloseHandle(fileM);
     RecodeProc(av[filearg],fileName);
     if(!DontShowLog)
       ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
@@ -215,10 +228,17 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   }
   if(fspec!=0||GetOpenFileName(&ofn))
   {
-    
     if(!fspec)puts("Ok...");
     fileM=CreateFile(ofn.lpstrFile,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     //Wow, opening a file is complicated.
+    SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
+    ZeroMemory(determineMode,sizeof(determineMode));
+    ReadFile(fileM,&determineMode,3,&read,NULL);
+    if(!strcmp(determineMode,"AX"))
+    {
+      mode=RUBY;
+    }
+    //Go to AC, get 2 bytes, see if they make AX - then it's r/s.
     if(fileM!=INVALID_HANDLE_VALUE)
     {
       if(!pspec)
