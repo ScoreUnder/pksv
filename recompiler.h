@@ -37,17 +37,17 @@ void RecodeProc(char*script,char*romfn)
   unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6;
   DWORD read;
   SetLastError(0);
-  CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   la=GetLastError();
   if(la)
   {
     strcat(romfn,".gba");
-    RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     la=GetLastError();
   }
   strcat(GlobBuf,"pokeinc.txt");
-  IncFile=CreateFile(GlobBuf,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  IncFile=CreateFile(GlobBuf,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(IncFile==INVALID_HANDLE_VALUE)
   {
     printf(GlobBuf);
@@ -87,7 +87,7 @@ void RecodeProc(char*script,char*romfn)
     ReadFile(IncFile,Script,fst,&read,NULL);
     strcat(Script,"\n");
     ReadFile(CurrFile,(char*)(Script+fst+1),fs,&read,NULL);
-    LogFile=CreateFile("PokeScrE.log",GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    LogFile=CreateFile("PokeScrE.log",GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
     if(LogFile==NULL)
     {
       MessageBox(NULL,"Failed to open a log.","Error",0x10);

@@ -185,7 +185,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     }else{
       strcpy(fileName,av[filearg+1]);
     }
-    fileM=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    fileM=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
     ZeroMemory(determineMode,sizeof(determineMode));
     ReadFile(fileM,&determineMode,3,&read,NULL);
@@ -229,7 +229,7 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
   if(fspec!=0||GetOpenFileName(&ofn))
   {
     if(!fspec)puts("Ok...");
-    fileM=CreateFile(ofn.lpstrFile,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+    fileM=CreateFile(ofn.lpstrFile,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
     //Wow, opening a file is complicated.
     SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
     ZeroMemory(determineMode,sizeof(determineMode));

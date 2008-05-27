@@ -26,7 +26,7 @@ char*transtxt(int howfar,char*file)
   char still_going;
   HANDLE fileC;
   read=0;
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(fileC!=INVALID_HANDLE_VALUE)
   {
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
@@ -141,7 +141,7 @@ char*transbrl(int howfar,char*file)
   char still_going;
   HANDLE fileC;
   read=0;
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(fileC!=INVALID_HANDLE_VALUE)
   {
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
@@ -206,7 +206,7 @@ char*transmove(int howfar,HANDLE file)
   unsigned char p;
   read=0;
   char buf[10];
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(fileC!=INVALID_HANDLE_VALUE)
   {
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
@@ -340,7 +340,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   HANDLE scrfile;
   char lb[5]; //Little Buffer
   
-  scrfile=CreateFile(scrfn,GENERIC_READ,FILE_SHARE_WRITE|FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  scrfile=CreateFile(scrfn,GENERIC_READ,FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
   if(pos!=0xFFFFFFFF)SetFilePointer(scrfile,pos,NULL,FILE_BEGIN);
   else              {MessageBox(NULL,"Darn file pointers. Always spoiling the fun.","Error",0x10);return;}
   if(scrfile==INVALID_HANDLE_VALUE){MessageBox(NULL,"Darn file handles. Always being complicated on purpose.","Error",0x10);return;}
