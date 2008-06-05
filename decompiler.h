@@ -87,6 +87,85 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("CMD_60 0x%X\r\n",arg1);
         break;
+      case CMD_CALLSTDIF:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        switch(arg1)
+        {
+          case 0:
+            strcpy(buf,"Smaller Than");
+            break;
+          case 1:
+            strcpy(buf,"Equal To");
+            break;
+          case 2:
+            strcpy(buf,"Larger Than");
+            break;
+          case 3:
+            strcpy(buf,"Smaller Than or Equal To");
+            break;
+          case 4:
+            strcpy(buf,"Larger Than or Equal To");
+            break;
+          case 5:
+            strcpy(buf,"Not Equal To");
+            break;
+          default:
+            strcpy(buf,"Unknown IF condition");
+            break;
+        }
+        func("callstdif 0x%X 0x%X ' %s\r\n",arg1,arg2,buf);
+        break;
+      case CMD_SHOWPOKEPIC:
+        arg1=0;
+        arg2=0;
+        arg3=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("showpokepic 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_HIDEPOKEPIC:
+        func("hidepokepic\r\n");
+        break;
+      case CMD_JUMPSTDIF:
+        arg1=0;
+        arg2=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        switch(arg1)
+        {
+          case 0:
+            strcpy(buf,"Smaller Than");
+            break;
+          case 1:
+            strcpy(buf,"Equal To");
+            break;
+          case 2:
+            strcpy(buf,"Larger Than");
+            break;
+          case 3:
+            strcpy(buf,"Smaller Than or Equal To");
+            break;
+          case 4:
+            strcpy(buf,"Larger Than or Equal To");
+            break;
+          case 5:
+            strcpy(buf,"Not Equal To");
+            break;
+          default:
+            strcpy(buf,"Unknown IF condition");
+            break;
+        }
+        func("jumpstdif 0x%X 0x%X ' %s\r\n",arg1,arg2,buf);
+        break;
+      case CMD_SETWORLDMAPFLAG:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("setworldmapflag 0x%X\r\n",arg1);
+        break;
       case CMD_9A:
         arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
@@ -97,14 +176,14 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("CMD_99 0x%X\r\n",arg1);
         break;
-      case CMD_63:
+      case CMD_MOVESPRITE2:
         arg1=0;
         arg2=0;
         arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
-        func("CMD_63 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        func("movesprite2 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_44:
         arg1=0;
@@ -113,12 +192,12 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("CMD_44 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case CMD_65:
+      case CMD_SPRITEBEHAVE:
         arg1=0;
         arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
-        ReadFile(fileM,&arg2,2,&read,NULL);
-        func("CMD_65 0x%X 0x%X\r\n",arg1,arg2);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("spritebehave 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_C2:
         arg1=0;
@@ -244,6 +323,11 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("disappear 0x%X\r\n",arg1);
         break;
+      case CMD_REAPPEAR:
+        arg1=0;
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("reappear 0x%X\r\n",arg1);
+        break;
       case CMD_GIVEEGG:
         arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
@@ -298,12 +382,16 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("CMD_9D 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case CMD_73:
+      case CMD_HIDEBOX:
         arg1=0;
         arg2=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        ReadFile(fileM,&arg2,2,&read,NULL);
-        func("CMD_73 0x%X 0x%X\r\n",arg1,arg2);
+        arg3=0;
+        arg4=0;
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        func("hidebox 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
         break;
       case CMD_STORETEXT:
         arg1=0;
@@ -905,10 +993,16 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         arg1=0;
         arg2=0;
         arg3=0;
+        arg4=0;
+        arg5=0;
+        arg6=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
-        func("addpokemon 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        ReadFile(fileM,&arg5,4,&read,NULL);
+        ReadFile(fileM,&arg6,4,&read,NULL);
+        func("addpokemon 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6);
         break;
       case CMD_FADEDEFAULT:
         GENERIC("fadedefault");

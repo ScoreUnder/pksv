@@ -30,6 +30,9 @@
 #define CMD_CALLIF                  0x07 //C,D ops(1) addr(4)
 #define CMD_JUMPSTD                 0x08 //C,D type(1)
 #define CMD_CALLSTD                 0x09 //C,D type(1)
+#define CMD_JUMPSTDIF               0x0A //C,D ops(1) type(1)
+#define CMD_CALLSTDIF               0x0B //C,D ops(1) type(1)
+#define CMD_JUMPRAM                 0x0C //C,D
 #define CMD_KILLSCRIPT              0x0D //C,D
 #define CMD_SETBYTE                 0x0E //C,D byte(1)
 #define CMD_MSGBOX                  0x0F //C,D 00 addr(4)
@@ -77,12 +80,13 @@
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
 #define CMD_PAUSEEVENT              0x51 //C,D event(2)
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
+#define CMD_REAPPEAR                0x55 //C,D sprite(2)
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_60                      0x60 //?,? (2)
 #define CMD_61                      0x61 //?,? (2)
-#define CMD_63                      0x63 //?,? (2)(2)(2)
-#define CMD_65                      0x65 //?,? (2)(2)
+#define CMD_MOVESPRITE2             0x63 //?,? (2)(2)(2)
+#define CMD_SPRITEBEHAVE            0x65 //?,? (2)(1)
 #define CMD_SHOWMSG                 0x66 //C,D
 #define CMD_MESSAGE                 0x67 //C,D addr(4)
 #define CMD_CLOSEMSG2               0x68 //C,D
@@ -93,10 +97,12 @@
 #define CMD_WAITBUTTON              0x6D //C,D
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
 #define CMD_MULTICHOICE2            0x70 //C,D x(1) y(1) list(1) ??(2)
-#define CMD_73                      0x73 //?,? ?(2) ?(2)
+#define CMD_HIDEBOX                 0x73 //C,D [1x4]
+#define CMD_SHOWPOKEPIC             0x75 //C,D var(2) x(1) y(1)
+#define CMD_HIDEPOKEPIC             0x76 //C,D
 #define CMD_PICTURE                 0x77 //C,D num(1)
 #define CMD_BRAILLE                 0x78 //C,D addr(4)
-#define CMD_ADDPOKEMON              0x79 //C,D poke(2) lvl(1) item(2)
+#define CMD_ADDPOKEMON              0x79 //C,D poke(2) lvl(1) item(2) ??(1) ??(4) ??(4)
 // GivePokemon copyvar 0x8004 0x800d addpokemon X Y Z hashpoke 0x1901 0x0
 // SelectPokemon special 0x73 copyvar 0x800a 0x8004
 // WildBattle Battle X Y 0x0000 special 0x(143|137|138|139)
@@ -136,6 +142,7 @@
 #define CMD_C2                      0xC2 //?,? (2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
 #define CMD_TEXTCOLOR               0xC7 //?,? colour(1)
+#define CMD_SETWORLDMAPFLAG         0xD0 //C,D FLAG(2)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?
 #define CMD_FE                      0xFE //?,? (1)

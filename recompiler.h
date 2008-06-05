@@ -76,7 +76,7 @@ void RecodeProc(char*script,char*romfn)
       CloseHandle(IncFile);
       return;
     }
-    Script=GlobalAlloc(GPTR,fs+fst+2);
+    Script=GlobalAlloc(GPTR,fs+fst+6);
     if(Script==NULL)
     {
       MessageBox(NULL,"GlobalAlloc() Failed to allocate memory for the script.","Error",0x10);
@@ -84,9 +84,13 @@ void RecodeProc(char*script,char*romfn)
       CloseHandle(IncFile);
       return;
     }
+    ZeroMemory(Script,fs+fst+6);
     ReadFile(IncFile,Script,fst,&read,NULL);
     strcat(Script,"\n");
+    strcat(Script,"\n");
     ReadFile(CurrFile,(char*)(Script+fst+1),fs,&read,NULL);
+    strcat(Script,"\n");
+    strcat(Script,"\n");
     LogFile=CreateFile("PokeScrE.log",GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
     if(LogFile==NULL)
     {
@@ -206,6 +210,23 @@ void RecodeProc(char*script,char*romfn)
           aa("fadeout")         {BASIC(CMD_FADEOUT);      ec();}
           aa("fadein")          {BASIC(CMD_FADEIN);       ec();}
           aa("countpokemon")    {BASIC(CMD_COUNTPOKEMON); ec();}
+          aa("jumpram")         {BASIC(CMD_JUMPRAM);      ec();}
+          aa("hidepokepic")     {BASIC(CMD_HIDEPOKEPIC);  ec();}
+          aa("showpokepic")
+          {
+            vlog("SHOWPOKEPIC\r\n",13);
+            arg1=GetNum("SHOWPOKEPIC");
+            if(!gffs){return;}
+            arg2=GetNum("SHOWPOKEPIC");
+            if(!gffs){return;}
+            arg3=GetNum("SHOWPOKEPIC");
+            if(!gffs){return;}
+            BASIC(CMD_SHOWPOKEPIC);
+            rom(arg1,2);
+            rom(arg2,1);
+            rom(arg3,1);
+            ec();
+          }
           aa("msgbox")
           {
             vlog("MSGBOX\r\n",8);
@@ -385,6 +406,15 @@ void RecodeProc(char*script,char*romfn)
             arg1=GetNum("SPECIAL");
             if(!gffs){return;}
             BASIC(CMD_SPECIAL);
+            rom(arg1,2);
+            ec();
+          }
+          aa("setworldmapflag")
+          {
+            vlog("setworldmapflag\r\n",17);
+            arg1=GetNum("setworldmapflag");
+            if(!gffs){return;}
+            BASIC(CMD_SETWORLDMAPFLAG);
             rom(arg1,2);
             ec();
           }
@@ -820,10 +850,19 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             arg3=GetNum("ADDPOKEMON");
             if(!gffs){return;}
+            arg4=GetNum("ADDPOKEMON");
+            if(!gffs){return;}
+            arg5=GetNum("ADDPOKEMON");
+            if(!gffs){return;}
+            arg6=GetNum("ADDPOKEMON");
+            if(!gffs){return;}
             BASIC(CMD_ADDPOKEMON);
             rom(arg1,2);
             rom(arg2,1);
             rom(arg3,2);
+            rom(arg4,1);
+            rom(arg5,4);
+            rom(arg6,4);
             ec();
           }
           aa("storepokemon")
@@ -919,16 +958,22 @@ void RecodeProc(char*script,char*romfn)
             rom(arg3,2);
             ec();
           }
-          aa("cmd_73")
+          aa("hidebox")
           {
-            vlog("CMD_73\r\n",8);
-            arg1=GetNum("CMD_73");
+            vlog("HIDEBOX\r\n",9);
+            arg1=GetNum("HIDEBOX");
             if(!gffs){return;}
-            arg2=GetNum("CMD_73");
+            arg2=GetNum("HIDEBOX");
             if(!gffs){return;}
-            BASIC(CMD_73);
-            rom(arg1,2);
-            rom(arg2,2);
+            arg3=GetNum("HIDEBOX");
+            if(!gffs){return;}
+            arg4=GetNum("HIDEBOX");
+            if(!gffs){return;}
+            BASIC(CMD_HIDEBOX);
+            rom(arg1,1);
+            rom(arg2,1);
+            rom(arg3,1);
+            rom(arg4,1);
             ec();
           }
           aa("storeitem")
@@ -1027,6 +1072,15 @@ void RecodeProc(char*script,char*romfn)
             rom(arg1,2);
             ec();
           }
+          aa("reappear")
+          {
+            vlog("REAPPEAR\r\n",10);
+            arg1=GetNum("REAPPEAR");
+            if(!gffs){return;}
+            BASIC(CMD_REAPPEAR);
+            rom(arg1,2);
+            ec();
+          }
           aa("cmd_93")
           {
             vlog("CMD_93\r\n",8);
@@ -1114,6 +1168,30 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,2);
             ec();
           }
+          aa("callstdif")
+          {
+            vlog("callstdif\r\n",11);
+            arg1=GetNum("callstdif");
+            if(!gffs){return;}
+            arg2=GetNum("callstdif");
+            if(!gffs){return;}
+            BASIC(CMD_CALLSTDIF);
+            rom(arg1,1);
+            rom(arg2,1);
+            ec();
+          }
+          aa("jumpstdif")
+          {
+            vlog("jumpstdif\r\n",11);
+            arg1=GetNum("jumpstdif");
+            if(!gffs){return;}
+            arg2=GetNum("jumpstdif");
+            if(!gffs){return;}
+            BASIC(CMD_JUMPSTDIF);
+            rom(arg1,1);
+            rom(arg2,1);
+            ec();
+          }
           aa("cmd_92")
           {
             vlog("CMD_92\r\n",8);
@@ -1183,29 +1261,29 @@ void RecodeProc(char*script,char*romfn)
             rom(arg1,2);
             ec();
           }
-          aa("cmd_63")
+          aa("movesprite2")
           {
-            vlog("CMD_63\r\n",8);
-            arg1=GetNum("CMD_63");
+            vlog("movesprite2\r\n",13);
+            arg1=GetNum("movesprite2");
             if(!gffs){return;}
-            arg2=GetNum("CMD_63");
+            arg2=GetNum("movesprite2");
             if(!gffs){return;}
-            arg3=GetNum("CMD_63");
+            arg3=GetNum("movesprite2");
             if(!gffs){return;}
-            BASIC(CMD_63);
+            BASIC(CMD_MOVESPRITE2);
             rom(arg1,2);
             rom(arg2,2);
             rom(arg3,2);
             ec();
           }
-          aa("cmd_65")
+          aa("spritebehave")
           {
-            vlog("CMD_65\r\n",8);
-            arg1=GetNum("CMD_65");
+            vlog("spritebehave\r\n",14);
+            arg1=GetNum("spritebehave");
             if(!gffs){return;}
-            arg2=GetNum("CMD_65");
+            arg2=GetNum("spritebehave");
             if(!gffs){return;}
-            BASIC(CMD_65);
+            BASIC(CMD_SPRITEBEHAVE);
             rom(arg1,2);
             rom(arg2,2);
             ec();
