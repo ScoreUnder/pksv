@@ -49,6 +49,7 @@ char*transtxt(int howfar,char*file)
         else if(p==0xad){p='.';}
         else if(p==0xb8){p=',';}
         else if(p==0xb4){p='\'';}
+        else if(p==0xae){p='-';}
         else if(p==0xfe) // \n
         {
           trans[pt]='\\';
@@ -146,19 +147,19 @@ char*transbrl(int howfar,char*file)
   {
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
     still_going=1;
-    printf("        '");
+    func("        '");
     while(still_going)
     {
       ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
       pt=0;
       if (p==0xff){still_going=0;break;}
-      printf("  ");
-      if(p&1) printf(".");
-      else printf(" ");
-      if(p&2) printf(".");
-      else printf(" ");
+      func("  ");
+      if(p&1) func(".");
+      else func(" ");
+      if(p&2) func(".");
+      else func(" ");
     }
-    printf("\n        '");
+    func("\n        '");
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
     still_going=1;
     while(still_going)
@@ -167,13 +168,13 @@ char*transbrl(int howfar,char*file)
       pt=0;
       if (p==0xff){still_going=0;break;}
       p=p>>2;
-      printf("  ");
-      if(p&1) printf(".");
-      else printf(" ");
-      if(p&2) printf(".");
-      else printf(" ");
+      func("  ");
+      if(p&1) func(".");
+      else func(" ");
+      if(p&2) func(".");
+      else func(" ");
     }
-    printf("\n        '");
+    func("\n        '");
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
     still_going=1;
     while(still_going)
@@ -182,18 +183,18 @@ char*transbrl(int howfar,char*file)
       pt=0;
       if (p==0xff){still_going=0;break;}
       p=p>>4;
-      printf("  ");
-      if(p&1) printf(".");
-      else printf(" ");
-      if(p&2) printf(".");
-      else printf(" ");
+      func("  ");
+      if(p&1) func(".");
+      else func(" ");
+      if(p&2) func(".");
+      else func(" ");
     }
-    puts("\n");  // Yes, this prints 2 new lines, not one.
+    func("\n");  // Yes, this prints 2 new lines, not one.
     CloseHandle(fileC);
   }
   else
   {
-    puts("          'Error in translating braille...");
+    func("          'Error in translating braille...");
   }
   return 0;
 }
@@ -268,7 +269,9 @@ char*transmove(int howfar,HANDLE file)
           case 0x64:strcat(trans,"say_X");break;
           case 0x65:strcat(trans,"say_!!");break;
           case 0x66:strcat(trans,"say_:)");break;
-          default:sprintf(buf,"raw_%X",p);strcat(trans,buf);break;
+          case 0x2F:strcat(trans,"walk_to_player");break;
+          case 0x2E:strcat(trans,"walk_to_lasttalk");break;
+          default:sprintf(buf,"raw_%02X",p);strcat(trans,buf);break;
         }
       }
       else
@@ -315,7 +318,7 @@ char*transmove(int howfar,HANDLE file)
           case 0x7f:strcat(trans,"run_up_fast");break;
           case 0x80:strcat(trans,"run_left_fast");break;
           case 0x81:strcat(trans,"run_right_fast");break;
-          default:sprintf(buf,"raw_%X",p);strcat(trans,buf);break;
+          default:sprintf(buf,"raw_%02X",p);strcat(trans,buf);break;
         }
       }
       strcat(trans," ");
@@ -369,6 +372,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
     else if(str[i]=='.'){NewSpace[j]=0xAD;}
     else if(str[i]==','){NewSpace[j]=0xB8;}
     else if(str[i]=='\''){NewSpace[j]=0xB4;}
+    else if(str[i]=='-'){NewSpace[j]=0xAE;}
     else if(str[i]=='\\')
     {
       i++;
@@ -418,4 +422,225 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   GlobalFree(NewSpace);
   CloseHandle(scrfile);
   return ret;
+}
+
+unsigned int transbackmove(char*script,unsigned int*ii)
+{
+  unsigned int i,len=0,j=0,k=0;
+  char cmdbuf[100];
+  char xbuf[100];
+  DWORD read;
+  i=*ii;
+  while(script[i]!='\n'&&script[i]!=0)
+  {
+    while(script[i]==' '){i++;}
+    j=0;
+    while(script[i]!=' '&&script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
+    {
+      cmdbuf[j]=script[i];
+      i++;
+      j++;
+    }
+    cmdbuf[j]=0;
+#define aaa(x) else if(!strcmp(cmdbuf,x))
+#define move trans[len]=
+    if(mode==FIRE_RED)
+    {
+      if(!strcmp(cmdbuf,"end")){move 0xfe;}
+      aaa("look_up"){move 0x01;}
+      aaa("look_left"){move 0x02;}
+      aaa("look_right"){move 0x03;}
+      aaa("look_down"){move 0x04;}
+      aaa("walk_down_vslow"){move 0x08;}
+      aaa("walk_up_vslow"){move 0x09;}
+      aaa("walk_left_vslow"){move 0x0A;}
+      aaa("walk_right_vslow"){move 0x0B;}
+      aaa("walk_down_slow"){move 0x0C;}
+      aaa("walk_up_slow"){move 0x0D;}
+      aaa("walk_left_slow"){move 0x0E;}
+      aaa("walk_right_slow"){move 0x0F;}
+      aaa("walk_down"){move 0x10;}
+      aaa("walk_up"){move 0x11;}
+      aaa("walk_left"){move 0x12;}
+      aaa("walk_right"){move 0x13;}
+      aaa("jump_down2"){move 0x14;}
+      aaa("jump_up2"){move 0x15;}
+      aaa("jump_left2"){move 0x16;}
+      aaa("jump_right2"){move 0x17;}
+      aaa("run_down"){move 0x1D;}
+      aaa("run_up"){move 0x1E;}
+      aaa("run_left"){move 0x1F;}
+      aaa("run_right"){move 0x20;}
+      aaa("look_left_jump_down"){move 0x46;}
+      aaa("look_down_jump_up"){move 0x47;}
+      aaa("look_up_jump_left"){move 0x48;}
+      aaa("look_left_jump_right"){move 0x49;}
+      aaa("faceplayer"){move 0x4A;}
+      aaa("face_away"){move 0x4B;}
+      aaa("jump_down1"){move 0x4E;}
+      aaa("jump_up1"){move 0x4F;}
+      aaa("jump_left1"){move 0x50;}
+      aaa("jump_right1"){move 0x51;}
+      aaa("jump_down"){move 0x52;}
+      aaa("jump_up"){move 0x53;}
+      aaa("jump_left"){move 0x54;}
+      aaa("jump_right"){move 0x55;}
+      aaa("jump_downup"){move 0x56;}
+      aaa("jump_updown"){move 0x57;}
+      aaa("jump_leftright"){move 0x58;}
+      aaa("jump_rightleft"){move 0x59;}
+      aaa("invisible"){move 0x60;}
+      aaa("say_!"){move 0x62;}
+      aaa("say_?"){move 0x63;}
+      aaa("say_X"){move 0x64;}
+      aaa("say_!!"){move 0x65;}
+      aaa("say_:)"){move 0x66;}
+      aaa("walk_to_player"){move 0x2F;}
+      aaa("walk_to_lasttalk"){move 0x2E;}
+      else if(cmdbuf[0]=='\'')
+      {
+        *ii=i;
+        return len;
+      }
+      else if(cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+      {
+        //RAW handler.
+        j=0;
+        while(j<16)
+        {
+          if(cmdbuf[4]=="0123456789abcdef"[j])
+          {break;}
+          j++;
+        }
+        if(j==16)
+        {
+          len--;
+          sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+        }
+        else
+        {
+          k=j;
+          j=0;
+          while(j<16)
+          {
+            if(cmdbuf[5]=="0123456789abcdef"[j])
+            {break;}
+            j++;
+          }
+          if(j==16)
+          {
+            len--;
+            sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
+            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          }
+          else
+          {
+            k=k<<4;
+            k|=j;
+            move k;
+          }
+        }
+      }
+      else{len--;
+      sprintf(xbuf,"Unknown FR/LG move command \"%s\"\r\n",cmdbuf);
+      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);}
+      len++;
+    }else
+    {
+      if(!strcmp(cmdbuf,"end")){move 0xfe;}
+      aaa("hide"){move 0x54;}
+      aaa("show"){move 0x55;}
+      aaa("alert"){move 0x56;}
+      aaa("question"){move 0x57;}
+      aaa("love"){move 0x58;}
+      aaa("pokeball"){move 0x5A;}
+      aaa("pause0"){move 0x10;}
+      aaa("pause1"){move 0x11;}
+      aaa("pause2"){move 0x12;}
+      aaa("pause3"){move 0x13;}
+      aaa("pause4"){move 0x14;}
+      aaa("look_down"){move 0x00;}
+      aaa("look_up"){move 0x01;}
+      aaa("look_left"){move 0x02;}
+      aaa("look_right"){move 0x03;}
+      aaa("walk_down_vslow"){move 0x04;}
+      aaa("walk_up_vslow"){move 0x05;}
+      aaa("walk_left_vslow"){move 0x06;}
+      aaa("walk_right_vslow"){move 0x07;}
+      aaa("walk_down_slow"){move 0x08;}
+      aaa("walk_up_slow"){move 0x09;}
+      aaa("walk_left_slow"){move 0x0A;}
+      aaa("walk_right_slow"){move 0x0B;}
+      aaa("walk_down"){move 0x17;}
+      aaa("walk_up"){move 0x18;}
+      aaa("walk_left"){move 0x15;}
+      aaa("walk_right"){move 0x16;}
+      aaa("walk_down_fast"){move 0x2D;}
+      aaa("walk_up_fast"){move 0x2E;}
+      aaa("walk_left_fast"){move 0x2F;}
+      aaa("walk_right_fast"){move 0x30;}
+      aaa("run_down"){move 0x35;}
+      aaa("run_up"){move 0x36;}
+      aaa("run_left"){move 0x37;}
+      aaa("run_right"){move 0x38;}
+      aaa("run_down_fast"){move 0x7e;}
+      aaa("run_up_fast"){move 0x7f;}
+      aaa("run_left_fast"){move 0x80;}
+      aaa("run_right_fast"){move 0x81;}
+      else if(cmdbuf[0]=='\'')
+      {
+        *ii=i;
+        return len;
+      }
+      else if(cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+      {
+        //RAW handler.
+        j=0;
+        while(j<16)
+        {
+          if(cmdbuf[4]=="0123456789abcdef"[j])
+          {break;}
+          j++;
+        }
+        if(j==16)
+        {
+          len--;
+          sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+        }
+        else
+        {
+          k=j;
+          j=0;
+          while(j<16)
+          {
+            if(cmdbuf[5]=="0123456789abcdef"[j])
+            {break;}
+            j++;
+          }
+          if(j==16)
+          {
+            len--;
+            sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
+            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          }
+          else
+          {
+            k=k<<4;
+            k|=j;
+            move k;
+          }
+        }
+      }
+      else{
+      len--;
+      sprintf(xbuf,"Unknown R/S move command \"%s\"\r\n",cmdbuf);
+      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+      }
+      len++;
+    }
+  }
+  *ii=i;
+  return len;
 }

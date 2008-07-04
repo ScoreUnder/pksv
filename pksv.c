@@ -17,6 +17,7 @@
 */
 #define FIRE_RED 0
 #define RUBY     1
+int(*func)(char*, ...);
 char IsVerbose=1;
 char filearg;
 char DontShowLog=0;
@@ -27,6 +28,7 @@ char mode=FIRE_RED;
 //Sorry for the horrible code.
 #include <stdio.h>
 #include <windows.h>
+HANDLE LogFile;
 #include "pokedef.h"
 #include "textproc.h" //ORDER IS IMPORTANT
 char fsend[65536];

@@ -17,12 +17,12 @@
 */
 #include "isdone.h"
 
-char defs[512][256];
-unsigned int means[512];
+char defs[4096][256];
+unsigned int means[4096];
 int pos;
 void Define(char*thing,unsigned int otherthing)
 {
-  if(pos>512){MessageBox(NULL,"Overflow of #DEFINEs - ask Score_Under for custom build\nto handle more #defines.","Error",0x10);return;}
+  if(pos>4096){MessageBox(NULL,"Overflow of #DEFINEs - ask Score_Under for custom build\nto handle more #defines.","Error",0x10);return;}
   strcpy(defs[pos],thing);
   means[pos]=otherthing;
   pos++;

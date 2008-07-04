@@ -42,7 +42,7 @@
 #define CMD_COPYSCRIPTBANKS         0x14 //C,D bank(1) bank(1)
 #define CMD_COPYBYTE                0x15 //C,D addr(4) addr(4)
 #define CMD_SETVAR                  0x16 //C,D var(2) val(2)
-#define CMD_17                      0x17 //?,? var(2) val(2)
+#define CMD_ADDVAR                  0x17 //?,? var(2) val(2)
 #define CMD_COPYVAR                 0x19 //C,D var(2) val(2)
 #define CMD_COPYVARIFNOTZERO        0x1A //C,D var(2) val(2)
 #define CMD_COMPAREVARTOBYTE        0x1C //C,D var(2) byte(1)
@@ -51,7 +51,7 @@
 #define CMD_COMPAREFARBYTETOBYTE    0x1F //C,D addr(4) byte(1)
 #define CMD_COMPAREFARBYTETOFARBYTE 0x20 //C,D fb(4) fb(4)
 #define CMD_COMPARE                 0x21 //C,D var(2) val(2)
-#define CMD_22                      0x22 //?,? var(2) val(2)
+#define CMD_COMPAREVARS             0x22 //?,? var(2) var(2)
 #define CMD_CALLASM                 0x23 //C,D addr(4)
 #define CMD_SPECIAL                 0x25 //C,D type(2)
 #define CMD_SPECIAL2                0x26 //C,D var(2) type(2)
@@ -63,36 +63,39 @@
 #define CMD_SETFLAG                 0x29 //C,D flag(2)
 #define CMD_CLEARFLAG               0x2A //C,D flag(2)
 #define CMD_CHECKFLAG               0x2B //C,D flag(2)
-#define CMD_2F                      0x2F //?,? ??(2)
-#define CMD_CRY                     0x30 //C,D bank(1) poke(2)
+#define CMD_SOUND                   0x2F //?,? id(2)
+#define CMD_CRY                     0x30 //C,D bank(1) poke(2) (fr=checksound)
 #define CMD_FANFARE                 0x31 //C,D snd(2)
 #define CMD_WAITFANFARE             0x32 //C,D
-#define CMD_PLAYSOUND               0x33 //C,D snd(2)
+#define CMD_PLAYSOUND               0x33 //C,D snd(2) (fr: +1)
 #define CMD_FADEDEFAULT             0x34 //C,D
 #define CMD_FADESOUND               0x35 //C,D snd(2)
 #define CMD_FADEOUT                 0x37 //C,D
 #define CMD_FADEIN                  0x38 //C,D
-#define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE
+#define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
 #define CMD_COUNTPOKEMON            0x43 //C,D
-#define CMD_44                      0x44 //?,? (2) (2)
+#define CMD_ADDITEM                 0x44 //C,D (2) (2)
 #define CMD_REMOVEITEM              0x45 //C,D item(2) num(2)
+#define CMD_CHECKITEMAMOUNT         0x46 //C,D item(2) ???(2)
 #define CMD_CHECKITEM               0x47 //C,D item(2) num(2)
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
 #define CMD_PAUSEEVENT              0x51 //C,D event(2)
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
 #define CMD_REAPPEAR                0x55 //C,D sprite(2)
 #define CMD_FACEPLAYER              0x5A //C,D
+#define CMD_SPRITEFACE              0x5B //C,D sprite(2) face(1)
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_60                      0x60 //?,? (2)
-#define CMD_61                      0x61 //?,? (2)
-#define CMD_MOVESPRITE2             0x63 //?,? (2)(2)(2)
-#define CMD_SPRITEBEHAVE            0x65 //?,? (2)(1)
+#define CMD_CLEARTRAINERFLAG        0x61 //C,D (2)
+#define CMD_MOVESPRITE2             0x63 //C,D spr(2)x(2)y(2)
+#define CMD_MOVEOFFSCREEN           0x64 //C,D spr(2)
+#define CMD_SPRITEBEHAVE            0x65 //C,D spr(2)typ(1)
 #define CMD_SHOWMSG                 0x66 //C,D
 #define CMD_MESSAGE                 0x67 //C,D addr(4)
-#define CMD_CLOSEMSG2               0x68 //C,D
-#define CMD_JINGLE                  0x69 //C,D
+#define CMD_CLOSEMSG                0x68 //C,D
+#define CMD_LOCKALL                 0x69 //C,D
 #define CMD_LOCK                    0x6A //C,D
-#define CMD_CLOSEMSG                0x6B //C,D
+#define CMD_RELEASEALL              0x6B //C,D
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
@@ -109,6 +112,7 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_GIVEEGG                 0x7A //C,D poke(2)
+#define CMD_CHECKATTACK             0x7C //C,D attk(2)
 #define CMD_STOREPOKEMON            0x7D //C,D TXT_VAR(1) POKE(2)
 #define CMD_STOREITEM               0x80 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D TXT_VAR(1) ITM(2)
@@ -120,20 +124,29 @@
 #define CMD_FAKEJUMPSTD             0x88 //C,D FR type(1)Does not affect actual gameplay
 #define CMD_FAKECALLSTD             0x89 //C,D FR type(1)Ditto
 #define CMD_SLOTMACHINE             0x89 //C,D RS ??(2)
-#define CMD_91                      0x91 //?,? (1)(2)(2)
-#define CMD_92                      0x92 //?,? (1)(2)(2)
-#define CMD_93                      0x93 //?,? (2)(1)
-#define CMD_94                      0x94 //?,? (2)
-#define CMD_95                      0x95 //?,? (1)
+#define CMD_RANDOM                  0x8F //C,D (2)
+#define CMD_PAYMONEY                0x91 //?,? (1)(2)(2)
+#define CMD_CHECKMONEY              0x92 //?,? (2)(1)
+#define CMD_SHOWMONEY               0x93 //?,? (2)(1)
+#define CMD_HIDEMONEY               0x94 //?,? (2)
+#define CMD_UPDATEMONEY             0x95 //?,? (1)(1)(1)
 #define CMD_96                      0x96 //?,? (2)
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
 #define CMD_99                      0x99 //?,? (2)
 #define CMD_9A                      0x9A //?,? (1)
-#define CMD_9D                      0x9D //?,? (2)(1) or (1)(2)??
+#define CMD_DOANIMATION             0x9C //C,D (2)
+#define CMD_SETANIMATION            0x9D //?,? (1)(2)
+#define CMD_CHECKANIMATION          0x9E //C,D (2)
+#define CMD_SETHEALINGPLACE         0x9F //C,D place(2)
 #define CMD_CHECKGENDER             0xA0 //C,D
+#define CMD_CRYFR                   0xA1 //C,D (2)(1)
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
-#define CMD_SETWEATHER              0xA4 //C,D weather(1)
+#define CMD_SETWEATHER              0xA4 //C,D weather(1) (fr=2)
 #define CMD_DOWEATHER               0xA5 //C,D
+#define CMD_SETMAPFOOTER            0xA7 //C,D (2)
+#define CMD_SETDOOROPENED           0xAC //C,D (2)(2)
+#define CMD_SETDOORCLOSED           0xAD //C,D (2)(2)
+#define CMD_DOORCHANGE              0xAE //C,D
 #define CMD_COINCASETOVAR           0xB3 //C,D var(2)
 #define CMD_GIVETOCOINCASE          0xB4 //C,D coins(2)
 #define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1) item(2)
@@ -141,7 +154,10 @@
 #define CMD_C1                      0xC1 //?,? (2)
 #define CMD_C2                      0xC2 //?,? (2)
 #define CMD_C3                      0xC3 //?,? ??????(1)
+#define CMD_WAITCRY                 0xC5 //C,D
 #define CMD_TEXTCOLOR               0xC7 //?,? colour(1)
+#define CMD_MSGBOXSIGN              0xCA //C,D
+#define CMD_MSGBOXNORMAL            0xCB //C,D
 #define CMD_SETWORLDMAPFLAG         0xD0 //C,D FLAG(2)
 #define CMD_D3                      0xD3 //?,? Braille(4)
 #define CMD_FB                      0xFB //?,? ADDR4?
@@ -213,7 +229,7 @@ showmsg Shows a message (usually stored by MESSAGE)
 message Gets ready to show a message
 closemsg2 One of the commands to close a message on-screen
 (don't you hate it when "you obtained ultra ball" stays on-screen?)
-jingle Makes that tinny "clink" sound that happens when you press A while someone is talking.
+lockall locks all players
 lock Stops the calling sprite from wandering off.
 closemsg Another one of those message-closing commands
 release Gives the calling sprite free will again (opposite of lock)
