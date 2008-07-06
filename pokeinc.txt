@@ -161,7 +161,7 @@
 #define SLOWBRO 80
 #define MAGNEMITE 81
 #define MAGNETON 82
-#define FARFETCHED 83
+#define FARFETCH'D 83
 #define DODUO 84
 #define DODRIO 85
 #define SEEL 86
@@ -328,7 +328,7 @@
 #define PUPITAR 247
 #define TYRANITAR 248
 #define LUGIA 249
-#define HOOH 250
+#define HO-OH 250
 #define CELEBI 251
 #define TREECKO 277
 #define GROVYLE 278
@@ -885,7 +885,7 @@
 #define GRASSCUSHION 0x6C
 #define FIRECUSHION 0x6D
 #define WATERCUSHION 0x6E
-#define SNORLAXDOL 0x6F
+#define SNORLAXDOLL 0x6F
 #define RHYDONDOLL 0x70
 #define LAPRASDOLL 0x71
 #define VENUSAURDOLL 0x72
