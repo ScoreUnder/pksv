@@ -45,7 +45,7 @@ int writescr(char*fmt, ...)
 
 void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 {
-  unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6,arg7;
+  unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6;
   DWORD read;
   unsigned char command;
   char buf[1024],buf2[1024];
@@ -78,8 +78,452 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
     if(read>0)
     {
 #define GENERIC(x) func("%s\r\n",x)
+      arg1=arg2=arg3=arg4=arg5=arg6=0;
       switch(command)
       {
+      case CMD_GIVEMONEY:
+        ReadFile(fileM,&arg1,4,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("givemoney 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_REAPPEARAT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("reappearat 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_MOVESPRITE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        func("movesprite 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_APPLYMOVEMENTFINISHAT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,4,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        if ((arg2&0xff000000)==0x08000000)
+        {
+          if (arg1==255)
+          {
+            func("applymovementfinishat PLAYER 0x%X 0x%X 0x%X ' %s\r\n",arg2,arg3,arg4,transmove(arg2,filename));
+          }
+          else if (arg1==0x800f)
+          {
+            func("applymovementfinishat LASTTALKED 0x%X 0x%X 0x%X ' %s\r\n",arg2,arg3,arg4,transmove(arg2,filename));
+          }
+          else if (arg1==0x7F)
+          {
+            func("applymovementfinishat CAMERA 0x%X 0x%X 0x%X ' %s\r\n",arg2,arg3,arg4,transmove(arg2,filename));
+          }
+          else
+          {
+            func("applymovementfinishat 0x%X 0x%X 0x%X 0x%X ' %s\r\n",arg1,arg2,arg3,arg4,transmove(arg2,filename));
+          }
+          DoMove(arg2);
+        }
+        else
+        {
+          if (arg1==255)
+          {
+            func("applymovementfinishat PLAYER 0x%X 0x%X 0x%X ' Not in ROM\r\n",arg2,arg3,arg4);
+          }
+          else if (arg1==0x800f)
+          {
+            func("applymovementfinishat LASTTALKED 0x%X 0x%X 0x%X ' Not in ROM\r\n",arg2,arg3,arg4);
+          }
+          else if (arg1==0x7f)
+          {
+            func("applymovementfinishat CAMERA 0x%X 0x%X 0x%X ' Not in ROM\r\n",arg2,arg3,arg4);
+          }
+          else
+          {
+            func("applymovementfinishat 0x%X 0x%X 0x%X 0x%X ' Not in ROM\r\n",arg1,arg2,arg3,arg4);
+          }
+        }
+        break;
+      case CMD_DISAPPEARAT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("disappearat 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_CHECKFURNITURE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkfurniture 0x%X\r\n",arg1);
+        break;
+      case CMD_TAKEFURNITURE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("takefurniture 0x%X\r\n",arg1);
+        break;
+      case CMD_CHECKITEMINPC:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("checkiteminpc 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_GIVEITEMTOPC:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("giveitemtopc 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_ADDFURNITURE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("addfurniture 0x%X\r\n",arg1);
+        break;
+      case CMD_CHECKITEMTYPE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkitemtype 0x%X\r\n",arg1);
+        break;
+      case CMD_CHECKIFROOMFORFURNITURE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkifroomforfurniture 0x%X\r\n",arg1);
+        break;
+      case CMD_PLAYSONG:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("playsong 0x%X\r\n",arg1);
+        break;
+      case CMD_FARREAPPEAR:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("farreappear 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_FARDISAPPEAR:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("fardisappear 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_STOREPOKEMONVAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("storepokemonvar 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETPOKEMONPP:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        func("setpokemonpp 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_MULTICHOICE3:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        ReadFile(fileM,&arg5,1,&read,NULL);
+        func("multichoice3 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        break;
+      case CMD_SHOWYESNO:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("showyesno 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETTRAINERFLAG:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("settrainerflag 0x%X\r\n",arg1);
+        break;
+      case CMD_STOREFIRSTPOKEMON:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("storefirstpokemon 0x%X\r\n",arg1);
+        break;
+      case CMD_POKEMART2:
+        ReadFile(fileM,&arg1,4,&read,NULL);
+        func("pokemart2 0x%X\r\n",arg1);
+        break;
+      case CMD_8A:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("CMD_8A 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_FADESCREENDELAY:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("fadescreendelay 0x%X 0x%X",arg1,arg2);
+        switch(arg1)
+        {
+          case 0:
+            func(" ' Fade back into the action from black");
+            break;
+          case 1:
+            func(" ' Fade screen to black");
+            break;
+          case 2:
+            func(" ' Fade back into the action from white");
+            break;
+          case 3:
+            func(" ' Fade screen to white");
+            break;
+        }
+        func("\r\n");
+        break;
+      case CMD_SETCATCHLOCATION:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("setcatchlocation 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_STOREITEMS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        func("storeitems 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_WARPTELEPORT2:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warpteleport2 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warpteleport2 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+        break;
+      case CMD_WARPMUTED:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warpmuted 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warpmuted 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_WARPWALKING:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warpwalking 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warpwalking 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_FALLDOWNHOLE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("falldownhole 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_WARPTELEPORT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warpteleport 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warpteleport 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_WARP3:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warp3 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warp3 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_WARPELEVATOR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warpelevator 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warpelevator 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_WARP4:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warp4 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warp4 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_WARP5:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        if(mode==FIRE_RED)
+        {
+          ReadFile(fileM,&arg4,2,&read,NULL);
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          func("warp5 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        }else
+        {
+          func("warp5 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        }
+        break;
+      case CMD_GETPLAYERXY:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("getplayerxy 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_FADESONG:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("fadesong 0x%X\r\n",arg1);
+        break;
+      case CMD_EXECUTERAM:
+        GENERIC("executeram");
+        break;
+      case CMD_LASTBATTLE:
+        GENERIC("lastbattle");
+        break;
+      case CMD_RESETWEATHER:
+        GENERIC("resetweather");
+        break;
+      case CMD_STARTWIRELESS:
+        GENERIC("startwireless");
+        break;
+      case CMD_CHOOSECONTESTPOKEMON:
+        GENERIC("choosecontestpokemon");
+        break;
+      case CMD_STARTCONTEST:
+        GENERIC("startcontest");
+        break;
+      case CMD_LASTTRAINERBATTLE:
+        GENERIC("lasttrainerbattle");
+        break;
+      case CMD_ENDTRAINERBATTLE:
+        GENERIC("endtrainerbattle");
+        break;
+      case CMD_ENDTRAINERBATTLE2:
+        GENERIC("endtrainerbattle2");
+        break;
+      case CMD_TAKEFROMCOINCASE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("takefromcoincase 0x%X\r\n",arg1);
+        break;
+      case CMD_MSGBOX2:
+        ReadFile(fileM,&arg2,4,&read,NULL);
+        if((arg2&0xff000000)!=0x08000000)
+        {
+          func("msgbox2 0x%X\r\n",arg2);
+        }
+        else
+        {
+          func("msgbox2 0x%X ' %s\r\n",arg2,transtxt(arg2,filename));
+          DoText(arg2);
+        }
+        if((arg2&0xff000000)!=0x08000000)
+        {
+          func("          'Pointer not in ROM area\r\n");
+        }
+        break;
+      case CMD_B2:
+        GENERIC("CMD_B2");
+        break;
+      case CMD_2D:
+        GENERIC("CMD_2D");
+        break;
+      case CMD_2C:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("CMD_2C 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_RESETVARS:
+        GENERIC("resetvars");
+        break;
+      case CMD_B1:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        ReadFile(fileM,&arg4,2,&read,NULL);
+        func("CMD_B1 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+        break;
+      case CMD_SETDOOROPENEDSTATIC:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("setdooropenedstatic 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETDOORCLOSEDSTATIC:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("setdoorclosedstatic 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_RESETSPRITELEVEL:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        func("resetspritelevel 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case CMD_CREATETEMPSPRITE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,2,&read,NULL);
+        ReadFile(fileM,&arg4,2,&read,NULL);
+        ReadFile(fileM,&arg5,1,&read,NULL);
+        ReadFile(fileM,&arg6,1,&read,NULL);
+        func("createtempsprite 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6);
+        break;
+      case CMD_A6:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("CMD_A6 0x%X\r\n",arg1);
+        break;
+      case CMD_TEMPSPRITEFACE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("tempspriteface 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETOBEDIENCE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("setobedience 0x%X\r\n",arg1);
+        break;
+      case CMD_CHECKOBEDIENCE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkobedience 0x%X\r\n",arg1);
+        break;
+      case CMD_COMPAREHIDDENVAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("checkobedience 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_STOREBOXNAME:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("storeboxname 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_WARP6:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,2,&read,NULL);
+        ReadFile(fileM,&arg5,2,&read,NULL);
+        func("warp6 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        break;
       case CMD_MSGBOXSIGN:
         GENERIC("msgboxsign");
         break;
@@ -87,42 +531,32 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("msgboxnormal");
         break;
       case CMD_SETHEALINGPLACE:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("sethealingplace 0x%X\r\n",arg1);
         break;
       case CMD_SPRITEFACE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("spriteface 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_RANDOM:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("random 0x%X\r\n",arg1);
         break;
       case CMD_MOVEOFFSCREEN:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("moveoffscreen 0x%X\r\n",arg1);
         break;
-      case CMD_60:
-        arg1=0;
+      case CMD_CHECKTRAINERFLAG:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_60 0x%X\r\n",arg1);
+        func("checktrainerflag 0x%X\r\n",arg1);
         break;
       case CMD_SETDOOROPENED:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("setdooropened 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SETDOORCLOSED:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("setdoorclosed 0x%X 0x%X\r\n",arg1,arg2);
@@ -131,8 +565,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("doorchange");
         break;
       case CMD_CALLSTDIF:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         switch(arg1)
@@ -159,12 +591,9 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
             strcpy(buf,"Unknown IF condition");
             break;
         }
-        func("callstdif 0x%X 0x%X ' %s\r\n",arg1,arg2,buf);
+        func("if 0x%X callstd 0x%X ' %s\r\n",arg1,arg2,buf);
         break;
       case CMD_SHOWPOKEPIC:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
@@ -174,13 +603,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("hidepokepic\r\n");
         break;
       case CMD_SETMAPFOOTER:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("setmapfooter 0x%X\r\n",arg1);
         break;
       case CMD_JUMPSTDIF:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         switch(arg1)
@@ -207,71 +633,68 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
             strcpy(buf,"Unknown IF condition");
             break;
         }
-        func("jumpstdif 0x%X 0x%X ' %s\r\n",arg1,arg2,buf);
+        func("if 0x%X jumpstd 0x%X ' %s\r\n",arg1,arg2,buf);
         break;
       case CMD_SETWORLDMAPFLAG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("setworldmapflag 0x%X\r\n",arg1);
         break;
-      case CMD_9A:
-        arg1=0;
+      case CMD_LIGHTROOM:
         ReadFile(fileM,&arg1,1,&read,NULL);
-        func("CMD_9A 0x%X\r\n",arg1);
+        func("lightroom 0x%X\r\n",arg1);
         break;
-      case CMD_99:
-        arg1=0;
+      case CMD_DARKENROOM:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_99 0x%X\r\n",arg1);
+        func("darkenroom 0x%X\r\n",arg1);
         break;
       case CMD_MOVESPRITE2:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         func("movesprite2 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_ADDITEM:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("additem 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SPRITEBEHAVE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("spritebehave 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case CMD_C2:
-        arg1=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_C2 0x%X\r\n",arg1);
+      case CMD_UPDATECOINS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("updatecoins 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETBYTE2:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("setbyte2 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case CMD_SETFARBYTE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,4,&read,NULL);
+        func("setfarbyte 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_TEXTCOLOR:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("textcolor 0x%X 'Sets text color (Fire Red).\r\n",arg1);
         break;
       case CMD_FAKEJUMPSTD:
         if(mode==FIRE_RED)
         {
-          arg1=0;
           ReadFile(fileM,&arg1,1,&read,NULL);
           func("fakejumpstd 0x%X\r\n",arg1);
         }
         else
         {
-          func("#raw 0x%X\r\n",CMD_FAKEJUMPSTD);
+          ReadFile(fileM,&arg1,4,&read,NULL);
+          func("pokemart3 0x%X\r\n",arg1);
         }
         break;
       case CMD_COMPAREVARS:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -284,19 +707,37 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         else if(arg2==0x800F){strcpy(buf,"LASTTALKED");}
         func("comparevars %s %s\r\n",buf,buf2);
         break;
+      case CMD_COMPAREVARS2:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        sprintf(buf,"0x%X",arg1);
+        sprintf(buf2,"0x%X",arg2);
+        if(arg1==0x800D){strcpy(buf,"LASTRESULT");}
+        else if(arg1==0x800C){strcpy(buf,"PLAYERFACING");}
+        else if(arg1==0x800F){strcpy(buf,"LASTTALKED");}
+        if(arg2==0x800D){strcpy(buf2,"LASTRESULT");}
+        else if(arg2==0x800C){strcpy(buf,"PLAYERFACING");}
+        else if(arg2==0x800F){strcpy(buf,"LASTTALKED");}
+        func("comparevars2 %s %s\r\n",buf,buf2);
+        break;
+      case CMD_SUBTRACTVAR:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        sprintf(buf,"0x%X",arg1);
+        if(arg1==0x800D){strcpy(buf,"LASTRESULT");}
+        else if(arg1==0x800C){strcpy(buf,"PLAYERFACING");}
+        else if(arg1==0x800F){strcpy(buf,"LASTTALKED");}
+        func("subtractvar %s 0x%X\r\n",buf,arg2);
+        break;
       case CMD_CLEARTRAINERFLAG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("cleartrainerflag 0x%X\r\n",arg1);
         break;
       case CMD_FE:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("CMD_FE 0x%X\r\n",arg1);
         break;
       case CMD_ADDVAR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -310,12 +751,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("addvar %s %s\r\n",buf,buf2);
         break;
       case CMD_96:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("CMD_96 0x%X\r\n",arg1);
         break;
       case CMD_COINCASETOVAR:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
         if(arg1==0x800D){strcpy(buf,"LASTRESULT");}
@@ -324,57 +763,43 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("coincasetovar %s\r\n",buf);
         break;
       case CMD_GIVETOCOINCASE:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("givetocoincase %d ' Bear in mind, it's not in hex\r\n",arg1);
         break;
       case CMD_CHECKMONEY:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         func("checkmoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_PAYMONEY:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         func("paymoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_UPDATEMONEY:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
         func("updatemoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_HIDEMONEY:
-        arg1=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("hidemoney 0x%X\r\n",arg1);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("hidemoney 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case CMD_C1:
-        arg1=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_C1 0x%X\r\n",arg1);
+      case CMD_HIDECOINS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("hidecoins 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case CMD_C0:
-        arg1=0;
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        func("CMD_C0 0x%X\r\n",arg1);
+      case CMD_SHOWCOINS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("showcoins 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_MULTICHOICE2:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
@@ -382,44 +807,33 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("multichoice2 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
         break;
       case CMD_SHOWMONEY:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("showmoney 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_DISAPPEAR:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("disappear 0x%X\r\n",arg1);
         break;
       case CMD_REAPPEAR:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("reappear 0x%X\r\n",arg1);
         break;
       case CMD_GIVEEGG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("giveegg 0x%X\r\n",arg1);
         break;
       case CMD_STOREFURNITURE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("storefurniture 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_STOREATK:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("storeatk 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_STORECOMP:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("storecomp 0x%X 0x%X\r\n",arg1,arg2);
@@ -427,46 +841,34 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_SLOTMACHINE:
         if(mode==FIRE_RED)
         {
-          arg1=0;
           ReadFile(fileM,&arg1,1,&read,NULL);
           func("fakecallstd 0x%X\r\n",arg1);
         }
         else if(mode==RUBY)
         {
-          arg1=0;
           ReadFile(fileM,&arg1,2,&read,NULL);
           func("slotmachine 0x%X\r\n",arg1);
         }
         break;
       case CMD_STOREITEM:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("storeitem 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_DOANIMATION:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("doanimation 0x%X\r\n",arg1);
         break;
       case CMD_CHECKANIMATION:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("checkanimation 0x%X\r\n",arg1);
         break;
       case CMD_SETANIMATION:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("setanimation 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_HIDEBOX:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
@@ -474,8 +876,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("hidebox 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
         break;
       case CMD_STORETEXT:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         if((arg2&0xff000000)!=0x08000000)
@@ -489,13 +889,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_SOUND:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("sound 0x%X\r\n",arg1);
         break;
       case CMD_STOREVAR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg2);
@@ -508,26 +905,18 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("doweather");
         break;
       case CMD_SETWEATHER:
-        arg1=0;
         arg2=1;
         if(mode==FIRE_RED)arg2=2;
         ReadFile(fileM,&arg1,arg2,&read,NULL);
         func("setweather 0x%X\r\n",arg1);
         break;
       case CMD_BATTLE:
-        arg1=0;
-        arg2=0;
-        arg3=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         func("battle 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
         break;
       case CMD_SETMAPTILE:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
@@ -539,7 +928,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("end");
         break;
       case CMD_POKEMART:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("pokemart 0x%X\r\n",arg1);
         break;
@@ -551,26 +939,20 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("return");
         break;
       case CMD_WRITEBYTETOOFFSET:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         func("writebytetooffset 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_CHECKFLAG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("checkflag 0x%X\r\n",arg1);
         break;
       case CMD_SPECIAL2:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("special2 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SETFLAG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("setflag 0x%X\r\n",arg1);
         break;
@@ -581,13 +963,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("faceplayer");
         break;
       case CMD_C3:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("CMD_C3 0x%X\r\n",arg1);
         break;
       case CMD_JUMPIF:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         switch(arg1)
@@ -625,11 +1004,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_WARP:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
-        arg5=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
@@ -645,48 +1019,35 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_FB:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("CMD_FB 0x%X\r\n",arg1);
         break;
       case CMD_COPYSCRIPTBANKS:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("copyscriptbanks 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_COMPAREVARTOFARBYTE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         func("comparevartofarbyte 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_COMPAREFARBYTETOVAR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("comparefarbytetovar 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_COMPAREFARBYTETOBYTE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("comparefarbytetobyte 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_COPYBYTE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         func("copybyte 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SETVAR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -696,7 +1057,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("setvar %s 0x%X\r\n",buf,arg2);
         break;
       case CMD_MESSAGE:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         if((arg1&0xff000000)!=0x08000000)
         {
@@ -709,8 +1069,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_CALLIF:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         switch(arg1)
@@ -751,8 +1109,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("checkgender");
         break;
       case CMD_COMPARE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -762,8 +1118,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("compare %s 0x%X\r\n",buf,arg2);
         break;
       case CMD_APPLYMOVEMENT:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         if ((arg2&0xff000000)==0x08000000)
@@ -810,17 +1164,14 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("release");
         break;
       case CMD_PAUSE:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("pause 0x%X\r\n",arg1);
         break;
       case CMD_PAUSEEVENT:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("pauseevent 0x%X\r\n",arg1);
         break;
       case CMD_CALL:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("call 0x%X\r\n",arg1);
         if((arg1&0xff000000)==0x08000000)
@@ -833,7 +1184,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_CALLSTD:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         strcpy(buf,"");
         sprintf(buf2,"0x%X",arg1);
@@ -863,7 +1213,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("callstd %s ' %s\r\n",buf2,buf);
         break;
       case CMD_MSGBOX:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         if (arg1==0)
@@ -888,14 +1237,11 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_STOREPOKEMON:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("storepokemon 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_SPECIAL:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("special 0x%X",arg1);
         if(arg1==0)
@@ -903,17 +1249,26 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("\r\n");
         break;
       case CMD_FADESCREEN:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("fadescreen 0x%X",arg1);
-        if(arg1==0)
-        {func(" ' Fade back into the action");}
-        else if (arg1==1)
-        {func(" ' Fade screen to black");}
+        switch(arg1)
+        {
+          case 0:
+            func(" ' Fade back into the action from black");
+            break;
+          case 1:
+            func(" ' Fade screen to black");
+            break;
+          case 2:
+            func(" ' Fade back into the action from white");
+            break;
+          case 3:
+            func(" ' Fade screen to white");
+            break;
+        }
         func("\r\n");
         break;
       case CMD_FANFARE:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("fanfare 0x%X\r\n",arg1);
         break;
@@ -921,7 +1276,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("waitfanfare");
         break;
       case CMD_BRAILLE:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("braille 0x%X\r\n",arg1);
         if((arg1&0xff000000)==0x08000000)
@@ -934,7 +1288,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_D3:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("CMD_D3 0x%X\r\n",arg1);
         if((arg1&0xff000000)==0x08000000)
@@ -956,7 +1309,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("lockall");
         break;
       case CMD_PICTURE:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("picture 0x%X\r\n",arg1);
         break;
@@ -967,14 +1319,12 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("nop1 ' #raw 0x1\r\n");
         break;
       case CMD_JUMP:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("jump 0x%X\r\n",arg1);
         Do(arg1);
         still_going=0;
         break;
       case CMD_JUMPSTD:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("jumpstd 0x%X\r\n",arg1);
         still_going=0;
@@ -983,13 +1333,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("killscript");
         break;
       case CMD_SETBYTE:
-        arg1=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         func("setbyte 0x%X\r\n",arg1);
         break;
       case CMD_COPYVARIFNOTZERO:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -999,8 +1346,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("copyvarifnotzero %s 0x%X\r\n",buf,arg2);
         break;
       case CMD_COPYVAR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         sprintf(buf,"0x%X",arg1);
@@ -1014,22 +1359,16 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("copyvar %s %s\r\n",buf,buf2);
         break;
       case CMD_COMPAREVARTOBYTE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("comparevartobyte 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_LOADBYTEFROMPOINTER:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         func("loadbytefrompointer 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_REMOVEITEM:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("removeitem 0x%X 0x%X\r\n",arg1,arg2);
@@ -1041,8 +1380,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("waitcry");
         break;
       case CMD_CRYFR:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("cry 0x%X 0x%X\r\n",arg1,arg2);
@@ -1050,8 +1387,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case CMD_CRY:
         if(mode!=FIRE_RED)
         {
-          arg1=0;
-          arg2=0;
           ReadFile(fileM,&arg1,1,&read,NULL);
           ReadFile(fileM,&arg2,2,&read,NULL);
           func("cry 0x%X 0x%X\r\n",arg1,arg2);
@@ -1060,8 +1395,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
           GENERIC("checksound");
         break;
       case CMD_PLAYSOUND:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         if(mode==FIRE_RED)
         {
@@ -1073,8 +1406,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
           func("playsound 0x%X\r\n",arg1);
         }
         break;
-      case CMD_FADESOUND:
-        arg1=0;
+      case CMD_FADEDEFAULT:
         if(mode==RUBY)
         {
           ReadFile(fileM,&arg1,2,&read,NULL);
@@ -1095,31 +1427,20 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         GENERIC("countpokemon");
         break;
       case CMD_CHECKITEM:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("checkitem 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_CHECKITEMAMOUNT:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         func("checkitemamount 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case CMD_CHECKATTACK:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("checkattack 0x%X\r\n",arg1);
         break;
       case CMD_TRAINERBATTLE:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
-        arg5=0;
-        arg6=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
@@ -1147,10 +1468,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         }
         break;
       case CMD_MULTICHOICE:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,1,&read,NULL);
@@ -1158,12 +1475,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         func("multichoice 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
         break;
       case CMD_ADDPOKEMON:
-        arg1=0;
-        arg2=0;
-        arg3=0;
-        arg4=0;
-        arg5=0;
-        arg6=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
@@ -1172,22 +1483,19 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg6,4,&read,NULL);
         func("addpokemon 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6);
         break;
-      case CMD_FADEDEFAULT:
-        GENERIC("fadedefault");
-        break;
       case CMD_CALLASM:
-        arg1=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         func("callasm 0x%X\r\n",arg1);
         break;
+      case CMD_CALLASM2:
+        ReadFile(fileM,&arg1,4,&read,NULL);
+        func("callasm2 0x%X\r\n",arg1);
+        break;
       case CMD_CLEARFLAG:
-        arg1=0;
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("clearflag 0x%X\r\n",arg1);
         break;
       case CMD_COMPAREFARBYTETOFARBYTE:
-        arg1=0;
-        arg2=0;
         ReadFile(fileM,&arg1,4,&read,NULL);
         ReadFile(fileM,&arg2,4,&read,NULL);
         func("comparefarbytetofarbyte 0x%X 0x%X\r\n",arg1,arg2);

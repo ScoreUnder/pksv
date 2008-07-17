@@ -207,7 +207,14 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       buf2[j]=0;
       if(buf2[0]==0)
       {
-        sprintf(buf2,"Unknown integer value in %s\r\n",func);
+        if(chr=='\n')
+        {
+          sprintf(buf2,"You need to enter more arguments to %s\r\n",func);
+        }
+        else
+        {
+          sprintf(buf2,"Unknown integer value in %s\r\n",func);
+        }
         WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
         return 0;
       }

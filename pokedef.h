@@ -37,22 +37,27 @@
 #define CMD_SETBYTE                 0x0E //C,D byte(1)
 #define CMD_MSGBOX                  0x0F //C,D 00 addr(4)
 /////// CMD_MSGBOX used as LOADPOINTER     C,D bank(1) addr(4)
+#define CMD_SETBYTE2                0x10 //C,D bank(1)byte(1)
 #define CMD_WRITEBYTETOOFFSET       0x11 //C,D byte(1) addr(4)
 #define CMD_LOADBYTEFROMPOINTER     0x12 //C,D byte(1) addr(4)
+#define CMD_SETFARBYTE              0x13 //C,D bank(1) addr(4)
 #define CMD_COPYSCRIPTBANKS         0x14 //C,D bank(1) bank(1)
 #define CMD_COPYBYTE                0x15 //C,D addr(4) addr(4)
 #define CMD_SETVAR                  0x16 //C,D var(2) val(2)
-#define CMD_ADDVAR                  0x17 //?,? var(2) val(2)
+#define CMD_ADDVAR                  0x17 //C,D var(2) val(2)
+#define CMD_SUBTRACTVAR             0x18 //C,D var(2)val(2)
 #define CMD_COPYVAR                 0x19 //C,D var(2) val(2)
 #define CMD_COPYVARIFNOTZERO        0x1A //C,D var(2) val(2)
+#define CMD_COMPAREVARS             0x1B //C,D var(2)var(2)
 #define CMD_COMPAREVARTOBYTE        0x1C //C,D var(2) byte(1)
 #define CMD_COMPAREVARTOFARBYTE     0x1D //C,D var(2) addr(4)
 #define CMD_COMPAREFARBYTETOVAR     0x1E //C,D addr(4) var(2)
 #define CMD_COMPAREFARBYTETOBYTE    0x1F //C,D addr(4) byte(1)
 #define CMD_COMPAREFARBYTETOFARBYTE 0x20 //C,D fb(4) fb(4)
 #define CMD_COMPARE                 0x21 //C,D var(2) val(2)
-#define CMD_COMPAREVARS             0x22 //?,? var(2) var(2)
+#define CMD_COMPAREVARS2            0x22 //?,? var(2) var(2)
 #define CMD_CALLASM                 0x23 //C,D addr(4)
+#define CMD_CALLASM2                0x24 //C,D addr(4)
 #define CMD_SPECIAL                 0x25 //C,D type(2)
 #define CMD_SPECIAL2                0x26 //C,D var(2) type(2)
 #define CMD_WAITSPECIAL             0x27 //C,D
@@ -63,30 +68,60 @@
 #define CMD_SETFLAG                 0x29 //C,D flag(2)
 #define CMD_CLEARFLAG               0x2A //C,D flag(2)
 #define CMD_CHECKFLAG               0x2B //C,D flag(2)
+#define CMD_2C                      0x2C //?,? (2)(2)
+#define CMD_2D                      0x2D //?,?
+#define CMD_RESETVARS               0x2E //C,D
 #define CMD_SOUND                   0x2F //?,? id(2)
 #define CMD_CRY                     0x30 //C,D bank(1) poke(2) (fr=checksound)
 #define CMD_FANFARE                 0x31 //C,D snd(2)
 #define CMD_WAITFANFARE             0x32 //C,D
 #define CMD_PLAYSOUND               0x33 //C,D snd(2) (fr: +1)
-#define CMD_FADEDEFAULT             0x34 //C,D
-#define CMD_FADESOUND               0x35 //C,D snd(2)
+#define CMD_PLAYSONG                0x34 //C,D song(2)
+#define CMD_FADEDEFAULT             0x35 //C,D
+#define CMD_FADESONG                0x36 //C,D song(2)
 #define CMD_FADEOUT                 0x37 //C,D
 #define CMD_FADEIN                  0x38 //C,D
 #define CMD_WARP                    0x39 //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARPMUTED               0x3A //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARPWALKING             0x3B //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_FALLDOWNHOLE            0x3C //C,D bank map
+#define CMD_WARPTELEPORT            0x3D //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARP3                   0x3E //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARPELEVATOR            0x3F //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARP4                   0x40 //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_WARP5                   0x41 //C,D bank map exit - ALL 1 BYTE FRONLY:??(2) ??(2)
+#define CMD_GETPLAYERXY             0x42 //C,D xvar(2)yvar(2)
 #define CMD_COUNTPOKEMON            0x43 //C,D
 #define CMD_ADDITEM                 0x44 //C,D (2) (2)
 #define CMD_REMOVEITEM              0x45 //C,D item(2) num(2)
 #define CMD_CHECKITEMAMOUNT         0x46 //C,D item(2) ???(2)
 #define CMD_CHECKITEM               0x47 //C,D item(2) num(2)
+#define CMD_CHECKITEMTYPE           0x48 //C,D item(2)
+#define CMD_GIVEITEMTOPC            0x49 //C,D item(2) num(2)
+#define CMD_CHECKITEMINPC           0x4A //C,D item(2) num(2)
+#define CMD_ADDFURNITURE            0x4B //C,D type(2)
+#define CMD_TAKEFURNITURE           0x4C //C,D type(2)
+#define CMD_CHECKIFROOMFORFURNITURE 0x4D //C,D type(2)
+#define CMD_CHECKFURNITURE          0x4E //C,D type(2)
 #define CMD_APPLYMOVEMENT           0x4F //C,D spr(2) addr(4)
+#define CMD_APPLYMOVEMENTFINISHAT   0x50 //C,D spr(2) addr(4) x,y(1,1)
 #define CMD_PAUSEEVENT              0x51 //C,D event(2)
 #define CMD_DISAPPEAR               0x53 //C,D sprite(2)
+#define CMD_DISAPPEARAT             0x54 //C,D sprite(2)x(1)y(1)
 #define CMD_REAPPEAR                0x55 //C,D sprite(2)
+#define CMD_REAPPEARAT              0x56 //C,D spr(2)x(1)y(1)
+#define CMD_MOVESPRITE              0x57 //C,D id(2)x(2)y(2)
+#define CMD_FARREAPPEAR             0x58 //C,D id(2)bnk(1)map(1)
+#define CMD_FARDISAPPEAR            0x59 //C,D id(2)bnk(1)map(1)
 #define CMD_FACEPLAYER              0x5A //C,D
 #define CMD_SPRITEFACE              0x5B //C,D sprite(2) face(1)
 #define CMD_TRAINERBATTLE           0x5C //C,D kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
-#define CMD_60                      0x60 //?,? (2)
+#define CMD_LASTTRAINERBATTLE       0x5D //C,D
+#define CMD_ENDTRAINERBATTLE        0x5E //C,D
+#define CMD_ENDTRAINERBATTLE2       0x5F //C,D
+#define CMD_CHECKTRAINERFLAG        0x60 //C,D (2)
 #define CMD_CLEARTRAINERFLAG        0x61 //C,D (2)
+#define CMD_SETTRAINERFLAG          0x62 //C,D (2)
 #define CMD_MOVESPRITE2             0x63 //C,D spr(2)x(2)y(2)
 #define CMD_MOVEOFFSCREEN           0x64 //C,D spr(2)
 #define CMD_SPRITEBEHAVE            0x65 //C,D spr(2)typ(1)
@@ -98,9 +133,13 @@
 #define CMD_RELEASEALL              0x6B //C,D
 #define CMD_RELEASE                 0x6C //C,D
 #define CMD_WAITBUTTON              0x6D //C,D
+#define CMD_SHOWYESNO               0x6E //C,D x(1) y(1)
 #define CMD_MULTICHOICE             0x6F //C,D x(1) y(1) list(1) AbleToCancel(1)
-#define CMD_MULTICHOICE2            0x70 //C,D x(1) y(1) list(1) ??(2)
-#define CMD_HIDEBOX                 0x73 //C,D [1x4]
+#define CMD_MULTICHOICE2            0x70 //C,D x(1) y(1) list(1) defchoice(1) AbleToCancel(1)
+#define CMD_MULTICHOICE3            0x71 //C,D 1:x y list how-many-per-row can-cancel
+#define CMD_SHOWBOX                 0x72 //C,D 1:xywh
+#define CMD_HIDEBOX                 0x73 //C,D 1:xywh
+#define CMD_CLEARBOX                0x74 //C,D 1:xywh
 #define CMD_SHOWPOKEPIC             0x75 //C,D var(2) x(1) y(1)
 #define CMD_HIDEPOKEPIC             0x76 //C,D
 #define CMD_PICTURE                 0x77 //C,D num(1)
@@ -112,8 +151,11 @@
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
 #define CMD_GIVEEGG                 0x7A //C,D poke(2)
+#define CMD_SETPOKEMONPP            0x7B //C,D pkmslot(1) atkslot(1) pp(2)
 #define CMD_CHECKATTACK             0x7C //C,D attk(2)
 #define CMD_STOREPOKEMON            0x7D //C,D TXT_VAR(1) POKE(2)
+#define CMD_STOREFIRSTPOKEMON       0x7E //C,D TXT_VAR(1)
+#define CMD_STOREPOKEMONVAR         0x7F //C,D TXT_VAR(1) VAR(2)
 #define CMD_STOREITEM               0x80 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D TXT_VAR(1) ITM(2)
 #define CMD_STOREATK                0x82 //C,D TXT_VAR(1) ATK(2)
@@ -121,45 +163,75 @@
 #define CMD_STORECOMP               0x84 //C,D TXT_VAR(1) COMP(2)
 #define CMD_STORETEXT               0x85 //C,D TXT_VAR(1) TXT(4)
 #define CMD_POKEMART                0x86 //C,D mart(4)
+#define CMD_POKEMART2               0x87 //C,D ptr(4)
 #define CMD_FAKEJUMPSTD             0x88 //C,D FR type(1)Does not affect actual gameplay
+#define CMD_POKEMART3               0x88 //C,D RS ptr(4)
 #define CMD_FAKECALLSTD             0x89 //C,D FR type(1)Ditto
 #define CMD_SLOTMACHINE             0x89 //C,D RS ??(2)
-#define CMD_RANDOM                  0x8F //C,D (2)
-#define CMD_PAYMONEY                0x91 //?,? (1)(2)(2)
-#define CMD_CHECKMONEY              0x92 //?,? (2)(1)
-#define CMD_SHOWMONEY               0x93 //?,? (2)(1)
-#define CMD_HIDEMONEY               0x94 //?,? (2)
-#define CMD_UPDATEMONEY             0x95 //?,? (1)(1)(1)
+#define CMD_8A                      0x8A //?,? (1)(1)(1)
+#define CMD_CHOOSECONTESTPOKEMON    0x8B //C,D
+#define CMD_STARTCONTEST            0x8C //C,D
+#define CMD_STARTWIRELESS           0x8E //C,D EM ONLY
+#define CMD_RANDOM                  0x8F //C,D possibilities(2)
+#define CMD_GIVEMONEY               0x90 //C,D amt(4)?(1)
+#define CMD_PAYMONEY                0x91 //C,D amt(4)?(1)
+#define CMD_CHECKMONEY              0x92 //C,D amt(4)?(1)
+#define CMD_SHOWMONEY               0x93 //C,D x(1)y(1)?(1)
+#define CMD_HIDEMONEY               0x94 //C,D (2)
+#define CMD_UPDATEMONEY             0x95 //C,D (1)(1)(1)
 #define CMD_96                      0x96 //?,? (2)
 #define CMD_FADESCREEN              0x97 //C,D blk(1)
-#define CMD_99                      0x99 //?,? (2)
-#define CMD_9A                      0x9A //?,? (1)
+#define CMD_FADESCREENDELAY         0x98 //C,D blk(1)delay(1)
+#define CMD_DARKENROOM              0x99 //C,D size(2)
+#define CMD_LIGHTROOM               0x9A //C,D size(1)
+#define CMD_MSGBOX2                 0x9B //C,D ptr(4)
 #define CMD_DOANIMATION             0x9C //C,D (2)
-#define CMD_SETANIMATION            0x9D //?,? (1)(2)
+#define CMD_SETANIMATION            0x9D //C,D (1)(2)
 #define CMD_CHECKANIMATION          0x9E //C,D (2)
 #define CMD_SETHEALINGPLACE         0x9F //C,D place(2)
 #define CMD_CHECKGENDER             0xA0 //C,D
 #define CMD_CRYFR                   0xA1 //C,D (2)(1)
 #define CMD_SETMAPTILE              0xA2 //C,D X(2) Y(2) tile(2) attr(2)
+#define CMD_RESETWEATHER            0xA3 //C,D
 #define CMD_SETWEATHER              0xA4 //C,D weather(1) (fr=2)
 #define CMD_DOWEATHER               0xA5 //C,D
+#define CMD_A6                      0xA6 //?,? (1)
 #define CMD_SETMAPFOOTER            0xA7 //C,D (2)
+#define CMD_INCREASESPRITELEVEL     0xA8 //C,D id(2)bank(1)map(1)?(1)
+#define CMD_RESETSPRITELEVEL        0xA9 //C,D id(2)bank(1)map(1)
+#define CMD_CREATETEMPSPRITE        0xAA //C,D spr(1)id(1)x(2)y(2)behave(1)dir(1)
+#define CMD_TEMPSPRITEFACE          0xAB //C,D id(1)dir(1)
 #define CMD_SETDOOROPENED           0xAC //C,D (2)(2)
 #define CMD_SETDOORCLOSED           0xAD //C,D (2)(2)
 #define CMD_DOORCHANGE              0xAE //C,D
+#define CMD_SETDOOROPENEDSTATIC     0xAF //C,D (2)(2)
+#define CMD_SETDOORCLOSEDSTATIC     0xB0 //C,D (2)(2)
+#define CMD_B1                      0xB1 //?,? (1)(1)(2)(2)
+#define CMD_B2                      0xB2 //?,?
 #define CMD_COINCASETOVAR           0xB3 //C,D var(2)
 #define CMD_GIVETOCOINCASE          0xB4 //C,D coins(2)
+#define CMD_TAKEFROMCOINCASE        0xB5 //C,D coins(2)
 #define CMD_BATTLE                  0xB6 //C,D poke(2) lvl(1) item(2)
-#define CMD_C0                      0xC0 //?,? (2)
-#define CMD_C1                      0xC1 //?,? (2)
-#define CMD_C2                      0xC2 //?,? (2)
+#define CMD_LASTBATTLE              0xB7 //C,D
+#define CMD_SHOWCOINS               0xC0 //?,? x(1)y(1)
+#define CMD_HIDECOINS               0xC1 //?,? x(1)y(1)
+#define CMD_UPDATECOINS             0xC2 //?,? x(1)y(1)
 #define CMD_C3                      0xC3 //?,? ??????(1)
+#define CMD_WARP6                   0xC4 //C,D bnk(1)map(1)ext(1)x(2)y(2)
 #define CMD_WAITCRY                 0xC5 //C,D
+#define CMD_STOREBOXNAME            0xC6 //C,D \v\hxx(1) boxno(2)
 #define CMD_TEXTCOLOR               0xC7 //?,? colour(1)
 #define CMD_MSGBOXSIGN              0xCA //C,D
 #define CMD_MSGBOXNORMAL            0xCB //C,D
+#define CMD_COMPAREHIDDENVAR        0xCC //C,D var(1) val(2)
+#define CMD_SETOBEDIENCE            0xCD //C,D id(2)
+#define CMD_CHECKOBEDIENCE          0xCE //C,D id(2)
+#define CMD_EXECUTERAM              0xCF //C,D
 #define CMD_SETWORLDMAPFLAG         0xD0 //C,D FLAG(2)
+#define CMD_WARPTELEPORT2           0xD1 //C,D bnk(1) map(1) ext(1) x(2) y(2)
+#define CMD_SETCATCHLOCATION        0xD2 //C,D id(2) loc(1)
 #define CMD_D3                      0xD3 //?,? Braille(4)
+#define CMD_STOREITEMS              0xD4 //C,D \v\hxx(1) id(2) amt(2)
 #define CMD_FB                      0xFB //?,? ADDR4?
 #define CMD_FE                      0xFE //?,? (1)
 

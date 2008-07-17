@@ -351,7 +351,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   while(1)
   {
     ReadFile(scrfile,&cch,1,&read,NULL);
-    if(read==0){MessageBox(0,"EOF","",0x40);break;}
+    if(read==0)break;
     if(cch=='\n')break;
     if(cch=='\r')break;
     str[k]=cch;
