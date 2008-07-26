@@ -17,10 +17,21 @@
 */
 #define log(asd,fgh) WriteFile(LogFile,asd,fgh,&read,NULL)
 #define aa(x) else if (!strcmp(buf,x))
-#define ec() while(Script[i+1]==' '){i++;}if(Script[i+1]=='\''){while(Script[i+1]!='\n'&&Script[i+1]!=0){i++;}}if(Script[i+1]!='\n'){log("Extra characters on line. Ignoring.\r\n",37);}while(chr!='\n'){i++;}
+#define ec() e_c(Script,&i,LogFile)
 #define rom(c,s) j=c;WriteFile(RomFile,&j,s,&read,NULL)
 #define BASIC(x) rom(x,1)
 #define vlog(x) vlogProc(LogFile,x)
+void e_c(char*Script,int*ii,HANDLE LogFile)
+{
+  register unsigned int i=*ii;
+  DWORD read;
+  while(Script[i+1]==' '){i++;}
+  if(Script[i+1]=='\''){while(Script[i+1]!='\n'&&Script[i+1]!=0){i++;}}
+  if(Script[i+1]!='\n'){log("Extra characters on line. Ignoring.\r\n",37);}
+  while(chr!='\n'){i++;}
+  *ii=i;
+  return;
+}
 void vlogProc(HANDLE LogFile,char*x)
 {
   DWORD read;
@@ -88,7 +99,7 @@ void RecodeProc(char*script,char*romfn)
     ReadFile(IncFile,Script,fst,&read,NULL);
     strcat(Script,"\n");
     strcat(Script,"\n");
-    ReadFile(CurrFile,(char*)(Script+fst+3),fs,&read,NULL);
+    ReadFile(CurrFile,(char*)(Script+fst+2),fs,&read,NULL);
     strcat(Script,"\n");
     strcat(Script,"\n");
     LogFile=CreateFile("PokeScrE.log",GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
