@@ -1,6 +1,7 @@
 #quiet
 'PKSV SETTINGS
-#define FINDFROM 0x6B0000 'This is where to start looking for free space
+#define FINDFROM 0x800000 'This is where to start looking for free space
+#define FINDFROMGOLD 0x98860
 'VARS
 #define LASTRESULT 0x800D
 #define LASTTALKED 0x800F

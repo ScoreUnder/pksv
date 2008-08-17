@@ -45,7 +45,7 @@ void RecodeProc(char*script,char*romfn)
                            //Use caps-lock carefully.
   char buf[1024],buf2[1024],buf3[1024];
   void*temp_ptr;
-  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6;
+  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6,arg7;
   DWORD read;
   SetLastError(0);
   CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -115,6 +115,376 @@ void RecodeProc(char*script,char*romfn)
     i=0;
     LowerCase(Script);
     RemAll0D(Script);
+    if(mode==GOLD)
+    {
+    while(i<strlen(Script))
+    {
+      switch(chr) //Behave differently according to char
+      {
+        case 0:  //E O Script
+          return;
+        case '\'':
+          while(chr!='\n'&&chr!=0)
+          {i++;}i--;break;
+        case ' ':  //Ignore spaces
+        case '\n':
+          break;
+        default:
+          j=0;
+          while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+          {
+            buf[j]=chr;
+            i++;
+            j++;
+          }
+          buf[j]=0;
+          if(!strcmp(buf,"#define"))
+          {
+            vlog("#DEFINE\r\n");
+            while(chr==' '){i++;}
+            if(chr=='\n'||chr==0||chr=='\'')
+            {
+              log("Premature end to #DEFINE!\r\n",27);
+              return;
+            }
+            j=0;
+            while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+            {
+              buf[j]=chr;
+              i++;
+              j++;
+            }
+            buf[j]=0; //Append null
+            sprintf(buf2,"   -> %s\r\n",buf);
+            vlog(buf2);
+            while(chr==' '){i++;} //The same old same old.
+            if(chr=='\n'||chr==0||chr=='\'')
+            {
+              log("Premature end to #DEFINE!\r\n",27);
+              return;
+            }
+            k=GetNum("#DEFINE");
+            if (!gffs){return;}
+            Define(buf,k);
+            ec();
+          }
+          aa("#org")
+          {
+            vlog("#ORG\r\n");
+            k=GetNum("#ORG");
+            if(!gffs){return;}
+            SetFilePointer(RomFile,k&0x00ffffff,NULL,FILE_BEGIN);
+            ec();
+          }
+          aa("#quiet")
+          {
+            IsVerbose=0;
+            ec();
+          }
+          aa("#loud")
+          {
+            IsVerbose=1;
+            ec();
+          }
+          aa("#raw")
+          {
+            vlog("#RAW\r\n");
+            k=GetNum("#RAW");
+            if(!gffs){return;}
+            BASIC(k);
+            if(k>255)
+            {
+              BASIC(k>>8);
+              if(k>65535)
+              {
+                BASIC(k>>16);
+                if(k>16777215)
+                {
+                  BASIC(k>>24);
+                }
+              }
+            }
+            ec();
+          }
+          aa("end")                 {BASIC(GLD_END);                 ec();}
+          aa("return")              {BASIC(GLD_RETURN);              ec();}
+          aa("reloadandreturn")     {BASIC(GLD_RELOADANDRETURN);     ec();}
+          aa("checktriggers")       {BASIC(GLD_CHECKTRIGGERS);       ec();}
+          aa("checkver")            {BASIC(GLD_CHECKVER);            ec();}
+          aa("wildoff")             {BASIC(GLD_WILDOFF);             ec();}
+          aa("wildon")              {BASIC(GLD_WILDON);              ec();}
+          aa("itemnotify")          {BASIC(GLD_ITEMNOTIFY);          ec();}
+          aa("pocketisfull")        {BASIC(GLD_POCKETISFULL);        ec();}
+          aa("opentextbox")         {BASIC(GLD_OPENTEXTBOX);         ec();}
+          aa("loadmovesprites")     {BASIC(GLD_LOADMOVESPRITES);     ec();}
+          aa("yesorno")             {BASIC(GLD_YESORNO);             ec();}
+          aa("writebackup")         {BASIC(GLD_WRITEBACKUP);         ec();}
+          aa("closetext")           {BASIC(GLD_CLOSETEXT);           ec();}
+          aa("keeptextopen")        {BASIC(GLD_KEEPTEXTOPEN);        ec();}
+          aa("pokepicyesorno")      {BASIC(GLD_POKEPICYESORNO);      ec();}
+          aa("interpretmenu")       {BASIC(GLD_INTERPRETMENU);       ec();}
+          aa("interpretmenu2")      {BASIC(GLD_INTERPRETMENU2);      ec();}
+          aa("loadpikadata")        {BASIC(GLD_LOADPIKADATA);        ec();}
+          aa("clearfight")          {BASIC(GLD_CLEARFIGHT);          ec();}
+          aa("loadtrainerseen")     {BASIC(GLD_LOADTRAINERSEEN);     ec();}
+          aa("startbattle")         {BASIC(GLD_STARTBATTLE);         ec();}
+          aa("returnafterbattle")   {BASIC(GLD_RETURNAFTERBATTLE);   ec();}
+          aa("talkafter")           {BASIC(GLD_TALKAFTER);           ec();}
+          aa("talkaftercancel")     {BASIC(GLD_TALKAFTERCANCEL);     ec();}
+          aa("talkaftercheck")      {BASIC(GLD_TALKAFTERCHECK);      ec();}
+          aa("faceplayer")          {BASIC(GLD_FACEPLAYER);          ec();}
+          aa("stopfollow")          {BASIC(GLD_STOPFOLLOW);          ec();}
+          aa("reloadmap")           {BASIC(GLD_RELOADMAP);           ec();}
+          aa("reloadmappart")       {BASIC(GLD_RELOADMAPPART);       ec();}
+          aa("playrammusic")        {BASIC(GLD_PLAYRAMMUSIC);        ec();}
+          aa("playmapmusic")        {BASIC(GLD_PLAYMAPMUSIC);        ec();}
+          aa("reloadmapmusic")      {BASIC(GLD_RELOADMAPMUSIC);      ec();}
+          aa("waitbutton")          {BASIC(GLD_WAITBUTTON);          ec();}
+          aa("warpsound")           {BASIC(GLD_WARPSOUND);           ec();}
+          aa("specialsound")        {BASIC(GLD_SPECIALSOUND);        ec();}
+          aa("warpcheck")           {BASIC(GLD_WARPCHECK);           ec();}
+          aa("resetfuncs")          {BASIC(GLD_RESETFUNCS);          ec();}
+          aa("hangup")              {BASIC(GLD_HANGUP);              ec();}
+          aa("checkphonecall")      {BASIC(GLD_CHECKPHONECALL);      ec();}
+          aa("halloffame")          {BASIC(GLD_HALLOFFAME);          ec();}
+          aa("credits")             {BASIC(GLD_CREDITS);             ec();}
+          aa("2call")
+          {
+            vlog("2CALL\r\n");
+            arg1=GetNum("2CALL");
+            if(!gffs){return;}
+            BASIC(GLD_2CALL);
+            rom(arg1,2);
+            ec();
+          }
+          aa("3call")
+          {
+            vlog("3CALL\r\n");
+            arg1=GetNum("3CALL");
+            if(!gffs){return;}
+            BASIC(GLD_3CALL);
+            rom(arg1,3);
+            ec();
+          }
+          aa("2ptcall")
+          {
+            vlog("2PTCALL\r\n");
+            arg1=GetNum("2PTCALL");
+            if(!gffs){return;}
+            BASIC(GLD_2PTCALL);
+            rom(arg1,2);
+            ec();
+          }
+          aa("2jump")
+          {
+            vlog("2JUMP\r\n");
+            arg1=GetNum("2JUMP");
+            if(!gffs){return;}
+            BASIC(GLD_2JUMP);
+            rom(arg1,2);
+            ec();
+          }
+          aa("3jump")
+          {
+            vlog("3JUMP\r\n");
+            arg1=GetNum("3JUMP");
+            if(!gffs){return;}
+            BASIC(GLD_3JUMP);
+            rom(arg1,3);
+            ec();
+          }
+          aa("2ptjump")
+          {
+            vlog("2PTJUMP\r\n");
+            arg1=GetNum("2PTJUMP");
+            if(!gffs){return;}
+            BASIC(GLD_2PTJUMP);
+            rom(arg1,2);
+            ec();
+          }
+          aa("if")
+          {
+            vlog("IF\r\n");
+            while(chr==' ')i++;
+            if(chr=='\n'||chr==0||chr=='\'')
+            {
+              log("Incorrect arguments to IF.\r\n",28);
+            }
+            j=0;
+            while(chr!='\n'&&chr!=' '&&chr!=0&&chr!='\'')
+            {
+              buf[j]=chr;
+              i++;
+              j++;
+            }
+            buf[j]=0;
+            if(!strcmp(buf,"=")||!strcmp(buf,"=="))
+            {
+              BASIC(GLD_EQBYTE);
+            }
+            else if(!strcmp(buf,"!=")||!strcmp(buf,"<>"))
+            {
+              BASIC(GLD_NEQBYTE);
+            }
+            else if(!strcmp(buf,"<")||!strcmp(buf,"<<"))
+            {
+              BASIC(GLD_LTBYTE);
+            }
+            else if(!strcmp(buf,">")||!strcmp(buf,">>"))
+            {
+              BASIC(GLD_GTBYTE);
+            }
+            else if(!strcmp(buf,"==0")||!strcmp(buf,"=0"))
+            {
+              BASIC(GLD_EQZERO);
+            }
+            else if(!strcmp(buf,"!=0")||!strcmp(buf,"<>0"))
+            {
+              BASIC(GLD_NEQZERO);
+            }
+            else
+            {
+              log("Incorrect arguments to IF\r\n",29);
+              return;
+            }
+            arg1=GetNum("IF");
+            if(!gffs){return;}
+            rom(arg1,2);
+            ec();
+          }
+          aa("jumpstd")
+          {
+            vlog("JUMPSTD\r\n");
+            arg1=GetNum("JUMPSTD");
+            if(!gffs){return;}
+            BASIC(GLD_JUMPSTD);
+            rom(arg1,2);
+            ec();
+          }
+          aa("callstd")
+          {
+            vlog("CALLSTD\r\n");
+            arg1=GetNum("CALLSTD");
+            if(!gffs){return;}
+            BASIC(GLD_CALLSTD);
+            rom(arg1,2);
+            ec();
+          }
+          aa("3callasm")
+          {
+            vlog("3CALLASM\r\n");
+            arg1=GetNum("3CALLASM");
+            if(!gffs){return;}
+            BASIC(GLD_3CALLASM);
+            rom(arg1,3);
+            ec();
+          }
+          aa("special")
+          {
+            vlog("SPECIAL\r\n");
+            arg1=GetNum("SPECIAL");
+            if(!gffs){return;}
+            BASIC(GLD_SPECIAL);
+            rom(arg1,2);
+            ec();
+          }
+          aa("2ptcallasm")
+          {
+            vlog("2PTCALLASM\r\n");
+            arg1=GetNum("2PTCALLASM");
+            if(!gffs){return;}
+            BASIC(GLD_2PTCALLASM);
+            rom(arg1,2);
+            ec();
+          }
+          aa("checkmaptriggers")
+          {
+            vlog("CHECKMAPTRIGGERS\r\n");
+            arg1=GetNum("CHECKMAPTRIGGERS");
+            if(!gffs){return;}
+            arg2=GetNum("CHECKMAPTRIGGERS");
+            if(!gffs){return;}
+            BASIC(GLD_CHECKMAPTRIGGERS);
+            rom(arg1,1);
+            rom(arg2,1);
+            ec();
+          }
+          aa("m")
+          {
+            vlog("Engine data...\r\n");
+            WriteFile(RomFile,trans,transbackmove(Script,&i),&read,NULL);
+            ec();
+          }
+          aa("=")
+          {
+            vlog("[STRING]\r\n");
+            if(chr==' '){i++;}
+            else{log("Should have a space after the =\r\n",33);}
+            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-2,RomFile);
+            while(chr!='\n'&&chr!=0){i++;}
+            sprintf(buf2,"   -> %s\r\n",temp_ptr);
+            GlobalFree(temp_ptr);
+            vlog(buf2);
+          }
+          aa(".")
+          {
+            vlog("[BINARY]\r\n   ->");
+            while(chr==' '){i++;}
+            k=0;
+            while(chr!='\n'&&chr!=0)
+            {
+              k=1-k;
+              while(chr==' ')
+              {i++;}
+              j=0;
+              while(((char*)("0123456789abcdef"))[j]!=0)
+              {
+                if(((char*)("0123456789abcdef"))[j]==chr)
+                {
+                  break;
+                }
+                j+=1;
+              }
+              if(((char*)("0123456789abcdef"))[j]==0)
+              {
+                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                log(buf2,strlen(buf2));
+                return;
+              }
+              if(k==0)
+              {
+                l|=j;
+                rom(j,1);
+                if(IsVerbose)
+                {
+                  sprintf(buf2," %02X",l);
+                  log(buf2,strlen(buf2));
+                }
+              }
+              else
+              {
+                l=j<<4;
+              }
+              i++;
+            }
+            vlog("\r\n");
+          }
+          else
+          {
+            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            log(buf2,strlen(buf2));
+            while(chr!='\n'&&chr!=0)
+            {
+              i++;
+            }
+          }
+          break;
+      }
+      i++;
+    }
+    }
+    else
+    {
     while(i<strlen(Script))
     {
       switch(chr) //Behave differently according to char
@@ -145,13 +515,13 @@ void RecodeProc(char*script,char*romfn)
           {
             vlog("#DEFINE\r\n");
             while(chr==' '){i++;}
-            if(chr=='\n'||chr==0)
+            if(chr=='\n'||chr==0||chr=='\'')
             {
               log("Premature end to #DEFINE!\r\n",27);
               return;
             }
             j=0;
-            while(chr!=' '&&chr!='\n'&&chr!=0)
+            while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
             {
               buf[j]=chr;
               i++;
@@ -161,7 +531,7 @@ void RecodeProc(char*script,char*romfn)
             sprintf(buf2,"   -> %s\r\n",buf);
             vlog(buf2);
             while(chr==' '){i++;} //The same old same old.
-            if(chr=='\n'||chr==0)
+            if(chr=='\n'||chr==0||chr=='\'')
             {
               log("Premature end to #DEFINE!\r\n",27);
               return;
@@ -1592,8 +1962,11 @@ void RecodeProc(char*script,char*romfn)
               sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
               vlog(buf3);
             }
-            arg5=GetNum("TRAINERBATTLE");
-            if(!gffs){return;}
+            if(arg1!=3)
+            {
+              arg5=GetNum("TRAINERBATTLE");
+              if(!gffs){return;}
+            }
             if((arg4&0xff000000)==0)
             {
               arg4|=0x08000000;
@@ -1605,8 +1978,11 @@ void RecodeProc(char*script,char*romfn)
             rom(arg2,2);
             rom(arg3,2);
             rom(arg4,4);
-            rom(arg5,4);
-            if(arg1==1)
+            if(arg1!=3)
+            {
+              rom(arg5,4);
+            }
+            else if(arg1==1)
             {
               arg6=GetNum("TRAINERBATTLE");
               if(!gffs){return;}
@@ -2521,7 +2897,7 @@ void RecodeProc(char*script,char*romfn)
             vlog("[STRING]\r\n");
             if(chr==' '){i++;}
             else{log("Should have a space after the =\r\n",33);}
-            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-1,RomFile);
+            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-2,RomFile);
             while(chr!='\n'&&chr!=0){i++;}
             sprintf(buf2,"   -> %s\r\n",temp_ptr);
             GlobalFree(temp_ptr);
@@ -2582,6 +2958,7 @@ void RecodeProc(char*script,char*romfn)
           break;
       }
       i++;
+    }
     }
     ///WriteFile(LogFile,stuff,fs,&read,NULL);
     GlobalFree(Script);

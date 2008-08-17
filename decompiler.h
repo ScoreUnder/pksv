@@ -45,7 +45,7 @@ int writescr(char*fmt, ...)
 
 void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
 {
-  unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6;
+  unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6,arg7;
   DWORD read;
   unsigned char command;
   char buf[1024],buf2[1024];
@@ -70,15 +70,24 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       func("'Address 0x%X is officially L33T!\r\n",(FileZoomPos&0x00ffffff));
     }
   }
-  func("#org 0x%X\r\n",(FileZoomPos|0x08000000));
+  if(mode==GOLD)
+  {
+    func("#org 0x%X\r\n",FileZoomPos);
+  }
+  else
+  {
+    func("#org 0x%X\r\n",(FileZoomPos|0x08000000));
+  }
   func("'-----------------------------------\r\n");
+  if(mode!=GOLD)
+  {
   while (still_going)
   {
     ReadFile(fileM,&command,1,&read,NULL);
     if(read>0)
     {
 #define GENERIC(x) func("%s\r\n",x)
-      arg1=arg2=arg3=arg4=arg5=arg6=0;
+      arg1=arg2=arg3=arg4=arg5=arg6=arg7=0;
       switch(command)
       {
       case CMD_GIVEMONEY:
@@ -1445,7 +1454,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg2,2,&read,NULL);
         ReadFile(fileM,&arg3,2,&read,NULL);
         ReadFile(fileM,&arg4,4,&read,NULL);
-        ReadFile(fileM,&arg5,4,&read,NULL);
+        if(arg1!=3)
+        {
+          ReadFile(fileM,&arg5,4,&read,NULL);
+        }
         if(arg1==1||arg1==2){
           ReadFile(fileM,&arg6,4,&read,NULL);
           func("trainerbattle 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6);
@@ -1454,15 +1466,19 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
             Do(arg6);
           }
         }
+        else if (arg1==3)
+        {
+          func("trainerbattle 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+        }
         else
         {
           func("trainerbattle 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
         }
-        if((arg4&0x08000000)!=0)
+        if((arg4&0xFF000000)==0x08000000)
         {
           DoText(arg4);
         }
-        if((arg5&0x08000000)!=0)
+        if((arg5&0xFF000000)==0x08000000)
         {
           DoText(arg5);
         }
@@ -1514,6 +1530,861 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       still_going=0;
     }
   }
+  }
+  else
+  {
+  while (still_going)
+  {
+    ReadFile(fileM,&command,1,&read,NULL);
+    if(read>0)
+    {
+#define GENERIC(x) func("%s\r\n",x)
+      arg1=arg2=arg3=arg4=arg5=arg6=arg7=0;
+      switch(command)
+      {
+      case GLD_END:
+        GENERIC("end");
+        still_going=0;
+        break;
+      case GLD_RETURN:
+        GENERIC("return");
+        still_going=0;
+        break;
+      case GLD_RELOADANDRETURN:
+        GENERIC("reloadandreturn");
+        still_going=0;
+        break;
+      case GLD_2CALL:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("2call 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_3CALL:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        arg2=PointerToOffset(arg1);
+        func("3call 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_2PTCALL:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
+        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        if(arg2!=0xFFFFFFFF)
+        {
+          SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
+          ReadFile(fileM,&arg4,3,&read,NULL);
+          SetFilePointer(fileM,arg3,NULL,FILE_BEGIN);
+        }
+        func("2ptcall 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+        Do(arg4);
+        break;
+      case GLD_2JUMP:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("2jump 0x%X ' 0x%X\r\n",arg1,arg2);
+        still_going=0;
+        Do(arg2);
+        break;
+      case GLD_PRIORITYJUMP:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("priorityjump 0x%X ' 0x%X\r\n",arg1,arg2);
+        still_going=0;
+        Do(arg2);
+        break;
+      case GLD_3JUMP:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        arg2=PointerToOffset(arg1);
+        func("3jump 0x%X ' 0x%X\r\n",arg1,arg2);
+        still_going=0;
+        Do(arg2);
+        break;
+      case GLD_2PTJUMP:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
+        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        if(arg2!=0xFFFFFFFF)
+        {
+          SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
+          ReadFile(fileM,&arg4,3,&read,NULL);
+          SetFilePointer(fileM,arg3,NULL,FILE_BEGIN);
+        }
+        func("2ptjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+        still_going=0;
+        Do(arg4);
+        break;
+      case GLD_PTPRIORITYJUMP:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
+        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        if(arg2!=0xFFFFFFFF)
+        {
+          SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
+          ReadFile(fileM,&arg4,3,&read,NULL);
+          SetFilePointer(fileM,arg3,NULL,FILE_BEGIN);
+        }
+        func("ptpriorityjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+        still_going=0;
+        Do(arg4);
+        break;
+      case GLD_EQBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if == 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_NEQBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if != 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_EQZERO:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if ==0 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_NEQZERO:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if !=0 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_LTBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if < 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_GTBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("if > 0x%X ' 0x%X\r\n",arg1,arg2);
+        Do(arg2);
+        break;
+      case GLD_JUMPSTD:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("jumpstd 0x%X\r\n",arg1);
+        still_going=0;
+        break;
+      case GLD_CALLSTD:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("callstd 0x%X\r\n",arg1);
+        break;
+      case GLD_3CALLASM:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        func("3callasm 0x%X\r\n",arg1);
+        break;
+      case GLD_SPECIAL:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("special 0x%X\r\n",arg1);
+        break;
+      case GLD_2PTCALLASM:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
+        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        if(arg2!=0xFFFFFFFF)
+        {
+          SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
+          ReadFile(fileM,&arg4,3,&read,NULL);
+          SetFilePointer(fileM,arg3,NULL,FILE_BEGIN);
+        }
+        func("2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+        break;
+      case GLD_CHECKMAPTRIGGERS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("checkmaptriggers 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_DOMAPTRIGGER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("domaptrigger 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_DOTRIGGER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("dotrigger 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKTRIGGERS:
+        GENERIC("checktriggers");
+        break;
+      case GLD_LOADPIKADATA:
+        GENERIC("loadpikadata");
+        break;
+      case GLD_LOADTRAINERSEEN:
+        GENERIC("loadtrainerseen");
+        break;
+      case GLD_INTERPRETMENU:
+        GENERIC("interpretmenu");
+        break;
+      case GLD_INTERPRETMENU2:
+        GENERIC("interpretmenu2");
+        break;
+      case GLD_POKEPICYESORNO:
+        GENERIC("pokepicyesorno");
+        break;
+      case GLD_HALLOFFAME:
+        GENERIC("halloffame");
+        break;
+      case GLD_CREDITS:
+        GENERIC("credits");
+        break;
+      case GLD_CHECKPHONECALL:
+        GENERIC("checkphonecall");
+        break;
+      case GLD_HANGUP:
+        GENERIC("hangup");
+        break;
+      case GLD_RESETFUNCS:
+        GENERIC("resetfuncs");
+        break;
+      case GLD_FACEPLAYER:
+        GENERIC("faceplayer");
+        break;
+      case GLD_OPENTEXTBOX:
+        GENERIC("opentextbox");
+        break;
+      case GLD_PLAYRAMMUSIC:
+        GENERIC("playrammusic");
+        break;
+      case GLD_PLAYMAPMUSIC:
+        GENERIC("playmapmusic");
+        break;
+      case GLD_WARPSOUND:
+        GENERIC("warpsound");
+        break;
+      case GLD_SPECIALSOUND:
+        GENERIC("specialsound");
+        break;
+      case GLD_RELOADMAPMUSIC:
+        GENERIC("reloadmapmusic");
+        break;
+      case GLD_KEEPTEXTOPEN:
+        GENERIC("keeptextopen");
+        break;
+      case GLD_PASSTOENGINE:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        arg2=PointerToOffset(arg1);
+        func("passtoengine 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_CHECKBIT1:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkbit1 0x%X\r\n",arg1);
+        break;
+      case GLD_SETBIT1:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("setbit1 0x%X\r\n",arg1);
+        break;
+      case GLD_SETBIT2:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("setbit2 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKBIT2:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkbit2 0x%X\r\n",arg1);
+        break;
+      case GLD_CLEARBIT2:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("clearbit2 0x%X\r\n",arg1);
+        break;
+      case GLD_CLEARBIT1:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("clearbit1 0x%X\r\n",arg1);
+        break;
+      case GLD_WRITETEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+        if(arg2!=0xFFFFFFFF)
+          DoText(arg2);
+        break;
+      case GLD_WRITETEXTBANK:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        arg2=PointerToOffset(arg1);
+        func("writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+        if(arg2!=0xFFFFFFFF)
+          DoText(arg2);
+        break;
+      case GLD_REPEATTEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("repeattext 0x%X\r\n",arg1);
+        break;
+      case GLD_POKEPIC:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("pokepic 0x%X\r\n",arg1);
+        break;
+      case GLD_DESCRIBEDECORATION:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("describedecoration 0x%X\r\n",arg1);
+        break;
+      case GLD_FRUITTREE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("fruittree 0x%X\r\n",arg1);
+        break;
+      case GLD_SPECIALPHONECALL:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("specialphonecall 0x%X\r\n",arg1);
+        break;
+      case GLD_FACEPERSON:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("faceperson 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_VARIABLESPRITE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("variablesprite 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_APPLYMOVEMENT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        func("applymovement 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_APPLYMOVEOTHER:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("applymoveother 0x%X ' 0x%X Applies movement to last talked\r\n",arg1,arg2);
+        break;
+      case GLD_VERBOSEGIVEITEM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("verbosegiveitem 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_LOADWILDDATA:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("loadwilddata 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_LOADTRAINER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("loadtrainer 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_CATCHTUTORIAL:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("catchtutorial 0x%X\r\n",arg1);
+        break;
+      case GLD_TRAINERTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("trainertext 0x%X\r\n",arg1);
+        break;
+      case GLD_TRAINERSTATUS:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("trainerstatus 0x%X\r\n",arg1);
+        break;
+      case GLD_CLOSETEXT:
+        GENERIC("closetext");
+        break;
+      case GLD_LOADMOVESPRITES:
+        GENERIC("loadmovesprites");
+        break;
+      case GLD_POKEMART:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        func("pokemart 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_ELEVATOR:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("elevator 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_YESORNO:
+        GENERIC("yesorno");
+        break;
+      case GLD_RETURNAFTERBATTLE:
+        GENERIC("returnafterbattle");
+        break;
+      case GLD_WAITBUTTON:
+        GENERIC("waitbutton");
+        break;
+      case GLD_WRITEBACKUP:
+        GENERIC("writebackup");
+        break;
+      case GLD_WILDOFF:
+        GENERIC("wildoff");
+        break;
+      case GLD_WILDON:
+        GENERIC("wildon");
+        break;
+      case GLD_ITEMNOTIFY:
+        GENERIC("itemnotify");
+        break;
+      case GLD_POCKETISFULL:
+        GENERIC("pocketisfull");
+        break;
+      case GLD_STARTBATTLE:
+        GENERIC("startbattle");
+        break;
+      case GLD_CLEARFIGHT:
+        GENERIC("clearfight");
+        break;
+      case GLD_TALKAFTERCANCEL:
+        GENERIC("talkaftercancel");
+        break;
+      case GLD_TALKAFTER:
+        GENERIC("talkafter");
+        break;
+      case GLD_TALKAFTERCHECK:
+        GENERIC("talkaftercheck");
+        break;
+      case GLD_CHECKVER:
+        GENERIC("checkver");
+        break;
+      case GLD_RELOADMAPPART:
+        GENERIC("reloadmappart");
+        break;
+      case GLD_RELOADMAP:
+        GENERIC("reloadmap");
+        break;
+      case GLD_DEACTIVATEFACING:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("deactivatefacing 0x%X\r\n",arg1);
+        break;
+      case GLD_NEWLOADMAP:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("newloadmap 0x%X\r\n",arg1);
+        break;
+      case GLD_WARPCHECK:
+        GENERIC("warpcheck");
+        break;
+      case GLD_GIVEITEM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("giveitem 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_REFRESHSCREEN:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("refreshscreen 0x%X\r\n",arg1);
+        break;
+      case GLD_C1CELOADBYTE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("C1CEloadbyte 0x%X ' Apparently useless.\r\n",arg1);
+        break;
+      case GLD_SETLASTTALKED:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("setlasttalked 0x%X\r\n",arg1);
+        break;
+      case GLD_EARTHQUAKE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("earthquake 0x%X\r\n",arg1);
+        break;
+      case GLD_LOADVAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("loadvar 0x%X\r\n",arg1);
+        break;
+      case GLD_ADDVAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("addvar 0x%X\r\n",arg1);
+        break;
+      case GLD_RANDOM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("random 0x%X\r\n",arg1);
+        break;
+      case GLD_COPYBYTETOVAR:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("copybytetovar 0x%X\r\n",arg1);
+        break;
+      case GLD_COPYVARTOBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("copyvartobyte 0x%X\r\n",arg1);
+        break;
+      case GLD_CHANGEBLOCK:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("changeblock 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_SHOWEMOTE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("showemote 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_FOLLOW:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("follow 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_FOLLOWNOTEXACT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("follownotexact 0x%X 0x%X ' Follows, but without mindlessly copying movements.\r\n",arg1,arg2);
+        break;
+      case GLD_SWAPMAPS:
+        ReadFile(fileM,&arg1,3,&read,NULL);
+        func("swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffeset(arg1));
+        break;
+      case GLD_CHANGEPERSONDIR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("changepersondir 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_MOVEPERSON:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("moveperson 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_WRITEPERSONLOC:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("writepersonloc 0x%X\r\n",arg1);
+        break;
+      case GLD_LOADEMOTE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("loademote 0x%X\r\n",arg1);
+        break;
+      case GLD_STOPFOLLOW:
+        GENERIC("stopfollow");
+        break;
+      case GLD_PLAYSOUND:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("playsound 0x%X\r\n",arg1);
+        break;
+      case GLD_PLAYMUSIC:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("playmusic 0x%X\r\n",arg1);
+        break;
+      case GLD_CRY:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("cry 0x%X\r\n",arg1);
+        break;
+      case GLD_PAUSE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("pause 0x%X\r\n",arg1);
+        break;
+      case GLD_WARPMOD:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("warpmod 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_WARP:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        func("warp 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+        break;
+      case GLD_WARPFACING:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        ReadFile(fileM,&arg5,1,&read,NULL);
+        func("warpfacing 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+        break;
+      case GLD_BLACKOUTMOD:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("blackoutmod 0x%X 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_LOCATIONTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("locationtotext 0x%X\r\n",arg1);
+        break;
+      case GLD_DISPLAYLOCATION:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("displaylocation 0x%X\r\n",arg1);
+        break;
+      case GLD_MONEYTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("moneytotext 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_COINSTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("coinstotext 0x%X\r\n",arg1);
+        break;
+      case GLD_VARTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("vartotext 0x%X\r\n",arg1);
+        break;
+      case GLD_POKETOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("poketotext 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_ITEMTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("itemtotext 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_TRAINERTOTEXT:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        func("trainertotext 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+        break;
+      case GLD_STRINGTOTEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("stringtotext 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        if(arg3!=-1)
+        {
+          DoText(arg3);
+        }
+        break;
+      case GLD_STORETEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        arg4=PointerToOffset((arg1<<8)|arg2);
+        func("storetext 0x%X 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3,arg4);
+        if(arg4!=-1)
+        {
+          DoText(arg4);
+        }
+        break;
+      case GLD_MUSICFADEOUT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("musicfadeout 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_WRITECMDQUEUE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("writecmdqueue 0x%X ' 0x%X\r\n",arg1,arg3);
+        break;
+      case GLD_DELCMDQUEUE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("delcmdqueue 0x%X\r\n",arg1);
+        break;
+      case GLD_JUMPTEXTFACEPLAYER:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("jumptextfaceplayer 0x%X ' 0x%X\r\n",arg1,arg2);
+        if(arg2!=-1)
+          DoText(arg2);
+        still_going=0;
+        break;
+      case GLD_JUMPTEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("jumptext 0x%X ' 0x%X\r\n",arg1,arg2);
+        if(arg2!=-1)
+          DoText(arg2);
+        still_going=0;
+        break;
+      case GLD_WINLOSSTEXT:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg4=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        func("winlosstext 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4);
+        if(arg3!=-1)
+          DoText(arg3);
+        if(arg4!=-1)
+          DoText(arg4);
+        break;
+      case GLD_APPEAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("appear 0x%X\r\n",arg1);
+        break;
+      case GLD_DISAPPEAR:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("disappear 0x%X\r\n",arg1);
+        break;
+      case GLD_ASKFORPHONENUMBER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("askforphonenumber 0x%X\r\n",arg1);
+        break;
+      case GLD_PHONECALL:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("phonecall 0x%X\r\n",arg1);
+        break;
+      case GLD_TRADE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("trade 0x%X\r\n",arg1);
+        break;
+      case GLD_TAKEITEM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("takeitem 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_GIVEITEM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("giveitem 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_GIVEMONEY:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,3,&read,NULL);
+        func("givemoney 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_TAKEMONEY:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,3,&read,NULL);
+        func("takemoney 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_CHECKMONEY:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,3,&read,NULL);
+        func("checkmoney 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_GIVECOINS:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("givecoins 0x%X\r\n",arg1);
+        break;
+      case GLD_TAKECOINS:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("takecoins 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKCOINS:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        func("checkcoins 0x%X\r\n",arg1);
+        break;
+      case GLD_GIVEPHONENUMBER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("givephonenumber 0x%X\r\n",arg1);
+        break;
+      case GLD_TAKEPHONENUMBER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("takephonenumber 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKPHONENUMBER:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("checkphonenumber 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKITEM:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("checkitem 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKTIME:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        arg2=rand()%10;
+        if(arg2==0)
+          func("checktime 0x%X ' Look, an acronym of CheckItem!\r\n",arg1); //Easter Egg
+        else
+          func("checktime 0x%X\r\n",arg1);
+        break;
+      case GLD_CHECKPOKE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("checkpoke 0x%X\r\n",arg1);
+        break;
+      case GLD_GIVEEGG:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("giveegg 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_GIVEPOKEITEM:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("givepokeitem 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_TAKEIFLETTER:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        func("takeifletter 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_XYCOMPARE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        func("xycompare 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_GIVEPOKE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        ReadFile(fileM,&arg3,1,&read,NULL);
+        ReadFile(fileM,&arg4,1,&read,NULL);
+        if(arg4==1)
+        {
+          ReadFile(fileM,&arg5,2,&read,NULL);
+          ReadFile(fileM,&arg6,2,&read,NULL);
+          arg7=(OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF);
+          func("givepoke 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
+          PointerToOffset(arg7|(arg5<<8)),
+          PointerToOffset(arg7|(arg6<<8)));
+        }
+        else
+        {
+          func("givepoke 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+        }
+        break;
+      case GLD_FRUITTREE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("fruittree 0x%X\r\n",arg1);
+        break;
+      case GLD_LOADMENUDATA:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        func("loadmenudata 0x%X ' 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_LOADPOKEDATA:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("loadpokedata 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_CHECKCODE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("checkcode 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_WRITEBYTE:
+        ReadFile(fileM,&arg1,2,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        func("writebyte 0x%X 0x%X\r\n",arg1,arg2);
+        break;
+      case GLD_WRITEVARCODE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        func("writevarcode 0x%X\r\n",arg1);
+        break;
+      case GLD_WRITECODE:
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,1,&read,NULL);
+        if(arg1==03)
+        {
+          *buf2=0;
+          switch(arg2)
+          {
+            case 0:
+            case 1:
+            case 5:
+            case 9:
+              strcpy(buf2," ' Normal fight");
+              break;
+            case 2:
+              strcpy(buf2," ' Fight with HIRO's backpic");
+              break;
+            case 3:
+              strcpy(buf2," ' Fight with DUDE's backpic");
+              break;
+            case 4:
+              strcpy(buf2," ' Fight pokemon caught with rod");
+              break;
+            case 6:
+              strcpy(buf2," ' Instant win fight");
+              break;
+            case 7:
+              strcpy(buf2," ' Shiny pokemon fight");
+              break;
+            case 8:
+              strcpy(buf2," ' Tree pokemon fight");
+              break;
+          }
+          func("writecode 0x3 0x%X%s\r\n",arg2,buf2);
+        }
+        else
+        {
+          func("writecode 0x%X 0x%X\r\n",arg1,arg2);
+        }
+        break;
+      default:
+        func("#raw 0x%X\r\n",command);
+        break;
+      }
+    }
+    else
+    {
+      puts("'--EOF--");
+      still_going=0;
+    }
+  }
+  }
   func("\r\n");
   while(!AllDone())
   {
@@ -1524,7 +2395,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
   {
     nl();
     arg1=DoneText(FindNotDoneText());
+    if(mode!=GOLD)
     func("#org 0x%X\r\n= %s\r\n",arg1,transtxt(arg1&0x00ffffff,filename));
+    else
+    func("#org 0x%X\r\n%s",arg1,transtxt(arg1&0x00ffffff,filename));
   }
   while(!AllDoneMove())
   {

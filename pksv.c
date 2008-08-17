@@ -17,6 +17,7 @@
 */
 #define FIRE_RED 0
 #define RUBY     1
+#define GOLD     2
 int(*func)(char*, ...);
 char IsVerbose=1;
 char filearg;
@@ -25,11 +26,13 @@ char error=0;
 char type=0;
 char GlobBuf[65536];
 char mode=FIRE_RED;
+unsigned char search=0xFF;
 //Sorry for the horrible code.
 #include <stdio.h>
 #include <windows.h>
 HANDLE LogFile;
 #include "pokedef.h"
+#include "golddef.h"
 #include "textproc.h" //ORDER IS IMPORTANT
 char fsend[65536];
 #include "codeproc.h"
@@ -47,7 +50,7 @@ int main(int ac,char**av)
   int i;
   unsigned int tmp;
   unsigned char pspec,fspec,cline;
-  char determineMode[3];
+  char determineMode[4];
   DWORD read;
   fileName[0]=(char)0;
   pspec=0;
@@ -182,8 +185,8 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     }
     if(filearg+1==ac)
     {
-      printf("Please enter the file to compile to: ");
-      gets(fileName);
+      *fileName=0;
+      if(!GetOpenFileName(&ofn))return 0;
     }else{
       strcpy(fileName,av[filearg+1]);
     }
@@ -191,9 +194,20 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
     ZeroMemory(determineMode,sizeof(determineMode));
     ReadFile(fileM,&determineMode,3,&read,NULL);
-    if(!strcmp(determineMode,"AX"))
+    if(determineMode[0]=='A'&&determineMode[1]=='X')
     {
       mode=RUBY;
+    }
+    if(determineMode[0]=='B'&&determineMode[1]=='P'&&determineMode[2]=='E')
+    {
+      search=0;
+    }
+    SetFilePointer(fileM,0x13F,NULL,FILE_BEGIN);
+    ReadFile(fileM,&determineMode,3,&read,NULL);
+    if(determineMode[0]=='A'&&determineMode[1]=='A')
+    {
+      mode=GOLD;
+      search=0;
     }
     CloseHandle(fileM);
     RecodeProc(av[filearg],fileName);
@@ -236,9 +250,20 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
     SetFilePointer(fileM,0xAC,NULL,FILE_BEGIN);
     ZeroMemory(determineMode,sizeof(determineMode));
     ReadFile(fileM,&determineMode,3,&read,NULL);
-    if(!strcmp(determineMode,"AX"))
+    if(determineMode[0]=='A'&&determineMode[1]=='X')
     {
       mode=RUBY;
+    }
+    if(determineMode[0]=='B'&&determineMode[1]=='P'&&determineMode[2]=='E')
+    {
+      search=0;
+    }
+    SetFilePointer(fileM,0x13F,NULL,FILE_BEGIN);
+    ReadFile(fileM,&determineMode,3,&read,NULL);
+    if(determineMode[0]=='A'&&determineMode[1]=='A')
+    {
+      mode=GOLD;
+      search=0;
     }
     //Go to AC, get 2 bytes, see if they make AX - then it's r/s.
     if(fileM!=INVALID_HANDLE_VALUE)

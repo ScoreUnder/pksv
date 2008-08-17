@@ -19,11 +19,12 @@ char trans[65536];
 
 char*transtxt(int howfar,char*file)
 {
-  unsigned int pt=0;
-  unsigned char p;
+  unsigned int pt=0,sl,arg1,arg2;
+  unsigned char p,code;
   const char hex[17]="0123456789ABCDEF";
+  char buf[128];
   int read;
-  char still_going;
+  char still_going,readagain,sub_going;
   HANDLE fileC;
   read=0;
   fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
@@ -31,6 +32,7 @@ char*transtxt(int howfar,char*file)
   {
     SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
     still_going=1;
+    if(mode!=GOLD){
     while(still_going)
     {
       ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
@@ -116,7 +118,7 @@ char*transtxt(int howfar,char*file)
           pt++;
           p=hex[p&0xf];
         }
-        if(pt>=65525) //cut smaller for safety
+        if(pt>=65525) //cut smaller for safety, 10 off because some commands are multichar.
         {
           trans[pt]=0;
           break;
@@ -124,6 +126,237 @@ char*transtxt(int howfar,char*file)
         trans[pt]=p;
         pt++;
       }
+    }
+    }
+    else
+    {
+    strcpy(trans,"");
+    while(still_going)
+    {
+      ReadFile(fileC,&code,1,(DWORD*)&read,NULL);
+      sub_going=1;
+      readagain=1;
+      if(code==0)
+      {
+        strcat(trans,"= ");
+        while(sub_going)
+        {
+          sl=strlen(trans);
+          if(readagain)
+            ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+          readagain=1;
+          if(read==0){still_going=sub_going=0;break;}
+          if((p>=0x80&&p<=0x99)||(p>=0xA0&&p<=0xB9)) {trans[sl]=p-0x3F;trans[sl+1]=0;} //letter
+          else if(p==0x7F) {trans[sl]=' ';trans[sl+1]=0;}
+          else if(p==0x75) {strcat(trans,"[...]");}
+          else if(p==0x9C) {trans[sl]=':';trans[sl+1]=0;}
+          else if(p==0xE6) {trans[sl]='?';trans[sl+1]=0;}
+          else if(p==0xE7) {trans[sl]='!';trans[sl+1]=0;}
+          else if(p==0xE8) {trans[sl]='.';trans[sl+1]=0;}
+          else if(p==0xF4) {trans[sl]=',';trans[sl+1]=0;}
+          else if(p==0xE3) {trans[sl]='-';trans[sl+1]=0;}
+          else if(p==0xE0) {trans[sl]='\'';trans[sl+1]=0;}
+          else if(p==0xF0) {trans[sl]='$';trans[sl+1]=0;}
+          else if(p==0xF6) {trans[sl]='0';trans[sl+1]=0;}
+          else if(p==0xF7) {trans[sl]='1';trans[sl+1]=0;}
+          else if(p==0xF8) {trans[sl]='2';trans[sl+1]=0;}
+          else if(p==0xF9) {trans[sl]='3';trans[sl+1]=0;}
+          else if(p==0xFA) {trans[sl]='4';trans[sl+1]=0;}
+          else if(p==0xFB) {trans[sl]='5';trans[sl+1]=0;}
+          else if(p==0xFC) {trans[sl]='6';trans[sl+1]=0;}
+          else if(p==0xFD) {trans[sl]='7';trans[sl+1]=0;}
+          else if(p==0xFE) {trans[sl]='8';trans[sl+1]=0;}
+          else if(p==0xFF) {trans[sl]='9';trans[sl+1]=0;}
+          else if(p==0xD0) {strcat(trans,"'d");}
+          else if(p==0xD1) {strcat(trans,"'l");}
+          else if(p==0xD2) {strcat(trans,"'m");}
+          else if(p==0xD3) {strcat(trans,"'r");}
+          else if(p==0xD4) {strcat(trans,"'s");}
+          else if(p==0xD5) {strcat(trans,"'t");}
+          else if(p==0x50) {sub_going=0;}
+          else if(p==0x51) {strcat(trans,"\\p");}
+          else if(p==0x52) {strcat(trans,"[PLAYER]");}
+          else if(p==0x54) {strcat(trans,"[POKé]");}
+          else if(p==0x55) {strcat(trans,"\\l");}
+          else if(p==0x4F) {strcat(trans,"\\n");}
+          else if(p==0x57)
+          {
+            readagain=0;
+            ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+            if(p==0){strcat(trans,"\\e\r\n");still_going=0;break;}
+            strcat(trans,"\\h57");
+          }
+          else
+          {
+            sprintf(buf,"\\h%02X",p);
+            strcat(trans,buf);
+          }
+        }
+        strcat(trans,"\r\n");
+      }
+      else if(code==1)
+      {
+        pt=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        sprintf(buf,"text-ram 0x%X\r\n",pt);
+        strcat(trans,buf);
+      }
+      else if(code==2)
+      {
+        pt=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+        if(p>>5==7)
+        {
+          sprintf(buf,"0x%X 0x%X money-no-zeros",pt,p&0x1F);
+        }
+        else if(p>>5==6)
+        {
+          sprintf(buf,"0x%X 0x%X no-zeros",pt,p&0x1F);
+        }
+        else if(p>>5==5)
+        {
+          sprintf(buf,"0x%X 0x%X money-spaces",pt,p&0x1F);
+        }
+        else if(p>>5==4)
+        {
+          sprintf(buf,"0x%X 0x%X spaces",pt,p&0x1F);
+        }
+        else if(p>>5==3)
+        {
+          sprintf(buf,"0x%X 0x%X money2",pt,p&0x1F);
+        }
+        else if(p>>5==2)
+        {
+          sprintf(buf,"0x%X 0x%X normal2",pt,p&0x1F);
+        }
+        else if(p>>5==1)
+        {
+          sprintf(buf,"0x%X 0x%X money",pt,p&0x1F);
+        }
+        else
+        {
+          sprintf(buf,"0x%X 0x%X normal",pt,p&0x1F);
+        }
+        strcat(trans,"text-hex ");
+        strcat(trans,buf);
+        strcat(trans,"\r\n");
+      }
+      else if (code==3)
+      {
+        pt=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        sprintf(buf,"text-reloc 0x%X\r\n",pt);
+        strcat(trans,buf);
+      }
+      else if (code==4)
+      {
+        pt=arg1=arg2=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
+        ReadFile(fileC,&arg2,1,(DWORD*)&read,NULL);
+        sprintf(buf,"text-box 0x%X 0x%X 0x%X\r\n",pt,arg1,arg2);
+        strcat(trans,buf);
+      }
+      else if (code==5)
+      {
+        strcat(trans,"text-newline\r\n");
+      }
+      else if (code==6)
+      {
+        strcat(trans,"text-waitbutton\r\n");
+      }
+      else if (code==7)
+      {
+        strcat(trans,"text-newlinewitharrow\r\n");
+      }
+      else if (code==8)
+      {
+        strcat(trans,"text-switchtoasm\r\n");
+        still_going=0;
+      }
+      else if (code==9)
+      {
+        pt=arg1=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
+        sprintf(buf,"text-number 0x%X 0x%X 0x%X\r\n",pt,(arg1&0xF0)>>8,arg1&0xF);
+        strcat(trans,buf);
+      }
+      else if (code==10)
+      {
+        strcat(trans,"text-interpretdata\r\n");
+      }
+      else if (code==11)
+      {
+        strcat(trans,"text-playsound0\r\n");
+      }
+      else if (code==12)
+      {
+        pt=0;
+        ReadFile(fileC,&pt,1,(DWORD*)&read,NULL);
+        sprintf(buf,"text-interpretxdata 0x%X\r\n",pt);
+        strcat(trans,buf);
+      }
+      else if (code==13)
+      {
+        strcat(trans,"text-waitbutton2\r\n");
+      }
+      else if (code==14)
+      {
+        strcat(trans,"text-playsound9\r\n");
+      }
+      else if (code==15)
+      {
+        strcat(trans,"text-playsound1\r\n");
+      }
+      else if (code==16)
+      {
+        strcat(trans,"text-playsound2\r\n");
+      }
+      else if (code==17)
+      {
+        strcat(trans,"text-playsounda\r\n");
+      }
+      else if (code==18)
+      {
+        strcat(trans,"text-playsoundd\r\n");
+      }
+      else if (code==19)
+      {
+        strcat(trans,"text-playsoundc\r\n");
+      }
+      else if (code==20)
+      {
+        pt=0;
+        ReadFile(fileC,&pt,1,(DWORD*)&read,NULL);
+        sprintf(buf,"text-buffer 0x%X\r\n",pt);
+        strcat(trans,buf);
+      }
+      else if (code==21)
+      {
+        strcat(trans,"text-day\r\n");
+      }
+      else if (code==20)
+      {
+        pt=arg1=0;
+        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
+        sprintf(buf,"text-newtxt 0x%X ' 0x%X\r\n",arg1|(pt<<8),PointerToOffset(arg1|(pt<<8)));
+        strcat(trans,buf);
+        if(PointerToOffset(arg1|(pt<<8))!=0xFFFFFFFF)
+        {
+          sprintf(buf,"\r\n#org 0x%X\r\n",PointerToOffset(arg1|(pt<<8)));
+          strcat(trans,buf);
+          SetFilePointer(fileC,PointerToOffset(arg1|(pt<<8)),NULL,FILE_BEGIN);
+        }
+      }
+      else
+      {
+        sprintf(buf,"#raw 0x%X\r\n",code);
+        strcat(trans,buf);
+      }
+    }
     }
     CloseHandle(fileC);
   }

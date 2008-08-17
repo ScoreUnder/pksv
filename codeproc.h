@@ -86,12 +86,19 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
   unsigned char cr;
   DWORD read;
   RomFile=CreateFile(romname,GENERIC_READ,FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  i=WhatIs("findfrom")+ffoff;
+  if(mode==GOLD)
+  {
+    i=WhatIs("findfromgold")+ffoff;
+  }
+  else
+  {
+    i=WhatIs("findfrom")+ffoff;
+  }
   SetFilePointer(RomFile,i,NULL,FILE_BEGIN);
   while(i<0x1000000)
   {
     ReadFile(RomFile,&cr,1,&read,NULL);
-    if(cr==0xff)
+    if(cr==search)
     {j++;}else{j=0;}
     i++;
     if(j>len){break;} //Yes, larger than
@@ -101,6 +108,34 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
   i++;
   CloseHandle(RomFile);
   return (0x08000000|i);
+}
+
+//Gold ptr<->offset functions
+signed int PointerToOffset(unsigned int ptr)
+{
+  unsigned int pointer=0;
+  unsigned int bank=0;
+  unsigned int offset=0;
+  bank=ptr&0xFF;
+  pointer=(ptr&0xFFFF00)>>8;
+  if(pointer<0x4000||pointer>0x7FFF)return -1;
+  pointer&=0x3FFF;
+  pointer|=(bank&3)<<14;
+  bank>>=2;
+  return pointer|(bank<<16);
+}
+signed int OffsetToPointer(unsigned int offset)
+{
+  unsigned int pointer=0;
+  unsigned int bank=0;
+  
+  bank=((offset&0xFF0000)>>14);
+  if(bank>0xFF){return -1;}
+  pointer=offset&0xFFFF;
+  bank|=((pointer&0xF000)>>14);
+  pointer&=0x3FFF;
+  pointer|=0x4000;
+  return (pointer<<8)|bank;
 }
 
 #define Defined(thing) ((WhatIs(thing)&&0)||!fail)
@@ -126,7 +161,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       j=0;
       if(chr=='r'){i--;}
       if(chr=='x'){i++;}
-      while(chr!=' '&&chr!='\n'&&chr!=0)
+      while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
       {
         buf[j]=chr;
         i++;
@@ -138,7 +173,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       l=buf[9];
       buf[9]=0;
       strcpy(buf2,"0123456789abcdef");
-      if(!strcmp(buf,"freespace")) // freespace(.*)?
+      if(!strcmp(buf,"freespace")) // freespace(.+)?
       {
         buf[9]=l;
         if(l==0)
@@ -166,7 +201,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
         k=FindFreeSpace(romfn,k);
         gffs=1;
         *ii=i;
-        if(!Defined("findfrom"))
+        if((!Defined("findfrom")&&mode!=GOLD)||(!Defined("findfromgold")&&mode==GOLD))
         {gffs=0;}
         if (IsVerbose)
         {
@@ -175,6 +210,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
         }
         return k;
       }
+      buf[9]=l;
       l=0;
       while(buf[l]!=0)
       {
@@ -229,7 +265,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
   else
   {
     j=0;
-    while(chr!=' '&&chr!='\n'&&chr!='\r'&&chr!=0)
+    while(chr!=' '&&chr!='\n'&&chr!='\''&&chr!=0)
     {
       buf3[j]=chr;
       i++;

@@ -32,6 +32,7 @@ ZeroMemory(doprocs,sizeof(donemoves));\
 unsigned int Do(unsigned int proc)
 {
   int i=0,j=0;
+  if(proc==0xFFFFFFFF)return proc;
   while(i<1024)
   {
     if(doprocs[i]==0)
