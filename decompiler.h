@@ -2016,7 +2016,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_SWAPMAPS:
         ReadFile(fileM,&arg1,3,&read,NULL);
-        func("swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffeset(arg1));
+        func("swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffset(arg1));
         break;
       case GLD_CHANGEPERSONDIR:
         ReadFile(fileM,&arg1,1,&read,NULL);
@@ -2206,11 +2206,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg2,1,&read,NULL);
         func("takeitem 0x%X 0x%X\r\n",arg1,arg2);
         break;
-      case GLD_GIVEITEM:
-        ReadFile(fileM,&arg1,1,&read,NULL);
-        ReadFile(fileM,&arg2,1,&read,NULL);
-        func("giveitem 0x%X 0x%X\r\n",arg1,arg2);
-        break;
       case GLD_GIVEMONEY:
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,3,&read,NULL);
@@ -2304,10 +2299,6 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         {
           func("givepoke 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
         }
-        break;
-      case GLD_FRUITTREE:
-        ReadFile(fileM,&arg1,1,&read,NULL);
-        func("fruittree 0x%X\r\n",arg1);
         break;
       case GLD_LOADMENUDATA:
         ReadFile(fileM,&arg1,2,&read,NULL);
