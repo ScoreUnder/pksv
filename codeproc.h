@@ -131,6 +131,7 @@ signed int OffsetToPointer(unsigned int offset)
   
   bank=((offset&0xFF0000)>>14);
   if(bank>0xFF){return -1;}
+  if((offset&0xFF000000)){return -1;}
   pointer=offset&0xFFFF;
   bank|=((pointer&0xF000)>>14);
   pointer&=0x3FFF;
@@ -243,7 +244,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       buf2[j]=0;
       if(buf2[0]==0)
       {
-        if(chr=='\n')
+        if(chr=='\n'||chr==0)
         {
           sprintf(buf2,"You need to enter more arguments to %s\r\n",func);
         }

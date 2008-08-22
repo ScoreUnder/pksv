@@ -148,7 +148,8 @@ char*transtxt(int howfar,char*file)
           if(read==0){still_going=sub_going=0;break;}
           if((p>=0x80&&p<=0x99)||(p>=0xA0&&p<=0xB9)) {trans[sl]=p-0x3F;trans[sl+1]=0;} //letter
           else if(p==0x7F) {trans[sl]=' ';trans[sl+1]=0;}
-          else if(p==0x75) {strcat(trans,"[...]");}
+          else if(p==0x75) {strcat(trans,"[.]");}
+          else if(p==0x56) {strcat(trans,"[..]");}
           else if(p==0x9C) {trans[sl]=':';trans[sl+1]=0;}
           else if(p==0xE6) {trans[sl]='?';trans[sl+1]=0;}
           else if(p==0xE7) {trans[sl]='!';trans[sl+1]=0;}
@@ -173,6 +174,7 @@ char*transtxt(int howfar,char*file)
           else if(p==0xD3) {strcat(trans,"'r");}
           else if(p==0xD4) {strcat(trans,"'s");}
           else if(p==0xD5) {strcat(trans,"'t");}
+          else if(p==0xD6) {strcat(trans,"'v");}
           else if(p==0x50) {sub_going=0;}
           else if(p==0x51) {strcat(trans,"\\p");}
           else if(p==0x52) {strcat(trans,"[PLAYER]");}
@@ -337,7 +339,7 @@ char*transtxt(int howfar,char*file)
       {
         strcat(trans,"text-day\r\n");
       }
-      else if (code==20)
+      else if (code==22)
       {
         pt=arg1=0;
         ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
@@ -435,7 +437,7 @@ char*transbrl(int howfar,char*file)
 char*transmove(int howfar,HANDLE file)
 {
   int read;
-  char still_going;
+  char still_going,nextraw;
   HANDLE fileC;
   unsigned char p;
   read=0;
@@ -449,7 +451,96 @@ char*transmove(int howfar,HANDLE file)
     while(still_going)
     {
       ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
-      if(mode==FIRE_RED)
+      if(mode==GOLD)
+      {
+        nextraw=0;
+        switch(p)
+        {
+          case 0x47:strcat(trans,"end");still_going=0;break;
+          case 0x00:strcat(trans,"look_down");break;
+          case 0x01:strcat(trans,"look_up");break;
+          case 0x02:strcat(trans,"look_left");break;
+          case 0x03:strcat(trans,"look_right");break;
+          case 0x04:strcat(trans,"halfstep_down");break;
+          case 0x05:strcat(trans,"halfstep_up");break;
+          case 0x06:strcat(trans,"halfstep_left");break;
+          case 0x07:strcat(trans,"halfstep_right");break;
+          case 0x08:strcat(trans,"slowstep_down");break;
+          case 0x09:strcat(trans,"slowstep_up");break;
+          case 0x0A:strcat(trans,"slowstep_left");break;
+          case 0x0B:strcat(trans,"slowstep_right");break;
+          case 0x0C:strcat(trans,"step_down");break;
+          case 0x0D:strcat(trans,"step_up");break;
+          case 0x0E:strcat(trans,"step_left");break;
+          case 0x0F:strcat(trans,"step_right");break;
+          case 0x10:strcat(trans,"halfstep2_down");break;
+          case 0x11:strcat(trans,"halfstep2_up");break;
+          case 0x12:strcat(trans,"halfstep2_left");break;
+          case 0x13:strcat(trans,"halfstep2_right");break;
+          case 0x14:strcat(trans,"slowslide_down");break;
+          case 0x15:strcat(trans,"slowslide_up");break;
+          case 0x16:strcat(trans,"slowslide_left");break;
+          case 0x17:strcat(trans,"slowslide_right");break;
+          case 0x18:strcat(trans,"slide_down");break;
+          case 0x19:strcat(trans,"slide_up");break;
+          case 0x1A:strcat(trans,"slide_left");break;
+          case 0x1B:strcat(trans,"slide_right");break;
+          case 0x1C:strcat(trans,"fastslide_down");break;
+          case 0x1D:strcat(trans,"fastslide_up");break;
+          case 0x1E:strcat(trans,"fastslide_left");break;
+          case 0x1F:strcat(trans,"fastslide_right");break;
+          case 0x20:strcat(trans,"facehiro_step_down");break;
+          case 0x21:strcat(trans,"facehiro_step_up");break;
+          case 0x22:strcat(trans,"facehiro_step_left");break;
+          case 0x23:strcat(trans,"facehiro_step_right");break;
+          case 0x24:strcat(trans,"dontfacehiro_step_down");break;
+          case 0x25:strcat(trans,"dontfacehiro_step_up");break;
+          case 0x26:strcat(trans,"dontfacehiro_step_left");break;
+          case 0x27:strcat(trans,"dontfacehiro_step_right");break;
+          case 0x28:strcat(trans,"waterfall_down");break;
+          case 0x29:strcat(trans,"waterfall_up");break;
+          case 0x2A:strcat(trans,"waterfall_left");break;
+          case 0x2B:strcat(trans,"waterfall_right");break;
+          case 0x2C:strcat(trans,"slowjump_down");break;
+          case 0x2D:strcat(trans,"slowjump_up");break;
+          case 0x2E:strcat(trans,"slowjump_left");break;
+          case 0x2F:strcat(trans,"slowjump_right");break;
+          case 0x30:strcat(trans,"jump_down");break;
+          case 0x31:strcat(trans,"jump_up");break;
+          case 0x32:strcat(trans,"jump_left");break;
+          case 0x33:strcat(trans,"jump_right");break;
+          case 0x34:strcat(trans,"fastjump_down");break;
+          case 0x35:strcat(trans,"fastjump_up");break;
+          case 0x36:strcat(trans,"fastjump_left");break;
+          case 0x37:strcat(trans,"fastjump_right");break;
+          //???
+          case 0x3A:strcat(trans,"remove_fixed_facing");break;
+          case 0x3B:strcat(trans,"apply_fixed_facing");break;
+          //???
+          case 0x3D:strcat(trans,"hide");break;
+          //???
+          case 0x45:strcat(trans,"speed_up");break;
+          case 0x46:strcat(trans,"pause");nextraw=1;break;
+          //47 = end
+          //???
+          case 0x49:strcat(trans,"hide2");break;
+          //???
+          case 0x4C:strcat(trans,"teleport_from");break;
+          case 0x4D:strcat(trans,"teleport_to");break;
+          case 0x4E:strcat(trans,"fall");break;
+          case 0x4F:strcat(trans,"spin");break;
+          case 0x55:strcat(trans,"earthquake");nextraw=1;break;
+          default:sprintf(buf,"raw_%02X",p);strcat(trans,buf);break;
+        }
+        strcat(trans," ");
+        if(nextraw)
+        {
+          ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+          sprintf(buf,"raw_0x%X ",p);
+          strcat(trans,buf);
+        }
+      }
+      else if(mode==FIRE_RED)
       {
         switch(p)
         {
@@ -506,6 +597,7 @@ char*transmove(int howfar,HANDLE file)
           case 0x2E:strcat(trans,"walk_to_lasttalk");break;
           default:sprintf(buf,"raw_%02X",p);strcat(trans,buf);break;
         }
+        strcat(trans," ");
       }
       else
       {
@@ -553,8 +645,8 @@ char*transmove(int howfar,HANDLE file)
           case 0x81:strcat(trans,"run_right_fast");break;
           default:sprintf(buf,"raw_%02X",p);strcat(trans,buf);break;
         }
+        strcat(trans," ");
       }
-      strcat(trans," ");
     }
     CloseHandle(fileC);
   }
@@ -594,6 +686,121 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   ret=GlobalAlloc(GPTR,strlen(str)+1);
   strcpy(ret,str);
   NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
+  if(mode==GOLD){
+  while(i<strlen(str))
+  {
+    if((str[i]>='A'&&str[i]<='Z')||(str[i]>='a'&&str[i]<='z')){NewSpace[j]=str[i]+0x3F;}
+    else if(str[i]>='0'&&str[i]<='9'){NewSpace[j]=str[i]+0xC6;}
+    else if(str[i]==' '){NewSpace[j]=0x7F;}
+    else if(str[i]=='?'){NewSpace[j]=0xE6;}
+    else if(str[i]=='!'){NewSpace[j]=0xE7;}
+    else if(str[i]=='.'){NewSpace[j]=0xE8;}
+    else if(str[i]==','){NewSpace[j]=0xF4;}
+    else if(str[i]=='-'){NewSpace[j]=0xE3;}
+    else if(str[i]=='$'){NewSpace[j]=0xF0;}
+    else if(str[i]=='\'')
+    {
+      i++;
+      if(str[i]=='d'){NewSpace[j]=0xD0;}
+      else if(str[i]=='l'){NewSpace[j]=0xD1;}
+      else if(str[i]=='m'){NewSpace[j]=0xD2;}
+      else if(str[i]=='r'){NewSpace[j]=0xD3;}
+      else if(str[i]=='s'){NewSpace[j]=0xD4;}
+      else if(str[i]=='t'){NewSpace[j]=0xD5;}
+      else if(str[i]=='v'){NewSpace[j]=0xD6;}
+      else
+      {
+        i--;
+        NewSpace[j]=0xE0;
+      }
+    }
+    else if(str[i]=='\\')
+    {
+      i++;
+      if(str[i]=='n'){NewSpace[j]=0x4F;}
+      else if (str[i]=='l'){NewSpace[j]=0x55;}
+      else if (str[i]=='p'){NewSpace[j]=0x51;}
+      else if (str[i]=='e'){NewSpace[j]=0x57;j++;NewSpace[j]=0x0;break;}
+      else if (str[i]=='h'){
+        i++;lb[0]=str[i];i++;lb[1]=str[i];lb[2]=0;
+        sscanf(lb,"%x",&k);
+        k=k&0xff;
+        NewSpace[j]=k;
+      }
+      else
+      {i--;}
+    }
+    else if(str[i]==':'){NewSpace[j]=0x9C;}
+    else if(str[i]=='[')
+    {
+      i++;
+      if(str[i]=='.')
+      {
+        i++;
+        if(str[i]==']')
+        {
+          NewSpace[j]=0x75;
+        }
+        else if(str[i]=='.')
+        {
+          i++;
+          if(str[i]==']')
+          {
+            NewSpace[j]=0x56;
+          }else{i-=3;}
+        }else{i-=2;}
+      }
+      else if(str[i++]=='P')
+      {
+        if(str[i]=='L')
+        {
+          i++;
+          if(str[i]=='A')
+          {
+            i++;
+            if(str[i]=='Y')
+            {
+              i++;
+              if(str[i]=='E')
+              {
+                i++;
+                if(str[i]=='R')
+                {
+                  i++;
+                  if(str[i]==']')
+                  {
+                    NewSpace[j]=0x52;
+                  }else{i-=7;}
+                }else{i-=6;}
+              }else{i-=5;}
+            }else{i-=4;}
+          }else{i-=3;}
+        }
+        else if(str[i]=='O')
+        {
+          i++;
+          if(str[i]=='K')
+          {
+            i++;
+            if(str[i]=='é'||str[i]=='e'||str[i]=='E'||str[i]=='É')
+            {
+              i++;
+              if(str[i]==']')
+              {
+                NewSpace[j]=0x54;
+              }else{i-=5;}
+            }else{i-=4;}
+          }else{i-=3;}
+        }else{i-=2;}
+      }else{i--;}
+    }
+    i++;
+    j++;
+  }
+  if(NewSpace[j-1]!=0x57){NewSpace[j]=0x50;j++;}
+  }
+  else
+  {
   while(i<strlen(str))
   {
     if(str[i]>='A'&&str[i]<='Z'){NewSpace[j]=str[i]+0x7a;}
@@ -651,6 +858,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   }
   NewSpace[j]=0xFF;
   j++;
+  }
   WriteFile(romfile,NewSpace,j,&read,NULL);
   GlobalFree(NewSpace);
   CloseHandle(scrfile);
@@ -664,7 +872,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
   char xbuf[100];
   DWORD read;
   i=*ii;
-  while(script[i]!='\n'&&script[i]!=0)
+  while(script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
   {
     while(script[i]==' '){i++;}
     j=0;
@@ -677,7 +885,134 @@ unsigned int transbackmove(char*script,unsigned int*ii)
     cmdbuf[j]=0;
 #define aaa(x) else if(!strcmp(cmdbuf,x))
 #define move trans[len]=
-    if(mode==FIRE_RED)
+    if(mode==GOLD)
+    {
+      if(!strcmp(cmdbuf,"end")){move 0x47;}
+      aaa("look_down"){move 0x00;}
+      aaa("look_up"){move 0x01;}
+      aaa("look_left"){move 0x02;}
+      aaa("look_right"){move 0x03;}
+      aaa("halfstep_down"){move 0x04;}
+      aaa("halfstep_up"){move 0x05;}
+      aaa("halfstep_left"){move 0x06;}
+      aaa("halfstep_right"){move 0x07;}
+      aaa("slowstep_down"){move 0x08;}
+      aaa("slowstep_up"){move 0x09;}
+      aaa("slowstep_left"){move 0x0A;}
+      aaa("slowstep_right"){move 0x0B;}
+      aaa("step_down"){move 0x0C;}
+      aaa("step_up"){move 0x0D;}
+      aaa("step_left"){move 0x0E;}
+      aaa("step_right"){move 0x0F;}
+      aaa("halfstep2_down"){move 0x10;}
+      aaa("halfstep2_up"){move 0x11;}
+      aaa("halfstep2_left"){move 0x12;}
+      aaa("halfstep2_right"){move 0x13;}
+      aaa("slowslide_down"){move 0x14;}
+      aaa("slowslide_up"){move 0x15;}
+      aaa("slowslide_left"){move 0x16;}
+      aaa("slowslide_right"){move 0x17;}
+      aaa("slide_down"){move 0x18;}
+      aaa("slide_up"){move 0x19;}
+      aaa("slide_left"){move 0x1A;}
+      aaa("slide_right"){move 0x1B;}
+      aaa("fastslide_down"){move 0x1C;}
+      aaa("fastslide_up"){move 0x1D;}
+      aaa("fastslide_left"){move 0x1E;}
+      aaa("fastslide_right"){move 0x1F;}
+      aaa("???_down"){move 0x20;}
+      aaa("???_up"){move 0x21;}
+      aaa("???_left"){move 0x22;}
+      aaa("???_right"){move 0x23;}
+      aaa("???2_down"){move 0x24;}
+      aaa("???2_up"){move 0x25;}
+      aaa("???2_left"){move 0x26;}
+      aaa("???2_right"){move 0x27;}
+      aaa("waterfall_down"){move 0x28;}
+      aaa("waterfall_up"){move 0x29;}
+      aaa("waterfall_left"){move 0x2A;}
+      aaa("waterfall_right"){move 0x2B;}
+      aaa("slowjump_down"){move 0x2C;}
+      aaa("slowjump_up"){move 0x2D;}
+      aaa("slowjump_left"){move 0x2E;}
+      aaa("slowjump_right"){move 0x2F;}
+      aaa("jump_down"){move 0x30;}
+      aaa("jump_up"){move 0x31;}
+      aaa("jump_left"){move 0x32;}
+      aaa("jump_right"){move 0x33;}
+      aaa("fastjump_down"){move 0x34;}
+      aaa("fastjump_up"){move 0x35;}
+      aaa("fastjump_left"){move 0x36;}
+      aaa("fastjump_right"){move 0x37;}
+      //???
+      aaa("remove_fixed_facing"){move 0x3A;}
+      aaa("apply_fixed_facing"){move 0x3B;}
+      //???
+      aaa("hide"){move 0x3D;}
+      //???
+      aaa("speed_up"){move 0x45;}
+      aaa("pause"){move 0x46;}
+      //47 = end
+      //???
+      aaa("hide2"){move 0x49;}
+      //???
+      aaa("teleport_from"){move 0x4C;}
+      aaa("teleport_to"){move 0x4D;}
+      aaa("fall"){move 0x4E;}
+      aaa("spin"){move 0x4F;}
+      aaa("earthquake"){move 0x55;}
+      else if(cmdbuf[0]=='\'')
+      {
+        *ii=i;
+        return len;
+      }
+      else if(cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+      {
+        //RAW handler.
+        j=0;
+        while(j<16)
+        {
+          if(cmdbuf[4]=="0123456789abcdef"[j])
+          {break;}
+          j++;
+        }
+        if(j==16)
+        {
+          len--;
+          sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+        }
+        else
+        {
+          k=j;
+          j=0;
+          while(j<16)
+          {
+            if(cmdbuf[5]=="0123456789abcdef"[j])
+            {break;}
+            j++;
+          }
+          if(j==16)
+          {
+            len--;
+            sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
+            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          }
+          else
+          {
+            k=k<<4;
+            k|=j;
+            move k;
+          }
+        }
+      }
+      else{len--;
+      sprintf(xbuf,"Unknown Gold/Silver/Crystal move command \"%s\"\r\n",cmdbuf);
+      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);}
+      len++;
+
+    }
+    else if(mode==FIRE_RED)
     {
       if(!strcmp(cmdbuf,"end")){move 0xfe;}
       aaa("look_up"){move 0x01;}

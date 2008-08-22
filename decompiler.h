@@ -1556,7 +1556,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_2CALL:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("2call 0x%X ' 0x%X\r\n",arg1,arg2);
         Do(arg2);
         break;
@@ -1569,7 +1569,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_2PTCALL:
         ReadFile(fileM,&arg1,2,&read,NULL);
         arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
-        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         if(arg2!=0xFFFFFFFF)
         {
           SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
@@ -1581,14 +1581,14 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_2JUMP:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("2jump 0x%X ' 0x%X\r\n",arg1,arg2);
         still_going=0;
         Do(arg2);
         break;
       case GLD_PRIORITYJUMP:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("priorityjump 0x%X ' 0x%X\r\n",arg1,arg2);
         still_going=0;
         Do(arg2);
@@ -1603,7 +1603,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_2PTJUMP:
         ReadFile(fileM,&arg1,2,&read,NULL);
         arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
-        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         if(arg2!=0xFFFFFFFF)
         {
           SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
@@ -1617,7 +1617,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_PTPRIORITYJUMP:
         ReadFile(fileM,&arg1,2,&read,NULL);
         arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
-        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         if(arg2!=0xFFFFFFFF)
         {
           SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
@@ -1629,40 +1629,44 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         Do(arg4);
         break;
       case GLD_EQBYTE:
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if == 0x%X ' 0x%X\r\n",arg1,arg2);
-        Do(arg2);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
+        func("if == 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        Do(arg3);
         break;
       case GLD_NEQBYTE:
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if != 0x%X ' 0x%X\r\n",arg1,arg2);
-        Do(arg2);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
+        func("if != 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        Do(arg3);
         break;
       case GLD_EQZERO:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if ==0 0x%X ' 0x%X\r\n",arg1,arg2);
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        func("if false 0x%X ' 0x%X\r\n",arg1,arg2);
         Do(arg2);
         break;
       case GLD_NEQZERO:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if !=0 0x%X ' 0x%X\r\n",arg1,arg2);
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        func("if true 0x%X ' 0x%X\r\n",arg1,arg2);
         Do(arg2);
         break;
       case GLD_LTBYTE:
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if < 0x%X ' 0x%X\r\n",arg1,arg2);
-        Do(arg2);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
+        func("if < 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        Do(arg3);
         break;
       case GLD_GTBYTE:
-        ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("if > 0x%X ' 0x%X\r\n",arg1,arg2);
-        Do(arg2);
+        ReadFile(fileM,&arg1,1,&read,NULL);
+        ReadFile(fileM,&arg2,2,&read,NULL);
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
+        func("if > 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        Do(arg3);
         break;
       case GLD_JUMPSTD:
         ReadFile(fileM,&arg1,2,&read,NULL);
@@ -1684,7 +1688,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_2PTCALLASM:
         ReadFile(fileM,&arg1,2,&read,NULL);
         arg3=SetFilePointer(fileM,0,NULL,FILE_CURRENT);
-        arg2=PointerToOffset((OffsetToPointer(arg3)&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         if(arg2!=0xFFFFFFFF)
         {
           SetFilePointer(fileM,arg2,NULL,FILE_BEGIN);
@@ -1744,8 +1748,8 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_FACEPLAYER:
         GENERIC("faceplayer");
         break;
-      case GLD_OPENTEXTBOX:
-        GENERIC("opentextbox");
+      case GLD_LOADFONT:
+        GENERIC("loadfont");
         break;
       case GLD_PLAYRAMMUSIC:
         GENERIC("playrammusic");
@@ -1794,17 +1798,17 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,2,&read,NULL);
         func("clearbit1 0x%X\r\n",arg1);
         break;
-      case GLD_WRITETEXT:
+      case GLD_2WRITETEXT:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        func("writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        func("2writetext 0x%X ' 0x%X\r\n",arg1,arg2);
         if(arg2!=0xFFFFFFFF)
           DoText(arg2);
         break;
-      case GLD_WRITETEXTBANK:
+      case GLD_3WRITETEXT:
         ReadFile(fileM,&arg1,3,&read,NULL);
         arg2=PointerToOffset(arg1);
-        func("writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+        func("3writetext 0x%X ' 0x%X\r\n",arg1,arg2);
         if(arg2!=0xFFFFFFFF)
           DoText(arg2);
         break;
@@ -1841,13 +1845,15 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_APPLYMOVEMENT:
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
-        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
         func("applymovement 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+        if(arg3!=-1)DoMove(arg3);
         break;
       case GLD_APPLYMOVEOTHER:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("applymoveother 0x%X ' 0x%X Applies movement to last talked\r\n",arg1,arg2);
+        if(arg2!=-1)DoMove(arg2);
         break;
       case GLD_VERBOSEGIVEITEM:
         ReadFile(fileM,&arg1,1,&read,NULL);
@@ -1874,7 +1880,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_TRAINERSTATUS:
         ReadFile(fileM,&arg1,1,&read,NULL);
-        func("trainerstatus 0x%X\r\n",arg1);
+        *buf2=0;
+        switch(arg1){
+          case 0:strcpy(buf2," ' Deactivate Trainer");break;
+          case 1:strcpy(buf2," ' Activate Trainer");break;
+          case 2:strcpy(buf2," ' Check if Trainer is Activated");break;
+        }
+        func("trainerstatus 0x%X%s\r\n",arg1,buf2);
         break;
       case GLD_CLOSETEXT:
         GENERIC("closetext");
@@ -1889,7 +1901,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_ELEVATOR:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("elevator 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_YESORNO:
@@ -1986,11 +1998,13 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_COPYBYTETOVAR:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        func("copybytetovar 0x%X\r\n",arg1);
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        func("copybytetovar 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_COPYVARTOBYTE:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        func("copyvartobyte 0x%X\r\n",arg1);
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        func("copyvartobyte 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_CHANGEBLOCK:
         ReadFile(fileM,&arg1,1,&read,NULL);
@@ -2018,10 +2032,10 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         ReadFile(fileM,&arg1,3,&read,NULL);
         func("swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffset(arg1));
         break;
-      case GLD_CHANGEPERSONDIR:
+      case GLD_SPRITEFACE:
         ReadFile(fileM,&arg1,1,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
-        func("changepersondir 0x%X 0x%X\r\n",arg1,arg2);
+        func("spriteface 0x%X 0x%X\r\n",arg1,arg2);
         break;
       case GLD_MOVEPERSON:
         ReadFile(fileM,&arg1,1,&read,NULL);
@@ -2122,7 +2136,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_STRINGTOTEXT:
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,1,&read,NULL);
-        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("stringtotext 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
         if(arg3!=-1)
         {
@@ -2147,7 +2161,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_WRITECMDQUEUE:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("writecmdqueue 0x%X ' 0x%X\r\n",arg1,arg3);
         break;
       case GLD_DELCMDQUEUE:
@@ -2156,7 +2170,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_JUMPTEXTFACEPLAYER:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("jumptextfaceplayer 0x%X ' 0x%X\r\n",arg1,arg2);
         if(arg2!=-1)
           DoText(arg2);
@@ -2164,7 +2178,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_JUMPTEXT:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("jumptext 0x%X ' 0x%X\r\n",arg1,arg2);
         if(arg2!=-1)
           DoText(arg2);
@@ -2173,8 +2187,8 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
       case GLD_WINLOSSTEXT:
         ReadFile(fileM,&arg1,2,&read,NULL);
         ReadFile(fileM,&arg2,2,&read,NULL);
-        arg3=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
-        arg4=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
+        arg4=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
         func("winlosstext 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4);
         if(arg3!=-1)
           DoText(arg3);
@@ -2268,17 +2282,17 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_GIVEPOKEITEM:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("givepokeitem 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_TAKEIFLETTER:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
         func("takeifletter 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_XYCOMPARE:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg2<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
         func("xycompare 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_GIVEPOKE:
@@ -2290,7 +2304,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         {
           ReadFile(fileM,&arg5,2,&read,NULL);
           ReadFile(fileM,&arg6,2,&read,NULL);
-          arg7=(OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF);
+          arg7=(OffsetToPointer(FileZoomPos)&0xFF);
           func("givepoke 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
           PointerToOffset(arg7|(arg5<<8)),
           PointerToOffset(arg7|(arg6<<8)));
@@ -2302,7 +2316,7 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_LOADMENUDATA:
         ReadFile(fileM,&arg1,2,&read,NULL);
-        arg2=PointerToOffset((OffsetToPointer(SetFilePointer(fileM,0,NULL,FILE_CURRENT))&0xFF)|(arg1<<8));
+        arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
         func("loadmenudata 0x%X ' 0x%X\r\n",arg1,arg2);
         break;
       case GLD_LOADPOKEDATA:
@@ -2312,8 +2326,9 @@ void DecodeProc(HANDLE fileM,unsigned int FileZoomPos,char*filename)
         break;
       case GLD_CHECKCODE:
         ReadFile(fileM,&arg1,1,&read,NULL);
-        ReadFile(fileM,&arg2,1,&read,NULL);
-        func("checkcode 0x%X 0x%X\r\n",arg1,arg2);
+        //ReadFile(fileM,&arg2,1,&read,NULL);
+        //func("checkcode 0x%X 0x%X\r\n",arg1,arg2);
+        func("checkcode 0x%X\r\n",arg1);
         break;
       case GLD_WRITEBYTE:
         ReadFile(fileM,&arg1,2,&read,NULL);

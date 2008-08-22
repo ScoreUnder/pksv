@@ -204,7 +204,7 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
     }
     SetFilePointer(fileM,0x13F,NULL,FILE_BEGIN);
     ReadFile(fileM,&determineMode,3,&read,NULL);
-    if(determineMode[0]=='A'&&determineMode[1]=='A')
+    if((determineMode[0]=='A'&&determineMode[1]=='A')||(determineMode[0]=='S'&&determineMode[1]=='M'))
     {
       mode=GOLD;
       search=0;
@@ -260,8 +260,8 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
     }
     SetFilePointer(fileM,0x13F,NULL,FILE_BEGIN);
     ReadFile(fileM,&determineMode,3,&read,NULL);
-    if(determineMode[0]=='A'&&determineMode[1]=='A')
-    {
+    if((determineMode[0]=='A'&&determineMode[1]=='A')||(determineMode[0]=='S'&&determineMode[1]=='M'))
+    { //SM = Pokemon Pri[SM]... a silly lockout hack
       mode=GOLD;
       search=0;
     }
