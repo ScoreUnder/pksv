@@ -687,6 +687,8 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   strcpy(ret,str);
   NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
   if(mode==GOLD){
+  NewSpace[0]=0;
+  j=1;
   while(i<strlen(str))
   {
     if((str[i]>='A'&&str[i]<='Z')||(str[i]>='a'&&str[i]<='z')){NewSpace[j]=str[i]+0x3F;}

@@ -18,7 +18,7 @@
 #define log(asd,fgh) WriteFile(LogFile,asd,fgh,&read,NULL)
 #define aa(x) else if (!strcmp(buf,x))
 #define ec() e_c(Script,&i,LogFile)
-#define rom(c,s) j=c;WriteFile(RomFile,&j,s,&read,NULL)
+#define rom(c,s) {j=c;WriteFile(RomFile,&j,s,&read,NULL);}
 #define BASIC(x) rom(x,1)
 #define vlog(x) vlogProc(LogFile,x)
 void e_c(char*Script,int*ii,HANDLE LogFile)
@@ -27,7 +27,7 @@ void e_c(char*Script,int*ii,HANDLE LogFile)
   DWORD read;
   while(Script[i+1]==' '){i++;}
   if(Script[i+1]=='\''){while(Script[i+1]!='\n'&&Script[i+1]!=0){i++;}}
-  if(Script[i+1]!='\n'){log("Extra characters on line. Ignoring.\r\n",37);}
+  if(Script[i+1]!='\n'&&chr!='\n'){log("Extra characters on line. Ignoring.\r\n",37);}
   while(chr!='\n'){i++;}
   *ii=i;
   return;
@@ -443,6 +443,7 @@ void RecodeProc(char*script,char*romfn)
               j++;
             }
             buf[j]=0;
+            arg1=0;
             if(!strcmp(buf,"=")||!strcmp(buf,"=="))
             {
               BASIC(GLD_EQBYTE);
@@ -462,19 +463,19 @@ void RecodeProc(char*script,char*romfn)
             else if(!strcmp(buf,"==0")||!strcmp(buf,"=0")||!strcmp(buf,"false"))
             {
               BASIC(GLD_EQZERO);
+              arg1=-1;
             }
             else if(!strcmp(buf,"!=0")||!strcmp(buf,"<>0")||!strcmp(buf,"true"))
             {
               BASIC(GLD_NEQZERO);
+              arg1=-1;
             }
             else
             {
               log("Incorrect arguments to IF\r\n",29);
               return;
             }
-            arg1=-1;
-            if(strcmp(buf,"false")&&strcmp(buf,"true")&&strcmp(buf,"==0")
-            &&strcmp(buf,"=0")&&strcmp(buf,"<>0")&&strcmp(buf,"!=0"))
+            if(arg1!=-1)
             {
               arg1=GetNum("IF");
               if(!gffs){return;}
@@ -482,7 +483,7 @@ void RecodeProc(char*script,char*romfn)
             arg2=GetNum("IF");
             if(!gffs){return;}
             if(arg1!=-1)
-            rom(arg1,1);
+              rom(arg1,1);
             rom(arg2,2);
             ec();
           }
