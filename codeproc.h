@@ -17,15 +17,35 @@
 */
 #include "isdone.h"
 
-char defs[4096][256];
-unsigned int means[4096];
-int pos;
+definition*basedef=NULL;
+
 void Define(char*thing,unsigned int otherthing)
 {
-  if(pos>4096){MessageBox(NULL,"Overflow of #DEFINEs - ask Score_Under for custom build\nto handle more #defines.","Error",0x10);return;}
-  strcpy(defs[pos],thing);
-  means[pos]=otherthing;
-  pos++;
+  definition*temp1;
+  definition*temp2;
+  if(basedef==NULL)
+  {
+    basedef=malloc(sizeof(definition));
+    basedef->next=NULL;
+    basedef->name=malloc(strlen(thing));
+    strcpy(basedef->name,thing);
+    basedef->means=otherthing;
+  }
+  else
+  {
+    temp2=basedef;
+    while(temp2!=NULL)
+    {
+      temp1=temp2;
+      temp2=temp1->next;
+    }
+    temp1->next=malloc(sizeof(definition));
+    temp1=temp1->next;
+    temp1->next=NULL;
+    temp1->name=malloc(strlen(thing));
+    strcpy(temp1->name,thing);
+    temp1->means=otherthing;
+  }
   return;
 }
 
@@ -36,7 +56,7 @@ char*LowerCase(char*orig)  //This is how you lowercase.
   int i=0;
   while(orig[i]!=0)
   {
-    if(orig[i]>0x40&&orig[i]<0x5A)
+    if(orig[i]>='A'&&orig[i]<='Z')
     {
       orig[i]+=0x20;
     }
@@ -47,15 +67,15 @@ char*LowerCase(char*orig)  //This is how you lowercase.
 
 unsigned int WhatIs(char*thing)
 {
-  int i=0;
+  definition*i=basedef;
   fail=0;
-  while(i<pos)
+  while(i!=NULL)
   {
-    if(!strcmp(defs[i],thing))
+    if(!strcmp(i->name,thing))
     {
-      return means[i];
+      return i->means;
     }
-    i++;
+    i=i->next;
   }
   fail=1;
   return 0;
@@ -63,7 +83,7 @@ unsigned int WhatIs(char*thing)
 
 char* RemAll0D(char*scr)
 {
-  int i=0;
+  unsigned int i=0;
   while(i<strlen(scr))
   {
     if(scr[i]==0x0d)
@@ -81,11 +101,10 @@ char* RemAll0D(char*scr)
 unsigned int ffoff=0;
 unsigned int FindFreeSpace(char*romname,unsigned int len)
 {
-  HANDLE RomFile;
+  FILE*RomFile;
   unsigned int i,j=0;
   unsigned char cr;
-  DWORD read;
-  RomFile=CreateFile(romname,GENERIC_READ,FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+  RomFile=fopen(romname,"rb");
   if(mode==GOLD)
   {
     i=WhatIs("findfromgold")+ffoff;
@@ -94,19 +113,19 @@ unsigned int FindFreeSpace(char*romname,unsigned int len)
   {
     i=WhatIs("findfrom")+ffoff;
   }
-  SetFilePointer(RomFile,i,NULL,FILE_BEGIN);
+  fseek(RomFile,i,SEEK_SET);
   while(i<0x1000000)
   {
-    ReadFile(RomFile,&cr,1,&read,NULL);
+    fread(&cr,1,1,RomFile);
     if(cr==search)
     {j++;}else{j=0;}
     i++;
-    if(j>len){break;} //Yes, larger than
+    if(j>len){break;} //Yes, larger than, because text ends in 0xFF
   }
   ffoff=i-WhatIs("findfrom");
   i-=j;
   i++;
-  CloseHandle(RomFile);
+  fclose(RomFile);
   return (0x08000000|i);
 }
 
@@ -141,18 +160,33 @@ signed int OffsetToPointer(unsigned int offset)
 
 #define Defined(thing) ((WhatIs(thing)&&0)||!fail)
 #define chr Script[i]
-#define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn)
+#define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn,c)
 unsigned char gffs;
-unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,char*romfn) //Generates number for function
+unsigned int GenForFunc(char*func,unsigned int*ii,FILE* LogFile,char*Script,char*romfn,codeblock*c) //Generates number for function
 {
   unsigned int j=0,k=0,l=0,i;
-  DWORD read;
+  //unsigned int read;
   char buf[1024],buf2[1024],buf3[1024];
   gffs=0;
   i=*ii;
   while(chr==' ')
   {
     i++;
+  }
+  if(chr=='@')
+  {
+    j=0;
+    while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+    {
+      buf[j]=chr;
+      i++;
+      j++;
+    }
+    buf[j]=0;
+    add_insert(c,c->size,buf);
+    gffs=1;
+    *ii=i;
+    return 0;
   }
   if((chr>0x2F&&chr<0x3A)||chr=='$'||(chr=='f'&&Script[i+1]=='r'&&Script[i+2]=='e'&&Script[i+3]=='e'&&Script[i+4]=='s'&&Script[i+5]=='p'&&Script[i+6]=='a'&&Script[i+7]=='c'&&Script[i+8]=='e'))
   {
@@ -180,7 +214,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
         if(l==0)
         {
           strcpy(buf3,"You did not specify the free space length - defaulting to 0x100");
-          WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+          fwrite(buf3,1,strlen(buf3),LogFile);
           k=0x100;
         }
         else
@@ -207,7 +241,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
         if (IsVerbose)
         {
           sprintf(buf3,"FS -> 0x%X\r\n",k);
-          WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+          fwrite(buf3,1,strlen(buf3),LogFile);
         }
         return k;
       }
@@ -228,7 +262,7 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       if (IsVerbose)
       {
         sprintf(buf3,"   -> 0x%X\r\n",k);
-        WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+        fwrite(buf3,1,strlen(buf3),LogFile);
       }
     }
     else
@@ -252,14 +286,14 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
         {
           sprintf(buf2,"Unknown integer value in %s\r\n",func);
         }
-        WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
+        fwrite(buf2,1,strlen(buf2),LogFile);
         return 0;
       }
       k=atoi(buf2);
       if(IsVerbose)
       {
         sprintf(buf3,"   -> 0x%X\r\n",k);
-        WriteFile(LogFile,buf3,strlen(buf3),&read,NULL);
+        fwrite(buf3,1,strlen(buf3),LogFile);
       }
     }
   }
@@ -279,12 +313,12 @@ unsigned int GenForFunc(char*func,unsigned int*ii,HANDLE LogFile,char*Script,cha
       if(IsVerbose)
       {
         sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,WhatIs(buf3));
-        WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
+        fwrite(buf2,1,strlen(buf2),LogFile);
       }
       return WhatIs(buf3);
     }
     sprintf(buf2,"Unknown value in %s (Value must be integer)\r\n",func);
-    WriteFile(LogFile,buf2,strlen(buf2),&read,NULL);
+    fwrite(buf2,1,strlen(buf2),LogFile);
     return 0;
   }
   gffs=1;

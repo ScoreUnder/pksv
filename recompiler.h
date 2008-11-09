@@ -15,16 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define log(asd,fgh) WriteFile(LogFile,asd,fgh,&read,NULL)
+#define log(asd,fgh) fwrite(asd,1,fgh,LogFile)
 #define aa(x) else if (!strcmp(buf,x))
 #define ec() e_c(Script,&i,LogFile)
-#define rom(c,s) {j=c;WriteFile(RomFile,&j,s,&read,NULL);}
+#define rom(x,s) {if(eorg){j=0xFFFFFFFF;}else{j=x;}if(c!=NULL)add_data(c,(char*)&j,s);}
 #define BASIC(x) rom(x,1)
 #define vlog(x) vlogProc(LogFile,x)
-void e_c(char*Script,int*ii,HANDLE LogFile)
+void e_c(char*Script,int*ii,FILE*LogFile)
 {
   register unsigned int i=*ii;
-  DWORD read;
+  //unsigned int read;
   while(Script[i+1]==' '){i++;}
   if(Script[i+1]=='\''){while(Script[i+1]!='\n'&&Script[i+1]!=0){i++;}}
   if(Script[i+1]!='\n'&&chr!='\n'){log("Extra characters on line. Ignoring.\r\n",37);}
@@ -32,90 +32,98 @@ void e_c(char*Script,int*ii,HANDLE LogFile)
   *ii=i;
   return;
 }
-void vlogProc(HANDLE LogFile,char*x)
+void vlogProc(FILE* LogFile,char*x)
 {
-  DWORD read;
-  if (IsVerbose){log(x,strlen(x));}
+  //unsigned int read;
+  if (IsVerbose)
+  {
+    log(x,strlen(x));
+  }
   return;
 }
 void RecodeProc(char*script,char*romfn)
 {
-  HANDLE CurrFile,IncFile,RomFile;
+  FILE*CurrFile;
+  FILE*IncFile;
+  FILE*RomFile;
   char*Script;             //Whoops, used the same name for the filename.
                            //Use caps-lock carefully.
   char buf[1024],buf2[1024],buf3[1024];
   void*temp_ptr;
-  unsigned int fs,la,fst,i,line,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6,arg7;
-  DWORD read;
-  SetLastError(0);
-  CurrFile=CreateFile(script,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  la=GetLastError();
-  if(la)
+  unsigned int start=0;
+  unsigned int dynu=0;
+  unsigned int fs,fst,i,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6;//,arg7;
+  codeblock*c;
+  codeblock*d;
+  c=NULL;
+  CurrFile=fopen(script,"rb");
+  RomFile=fopen(romfn,"r+b");
+  if(RomFile==NULL)
   {
     strcat(romfn,".gba");
-    RomFile=CreateFile(romfn,GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-    la=GetLastError();
+    RomFile=fopen(romfn,"r+b");
   }
   strcat(GlobBuf,"pokeinc.txt");
-  IncFile=CreateFile(GlobBuf,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  if(IncFile==INVALID_HANDLE_VALUE)
+  IncFile=fopen(GlobBuf,"rb");
+  if(IncFile==NULL)
   {
-    printf(GlobBuf);
+    printf("Cannot open pokeinc.txt\n");
+#ifdef WIN32
     MessageBox(NULL,"The default includes (pokeinc.txt) could not be opened","Error",0x10);
-    CloseHandle(CurrFile);
+#endif
+    fclose(CurrFile);
     return;
   }
-  if(la)
+  if(RomFile==NULL)
   {
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,NULL,la,0,buf,1023,NULL);
-    MessageBox(NULL,buf,"Error",0x40);
-    CloseHandle(IncFile);
+    printf("Cannot open ROM\n");
+#ifdef WIN32
+    MessageBox(NULL,"The ROM file could not be opened","Error",0x10);
+#endif
+    fclose(IncFile);
+    fclose(CurrFile);
     return;
   }
-  if(CurrFile!=INVALID_HANDLE_VALUE)
+  if(CurrFile!=NULL)
   {
-    SetLastError(0);
-    fs=GetFileSize(CurrFile,NULL);
-    fst=GetFileSize(IncFile,NULL);
-    la=GetLastError();
-    if(la)
-    {
-      FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,NULL,la,0,buf,1023,NULL);
-      MessageBox(NULL,buf,"Error",0x40);
-      if(strcmp(script,""))CloseHandle(CurrFile);
-      CloseHandle(IncFile);
-      return;
-    }
-    Script=GlobalAlloc(GPTR,fs+fst+6);
+    fseek(CurrFile,0,SEEK_END);
+    fseek(IncFile,0,SEEK_END);
+    fs=ftell(CurrFile);
+    fst=ftell(IncFile);
+    fseek(CurrFile,0,SEEK_SET);
+    fseek(IncFile,0,SEEK_SET);
+    Script=malloc(fs+fst+6);
     if(Script==NULL)
     {
-      MessageBox(NULL,"GlobalAlloc() Failed to allocate memory for the script.","Error",0x10);
-      if(strcmp(script,""))CloseHandle(CurrFile);
-      CloseHandle(IncFile);
+#ifdef WIN32
+      MessageBox(NULL,"malloc() Failed to allocate memory for the script.","Error",0x10);
+#endif
+      if(strcmp(script,""))fclose(CurrFile);
+      fclose(IncFile);
       return;
     }
-    ZeroMemory(Script,fs+fst+6);
-    ReadFile(IncFile,Script,fst,&read,NULL);
-    strcat(Script,"\n");
-    strcat(Script,"\n");
-    ReadFile(CurrFile,(char*)(Script+fst+2),fs,&read,NULL);
-    strcat(Script,"\n");
-    strcat(Script,"\n");
-    LogFile=CreateFile("PokeScrE.log",GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+    memset(Script,0,fs+fst+6);
+    fread(Script,1,fst,IncFile);
+    strcat(Script,"\n\n");
+    fread((char*)(Script+fst+2),1,fs,CurrFile);
+    strcat(Script,"\n\n");
+    LogFile=fopen("PokeScrE.log","wb");
     if(LogFile==NULL)
     {
+      printf("Failed to open a logfile\n");
+#ifdef WIN32
       MessageBox(NULL,"Failed to open a log.","Error",0x10);
-      GlobalFree(Script);
-      if(strcmp(script,""))CloseHandle(CurrFile);
-      CloseHandle(IncFile);
+#endif
+      free(Script);
+      if(strcmp(script,""))fclose(CurrFile);
+      fclose(IncFile);
       return;
     }
-    WriteFile(LogFile,"Opened file.\r\n",14,&read,NULL);
+    fprintf(LogFile,"Opened file.\r\n");
     i=0;
     LowerCase(Script);
     RemAll0D(Script);
-    if(mode==GOLD)
+    if(mode==DIAMOND)
     {
     while(i<strlen(Script))
     {
@@ -168,12 +176,61 @@ void RecodeProc(char*script,char*romfn)
             Define(buf,k);
             ec();
           }
-          aa("#org")
+          aa("#narc")
           {
-            vlog("#ORG\r\n");
-            k=GetNum("#ORG");
+            vlog("#NARC\r\n");
+            arg1=GetNum("#NARC");
             if(!gffs){return;}
-            SetFilePointer(RomFile,k&0x00ffffff,NULL,FILE_BEGIN);
+            arg2=GetNum("#NARC");
+            if(!gffs){return;}
+            fseek(RomFile,0xE,SEEK_SET);
+            arg3=0;
+            fread(&arg3,1,2,RomFile);
+            fseek(RomFile,0x10,SEEK_SET);
+            fread(&buf,1,4,RomFile);
+            buf[4]=0;
+            k=0;
+            while(k<arg3&&strcmp(buf,"BTAF"))
+            {
+              arg4=0;
+              fread(&arg4,1,4,RomFile);
+              fseek(RomFile,arg4-0x8,SEEK_CUR);
+              fread(&buf,1,4,RomFile);
+              buf[4]=0;
+              k++;
+            }
+            if(!strcmp(buf,"BTAF"))
+            {
+              fseek(RomFile,8*(arg1+1),SEEK_CUR);
+              fread(&arg1,1,4,RomFile);
+              fseek(RomFile,0x10,SEEK_SET);
+              fread(&buf,1,4,RomFile);
+              buf[4]=0;
+              k=0;
+              while(k<arg3&&strcmp(buf,"GMIF"))
+              {
+                arg4=0;
+                fread(&arg4,1,4,RomFile);
+                fseek(RomFile,arg4-0x8,SEEK_CUR);
+                fread(&buf,1,4,RomFile);
+                buf[4]=0;
+                k++;
+              }
+              if(!strcmp(buf,"GMIF"))
+              {
+                fseek(RomFile,4+arg1+arg2,SEEK_CUR);
+              }
+              else
+              {
+                log("Incomplete NARC.\r\n",18);
+                return;
+              }
+            }
+            else
+            {
+              log("Incomplete NARC.\r\n",18);
+              return;
+            }
             ec();
           }
           aa("#quiet")
@@ -184,6 +241,336 @@ void RecodeProc(char*script,char*romfn)
           aa("#loud")
           {
             IsVerbose=1;
+            ec();
+          }
+          aa("#gsc")
+          {
+            mode=GOLD;
+            goto gsc;
+            ec();
+          }
+          aa("#frlg")
+          {
+            mode=FIRE_RED;
+            goto frlg;
+            ec();
+          }
+          aa("#rse")
+          {
+            mode=RUBY;
+            goto rse;
+            ec();
+          }
+          aa("#dp")
+          {
+            mode=DIAMOND;
+            dp:
+            ec();
+          }
+          aa("#raw")
+          {
+            vlog("#RAW\r\n");
+            k=GetNum("#RAW");
+            if(!gffs){return;}
+            BASIC(k);
+            if(k>255)
+            {
+              BASIC(k>>8);
+              if(k>65535)
+              {
+                BASIC(k>>16);
+                if(k>16777215)
+                {
+                  BASIC(k>>24);
+                }
+              }
+            }
+            ec();
+          }
+          aa("wildbattle")
+          {
+            vlog("WILDBATTLE\r\n");
+            arg1=GetNum("WILDBATTLE");
+            if(!gffs){return;}
+            arg2=GetNum("WILDBATTLE");
+            if(!gffs){return;}
+            arg3=GetNum("WILDBATTLE");
+            if(!gffs){return;}
+            BASIC(0xBC);
+            BASIC(0x00);
+            BASIC(0x06);
+            BASIC(0x00);
+            BASIC(0x01);
+            BASIC(0x00);
+            BASIC(0x01);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0xBD);
+            BASIC(0x00);
+            BASIC(0xDE);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0x80);
+            BASIC(0x96);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0x80);
+            BASIC(0x05);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0x00);
+            BASIC(0x0C);
+            BASIC(0x80);
+            BASIC(0x1E);
+            BASIC(0x00);
+            BASIC(arg1);
+            BASIC(0x01);
+            rom(arg2,2);
+            BASIC(arg3);
+            ec();
+          }
+          aa("m")
+          {
+            vlog("Movement data...\r\n");
+            add_data(c,trans,transbackmove(Script,&i));
+            ec();
+          }
+          aa("=")
+          {
+            vlog("[STRING]\r\n");
+            if(chr==' '){i++;}
+            else{log("Should have a space after the =\r\n",33);}
+            fseek(IncFile,0,SEEK_END);
+            temp_ptr=transbackstr(script,i-ftell(IncFile)-2,c);
+            while(chr!='\n'&&chr!=0){i++;}
+            sprintf(buf2,"   -> %s\r\n",temp_ptr);
+            free(temp_ptr);
+            vlog(buf2);
+          }
+          aa(".")
+          {
+            vlog("[BINARY]\r\n   ->");
+            while(chr==' '){i++;}
+            k=0;
+            while(chr!='\n'&&chr!=0)
+            {
+              k=1-k;
+              while(chr==' ')
+              {i++;}
+              j=0;
+              while(((char*)("0123456789abcdef"))[j]!=0)
+              {
+                if(((char*)("0123456789abcdef"))[j]==chr)
+                {
+                  break;
+                }
+                j+=1;
+              }
+              if(((char*)("0123456789abcdef"))[j]==0)
+              {
+                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                log(buf2,strlen(buf2));
+                return;
+              }
+              if(k==0)
+              {
+                l|=j;
+                rom(j,1);
+                if(IsVerbose)
+                {
+                  sprintf(buf2," %02X",l);
+                  log(buf2,strlen(buf2));
+                }
+              }
+              else
+              {
+                l=j<<4;
+              }
+              i++;
+            }
+            vlog("\r\n");
+          }
+          else
+          {
+            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            log(buf2,strlen(buf2));
+            while(chr!='\n'&&chr!=0)
+            {
+              i++;
+            }
+          }
+          break;
+      }
+      i++;
+    }
+    }
+    else if(mode==GOLD)
+    {
+    while(i<strlen(Script))
+    {
+      switch(chr) //Behave differently according to char
+      {
+        case 0:  //E O Script
+          return;
+        case '\'':
+          while(chr!='\n'&&chr!=0)
+          {i++;}i--;break;
+        case ' ':  //Ignore spaces
+        case '\n':
+          break;
+        default:
+          j=0;
+          while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+          {
+            buf[j]=chr;
+            i++;
+            j++;
+          }
+          buf[j]=0;
+          if(!strcmp(buf,"#define"))
+          {
+            vlog("#DEFINE\r\n");
+            while(chr==' '){i++;}
+            if(chr=='\n'||chr==0||chr=='\'')
+            {
+              log("Premature end to #DEFINE!\r\n",27);
+              return;
+            }
+            j=0;
+            while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+            {
+              buf[j]=chr;
+              i++;
+              j++;
+            }
+            buf[j]=0; //Append null
+            sprintf(buf2,"   -> %s\r\n",buf);
+            vlog(buf2);
+            while(chr==' '){i++;} //The same old same old.
+            if(chr=='\n'||chr==0||chr=='\'')
+            {
+              log("Premature end to #DEFINE!\r\n",27);
+              return;
+            }
+            k=GetNum("#DEFINE");
+            if (!gffs){return;}
+            Define(buf,k);
+            ec();
+          }
+          aa("#dyn")
+          {
+            vlog("#DYN\r\n");
+            start=GetNum("#DYN");
+            if(!gffs)return;
+            ec();
+          }
+          aa("#dynamic")
+          {
+            vlog("#DYNAMIC\r\n");
+            start=GetNum("#DYNAMIC");
+            if(!gffs)return;
+            ec();
+          }
+          aa("#org")
+          {
+            eorg=0;
+            vlog("#ORG\r\n");
+            while(chr==' ')i++;
+            buf[0]=0;
+            if(chr=='@')
+            {
+              dynu=1;
+              j=0;
+              while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+              {
+                buf[j]=chr;
+                i++;
+                j++;
+              }
+              buf[j]=0;
+            }
+            else
+            {
+              k=GetNum("#ORG");
+              if(!gffs){return;}
+            }
+            d=malloc(sizeof(codeblock));
+            if(*buf==0)
+              init_codeblock(d,NULL);
+            else
+              init_codeblock(d,buf);
+            if(*buf==0)d->org=k;
+            d->prev=c;
+            if(c!=NULL)c->next=d;
+            c=d;
+            ec();
+          }
+          aa("#eorg")
+          {
+            eorg=1;
+            vlog("#EORG\r\n");
+            while(chr==' ')i++;
+            buf[0]=0;
+            if(chr=='@')
+            {
+              j=0;
+              while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+              {
+                buf[j]=chr;
+                i++;
+                j++;
+              }
+              buf[j]=0;
+            }
+            else
+            {
+              k=GetNum("#ORG");
+              if(!gffs){return;}
+            }
+            d=malloc(sizeof(codeblock));
+            if(*buf==0)
+              init_codeblock(d,NULL);
+            else
+              init_codeblock(d,buf);
+            if(buf==NULL)d->org=k;
+            d->prev=c;
+            if(c!=NULL)c->next=d;
+            c=d;
+            ec();
+          }
+          aa("#quiet")
+          {
+            IsVerbose=0;
+            ec();
+          }
+          aa("#loud")
+          {
+            IsVerbose=1;
+            ec();
+          }
+          aa("#gsc")
+          {
+            mode=GOLD;
+            gsc:
+            ec();
+          }
+          aa("#frlg")
+          {
+            mode=FIRE_RED;
+            goto frlg;
+            ec();
+          }
+          aa("#rse")
+          {
+            mode=RUBY;
+            goto rse;
+            ec();
+          }
+          aa("#dp")
+          {
+            mode=DIAMOND;
+            goto dp;
             ec();
           }
           aa("#raw")
@@ -1645,7 +2032,7 @@ void RecodeProc(char*script,char*romfn)
           aa("m")
           {
             vlog("Movement data...\r\n");
-            WriteFile(RomFile,trans,transbackmove(Script,&i),&read,NULL);
+            add_data(c,trans,transbackmove(Script,&i));
             ec();
           }
           aa("=")
@@ -1653,10 +2040,11 @@ void RecodeProc(char*script,char*romfn)
             vlog("[STRING]\r\n");
             if(chr==' '){i++;}
             else{log("Should have a space after the =\r\n",33);}
-            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-2,RomFile);
+            fseek(IncFile,0,SEEK_END);
+            temp_ptr=transbackstr(script,i-ftell(IncFile)-2,c);
             while(chr!='\n'&&chr!=0){i++;}
             sprintf(buf2,"   -> %s\r\n",temp_ptr);
-            GlobalFree(temp_ptr);
+            free(temp_ptr);
             vlog(buf2);
           }
           aa(".")
@@ -1716,7 +2104,7 @@ void RecodeProc(char*script,char*romfn)
       i++;
     }
     }
-    else
+    else //Fire Red
     {
     while(i<strlen(Script))
     {
@@ -1770,16 +2158,87 @@ void RecodeProc(char*script,char*romfn)
               return;
             }
             k=GetNum("#DEFINE");
-            if (!gffs){return;}
+            if (!gffs)
+			  return;
             Define(buf,k);
+            ec();
+          }
+          aa("#dyn")
+          {
+            vlog("#DYN\r\n");
+            start=GetNum("#DYN");
+            if(!gffs)
+			  return;
             ec();
           }
           aa("#org")
           {
+            eorg=0;
             vlog("#ORG\r\n");
-            k=GetNum("#ORG");
-            if(!gffs){return;}
-            SetFilePointer(RomFile,k&0x00ffffff,NULL,FILE_BEGIN);
+            while(chr==' ')i++;
+            buf[0]=0;
+            if(chr=='@')
+            {
+              dynu=1;
+              j=0;
+              while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+              {
+                buf[j]=chr;
+                i++;
+                j++;
+              }
+              buf[j]=0;
+            }
+            else
+            {
+              k=GetNum("#ORG");
+              if(!gffs)
+				return;
+            }
+            d=malloc(sizeof(codeblock));
+            if(*buf==0)
+              init_codeblock(d,NULL);
+            else
+              init_codeblock(d,buf);
+            if(*buf==0)
+			  d->org=k;
+            d->prev=c;
+            if(c!=NULL)
+			  c->next=d;
+            c=d;
+            ec();
+          }
+          aa("#eorg")
+          {
+            eorg=1;
+            vlog("#EORG\r\n");
+            while(chr==' ')i++;
+            buf[0]=0;
+            if(chr=='@')
+            {
+              j=0;
+              while(chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+              {
+                buf[j]=chr;
+                i++;
+                j++;
+              }
+              buf[j]=0;
+            }
+            else
+            {
+              k=GetNum("#ORG");
+              if(!gffs){return;}
+            }
+            d=malloc(sizeof(codeblock));
+            if(*buf==0)
+              init_codeblock(d,NULL);
+            else
+              init_codeblock(d,buf);
+            if(buf==NULL)d->org=k;
+            d->prev=c;
+            if(c!=NULL)c->next=d;
+            c=d;
             ec();
           }
           aa("#quiet")
@@ -1790,6 +2249,30 @@ void RecodeProc(char*script,char*romfn)
           aa("#loud")
           {
             IsVerbose=1;
+            ec();
+          }
+          aa("#gsc")
+          {
+            mode=GOLD;
+            goto gsc;
+            ec();
+          }
+          aa("#frlg")
+          {
+            mode=FIRE_RED;
+            frlg:
+            ec();
+          }
+          aa("#rse")
+          {
+            mode=RUBY;
+            rse:
+            ec();
+          }
+          aa("#dp")
+          {
+            mode=DIAMOND;
+            goto dp;
             ec();
           }
           aa("#raw")
@@ -2291,6 +2774,18 @@ void RecodeProc(char*script,char*romfn)
             if(!gffs){return;}
             BASIC(CMD_DOANIMATION);
             rom(arg1,2);
+            ec();
+          }
+          aa("setanimation")
+          {
+            vlog("SETANIMATION\r\n");
+            arg1=GetNum("SETANIMATION");
+            if(!gffs){return;}
+            arg2=GetNum("SETANIMATION");
+            if(!gffs){return;}
+            BASIC(CMD_SETANIMATION);
+            rom(arg1,1);
+            rom(arg2,2);
             ec();
           }
           aa("checkobedience")
@@ -3199,12 +3694,12 @@ void RecodeProc(char*script,char*romfn)
             {
               arg5=GetNum("TRAINERBATTLE");
               if(!gffs){return;}
-            }
-            if((arg4&0xff000000)==0)
-            {
-              arg4|=0x08000000;
-              sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
-              vlog(buf3);
+              if((arg5&0xff000000)==0)
+              {
+                arg5|=0x08000000;
+                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
+                vlog(buf3);
+              }
             }
             BASIC(CMD_TRAINERBATTLE);
             rom(arg1,1);
@@ -3215,10 +3710,16 @@ void RecodeProc(char*script,char*romfn)
             {
               rom(arg5,4);
             }
-            else if(arg1==1)
+            if(arg1==1||arg1==2)
             {
               arg6=GetNum("TRAINERBATTLE");
               if(!gffs){return;}
+              if((arg6&0xff000000)==0)
+              {
+                arg6|=0x08000000;
+                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
+                vlog(buf3);
+              }
               rom(arg6,4);
             }
             ec();
@@ -4122,7 +4623,7 @@ void RecodeProc(char*script,char*romfn)
           aa("m")
           {
             vlog("Movement data...\r\n");
-            WriteFile(RomFile,trans,transbackmove(Script,&i),&read,NULL);
+            add_data(c,trans,transbackmove(Script,&i));
             ec();
           }
           aa("=")
@@ -4130,10 +4631,11 @@ void RecodeProc(char*script,char*romfn)
             vlog("[STRING]\r\n");
             if(chr==' '){i++;}
             else{log("Should have a space after the =\r\n",33);}
-            temp_ptr=transbackstr(script,i-SetFilePointer(IncFile,0,NULL,FILE_END)-2,RomFile);
+            fseek(IncFile,0,SEEK_END);
+            temp_ptr=transbackstr(script,i-ftell(IncFile)-2,c);
             while(chr!='\n'&&chr!=0){i++;}
             sprintf(buf2,"   -> %s\r\n",temp_ptr);
-            GlobalFree(temp_ptr);
+            free(temp_ptr);
             vlog(buf2);
           }
           aa(".")
@@ -4193,16 +4695,45 @@ void RecodeProc(char*script,char*romfn)
       i++;
     }
     }
-    ///WriteFile(LogFile,stuff,fs,&read,NULL);
-    GlobalFree(Script);
-    CloseHandle(LogFile);
-    CloseHandle(IncFile);
-    if(strcmp(script,""))CloseHandle(CurrFile);
+    free(Script);
+    fclose(IncFile);
+    if(strcmp(script,""))fclose(CurrFile);
   }
   else
   {
     printf("Error opening script.");
     return;
   }
+  if(dynu&&start==0)
+  {
+    log("Error: No #dyn used with dynamic offsets!\r\n",43);
+  }
+  else
+  {
+	vlog("\r\n#ORG: data\r\n");
+    if(dynu)
+    {
+      calc_org(c,start);
+      process_inserts(c);
+    }
+    if(c!=NULL)
+      c=rewind_codeblock(c);
+    while(c!=NULL)
+    {
+      fseek(RomFile,c->org&0x07FFFFFF,SEEK_SET);
+      if(c->name!=NULL)
+      {
+        fprintf(LogFile,"   -> %s <-> 0x%X (0x%X bytes)\r\n",c->name,c->org,c->size);
+      }
+      else
+      {
+        fprintf(LogFile,"   -> 0x%X (0x%X bytes)\r\n",c->org,c->size);
+      }
+      if(!testing)
+        fwrite(c->data,1,c->size,RomFile);
+      c=c->next;
+    }
+  }
+  fclose(LogFile);
   return;
 }

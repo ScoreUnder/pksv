@@ -119,56 +119,56 @@
 #define CMD_LASTTRAINERBATTLE       0x5D //C,D,T
 #define CMD_ENDTRAINERBATTLE        0x5E //C,D,T
 #define CMD_ENDTRAINERBATTLE2       0x5F //C,D,T
-#define CMD_CHECKTRAINERFLAG        0x60 //C,D,  (2)
-#define CMD_CLEARTRAINERFLAG        0x61 //C,D,  (2)
-#define CMD_SETTRAINERFLAG          0x62 //C,D,  (2)
-#define CMD_MOVESPRITE2             0x63 //C,D,  spr(2)x(2)y(2)
-#define CMD_MOVEOFFSCREEN           0x64 //C,D,  spr(2)
-#define CMD_SPRITEBEHAVE            0x65 //C,D,  spr(2)typ(1)
-#define CMD_SHOWMSG                 0x66 //C,D, 
-#define CMD_MESSAGE                 0x67 //C,D,  addr(4)
-#define CMD_CLOSEMSG                0x68 //C,D, 
-#define CMD_LOCKALL                 0x69 //C,D, 
-#define CMD_LOCK                    0x6A //C,D, 
-#define CMD_RELEASEALL              0x6B //C,D, 
-#define CMD_RELEASE                 0x6C //C,D, 
-#define CMD_WAITBUTTON              0x6D //C,D, 
-#define CMD_SHOWYESNO               0x6E //C,D,  x(1) y(1)
-#define CMD_MULTICHOICE             0x6F //C,D,  x(1) y(1) list(1) AbleToCancel(1)
-#define CMD_MULTICHOICE2            0x70 //C,D,  x(1) y(1) list(1) defchoice(1) AbleToCancel(1)
-#define CMD_MULTICHOICE3            0x71 //C,D,  1:x y list how-many-per-row can-cancel
-#define CMD_SHOWBOX                 0x72 //C,D,  1:xywh
-#define CMD_HIDEBOX                 0x73 //C,D,  1:xywh
-#define CMD_CLEARBOX                0x74 //C,D,  1:xywh
-#define CMD_SHOWPOKEPIC             0x75 //C,D,  var(2) x(1) y(1)
-#define CMD_HIDEPOKEPIC             0x76 //C,D, 
-#define CMD_PICTURE                 0x77 //C,D,  num(1)
-#define CMD_BRAILLE                 0x78 //C,D,  addr(4)
-#define CMD_ADDPOKEMON              0x79 //C,D,  poke(2) lvl(1) item(2) ??(1) ??(4) ??(4)
+#define CMD_CHECKTRAINERFLAG        0x60 //C,D,T (2)
+#define CMD_CLEARTRAINERFLAG        0x61 //C,D,T (2)
+#define CMD_SETTRAINERFLAG          0x62 //C,D,T (2)
+#define CMD_MOVESPRITE2             0x63 //C,D,T spr(2)x(2)y(2)
+#define CMD_MOVEOFFSCREEN           0x64 //C,D,T spr(2)
+#define CMD_SPRITEBEHAVE            0x65 //C,D,T spr(2)typ(1)
+#define CMD_SHOWMSG                 0x66 //C,D,T
+#define CMD_MESSAGE                 0x67 //C,D,T addr(4)
+#define CMD_CLOSEMSG                0x68 //C,D,T
+#define CMD_LOCKALL                 0x69 //C,D,T
+#define CMD_LOCK                    0x6A //C,D,T
+#define CMD_RELEASEALL              0x6B //C,D,T
+#define CMD_RELEASE                 0x6C //C,D,T
+#define CMD_WAITBUTTON              0x6D //C,D,T
+#define CMD_SHOWYESNO               0x6E //C,D,T x(1) y(1)
+#define CMD_MULTICHOICE             0x6F //C,D,T x(1) y(1) list(1) AbleToCancel(1)
+#define CMD_MULTICHOICE2            0x70 //C,D,T x(1) y(1) list(1) defchoice(1) AbleToCancel(1)
+#define CMD_MULTICHOICE3            0x71 //C,D,T 1:x y list how-many-per-row can-cancel
+#define CMD_SHOWBOX                 0x72 //C,D,T 1:xywh
+#define CMD_HIDEBOX                 0x73 //C,D,T 1:xywh
+#define CMD_CLEARBOX                0x74 //C,D,T 1:xywh
+#define CMD_SHOWPOKEPIC             0x75 //C,D,T var(2) x(1) y(1)
+#define CMD_HIDEPOKEPIC             0x76 //C,D,T
+#define CMD_PICTURE                 0x77 //C,D,T num(1)
+#define CMD_BRAILLE                 0x78 //C,D,T addr(4)
+#define CMD_ADDPOKEMON              0x79 //C,D,T poke(2) lvl(1) item(2) ??(1) ??(4) ??(4)
 // GivePokemon copyvar 0x8004 0x800d addpokemon X Y Z hashpoke 0x1901 0x0
 // SelectPokemon special 0x73 copyvar 0x800a 0x8004
 // WildBattle Battle X Y 0x0000 special 0x(143|137|138|139)
 // GiveItem copyvarifnotzero 0x8000 X copyvarifnotzero 0x8001 Y
 // ... callstd 0x(00|01)
-#define CMD_GIVEEGG                 0x7A //C,D,  poke(2)
-#define CMD_SETPOKEMONPP            0x7B //C,D,  pkmslot(1) atkslot(1) pp(2)
-#define CMD_CHECKATTACK             0x7C //C,D,  attk(2)
-#define CMD_STOREPOKEMON            0x7D //C,D,  TXT_VAR(1) POKE(2)
-#define CMD_STOREFIRSTPOKEMON       0x7E //C,D,  TXT_VAR(1)
-#define CMD_STOREPOKEMONVAR         0x7F //C,D,  TXT_VAR(1) VAR(2)
-#define CMD_STOREITEM               0x80 //C,D,  TXT_VAR(1) ITM(2)
-#define CMD_STOREFURNITURE          0x81 //C,D,  TXT_VAR(1) ITM(2)
-#define CMD_STOREATK                0x82 //C,D,  TXT_VAR(1) ATK(2)
-#define CMD_STOREVAR                0x83 //C,D,  TXT_VAR(1) VAR(2)
-#define CMD_STORECOMP               0x84 //C,D,  TXT_VAR(1) COMP(2)
-#define CMD_STORETEXT               0x85 //C,D,  TXT_VAR(1) TXT(4)
-#define CMD_POKEMART                0x86 //C,D,  mart(4)
-#define CMD_POKEMART2               0x87 //C,D,  ptr(4)
-#define CMD_FAKEJUMPSTD             0x88 //C,D,  FR type(1)Does not affect actual gameplay
-#define CMD_POKEMART3               0x88 //C,D,  RS ptr(4)
-#define CMD_FAKECALLSTD             0x89 //C,D,  FR type(1)Ditto
-#define CMD_SLOTMACHINE             0x89 //C,D,  RS ??(2)
-#define CMD_8A                      0x8A //?,?,  (1)(1)(1)
+#define CMD_GIVEEGG                 0x7A //C,D,T poke(2)
+#define CMD_SETPOKEMONPP            0x7B //C,D,T pkmslot(1) atkslot(1) pp(2)
+#define CMD_CHECKATTACK             0x7C //C,D,T attk(2)
+#define CMD_STOREPOKEMON            0x7D //C,D,T TXT_VAR(1) POKE(2)
+#define CMD_STOREFIRSTPOKEMON       0x7E //C,D,T TXT_VAR(1)
+#define CMD_STOREPOKEMONVAR         0x7F //C,D,T TXT_VAR(1) VAR(2)
+#define CMD_STOREITEM               0x80 //C,D,T TXT_VAR(1) ITM(2)
+#define CMD_STOREFURNITURE          0x81 //C,D,T TXT_VAR(1) ITM(2)
+#define CMD_STOREATK                0x82 //C,D,T TXT_VAR(1) ATK(2)
+#define CMD_STOREVAR                0x83 //C,D,T TXT_VAR(1) VAR(2)
+#define CMD_STORECOMP               0x84 //C,D,T TXT_VAR(1) COMP(2)
+#define CMD_STORETEXT               0x85 //C,D,T TXT_VAR(1) TXT(4)
+#define CMD_POKEMART                0x86 //C,D,T mart(4)
+#define CMD_POKEMART2               0x87 //C,D,T ptr(4)
+#define CMD_FAKEJUMPSTD             0x88 //C,D,T FR type(1)Does not affect actual gameplay
+#define CMD_POKEMART3               0x88 //C,D,T RS ptr(4)
+#define CMD_FAKECALLSTD             0x89 //C,D,T FR type(1)Ditto
+#define CMD_SLOTMACHINE             0x89 //C,D,T RS ??(2)
+#define CMD_8A                      0x8A //?,?,T (1)(1)(1)
 #define CMD_CHOOSECONTESTPOKEMON    0x8B //C,D, 
 #define CMD_STARTCONTEST            0x8C //C,D, 
 #define CMD_STARTWIRELESS           0x8E //C,D,  EM ONLY

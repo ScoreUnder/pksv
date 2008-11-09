@@ -10,6 +10,7 @@
 #define PLAYER 0xFF
 #define CAMERA 0x7F
 'CALLSTD
+#define MSG_ITEM 0x9
 #define MSG_NORMAL 0x6
 #define MSG_YESNO 0x5
 #define MSG_NOCLOSE 0x4

@@ -23,22 +23,23 @@ char*transtxt(int howfar,char*file)
   unsigned char p,code;
   const char hex[17]="0123456789ABCDEF";
   char buf[128];
-  int read;
+  unsigned int read;
   char still_going,readagain,sub_going;
-  HANDLE fileC;
+  FILE* fileC;
   read=0;
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  if(fileC!=INVALID_HANDLE_VALUE)
+  fileC=fopen(file,"rb");
+  *trans=0;
+  if(fileC!=NULL)
   {
-    SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
+    fseek(fileC,(howfar&0x7ffffff),SEEK_SET);
     still_going=1;
     if(mode!=GOLD){
     while(still_going)
     {
-      ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+      read=(int)fread(&p,1,1,fileC);
       if (read==0)
       {
-        still_going=0;
+        break;
       }
       else
       {
@@ -46,8 +47,8 @@ char*transtxt(int howfar,char*file)
         else if(p>=0xd5&&p<=0xee) {p-=0x74;} //lower letter
         else if(p>=0xA1&&p<=0xAA) {p-=0x71;}
         else if(p==0) {p=0x20;} //space
-        else if(p==0x1b){p='é';}
-        else if(p==0xac){p='?';}
+        else if(p==0x1b){p=(char)0xE9;} //e acute
+        else if(p==(unsigned char)0xac){p='?';} //(unsigned char) keeps Micro$oft VS happy
         else if(p==0xad){p='.';}
         else if(p==0xb8){p=',';}
         else if(p==0xb4){p='\'';}
@@ -94,7 +95,7 @@ char*transtxt(int howfar,char*file)
           pt++;
           trans[pt]='h';
           pt++;
-          ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+          fread(&p,1,1,fileC);
           trans[pt]=hex[(p&0xf0)>>4];
           pt++;
           p=hex[p&0xf];
@@ -133,7 +134,8 @@ char*transtxt(int howfar,char*file)
     strcpy(trans,"");
     while(still_going)
     {
-      ReadFile(fileC,&code,1,(DWORD*)&read,NULL);
+      read=(unsigned int)fread(&code,1,1,fileC);
+      if(read==0){break;}
       sub_going=1;
       readagain=1;
       if(code==0)
@@ -141,9 +143,9 @@ char*transtxt(int howfar,char*file)
         strcat(trans,"= ");
         while(sub_going)
         {
-          sl=strlen(trans);
+          sl=(unsigned int)strlen(trans);
           if(readagain)
-            ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+            read=(unsigned int)fread(&p,1,1,fileC);
           readagain=1;
           if(read==0){still_going=sub_going=0;break;}
           if((p>=0x80&&p<=0x99)||(p>=0xA0&&p<=0xB9)) {trans[sl]=p-0x3F;trans[sl+1]=0;} //letter
@@ -184,7 +186,7 @@ char*transtxt(int howfar,char*file)
           else if(p==0x57)
           {
             readagain=0;
-            ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+            fread(&p,1,1,fileC);
             if(p==0){strcat(trans,"\\e\r\n");still_going=0;break;}
             strcat(trans,"\\h57");
           }
@@ -199,15 +201,15 @@ char*transtxt(int howfar,char*file)
       else if(code==1)
       {
         pt=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
         sprintf(buf,"text-ram 0x%X\r\n",pt);
         strcat(trans,buf);
       }
       else if(code==2)
       {
         pt=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
-        ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
+        fread(&p,1,1,fileC);
         if(p>>5==7)
         {
           sprintf(buf,"0x%X 0x%X money-no-zeros",pt,p&0x1F);
@@ -247,16 +249,16 @@ char*transtxt(int howfar,char*file)
       else if (code==3)
       {
         pt=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
         sprintf(buf,"text-reloc 0x%X\r\n",pt);
         strcat(trans,buf);
       }
       else if (code==4)
       {
         pt=arg1=arg2=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
-        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
-        ReadFile(fileC,&arg2,1,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
+        fread(&arg1,1,1,fileC);
+        fread(&arg2,1,1,fileC);
         sprintf(buf,"text-box 0x%X 0x%X 0x%X\r\n",pt,arg1,arg2);
         strcat(trans,buf);
       }
@@ -280,8 +282,8 @@ char*transtxt(int howfar,char*file)
       else if (code==9)
       {
         pt=arg1=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
-        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
+        fread(&arg1,1,1,fileC);
         sprintf(buf,"text-number 0x%X 0x%X 0x%X\r\n",pt,(arg1&0xF0)>>8,arg1&0xF);
         strcat(trans,buf);
       }
@@ -296,7 +298,7 @@ char*transtxt(int howfar,char*file)
       else if (code==12)
       {
         pt=0;
-        ReadFile(fileC,&pt,1,(DWORD*)&read,NULL);
+        fread(&pt,1,1,fileC);
         sprintf(buf,"text-interpretxdata 0x%X\r\n",pt);
         strcat(trans,buf);
       }
@@ -331,7 +333,7 @@ char*transtxt(int howfar,char*file)
       else if (code==20)
       {
         pt=0;
-        ReadFile(fileC,&pt,1,(DWORD*)&read,NULL);
+        fread(&pt,1,1,fileC);
         sprintf(buf,"text-buffer 0x%X\r\n",pt);
         strcat(trans,buf);
       }
@@ -342,15 +344,15 @@ char*transtxt(int howfar,char*file)
       else if (code==22)
       {
         pt=arg1=0;
-        ReadFile(fileC,&pt,2,(DWORD*)&read,NULL);
-        ReadFile(fileC,&arg1,1,(DWORD*)&read,NULL);
+        fread(&pt,1,2,fileC);
+        fread(&arg1,1,1,fileC);
         sprintf(buf,"text-newtxt 0x%X ' 0x%X\r\n",arg1|(pt<<8),PointerToOffset(arg1|(pt<<8)));
         strcat(trans,buf);
         if(PointerToOffset(arg1|(pt<<8))!=0xFFFFFFFF)
         {
           sprintf(buf,"\r\n#org 0x%X\r\n",PointerToOffset(arg1|(pt<<8)));
           strcat(trans,buf);
-          SetFilePointer(fileC,PointerToOffset(arg1|(pt<<8)),NULL,FILE_BEGIN);
+          fseek(fileC,PointerToOffset(arg1|(pt<<8)),SEEK_SET);
         }
       }
       else
@@ -360,7 +362,7 @@ char*transtxt(int howfar,char*file)
       }
     }
     }
-    CloseHandle(fileC);
+    fclose(fileC);
   }
   else
   {
@@ -369,88 +371,88 @@ char*transtxt(int howfar,char*file)
   return trans;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-char*transbrl(int howfar,char*file)
+char*transbrl(int howfar,char*file,FILE*fsend)
 {
   unsigned int pt=0;
   unsigned char p;
   int read;
   char still_going;
-  HANDLE fileC;
+  FILE*fileC;
   read=0;
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  if(fileC!=INVALID_HANDLE_VALUE)
+  fileC=fopen(file,"rb");
+  if(fileC!=NULL)
   {
-    SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
+    fseek(fileC,(howfar&0xffffff),SEEK_SET);
     still_going=1;
-    func("        '");
+    fprintf(fsend,"        '");
     while(still_going)
     {
-      ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+      fread(&p,1,1,fileC);
       pt=0;
       if (p==0xff){still_going=0;break;}
-      func("  ");
-      if(p&1) func(".");
-      else func(" ");
-      if(p&2) func(".");
-      else func(" ");
+      fprintf(fsend,"  ");
+      if(p&1) fprintf(fsend,".");
+      else fprintf(fsend," ");
+      if(p&2) fprintf(fsend,".");
+      else fprintf(fsend," ");
     }
-    func("\n        '");
-    SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
+    fprintf(fsend,"\n        '");
+    fseek(fileC,(howfar&0xffffff),SEEK_SET);
     still_going=1;
     while(still_going)
     {
-      ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+      fread(&p,1,1,fileC);
       pt=0;
       if (p==0xff){still_going=0;break;}
       p=p>>2;
-      func("  ");
-      if(p&1) func(".");
-      else func(" ");
-      if(p&2) func(".");
-      else func(" ");
+      fprintf(fsend,"  ");
+      if(p&1) fprintf(fsend,".");
+      else fprintf(fsend," ");
+      if(p&2) fprintf(fsend,".");
+      else fprintf(fsend," ");
     }
-    func("\n        '");
-    SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
+    fprintf(fsend,"\n        '");
+    fseek(fileC,(howfar&0xffffff),SEEK_SET);
     still_going=1;
     while(still_going)
     {
-      ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+      fread(&p,1,1,fileC);
       pt=0;
       if (p==0xff){still_going=0;break;}
       p=p>>4;
-      func("  ");
-      if(p&1) func(".");
-      else func(" ");
-      if(p&2) func(".");
-      else func(" ");
+      fprintf(fsend,"  ");
+      if(p&1) fprintf(fsend,".");
+      else fprintf(fsend," ");
+      if(p&2) fprintf(fsend,".");
+      else fprintf(fsend," ");
     }
-    func("\n");  // Yes, this prints 2 new lines, not one.
-    CloseHandle(fileC);
+    fprintf(fsend,"\n");  // Yes, this prints 2 new lines, not one.
+    fclose(fileC);
   }
   else
   {
-    func("          'Error in translating braille...");
+    fprintf(fsend,"          'Error in translating braille...");
   }
   return 0;
 }
 
-char*transmove(int howfar,HANDLE file)
+char*transmove(int howfar,char*file)
 {
-  int read;
+  unsigned int read;
   char still_going,nextraw;
-  HANDLE fileC;
+  FILE*fileC;
   unsigned char p;
-  read=0;
   char buf[10];
-  fileC=CreateFile(file,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  if(fileC!=INVALID_HANDLE_VALUE)
+  read=0;
+  fileC=fopen(file,"rb");
+  if(fileC!=NULL)
   {
-    SetFilePointer(fileC,(howfar&0xffffff),NULL,FILE_BEGIN);
+    fseek(fileC,(howfar&0xffffff),SEEK_SET);
     still_going=1;
     strcpy(trans,"");
     while(still_going)
     {
-      ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+      fread(&p,1,1,fileC);
       if(mode==GOLD)
       {
         nextraw=0;
@@ -535,7 +537,7 @@ char*transmove(int howfar,HANDLE file)
         strcat(trans," ");
         if(nextraw)
         {
-          ReadFile(fileC,&p,1,(DWORD*)&read,NULL);
+          fread(&p,1,1,fileC);
           sprintf(buf,"raw_0x%X ",p);
           strcat(trans,buf);
         }
@@ -648,7 +650,7 @@ char*transmove(int howfar,HANDLE file)
         strcat(trans," ");
       }
     }
-    CloseHandle(fileC);
+    fclose(fileC);
   }
   else
   {
@@ -658,24 +660,32 @@ char*transmove(int howfar,HANDLE file)
 }
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
+char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 {
   char*NewSpace,*ret;
   char cch;
   char str[65536];
   unsigned int i=0,j=0,k;
-  DWORD read;
-  HANDLE scrfile;
+  unsigned int read;
+  FILE*scrfile;
   char lb[5]; //Little Buffer
   
-  scrfile=CreateFile(scrfn,GENERIC_READ,FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-  if(pos!=0xFFFFFFFF)SetFilePointer(scrfile,pos,NULL,FILE_BEGIN);
-  else              {MessageBox(NULL,"Darn file pointers. Always spoiling the fun.","Error",0x10);return;}
-  if(scrfile==INVALID_HANDLE_VALUE){MessageBox(NULL,"Darn file handles. Always being complicated on purpose.","Error",0x10);return;}
+  scrfile=fopen(scrfn,"rb");
+  if(pos!=0xFFFFFFFF)fseek(scrfile,pos,SEEK_SET);
+  else{
+#ifdef WIN32
+MessageBox(NULL,"Darn file pointers. Always spoiling the fun.","Error",0x10);
+#endif
+return NULL;}
+  if(scrfile==NULL){
+#ifdef WIN32
+MessageBox(NULL,"Darn file handles. Always being complicated on purpose.","Error",0x10);
+#endif
+return NULL;}
   k=0;
   while(1)
   {
-    ReadFile(scrfile,&cch,1,&read,NULL);
+    read=(unsigned int)fread(&cch,1,1,scrfile);
     if(read==0)break;
     if(cch=='\n')break;
     if(cch=='\r')break;
@@ -683,9 +693,9 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
     k++;
   }
   str[k]=0;
-  ret=GlobalAlloc(GPTR,strlen(str)+1);
+  ret=malloc(strlen(str)+1);
   strcpy(ret,str);
-  NewSpace=GlobalAlloc(GPTR,strlen(str)+1);
+  NewSpace=malloc(strlen(str)+1);
   if(mode==GOLD){
   NewSpace[0]=0;
   j=1;
@@ -784,7 +794,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
           if(str[i]=='K')
           {
             i++;
-            if(str[i]=='é'||str[i]=='e'||str[i]=='E'||str[i]=='É')
+            if((unsigned char)str[i]==(unsigned char)0xE9||str[i]=='e'||str[i]=='E'||(unsigned char)str[i]==(unsigned char)0xC9)
             {
               i++;
               if(str[i]==']')
@@ -809,7 +819,7 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
     else if(str[i]>='a'&&str[i]<='z'){NewSpace[j]=str[i]+0x74;}
     else if(str[i]>='0'&&str[i]<='9'){NewSpace[j]=str[i]+0x71;}
     else if(str[i]==' '){NewSpace[j]=0;}
-    else if(str[i]=='é'){NewSpace[j]=0x1B;}
+    else if((unsigned char)str[i]==(unsigned char)0xE9){NewSpace[j]=0x1B;}
     else if(str[i]=='?'){NewSpace[j]=0xAC;}
     else if(str[i]=='.'){NewSpace[j]=0xAD;}
     else if(str[i]==','){NewSpace[j]=0xB8;}
@@ -861,9 +871,15 @@ char* transbackstr(char*scrfn,DWORD pos,HANDLE romfile)
   NewSpace[j]=0xFF;
   j++;
   }
-  WriteFile(romfile,NewSpace,j,&read,NULL);
-  GlobalFree(NewSpace);
-  CloseHandle(scrfile);
+  if(eorg&&mode!=GOLD)
+    for(k=0;k<j;k++)
+      NewSpace[k]=0xFF;
+  else if(eorg)
+    for(k=0;k<j;k++)
+      NewSpace[k]=0;
+  add_data(c,NewSpace,j);
+  free(NewSpace);
+  fclose(scrfile);
   return ret;
 }
 
@@ -872,7 +888,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
   unsigned int i,len=0,j=0,k=0;
   char cmdbuf[100];
   char xbuf[100];
-  DWORD read;
+  //unsigned int read;
   i=*ii;
   while(script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
   {
@@ -889,7 +905,8 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 #define move trans[len]=
     if(mode==GOLD)
     {
-      if(!strcmp(cmdbuf,"end")){move 0x47;}
+      if(eorg){move 0x00;}
+      aaa("end"){move 0x47;}
       aaa("look_down"){move 0x00;}
       aaa("look_up"){move 0x01;}
       aaa("look_left"){move 0x02;}
@@ -982,7 +999,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          fwrite(xbuf,1,strlen(xbuf),LogFile);
         }
         else
         {
@@ -998,7 +1015,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+            fwrite(xbuf,1,strlen(xbuf),LogFile);
           }
           else
           {
@@ -1010,13 +1027,14 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       }
       else{len--;
       sprintf(xbuf,"Unknown Gold/Silver/Crystal move command \"%s\"\r\n",cmdbuf);
-      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);}
+      fwrite(xbuf,1,strlen(xbuf),LogFile);}
       len++;
 
     }
     else if(mode==FIRE_RED)
     {
-      if(!strcmp(cmdbuf,"end")){move 0xfe;}
+      if(eorg){move 0xFF;}
+      aaa("end"){move 0xfe;}
       aaa("look_up"){move 0x01;}
       aaa("look_left"){move 0x02;}
       aaa("look_right"){move 0x03;}
@@ -1086,7 +1104,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          fwrite(xbuf,1,strlen(xbuf),LogFile);
         }
         else
         {
@@ -1102,7 +1120,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+            fwrite(xbuf,1,strlen(xbuf),LogFile);
           }
           else
           {
@@ -1112,13 +1130,14 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           }
         }
       }
-      else{len--;
+      else if(*cmdbuf!=0){len--;
       sprintf(xbuf,"Unknown FR/LG move command \"%s\"\r\n",cmdbuf);
-      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);}
+      fwrite(xbuf,1,strlen(xbuf),LogFile);}
       len++;
     }else
     {
-      if(!strcmp(cmdbuf,"end")){move 0xfe;}
+      if(eorg){move 0xFF;}
+      aaa("end"){move 0xfe;}
       aaa("hide"){move 0x54;}
       aaa("show"){move 0x55;}
       aaa("alert"){move 0x56;}
@@ -1177,7 +1196,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+          fwrite(xbuf,1,strlen(xbuf),LogFile);
         }
         else
         {
@@ -1193,7 +1212,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+            fwrite(xbuf,1,strlen(xbuf),LogFile);
           }
           else
           {
@@ -1206,7 +1225,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       else{
       len--;
       sprintf(xbuf,"Unknown R/S move command \"%s\"\r\n",cmdbuf);
-      WriteFile(LogFile,xbuf,strlen(xbuf),&read,NULL);
+      fwrite(xbuf,1,strlen(xbuf),LogFile);
       }
       len++;
     }
