@@ -1,4 +1,6 @@
 /*
+    THIS IS DEPRECATED. See pksv2.c
+
     Charles Daffern (Score_Under)'s PKSV - Pokemon ROM script viewer/editor
     Copyright (C) 2007  Charles Daffern
 
@@ -15,9 +17,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define FIRE_RED 0
+/*#define FIRE_RED 0
 #define RUBY     1
 #define GOLD     2
+#define DIAMOND  3
 int(*func)(char*, ...);
 char IsVerbose=1;
 char filearg;
@@ -33,6 +36,8 @@ unsigned char search=0xFF;
 HANDLE LogFile;
 #include "pokedef.h"
 #include "golddef.h"
+#include "diamonddef.h"
+char eorg=0;
 #include "textproc.h" //ORDER IS IMPORTANT
 char fsend[65536];
 #include "codeproc.h"
@@ -49,12 +54,13 @@ int main(int ac,char**av)
   unsigned int FileZoomPos;
   int i;
   unsigned int tmp;
-  unsigned char pspec,fspec,cline;
+  unsigned char pspec,fspec,cline,narc;
   char determineMode[4];
   DWORD read;
   fileName[0]=(char)0;
   pspec=0;
   fspec=0;
+  narc=0;
   initDoneProcs();
   i=strlen(av[0]);
   while(av[0][i]!='\\'&&av[0][i]!='/'&&i!=0)
@@ -209,6 +215,13 @@ FILE                Using FILE, ask for address to decompile at.\n\t\
       mode=GOLD;
       search=0;
     }
+    SetFilePointer(fileM,0x0,NULL,FILE_BEGIN);
+    ReadFile(fileM,&determineMode,4,&read,NULL);
+    if(determineMode[0]=='N'&&determineMode[1]=='A'&&determineMode[2]=='R'&&determineMode[3]=='C')
+    {
+      mode=DIAMOND;
+      search=0;
+    }
     CloseHandle(fileM);
     RecodeProc(av[filearg],fileName);
     if(!DontShowLog)
@@ -226,7 +239,7 @@ This is free software, and you are welcome to redistribute it\n\
 under certain conditions; pass argument `--ver' for details.\n\nPass argument --help for help.\n\n");
   if(!fspec)
   { //Not likely to be using cmd line.
-  
+
     printf("Enter a file to send the script to, (relative to PKSV folder, w/o extension please)\nor leave blank to see on-screen: ");
     gets(fsend); //waah not the gets! NOT THE GETS!!!!!!!!oneone
     if(strcmp(fsend,"")&&strcmp(fsend,"\""))
@@ -265,6 +278,13 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
       mode=GOLD;
       search=0;
     }
+    SetFilePointer(fileM,0x0,NULL,FILE_BEGIN);
+    ReadFile(fileM,&determineMode,4,&read,NULL);
+    if(determineMode[0]=='N'&&determineMode[1]=='A'&&determineMode[2]=='R'&&determineMode[3]=='C')
+    {
+      mode=DIAMOND;
+      search=0;
+    }
     //Go to AC, get 2 bytes, see if they make AX - then it's r/s.
     if(fileM!=INVALID_HANDLE_VALUE)
     {
@@ -276,14 +296,30 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
       }
       if(FileZoomPos!=0xffffffff)
       {
-        if(ac>3){
+        if((ac>3&&mode!=DIAMOND)||(ac>4&&mode==DIAMOND)){
+          if(mode==DIAMOND)
+          strcpy(fsend,av[4]);
+          else
           strcpy(fsend,av[3]);
           scrf=CreateFile(fsend,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);}
         FileZoomPos=FileZoomPos&0x00ffffff;
         if(!pspec)printf("You chose 0x%X\n",FileZoomPos);
         if(type==0)
         {
-          DecodeProc(fileM,FileZoomPos,ofn.lpstrFile);
+          if(mode==DIAMOND)
+          {
+            pspec=1;
+            sscanf(av[3],"%x",&FileZoomPos);
+            sscanf(av[2],"%x",&narc);
+            DecodeProc(fileM,narc,FileZoomPos,ofn.lpstrFile);
+            CloseHandle(fileM);
+            CloseHandle(scrf);
+            return error;
+          }
+          else
+          {
+            DecodeProc(fileM,0,FileZoomPos,ofn.lpstrFile);
+          }
         }
         else if(type==1)
         {
@@ -323,7 +359,10 @@ under certain conditions; pass argument `--ver' for details.\n\nPass argument --
     printf("Press any key to exit.\n");
   }
   if(!pspec)
-  getch();
+  {
+    getch();
+  }
   return error;
 }
 
+*/

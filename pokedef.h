@@ -17,9 +17,9 @@
 */
 //PokeDef.h by Charles Daffern
 //Here come the defs!              Compile,Decompile, Args
-//      Text   (#org xx\n= asdfg)          C,D, 
-//      Moves  (#org xx\nM x)              C,D, 
-//      Braille (Used as #raw in compiler) C,D, 
+//      Text   (#org xx\n= asdfg)          C,D,
+//      Moves  (#org xx\nM x)              C,D,
+//      Braille (Used as #raw in compiler) C,D,
 #define CMD_NOP0                    0x00 //C,D,T
 #define CMD_NOP1                    0x01 //C,D,T
 #define CMD_END                     0x02 //C,D,T
@@ -169,15 +169,15 @@
 #define CMD_FAKECALLSTD             0x89 //C,D,T FR type(1)Ditto
 #define CMD_SLOTMACHINE             0x89 //C,D,T RS ??(2)
 #define CMD_8A                      0x8A //?,?,T (1)(1)(1)
-#define CMD_CHOOSECONTESTPOKEMON    0x8B //C,D, 
-#define CMD_STARTCONTEST            0x8C //C,D, 
-#define CMD_STARTWIRELESS           0x8E //C,D,  EM ONLY
-#define CMD_RANDOM                  0x8F //C,D,  possibilities(2)
-#define CMD_GIVEMONEY               0x90 //C,D,  amt(4)?(1)
-#define CMD_PAYMONEY                0x91 //C,D,  amt(4)?(1)
-#define CMD_CHECKMONEY              0x92 //C,D,  amt(4)?(1)
-#define CMD_SHOWMONEY               0x93 //C,D,  x(1)y(1)?(1)
-#define CMD_HIDEMONEY               0x94 //C,D,  (2)
+#define CMD_CHOOSECONTESTPOKEMON    0x8B //C,D,T
+#define CMD_STARTCONTEST            0x8C //C,D,T
+#define CMD_STARTWIRELESS           0x8E //C,D,T EM ONLY
+#define CMD_RANDOM                  0x8F //C,D,T possibilities(2)
+#define CMD_GIVEMONEY               0x90 //C,D,T amt(4)?(1)
+#define CMD_PAYMONEY                0x91 //C,D,T amt(4)?(1)
+#define CMD_CHECKMONEY              0x92 //C,D,T amt(4)?(1)
+#define CMD_SHOWMONEY               0x93 //C,D,T x(1)y(1)?(1)
+#define CMD_HIDEMONEY               0x94 //C,D,T x(1)y(1)
 #define CMD_UPDATEMONEY             0x95 //C,D,  (1)(1)(1)
 #define CMD_96                      0x96 //?,?,  (2)
 #define CMD_FADESCREEN              0x97 //C,D,  blk(1)
