@@ -19,6 +19,9 @@ unsigned int doprocs[1024],doneprocs[2048];
 unsigned int dotexts[1024],donetexts[2048];
 unsigned int domoves[1024],donemoves[2048];
 unsigned int domarts[1024],donemarts[2048];
+unsigned int dothumb[1024],donethumb[2048];
+unsigned int dodword[1024],donedword[2048];
+unsigned int dolevel[1024],donelevel[2048];
 #define initDoneProcs() {\
 memset(doprocs,0,sizeof(doprocs));\
 memset(doneprocs,0,sizeof(doneprocs));\
@@ -28,385 +31,676 @@ memset(domoves,0,sizeof(domoves));\
 memset(donemoves,0,sizeof(donemoves));\
 memset(domarts,0,sizeof(domarts));\
 memset(donemarts,0,sizeof(donemarts));\
+memset(dothumb,0,sizeof(dothumb));\
+memset(donethumb,0,sizeof(donethumb));\
+memset(dodword,0,sizeof(dodword));\
+memset(donedword,0,sizeof(donedword));\
+memset(dolevel,0,sizeof(dolevel));\
+memset(donelevel,0,sizeof(donelevel));\
 }
 //for debugging only:
 //#define crash() __asm("int $0x3\n")
 
 unsigned int Do(unsigned int proc)
 {
-    register int i=0,j=0;
-    if (proc==0xFFFFFFFF)return proc;
-    while (i<1024)
+  register int i=0,j=0;
+  if (proc==0xFFFFFFFF)return proc;
+  while (i<1024)
+  {
+    if (doprocs[i]==0)
     {
-        if (doprocs[i]==0)
-        {
-            j=0;
-            while (j<2048)
-            {
-                if (doneprocs[j]==proc)
-                    return proc;
-                j++;
-            }
-            doprocs[i]=proc;
-            break;
-        }
-        i++;
+      j=0;
+      while (j<2048)
+      {
+        if (doneprocs[j]==proc)
+          return proc;
+        j++;
+      }
+      doprocs[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned int Done(unsigned int proc)
 {
-    register int i=0;
-    while (i<1024)
+  register int i=0;
+  while (i<1024)
+  {
+    if (doprocs[i]==proc)
     {
-        if (doprocs[i]==proc)
-        {
-            doprocs[i]=0;
-            break;
-        }
-        i++;
+      doprocs[i]=0;
+      break;
     }
-    i=0;
-    while (i<2048)
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (doneprocs[i]==0)
     {
-        if (doneprocs[i]==0)
-        {
-            doneprocs[i]=proc;
-            break;
-        }
-        i++;
+      doneprocs[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned char AllDone()
 {
-    register int i=0,j;
-    while (i<1024)
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (doprocs[i]!=0)
     {
-        if (doprocs[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (doneprocs[j]==doprocs[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (doneprocs[j]==doprocs[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (j==2048)
-            {
-                return 0;
-            }
+          break;
         }
-        i++;
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
     }
-    return 1;
+    i++;
+  }
+  return 1;
 }
 unsigned int FindNotDone()
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (doprocs[i]!=0)
     {
-        if (doprocs[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (doneprocs[j]==doprocs[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (doneprocs[j]==doprocs[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (doneprocs[j]!=doprocs[i])
-                return doprocs[i];
+          break;
         }
-        i++;
+        j++;
+      }
+      if (doneprocs[j]!=doprocs[i])
+        return doprocs[i];
     }
-    return 0;
+    i++;
+  }
+  return 0;
 }
 ////////////////////////////////////////////////////////////
 unsigned int DoText(unsigned int proc)
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dotexts[i]==0)
     {
-        if (dotexts[i]==0)
-        {
-            j=0;
-            while (j<2048)
-            {
-                if (donetexts[j]==proc)
-                    return proc;
-                j++;
-            }
-            dotexts[i]=proc;
-            break;
-        }
-        i++;
+      j=0;
+      while (j<2048)
+      {
+        if (donetexts[j]==proc)
+          return proc;
+        j++;
+      }
+      dotexts[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned int DoneText(unsigned int proc)
 {
-    register int i=0;
-    while (i<1024)
+  register int i=0;
+  while (i<1024)
+  {
+    if (dotexts[i]==proc)
     {
-        if (dotexts[i]==proc)
-        {
-            dotexts[i]=0;
-            break;
-        }
-        i++;
+      dotexts[i]=0;
+      break;
     }
-    i=0;
-    while (i<2048)
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donetexts[i]==0)
     {
-        if (donetexts[i]==0)
-        {
-            donetexts[i]=proc;
-            break;
-        }
-        i++;
+      donetexts[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned char AllDoneText()
 {
-    register int i=0,j;
-    while (i<1024)
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (dotexts[i]!=0)
     {
-        if (dotexts[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donetexts[j]==dotexts[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donetexts[j]==dotexts[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (j==2048)
-            {
-                return 0;
-            }
+          break;
         }
-        i++;
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
     }
-    return 1;
+    i++;
+  }
+  return 1;
 }
 unsigned int FindNotDoneText()
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dotexts[i]!=0)
     {
-        if (dotexts[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donetexts[j]==dotexts[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donetexts[j]==dotexts[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (donetexts[j]!=dotexts[i])
-                return dotexts[i];
+          break;
         }
-        i++;
+        j++;
+      }
+      if (donetexts[j]!=dotexts[i])
+        return dotexts[i];
     }
-    return 0;
+    i++;
+  }
+  return 0;
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int DoMove(unsigned int proc)
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (domoves[i]==0)
     {
-        if (domoves[i]==0)
-        {
-            j=0;
-            while (j<2048)
-            {
-                if (donemoves[j]==proc)
-                    return proc;
-                j++;
-            }
-            domoves[i]=proc;
-            break;
-        }
-        i++;
+      j=0;
+      while (j<2048)
+      {
+        if (donemoves[j]==proc)
+          return proc;
+        j++;
+      }
+      domoves[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned int DoneMove(unsigned int proc)
 {
-    register int i=0;
-    while (i<1024)
+  register int i=0;
+  while (i<1024)
+  {
+    if (domoves[i]==proc)
     {
-        if (domoves[i]==proc)
-        {
-            domoves[i]=0;
-            break;
-        }
-        i++;
+      domoves[i]=0;
+      break;
     }
-    i=0;
-    while (i<2048)
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donemoves[i]==0)
     {
-        if (donemoves[i]==0)
-        {
-            donemoves[i]=proc;
-            break;
-        }
-        i++;
+      donemoves[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned char AllDoneMove()
 {
-    register int i=0,j;
-    while (i<1024)
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (domoves[i]!=0)
     {
-        if (domoves[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donemoves[j]==domoves[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donemoves[j]==domoves[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (j==2048)
-            {
-                return 0;
-            }
+          break;
         }
-        i++;
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
     }
-    return 1;
+    i++;
+  }
+  return 1;
 }
 unsigned int FindNotDoneMove()
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (domoves[i]!=0)
     {
-        if (domoves[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donemoves[j]==domoves[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donemoves[j]==domoves[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (donemoves[j]!=domoves[i])
-                return domoves[i];
+          break;
         }
-        i++;
+        j++;
+      }
+      if (donemoves[j]!=domoves[i])
+        return domoves[i];
     }
-    return 0;
+    i++;
+  }
+  return 0;
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int DoMart(unsigned int proc)
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (domarts[i]==0)
     {
-        if (domarts[i]==0)
-        {
-            j=0;
-            while (j<2048)
-            {
-                if (donemarts[j]==proc)
-                    return proc;
-                j++;
-            }
-            domarts[i]=proc;
-            break;
-        }
-        i++;
+      j=0;
+      while (j<2048)
+      {
+        if (donemarts[j]==proc)
+          return proc;
+        j++;
+      }
+      domarts[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned int DoneMart(unsigned int proc)
 {
-    register int i=0;
-    while (i<1024)
+  register int i=0;
+  while (i<1024)
+  {
+    if (domarts[i]==proc)
     {
-        if (domarts[i]==proc)
-        {
-            domarts[i]=0;
-            break;
-        }
-        i++;
+      domarts[i]=0;
+      break;
     }
-    i=0;
-    while (i<2048)
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donemarts[i]==0)
     {
-        if (donemarts[i]==0)
-        {
-            donemarts[i]=proc;
-            break;
-        }
-        i++;
+      donemarts[i]=proc;
+      break;
     }
-    return proc;
+    i++;
+  }
+  return proc;
 }
 unsigned char AllDoneMart()
 {
-    register int i=0,j;
-    while (i<1024)
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (domarts[i]!=0)
     {
-        if (domarts[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donemarts[j]==domarts[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donemarts[j]==domarts[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (j==2048)
-            {
-                return 0;
-            }
+          break;
         }
-        i++;
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
     }
-    return 1;
+    i++;
+  }
+  return 1;
 }
 unsigned int FindNotDoneMart()
 {
-    register int i=0,j=0;
-    while (i<1024)
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (domarts[i]!=0)
     {
-        if (domarts[i]!=0)
+      j=0;
+      while (j<2048)
+      {
+        if (donemarts[j]==domarts[i])
         {
-            j=0;
-            while (j<2048)
-            {
-                if (donemarts[j]==domarts[i])
-                {
-                    break;
-                }
-                j++;
-            }
-            if (donemarts[j]!=domarts[i])
-                return domarts[i];
+          break;
         }
-        i++;
+        j++;
+      }
+      if (donemarts[j]!=domarts[i])
+        return domarts[i];
     }
-    return 0;
+    i++;
+  }
+  return 0;
 }
+
+///////////////////////////////////////////////////////////////////
+unsigned int DoThumb(unsigned int proc)
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dothumb[i]==0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donethumb[j]==proc)
+          return proc;
+        j++;
+      }
+      dothumb[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned int DoneThumb(unsigned int proc)
+{
+  register int i=0;
+  while (i<1024)
+  {
+    if (dothumb[i]==proc)
+    {
+      dothumb[i]=0;
+      break;
+    }
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donethumb[i]==0)
+    {
+      donethumb[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned char AllDoneThumb()
+{
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (dothumb[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donethumb[j]==dothumb[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
+    }
+    i++;
+  }
+  return 1;
+}
+unsigned int FindNotDoneThumb()
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dothumb[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donethumb[j]==dothumb[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (donethumb[j]!=dothumb[i])
+        return dothumb[i];
+    }
+    i++;
+  }
+  return 0;
+}
+///////////////////////////////////////////////////////////////////
+unsigned int DoDword(unsigned int proc)
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dodword[i]==0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donedword[j]==proc)
+          return proc;
+        j++;
+      }
+      dodword[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned int DoneDword(unsigned int proc)
+{
+  register int i=0;
+  while (i<1024)
+  {
+    if (dodword[i]==proc)
+    {
+      dodword[i]=0;
+      break;
+    }
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donedword[i]==0)
+    {
+      donedword[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned char AllDoneDword()
+{
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (dodword[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donedword[j]==dodword[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
+    }
+    i++;
+  }
+  return 1;
+}
+unsigned int FindNotDoneDword()
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dodword[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donedword[j]==dodword[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (donedword[j]!=dodword[i])
+        return dodword[i];
+    }
+    i++;
+  }
+  return 0;
+}
+///////////////////////////////////////////////////////////////////
+unsigned int DoLevel(unsigned int proc)
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dolevel[i]==0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donelevel[j]==proc)
+          return proc;
+        j++;
+      }
+      dolevel[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned int DoneLevel(unsigned int proc)
+{
+  register int i=0;
+  while (i<1024)
+  {
+    if (dolevel[i]==proc)
+    {
+      dolevel[i]=0;
+      break;
+    }
+    i++;
+  }
+  i=0;
+  while (i<2048)
+  {
+    if (donelevel[i]==0)
+    {
+      donelevel[i]=proc;
+      break;
+    }
+    i++;
+  }
+  return proc;
+}
+unsigned char AllDoneLevel()
+{
+  register int i=0,j;
+  while (i<1024)
+  {
+    if (dolevel[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donelevel[j]==dolevel[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (j==2048)
+      {
+        return 0;
+      }
+    }
+    i++;
+  }
+  return 1;
+}
+unsigned int FindNotDoneLevel()
+{
+  register int i=0,j=0;
+  while (i<1024)
+  {
+    if (dolevel[i]!=0)
+    {
+      j=0;
+      while (j<2048)
+      {
+        if (donelevel[j]==dolevel[i])
+        {
+          break;
+        }
+        j++;
+      }
+      if (donelevel[j]!=dolevel[i])
+        return dolevel[i];
+    }
+    i++;
+  }
+  return 0;
+}
+
+
 
 

@@ -155,7 +155,7 @@
 #define CMD_CHECKATTACK             0x7C //C,D,T attk(2)
 #define CMD_STOREPOKEMON            0x7D //C,D,T TXT_VAR(1) POKE(2)
 #define CMD_STOREFIRSTPOKEMON       0x7E //C,D,T TXT_VAR(1)
-#define CMD_STOREPOKEMONVAR         0x7F //C,D,T TXT_VAR(1) VAR(2)
+#define CMD_STOREPARTYPOKEMON       0x7F //C,D,T TXT_VAR(1) POS(2)
 #define CMD_STOREITEM               0x80 //C,D,T TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D,T TXT_VAR(1) ITM(2)
 #define CMD_STOREATK                0x82 //C,D,T TXT_VAR(1) ATK(2)
