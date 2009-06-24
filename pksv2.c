@@ -20,10 +20,13 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "windows.h"
 HWND UI_WIN;
+RECT rect;
+HINSTANCE inst;
 #endif
+char VersionOverride=0;
 #include <stdio.h>
 #include <strings.h>
-#include <malloc.h>
+#include <stdlib.h>
 char dyntype=1;
 #define FIRE_RED  0
 #define RUBY      1
@@ -69,6 +72,9 @@ int main(unsigned int argc,char**argv)
   unsigned int file_location=0;
   unsigned int decompile_at;
   unsigned int narc;
+#ifdef WIN32
+  inst=GetModuleHandle(NULL);
+#endif
   i=(unsigned int)strlen(argv[0]);
   while (argv[0][i]!='\\'&&argv[0][i]!='/'&&i!=0)
   {

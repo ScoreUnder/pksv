@@ -1,7 +1,7 @@
 #ifndef __HAVE_SULIB
 #define __HAVE_SULIB
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 typedef struct __define {
   char*name;
