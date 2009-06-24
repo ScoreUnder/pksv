@@ -19,7 +19,7 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #include "windows.h"
 char dyntype=1;
-#define INTERNAL_VERSION "2.0.3"
+#define INTERNAL_VERSION "2.0.4"
 HINSTANCE inst=NULL;
 #define malloc(x) GlobalAlloc(GPTR,x)
 #define free(x) GlobalFree(x)
@@ -96,11 +96,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,
   }
   return 1;
 }
-__declspec(dllexport) int VersionMismatch(char*v)
+__declspec(dllexport) __cdecl int VersionMismatch(char*v)
 {
   return strcmp(v,INTERNAL_VERSION);
 }
-__declspec(dllexport) int NewMode(int nmode)
+__declspec(dllexport) __cdecl int NewMode(int nmode)
 {
   mode=nmode;
   VersionOverride=1;
@@ -108,7 +108,7 @@ __declspec(dllexport) int NewMode(int nmode)
   else search=0;
   return mode;
 }
-__declspec(dllexport) int DetermineMode(char*rom)
+__declspec(dllexport) __cdecl int DetermineMode(char*rom)
 {
   register FILE*romfile;
   VersionOverride=0;
@@ -152,7 +152,7 @@ __declspec(dllexport) int DetermineMode(char*rom)
   fclose(romfile);
   return mode;
 }
-__declspec(dllexport) char* decompile(char*fname,int loc,int narc)
+__declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
 {
   register FILE*romfile;
 
@@ -173,7 +173,7 @@ __declspec(dllexport) char* decompile(char*fname,int loc,int narc)
   fclose(romfile);
   return decompiled;
 }
-__declspec(dllexport) char* decompileASM(char*fname,int loc)
+__declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
 {
   register FILE*romfile;
 
@@ -187,7 +187,7 @@ __declspec(dllexport) char* decompileASM(char*fname,int loc)
   fclose(romfile);
   return decompiled;
 }
-__declspec(dllexport) char* decompileLevel(char*fname,int loc)
+__declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
 {
   register FILE*romfile;
 
@@ -216,7 +216,7 @@ void ClearDefines()
   basedef=NULL;
 }
 int dlg_active,compiling=0;
-__declspec(dllexport) int compile(char*fname,char*to_recompile)
+__declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
 {
   while (compiling)Sleep(1);
   OutputDebugString("Start compile...");
@@ -252,7 +252,7 @@ __declspec(dllexport) int compile(char*fname,char*to_recompile)
   }*/
   return 0;
 }
-__declspec(dllexport) int DebugCompile(char*fname,char*to_recompile)
+__declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
 {
   while (compiling)Sleep(1);
   compiling=1;

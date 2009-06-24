@@ -856,7 +856,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -871,7 +871,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -885,7 +885,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -904,7 +904,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -918,7 +918,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -932,7 +932,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -946,7 +946,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -960,7 +960,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -1656,7 +1656,7 @@ void DecodeProc2(FILE* fileM_,
           fread(&arg1,1,1,fileM);
           fread(&arg2,1,1,fileM);
           fread(&arg3,1,1,fileM);
-          if (mode==FIRE_RED||arg3==0xFF)
+          if (arg3==0xFF)
           {
             fread(&arg4,1,2,fileM);
             fread(&arg5,1,2,fileM);
@@ -2193,14 +2193,14 @@ void DecodeProc2(FILE* fileM_,
         case CMD_CALLASM:
           fread(&arg1,1,4,fileM);
           fprintf(fsend,"callasm 0x%X\r\n",arg1);
-		  if(arg1&1)
-			DoThumb(arg1&0xFFFFFFFE);
+          if (arg1&1)
+            DoThumb(arg1&0xFFFFFFFE);
           break;
         case CMD_CALLASM2:
           fread(&arg1,1,4,fileM);
           fprintf(fsend,"callasm2 0x%X\r\n",arg1);
-		  if(arg1&1)
-			DoThumb(arg1&0xFFFFFFFE);
+          if (arg1&1)
+            DoThumb(arg1&0xFFFFFFFE);
           break;
         case CMD_CLEARFLAG:
           fread(&arg1,1,2,fileM);
@@ -3982,67 +3982,67 @@ void DecodeProcLevel(FILE*fileM,
   unsigned int arg2,arg3;
   register char*m;
   initDoneProcs();
-  if(VersionOverride)
+  if (VersionOverride)
   {
-	switch(mode)
-	{
-	case RUBY:
-	  fprintf(fsend,"#rse\r\n\r\n");
-	  break;
-	case FIRE_RED:
+    switch (mode)
+    {
+    case RUBY:
+      fprintf(fsend,"#rse\r\n\r\n");
+      break;
+    case FIRE_RED:
       fprintf(fsend,"#frlg\r\n\r\n");
-	  break;
-	case DIAMOND:
+      break;
+    case DIAMOND:
       fprintf(fsend,"#dp\r\n\r\n");
-	  break;
-	case CRYSTAL:
+      break;
+    case CRYSTAL:
       fprintf(fsend,"#c\r\n\r\n");
-	  break;
-	case GOLD:
+      break;
+    case GOLD:
       fprintf(fsend,"#gs\r\n\r\n");
-	  break;
-	default:
-	  fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
-	}
+      break;
+    default:
+      fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+    }
   }
   fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
   arg2=1;
-  fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n");
-  while(arg2)
+  fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n",FileZoomPos&0x07FFFFFF);
+  while (arg2)
   {
-	fread(&arg2,1,1,fileM);
-	if(arg2)
-	{
-	  fread(&arg3,1,4,fileM);
-	  fprintf(fsend,"#raw 0x%02X\r\n#dword 0x%X\r\n",arg2,arg3);
-	  if(arg2&1)//hack? I don't know. Only time will tell.
-	  {
-		Do(arg3);
-	  }
-	  else
-	  {
-		DoLevel(arg3);
-	  }
-	}
-	else
-	{
-	  fprintf(fsend,"#raw 0x00\r\n");
-	}
+    fread(&arg2,1,1,fileM);
+    if (arg2)
+    {
+      fread(&arg3,1,4,fileM);
+      fprintf(fsend,"#raw 0x%02X\r\n#dword 0x%X\r\n",arg2,arg3);
+      if (arg2&1)//hack? I don't know. Only time will tell.
+      {
+        Do(arg3);
+      }
+      else
+      {
+        DoLevel(arg3);
+      }
+    }
+    else
+    {
+      fprintf(fsend,"#raw 0x00\r\n");
+    }
   }
   fprintf(fsend,"\r\n");
   while (!AllDoneLevel())
   {
-	arg1=DoneLevel(FindNotDoneLevel());
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n",arg1);
-	arg2=arg3=0;
-	fread(&arg2,1,2,fileM);
-	fread(&arg3,1,2,fileM);
-	fprintf(fsend,"#word 0x%X\r\n#word 0x%X\r\n",arg2,arg3);
-	fread(&arg2,1,4,fileM);
-	fread(&arg3,1,2,fileM);
-	fprintf(fsend,"#dword 0x%X\r\n#word 0x%X\r\n\r\n",arg2,arg3);
-	Do(arg2);
+    arg1=DoneLevel(FindNotDoneLevel());
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n",arg1);
+    arg2=arg3=0;
+    fread(&arg2,1,2,fileM);
+    fread(&arg3,1,2,fileM);
+    fprintf(fsend,"#word 0x%X\r\n#word 0x%X\r\n",arg2,arg3);
+    fread(&arg2,1,4,fileM);
+    fread(&arg3,1,2,fileM);
+    fprintf(fsend,"#dword 0x%X\r\n#word 0x%X\r\n\r\n",arg2,arg3);
+    Do(arg2);
   }
   while (!AllDone())
   {
@@ -4095,27 +4095,27 @@ void DecodeProcLevel(FILE*fileM,
   {
     nl();
     arg1=DoneThumb(FindNotDoneThumb());
-	fprintf(fsend,"'#org 0x%X\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	arg2=1;
-	arg3=0;
-    while(arg2)
-	{
-	  fread(&arg3,1,2,fileM);
-	  arg2=dec_thumb(arg3,arg1);
-	  fprintf(fsend,"'%s\r\n",asm_buf);
-	  arg1+=2;
-	}
+    fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    arg2=1;
+    arg3=0;
+    while (arg2)
+    {
+      fread(&arg3,1,2,fileM);
+      arg2=dec_thumb(arg3,arg1);
+      fprintf(fsend,"%s\r\n",asm_buf);
+      arg1+=2;
+    }
     fprintf(fsend,"\r\n");
   }
   while (!AllDoneDword())
   {
     nl();
     arg1=DoneDword(FindNotDoneDword());
-	fprintf(fsend,"#org 0x%X\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	fread(&arg2,1,4,fileM);
-	fprintf(fsend,"#dword 0x%X\r\n",arg2);
+    fprintf(fsend,"#org 0x%X\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    fread(&arg2,1,4,fileM);
+    fprintf(fsend,"#dword 0x%X\r\n",arg2);
   }
 }
 
@@ -4132,28 +4132,28 @@ void DecodeProc(FILE*fileM,
   unsigned int arg2,arg3;
   register char*m;
   initDoneProcs();
-    if(VersionOverride)
+  if (VersionOverride)
   {
-	switch(mode)
-	{
-	case RUBY:
-	  fprintf(fsend,"#rse\r\n\r\n");
-	  break;
-	case FIRE_RED:
+    switch (mode)
+    {
+    case RUBY:
+      fprintf(fsend,"#rse\r\n\r\n");
+      break;
+    case FIRE_RED:
       fprintf(fsend,"#frlg\r\n\r\n");
-	  break;
-	case DIAMOND:
+      break;
+    case DIAMOND:
       fprintf(fsend,"#dp\r\n\r\n");
-	  break;
-	case CRYSTAL:
+      break;
+    case CRYSTAL:
       fprintf(fsend,"#c\r\n\r\n");
-	  break;
-	case GOLD:
+      break;
+    case GOLD:
       fprintf(fsend,"#gs\r\n\r\n");
-	  break;
-	default:
-	  fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
-	}
+      break;
+    default:
+      fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+    }
   }
   DecodeProc2(fileM,narc,FileZoomPos,fname
 #ifndef DLL
@@ -4210,27 +4210,27 @@ void DecodeProc(FILE*fileM,
   {
     nl();
     arg1=DoneThumb(FindNotDoneThumb());
-	fprintf(fsend,"'#org 0x%X\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	arg2=1;
-	arg3=0;
-    while(arg2)
-	{
-	  fread(&arg3,1,2,fileM);
-	  arg2=dec_thumb(arg3,arg1);
-	  fprintf(fsend,"'%s\r\n",asm_buf);
-	  arg1+=2;
-	}
+    fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    arg2=1;
+    arg3=0;
+    while (arg2)
+    {
+      fread(&arg3,1,2,fileM);
+      arg2=dec_thumb(arg3,arg1);
+      fprintf(fsend,"%s\r\n",asm_buf);
+      arg1+=2;
+    }
     fprintf(fsend,"\r\n");
   }
   while (!AllDoneDword())
   {
     nl();
     arg1=DoneDword(FindNotDoneDword());
-	fprintf(fsend,"#org 0x%X\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	fread(&arg2,1,4,fileM);
-	fprintf(fsend,"#dword 0x%X\r\n",arg2);
+    fprintf(fsend,"#org 0x%X\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    fread(&arg2,1,4,fileM);
+    fprintf(fsend,"#dword 0x%X\r\n",arg2);
   }
 }
 
@@ -4245,56 +4245,57 @@ void DecodeProcASM(FILE*fileM,
   register unsigned int arg1;
   unsigned int arg2,arg3;
   initDoneProcs();
-    if(VersionOverride)
+  if (VersionOverride)
   {
-	switch(mode)
-	{
-	case RUBY:
-	  fprintf(fsend,"#rse\r\n\r\n");
-	  break;
-	case FIRE_RED:
+    switch (mode)
+    {
+    case RUBY:
+      fprintf(fsend,"#rse\r\n\r\n");
+      break;
+    case FIRE_RED:
       fprintf(fsend,"#frlg\r\n\r\n");
-	  break;
-	case DIAMOND:
+      break;
+    case DIAMOND:
       fprintf(fsend,"#dp\r\n\r\n");
-	  break;
-	case CRYSTAL:
+      break;
+    case CRYSTAL:
       fprintf(fsend,"#c\r\n\r\n");
-	  break;
-	case GOLD:
+      break;
+    case GOLD:
       fprintf(fsend,"#gs\r\n\r\n");
-	  break;
-	default:
-	  fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
-	}
+      break;
+    default:
+      fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+    }
   }
-  if(FileZoomPos&1)DoThumb(FileZoomPos);
+  if (FileZoomPos&1)DoThumb(FileZoomPos&0xFFFFFFFE);
+#ifdef WIN32
   else MessageBox(NULL,"Only THUMB has been implemented. Please add 1 to your offset to decompile as THUMB.","Warning",0x30);//DoARM(FileZoomPos);
+#endif
   while (!AllDoneThumb())
   {
-    nl();
     arg1=DoneThumb(FindNotDoneThumb());
-	fprintf(fsend,"'#org 0x%X\r\n'#thumb\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	arg2=1;
-	arg3=0;
-    while(arg2)
-	{
-	  fread(&arg3,1,2,fileM);
-	  arg2=dec_thumb(arg3,arg1);
-	  fprintf(fsend,"'%s\r\n",asm_buf);
-	  arg1+=2;
-	}
+    fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    arg2=1;
+    arg3=0;
+    while (arg2)
+    {
+      fread(&arg3,1,2,fileM);
+      arg2=dec_thumb(arg3,arg1);
+      fprintf(fsend,"%s\r\n",asm_buf);
+      arg1+=2;
+    }
     fprintf(fsend,"\r\n");
   }
   while (!AllDoneDword())
   {
     nl();
     arg1=DoneDword(FindNotDoneDword());
-	fprintf(fsend,"#org 0x%X\r\n",arg1);
-	fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-	fread(&arg2,1,4,fileM);
-	fprintf(fsend,"#dword 0x%X\r\n",arg2);
+    fprintf(fsend,"#org 0x%X\r\n",arg1);
+    fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
+    fread(&arg2,1,4,fileM);
+    fprintf(fsend,"#dword 0x%X\r\n",arg2);
   }
 }
 

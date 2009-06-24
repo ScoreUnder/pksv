@@ -221,7 +221,7 @@ unsigned int GenForFunc(char*func,
     buf[j]=0;
     add_insert(c,c->size,buf);
     sprintf(buf3,"DYN-> %s\r\n",buf);
-    log(buf3,strlen(buf3));
+    log_txt(buf3,strlen(buf3));
     gffs=1;
     *ii=i;
     return 0x08000000;
@@ -256,7 +256,7 @@ unsigned int GenForFunc(char*func,
         if (l==0)
         {
           strcpy(buf3,"You did not specify the free space length - defaulting to 0x100");
-          log(buf3,strlen(buf3));
+          log_txt(buf3,strlen(buf3));
           k=0x100;
         }
         else
@@ -287,7 +287,7 @@ unsigned int GenForFunc(char*func,
         if (IsVerbose)
         {
           sprintf(buf3,"FS -> 0x%X\r\n",k);
-          log(buf3,strlen(buf3));
+          log_txt(buf3,strlen(buf3));
         }
         return k;
       }
@@ -310,7 +310,7 @@ unsigned int GenForFunc(char*func,
       if (IsVerbose)
       {
         sprintf(buf3,"   -> 0x%X\r\n",k);
-        log(buf3,strlen(buf3));
+        log_txt(buf3,strlen(buf3));
       }
     }
     else
@@ -327,14 +327,14 @@ unsigned int GenForFunc(char*func,
       if (buf2[0]==0)
       {
         sprintf(buf2,"You need to enter more arguments to %s\r\n",func);
-        log(buf2,strlen(buf2));
+        log_txt(buf2,strlen(buf2));
         return 0;
       }
       k=atoi(buf2);
       if (IsVerbose)
       {
         sprintf(buf3,"   -> 0x%X\r\n",k);
-        log(buf3,strlen(buf3));
+        log_txt(buf3,strlen(buf3));
       }
     }
   }
@@ -355,12 +355,12 @@ unsigned int GenForFunc(char*func,
       if (IsVerbose)
       {
         sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,WhatIs(buf3));
-        log(buf2,strlen(buf2));
+        log_txt(buf2,strlen(buf2));
       }
       return WhatIs(buf3);
     }
     sprintf(buf2,"Unknown value in %s (Value must be integer)\r\n",func);
-    log(buf2,strlen(buf2));
+    log_txt(buf2,strlen(buf2));
     return 0;
   }
   gffs=1;

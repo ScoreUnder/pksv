@@ -21,7 +21,7 @@ char trans[65536];
 //char*logtxt;
 //unsigned int log_allocated;
 //unsigned int log_size;
-void log(char*format)
+void log_txt(char*format)
 {
   int len,alloc;
   char*newchr;
@@ -49,9 +49,9 @@ void log(char*format)
     log_size+=len;
   }
 }
-#define log(x,y) log(x)
+#define log_txt(x,y) log_txt(x)
 #else
-#define log(asd,fgh) fwrite(asd,1,fgh,LogFile)
+#define log_txt(asd,fgh) fwrite(asd,1,fgh,LogFile)
 #endif
 
 char*transtxt(int howfar,char*file)
@@ -1796,7 +1796,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          log(xbuf,strlen(xbuf));
+          log_txt(xbuf,strlen(xbuf));
         }
         else
         {
@@ -1814,7 +1814,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            log(xbuf,strlen(xbuf));
+            log_txt(xbuf,strlen(xbuf));
           }
           else
           {
@@ -1827,7 +1827,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       else {
         len--;
         sprintf(xbuf,"Unknown Gold/Silver/Crystal move command \"%s\"\r\n",cmdbuf);
-        log(xbuf,strlen(xbuf));
+        log_txt(xbuf,strlen(xbuf));
       }
       len++;
 
@@ -2017,7 +2017,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          log(xbuf,strlen(xbuf));
+          log_txt(xbuf,strlen(xbuf));
         }
         else
         {
@@ -2035,7 +2035,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            log(xbuf,strlen(xbuf));
+            log_txt(xbuf,strlen(xbuf));
           }
           else
           {
@@ -2049,7 +2049,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       {
         len--;
         sprintf(xbuf,"Unknown FR/LG move command \"%s\"\r\n",cmdbuf);
-        log(xbuf,strlen(xbuf));
+        log_txt(xbuf,strlen(xbuf));
       }
       len++;
     }
@@ -2199,7 +2199,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
         {
           len--;
           sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
-          log(xbuf,strlen(xbuf));
+          log_txt(xbuf,strlen(xbuf));
         }
         else
         {
@@ -2217,7 +2217,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
           {
             len--;
             sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-            log(xbuf,strlen(xbuf));
+            log_txt(xbuf,strlen(xbuf));
           }
           else
           {
@@ -2230,7 +2230,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       else {
         len--;
         sprintf(xbuf,"Unknown R/S move command \"%s\"\r\n",cmdbuf);
-        log(xbuf,strlen(xbuf));
+        log_txt(xbuf,strlen(xbuf));
       }
       len++;
     }
