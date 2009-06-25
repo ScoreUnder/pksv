@@ -1398,9 +1398,10 @@ void RecodeProc(char*script,char*romfn)
   fs,
 #endif
   fst,i,j,k,l,arg1,arg2,arg3,arg4,arg5,arg6,scriptlen;//,arg7;
-  codeblock*c;
+  codeblock*c=NULL;
   codeblock*d;
-  c=NULL;
+  codelabel*cl=NULL;
+  codelabel*cl2;
   RomFile=fopen(romfn,"r+b");
   if (RomFile==NULL)
   {
@@ -1757,7 +1758,13 @@ dp:
             ec();
           }
           try_asm();
-          if (!strcmp(buf,"m"))
+          if (*buf==':')
+          {
+            if(c)
+              add_label(buf,c,c->size,&cl);
+            ec();
+          }
+          aa("m")
           {
             vlog_txt("Movement data...\r\n");
             add_data(c,trans,transbackmove(Script,&i));
@@ -4075,7 +4082,13 @@ cry:
             ec();
           }
           try_asm();
-          if (!strcmp(buf,"m"))
+          if (*buf==':')
+          {
+            if(c)
+              add_label(buf,c,c->size,&cl);
+            ec();
+          }
+          aa("m")
           {
             vlog_txt("Movement data...\r\n");
             add_data(c,trans,transbackmove(Script,&i));
@@ -6390,7 +6403,13 @@ gsc:
             ec();
           }
           try_asm();
-          if (!strcmp(buf,"m"))
+          if (*buf==':')
+          {
+            if(c)
+              add_label(buf,c,c->size,&cl);
+            ec();
+          }
+          aa("m")
           {
             vlog_txt("Movement data...\r\n");
             add_data(c,trans,transbackmove(Script,&i));
@@ -9788,6 +9807,12 @@ rse:
           {
             try_asm();
           }
+          else if (*buf==':')
+          {
+            if(c)
+              add_label(buf,c,c->size,&cl);
+            ec();
+          }
           aa("=")
           {
             vlog_txt("[STRING]\r\n");
@@ -9914,7 +9939,7 @@ unk_cmd_fr:
     if (dynu)
     {
       calc_org(c,start,romfn);
-      process_inserts(c);
+      process_inserts(c,cl);
     }
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");
@@ -9962,6 +9987,14 @@ unk_cmd_fr:
       free(c->name);
     free(c);
     c=d;
+  }
+  while(cl)
+  {
+    cl2=cl->next;
+    if(cl->name)
+      free(cl->name);
+    free(cl);
+    cl=cl2;
   }
 #ifdef WIN32
   if (needdlg)

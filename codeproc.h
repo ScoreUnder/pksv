@@ -209,7 +209,7 @@ unsigned int GenForFunc(char*func,
   {
     i++;
   }
-  if (chr=='@')
+  if (chr=='@'||chr==':')
   {
     j=0;
     while (chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')

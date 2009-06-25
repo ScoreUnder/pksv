@@ -27,6 +27,35 @@ typedef struct __block {
   unsigned int org;
 } codeblock;
 
+typedef struct __label {
+  unsigned int pos;
+  char*name;
+  codeblock*block;
+  struct __label*next;
+  struct __label*prev;
+} codelabel;
+
+unsigned int add_label(char*name,codeblock*c,unsigned int loc,codelabel**chain)
+{
+  char*name2;
+  codelabel*ncl;
+  codelabel*d;
+  name2=malloc(strlen(name)+1);
+  strcpy(name2,name);
+  ncl=malloc(sizeof(codelabel));
+  d=*chain;
+  if(d)
+    while(d->next)d=d->next;
+  ncl->prev=d;
+  if(d)d->next=ncl;
+  ncl->next=NULL;
+  ncl->name=name2;
+  ncl->pos=loc;
+  ncl->block=c;
+  if(!*chain)*chain=ncl;
+  return !!ncl;
+}
+
 unsigned int init_codeblock(codeblock*c,char*name)
 {
   if (c==NULL)return 0;
@@ -230,11 +259,12 @@ void calc_org(codeblock*c,unsigned int start,char*file)
   }
 }
 
-void process_inserts(codeblock*c) //process inserts for everything.
+void process_inserts(codeblock*c,codelabel*cl) //process inserts for everything.
 {
   register codeblock*z;
   register codeblock*y;
   register codeinsert*x;
+  register codelabel*cl2;
   unsigned int j;
   y=rewind_codeblock(c);
   while (y!=NULL)
@@ -242,21 +272,46 @@ void process_inserts(codeblock*c) //process inserts for everything.
     x=y->insert;
     while (x!=NULL)
     {
-      z=rewind_codeblock(c);
-      while (z!=NULL)
+      if(*(x->name)==':')
       {
-        if (z->name!=NULL)
-          if (!strcmp(z->name,x->name))
-          {
-            if (x->IsGoldDyn)
+        cl2=cl;
+        while (cl2)
+        {
+          if (cl2->name)
+            if (!strcmp(cl2->name,x->name))
             {
-              j=OffsetToPointer(z->org);
-              memcpy((void*)(y->data+x->pos),&j,3);
+              if (x->IsGoldDyn)
+              {
+                j=OffsetToPointer(cl2->pos);
+                memcpy((void*)(y->data+x->pos),&j,3);
+              }
+              else
+              {
+                j=cl2->pos+cl2->block->org;
+                memcpy((void*)(y->data+x->pos),&j,4);
+              }
             }
-            else
-              memcpy((void*)(y->data+x->pos),&(z->org),4);
-          }
-        z=z->next;
+          cl2=cl2->next;
+        }
+      }
+      else
+      {
+        z=rewind_codeblock(c);
+        while (z)
+        {
+          if (z->name)
+            if (!strcmp(z->name,x->name))
+            {
+              if (x->IsGoldDyn)
+              {
+                j=OffsetToPointer(z->org);
+                memcpy((void*)(y->data+x->pos),&j,3);
+              }
+              else
+                memcpy((void*)(y->data+x->pos),&(z->org),4);
+            }
+          z=z->next;
+        }
       }
       x=x->next;
     }

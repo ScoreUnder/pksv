@@ -939,12 +939,92 @@ char*transmove(int howfar,char*file)
         case 0x20:
           strcat(trans,"run_right");
           break;
+        ///////////////////////////////////////////////////////////
+        case 0x21:
+          strcat(trans,"onspot_down_slow");
+          break;
+        case 0x22:
+          strcat(trans,"onspot_up_slow");
+          break;
+        case 0x23:
+          strcat(trans,"onspot_left_slow");
+          break;
+        case 0x24:
+          strcat(trans,"onspot_right_slow");
+          break;
+        case 0x25:
+          strcat(trans,"onspot_down");
+          break;
+        case 0x26:
+          strcat(trans,"onspot_up");
+          break;
+        case 0x27:
+          strcat(trans,"onspot_left");
+          break;
+        case 0x28:
+          strcat(trans,"onspot_right");
+          break;
+        case 0x29:
+          strcat(trans,"onspot_down_fast");
+          break;
+        case 0x2A:
+          strcat(trans,"onspot_up_fast");
+          break;
+        case 0x2B:
+          strcat(trans,"onspot_left_fast");
+          break;
+        case 0x2C:
+          strcat(trans,"onspot_right_fast");
+          break;
+        case 0x2D:
+          strcat(trans,"look_down_delayed");
+          break;
         case 0x2E:
-          strcat(trans,"walk_to_lasttalk");
+          strcat(trans,"look_up_delayed");
           break;
         case 0x2F:
-          strcat(trans,"walk_to_player");
+          strcat(trans,"look_left_delayed");
           break;
+        case 0x30:
+          strcat(trans,"look_right_delayed");
+          break;
+        case 0x31:
+          strcat(trans,"slide_down");
+          break;
+        case 0x32:
+          strcat(trans,"slide_up");
+          break;
+        case 0x33:
+          strcat(trans,"slide_left");
+          break;
+        case 0x34:
+          strcat(trans,"slide_right");
+          break;
+        case 0x3D:
+          strcat(trans,"slide_down2");
+          break;
+        case 0x3E:
+          strcat(trans,"slide_up2");
+          break;
+        case 0x3F:
+          strcat(trans,"slide_left2");
+          break;
+        case 0x40:
+          strcat(trans,"slide_right2");
+          break;
+        case 0x41:
+          strcat(trans,"slide_down3");
+          break;
+        case 0x42:
+          strcat(trans,"slide_up3");
+          break;
+        case 0x43:
+          strcat(trans,"slide_left3");
+          break;
+        case 0x44:
+          strcat(trans,"slide_right3");
+          break;
+          ////////////////////////////////////////
         case 0x46:
           strcat(trans,"look_left_jump_down");
           break;
@@ -1912,12 +1992,35 @@ unsigned int transbackmove(char*script,unsigned int*ii)
       aaa("run_right") {
         move 0x20;
       }
-      aaa("walk_to_lasttalk") {
-        move 0x2E;
-      }
-      aaa("walk_to_player") {
-        move 0x2F;
-      }
+        aaa("onspot_down_slow"){move 0x21;}
+        aaa("onspot_up_slow"){move 0x22;}
+        aaa("onspot_left_slow"){move 0x23;}
+        aaa("onspot_right_slow"){move 0x24;}
+        aaa("onspot_down"){move 0x25;}
+        aaa("onspot_up"){move 0x26;}
+        aaa("onspot_left"){move 0x27;}
+        aaa("onspot_right"){move 0x28;}
+        aaa("onspot_down_fast"){move 0x29;}
+        aaa("onspot_up_fast"){move 0x2A;}
+        aaa("onspot_left_fast"){move 0x2B;}
+        aaa("onspot_right_fast"){move 0x2C;}
+        aaa("look_down_delayed"){move 0x2D;}
+        aaa("look_up_delayed"){move 0x2E;}
+        aaa("look_left_delayed"){move 0x2F;}
+        aaa("look_right_delayed"){move 0x30;}
+        aaa("slide_down"){move 0x31;}
+        aaa("slide_up"){move 0x32;}
+        aaa("slide_left"){move 0x33;}
+        aaa("slide_right"){move 0x34;}
+        aaa("slide_down2"){move 0x3D;}
+        aaa("slide_up2"){move 0x3E;}
+        aaa("slide_left2"){move 0x3F;}
+        aaa("slide_right2"){move 0x40;}
+        aaa("slide_down3"){move 0x41;}
+        aaa("slide_up3"){move 0x42;}
+        aaa("slide_left3"){move 0x43;}
+        aaa("slide_right3"){move 0x44;}
+
       aaa("look_left_jump_down") {
         move 0x46;
       }
