@@ -23,6 +23,7 @@ HWND UI_WIN;
 RECT rect;
 HINSTANCE inst;
 #endif
+#include "pksv_dll.c"
 char VersionOverride=0;
 #include <stdio.h>
 #include <strings.h>
@@ -121,8 +122,18 @@ int main(unsigned int argc,char**argv)
     }
     else if (!strcmp(argv[i],"--help"))
     {
-      printf("PKSV - backend used for compiling/decompiling.\n");
+      printf("PKSV V"INTERNAL_VERSION" - backend used for compiling/decompiling.\n\
+pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
+pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
+pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
+");
+      return 0;
     }
+  }
+  if(argc<4)
+  {
+    printf("Not enough arguments...\n");
+    return 0;
   }
   if (file_location==0)
   {

@@ -15,11 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define INTERNAL_VERSION "2.0.4"
 #ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
 #include "windows.h"
 char dyntype=1;
-#define INTERNAL_VERSION "2.0.4"
 HINSTANCE inst=NULL;
 #define malloc(x) GlobalAlloc(GPTR,x)
 #define free(x) GlobalFree(x)

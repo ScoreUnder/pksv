@@ -9912,7 +9912,7 @@ unk_cmd_fr:
 #endif
 #ifdef WIN32
 #ifndef DLL
-  HW_DLG=CreateDialog_txt(inst,MAKEINTRESOURCE(10),NULL,(DLGPROC)&OffsetDlg);
+  HW_DLG=CreateDialog(inst,MAKEINTRESOURCE(10),NULL,(DLGPROC)&OffsetDlg);
   UI_WIN=FindWindow("Score_Under_PKSVUI",NULL);
   if (UI_WIN!=NULL)
   {
