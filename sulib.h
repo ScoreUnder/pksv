@@ -25,6 +25,7 @@ typedef struct __block {
   char*name;
   struct __insert*insert;
   unsigned int org;
+  unsigned int align;
 } codeblock;
 
 typedef struct __label {
@@ -63,6 +64,7 @@ unsigned int init_codeblock(codeblock*c,char*name)
   c->allocated=128;
   c->size=0;
   c->next=NULL;
+  c->align=0;
   c->prev=NULL;
   if (name!=NULL)
   {
@@ -232,6 +234,8 @@ void calc_org(codeblock*c,unsigned int start,char*file)
       if (dyntype==1)
       {
         b->org=a;
+        if(b->align&&b->org%b->align)
+          b->org+=b->align-(b->org % b->align);
         if ((mode==GOLD||mode==CRYSTAL)&&b->size<0x3FFF)
         {
           while ((OffsetToPointer(b->org)&0xFF)!=(OffsetToPointer(b->org+b->size)&0xFF))
@@ -240,11 +244,13 @@ void calc_org(codeblock*c,unsigned int start,char*file)
             b->org=a;
           }
         }
-        a+=b->size;
+        a=b->org+b->size;
       }
       else
       {
-        b->org=FindFreeSpace(file,b->size);
+        b->org=FindFreeSpace(file,b->size+b->align-1);
+        if(b->align&&b->org%b->align)
+          b->org+=b->align-(b->org % b->align);
         if ((mode==GOLD||mode==CRYSTAL)&&b->size<0x3FFF)
         {
           while ((OffsetToPointer(b->org)&0xFF)!=(OffsetToPointer(b->org+b->size)&0xFF))
@@ -287,7 +293,7 @@ void process_inserts(codeblock*c,codelabel*cl) //process inserts for everything.
               }
               else
               {
-                j=cl2->pos+cl2->block->org;
+                j=(cl2->pos+cl2->block->org)|0x08000000;
                 memcpy((void*)(y->data+x->pos),&j,4);
               }
             }

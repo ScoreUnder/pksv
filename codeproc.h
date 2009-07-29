@@ -17,41 +17,126 @@
 */
 #include "isdone.h"
 
-definition*basedef=NULL;
+int*basedef=NULL;
+char**defnames=NULL;
+
+int def_alloc=0;
+int def_size=0;
 
 void Define(char*thing,unsigned int otherthing)
 {
-  definition*temp1;
-  definition*temp2;
-  if (basedef==NULL)
+  char*m,*m2;
+  
+  if(def_alloc>(def_size<<2))
   {
-    basedef=malloc(sizeof(definition));
-    basedef->next=NULL;
-    basedef->name=malloc(strlen(thing)+1);
-    strcpy(basedef->name,thing);
-    basedef->means=otherthing;
+    def_size++;
   }
   else
   {
-    temp2=basedef;
-    while (temp2)
-    {
-      temp1=temp2;
-      temp2=temp1->next;
-    }
-    temp1->next=malloc(sizeof(definition));
-    temp1=temp1->next;
-    temp1->next=NULL;
-    temp1->name=malloc(strlen(thing)+1);
-    strcpy(temp1->name,thing);
-    temp1->means=otherthing;
+    m=malloc(def_alloc+512*4);
+    m2=malloc(def_alloc+512*4);
+    //memcpy(edi,esi,ecx);
+    memcpy(m,basedef,def_alloc);
+    memcpy(m2,defnames,def_alloc);
+    def_size++;
+    def_alloc+=512*4;
+    if(basedef)
+      free(basedef);
+    if(defnames)
+      free(defnames);
+    basedef=(int*)m;
+    defnames=(char**)m2;
   }
+  m=malloc(strlen(thing)+1);
+  strcpy(m,thing);
+  defnames[def_size-1]=m;
+  basedef[def_size-1]=otherthing;
+  return;
+}
+unsigned int fail;
+unsigned int WhatIs(char*thing)
+{
+  register int i;
+  fail=0;
+  for(i=0;i<def_size;i++)
+    if(!strcmp(thing,defnames[i]))
+      return basedef[i];
+  fail=1;
+  return 0;
+}
+
+void ReDefine(char*thing,int val)
+{
+  register int i;
+  fail=0;
+  for(i=0;i<def_size;i++)
+    if(!strcmp(thing,defnames[i]))
+    {
+      basedef[i]=val;
+      return;
+    }
+  fail=1;
   return;
 }
 
-unsigned int fail;
+int*basedef2=NULL;
+char**defnames2=NULL;
 
-char*LowerCase(char*orig)  //This is how you lowercase.
+int def_alloc2=0;
+int def_size2=0;
+
+int codenum=0;
+int levelnum=0;
+int textnum=0;
+int movenum=0;
+int martnum=0;
+int thumbnum=0;
+int dwordnum=0;
+
+void Define2(unsigned int otherthing,char*thing)
+{
+  char*m,*m2;
+  
+  if(def_alloc2>(def_size2<<2))
+  {
+    def_size2++;
+  }
+  else
+  {
+    m=malloc(def_alloc2+512*4);
+    m2=malloc(def_alloc2+512*4);
+    //memcpy(edi,esi,ecx);
+    memcpy(m,basedef2,def_alloc2);
+    memcpy(m2,defnames2,def_alloc2);
+    def_size2++;
+    def_alloc2+=512*4;
+    if(basedef2)
+      free(basedef2);
+    if(defnames2)
+      free(defnames2);
+    basedef2=(int*)m;
+    defnames2=(char**)m2;
+  }
+  m=malloc(strlen(thing)+1);
+  strcpy(m,thing);
+  defnames2[def_size2-1]=m;
+  basedef2[def_size2-1]=otherthing;
+  return;
+}
+unsigned int fail2;
+char* WhatIs2(int thing)
+{
+  register int i;
+  fail=0;
+  for(i=0;i<def_size2;i++)
+    if(thing==basedef2[i])
+      return defnames2[i];
+  fail=1;
+  return 0;
+}
+#define Defined2(thing) ((((int)WhatIs2(thing))&0)|!fail)
+
+char*LowerCase(char*orig)
 {
   register unsigned int i=0;
   while (orig[i]!=0)
@@ -93,25 +178,17 @@ void LowerCaseAndRemAll0D(char*orig)
     {
       *orig='\n';
     }
+    else if (a=='\t')
+    {
+      *orig=' ';
+    }
+    else if (a=='/'&&orig[1]=='/')
+    {
+      *orig='\'';
+    }
     orig++;
     a=*orig;
   }
-}
-
-unsigned int WhatIs(char*thing)
-{
-  definition*i=basedef;
-  fail=0;
-  while (i!=NULL)
-  {
-    if (!strcmp(i->name,thing))
-    {
-      return i->means;
-    }
-    i=i->next;
-  }
-  fail=1;
-  return 0;
 }
 
 unsigned int FindFreeSpace(char*romname,unsigned int len)
@@ -155,7 +232,6 @@ signed int PointerToOffset(unsigned int ptr)
 {
   unsigned int pointer=0;
   unsigned int bank=0;
-  unsigned int offset=0;
   bank=ptr&0xFF;
   pointer=(ptr&0xFFFF00)>>8;
   if (pointer<0x4000||pointer>0x7FFF)return -1;
@@ -183,7 +259,7 @@ signed int OffsetToPointer(unsigned int offset)
   return (pointer<<8)|bank;
 }
 
-#define Defined(thing) ((WhatIs(thing)&&0)||!fail)
+#define Defined(thing) ((WhatIs(thing)&0)|!fail)
 #define chr Script[i]
 #ifndef DLL
 #define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn,c)
@@ -221,7 +297,8 @@ unsigned int GenForFunc(char*func,
     buf[j]=0;
     add_insert(c,c->size,buf);
     sprintf(buf3,"DYN-> %s\r\n",buf);
-    log_txt(buf3,strlen(buf3));
+    if(IsVerbose)
+			log_txt(buf3,strlen(buf3));
     gffs=1;
     *ii=i;
     return 0x08000000;

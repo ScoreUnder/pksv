@@ -79,7 +79,7 @@
 #define CMD_PLAYSONG                0x34 //C,D,T song(2)
 #define CMD_FADEDEFAULT             0x35 //C,D,T
 #define CMD_FADESONG                0x36 //C,D,T song(2)
-#define CMD_FADEOUT                 0x37 //C,D,T
+#define CMD_FADEOUT                 0x37 //C,D,T speed?(1)
 #define CMD_FADEIN                  0x38 //C,D,T
 #define CMD_WARP                    0x39 //C,D,T bank map exit - ALL 1 BYTE FRONLY:x(2) y(2)
 #define CMD_WARPMUTED               0x3A //C,D,T bank map exit - ALL 1 BYTE FRONLY:x(2) y(2)
@@ -94,7 +94,7 @@
 #define CMD_COUNTPOKEMON            0x43 //C,D,T
 #define CMD_ADDITEM                 0x44 //C,D,T (2) (2)
 #define CMD_REMOVEITEM              0x45 //C,D,T item(2) num(2)
-#define CMD_CHECKITEMAMOUNT         0x46 //C,D,T item(2) ???(2)
+#define CMD_CHECKITEMSPACEINBAG     0x46 //C,D,T item(2) ???(2)
 #define CMD_CHECKITEM               0x47 //C,D,T item(2) num(2)
 #define CMD_CHECKITEMTYPE           0x48 //C,D,T item(2)
 #define CMD_GIVEITEMTOPC            0x49 //C,D,T item(2) num(2)
@@ -134,7 +134,7 @@
 #define CMD_RELEASE                 0x6C //C,D,T
 #define CMD_WAITBUTTON              0x6D //C,D,T
 #define CMD_SHOWYESNO               0x6E //C,D,T x(1) y(1)
-#define CMD_MULTICHOICE             0x6F //C,D,T x(1) y(1) list(1) AbleToCancel(1)
+#define CMD_MULTICHOICE             0x6F //C,D,T x(1) y(1) list(1) AbleToCancel(1) OR'd binary bits. 0x1 = unable, 0x2 = return 127
 #define CMD_MULTICHOICE2            0x70 //C,D,T x(1) y(1) list(1) defchoice(1) AbleToCancel(1)
 #define CMD_MULTICHOICE3            0x71 //C,D,T 1:x y list how-many-per-row can-cancel
 #define CMD_SHOWBOX                 0x72 //C,D,T 1:xywh
@@ -158,7 +158,7 @@
 #define CMD_STOREPARTYPOKEMON       0x7F //C,D,T TXT_VAR(1) POS(2)
 #define CMD_STOREITEM               0x80 //C,D,T TXT_VAR(1) ITM(2)
 #define CMD_STOREFURNITURE          0x81 //C,D,T TXT_VAR(1) ITM(2)
-#define CMD_STOREATK                0x82 //C,D,T TXT_VAR(1) ATK(2)
+#define CMD_STOREATTACK             0x82 //C,D,T TXT_VAR(1) ATK(2)
 #define CMD_STOREVAR                0x83 //C,D,T TXT_VAR(1) VAR(2)
 #define CMD_STORECOMP               0x84 //C,D,T TXT_VAR(1) COMP(2)
 #define CMD_STORETEXT               0x85 //C,D,T TXT_VAR(1) TXT(4)
@@ -276,7 +276,7 @@ pause Waits a certain amount of time
 Setflag Sets a flag to 1 (a flag is a variable that can be only 1 or 0)
 clearflag Sets a flag to 0
 checkflag Checks if a flag is 1
-cmd_2f Seriously, why do nintendo make such cryptic commands. WHAT DOES IT MEAN? What's the significance of MR. Bean?
+cmd_2f No idea.
 cry Makes the same sound a pokemon (that you decide) makes when it comes into battle.
 fanfare Plays any pre-defined sound
 waitfanfare Waits for that command to complete
@@ -326,7 +326,7 @@ fadescreen Fades in or out.
 cmd_91 ¯\
 cmd_92  |
 cmd_93  |
-cmd_94  >- I have no clue. PS, to do overscore, do ALT+0175. Yes, I remember that off the top of my head
+cmd_94  >- I have no clue.
 cmd_95  |
 cmd_96  |
 cmd_9D _/
@@ -337,5 +337,5 @@ doweather Applies the weather change
 coincasetovar Copies the amount of coins in the coin case (even if you don't have one) to a variable.
 givetocoincase Gives money to a coin-case, even if you don't have one.
 battle Stores the variables necessary for having a wild pokemon battle.
-cmd_XX Don't know
+
 */

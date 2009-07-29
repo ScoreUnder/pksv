@@ -118,16 +118,16 @@ int dec_thumb(short opcode,int place)
 					switch((opcode&0x0300)>>8)
 					{
 						case 0:
-							sprintf(asm_buf,"-ADD   R%u,R%u",opcode&0x0007|((opcode&0x0080)>>4),(opcode&0x0028)>>3);
+							sprintf(asm_buf,"-ADD   R%u,R%u",(opcode&0x0007)|((opcode&0x0080)>>4),(opcode&0x0028)>>3);
 							break;
 						case 1:
-							sprintf(asm_buf,"-CMP   R%u,R%u",opcode&0x0007|((opcode&0x0080)>>4),(opcode&0x0028)>>3);
+							sprintf(asm_buf,"-CMP   R%u,R%u",(opcode&0x0007)|((opcode&0x0080)>>4),(opcode&0x0028)>>3);
 							break;
 						case 2:
 							if((opcode&0xFF)==0xC0)
 								strcpy(asm_buf,"-NOP");
 							else
-								sprintf(asm_buf,"-MOV   R%u,R%u",opcode&0x0007|((opcode&0x0080)>>4),(opcode&0x0078)>>3);
+								sprintf(asm_buf,"-MOV   R%u,R%u",(opcode&0x0007)|((opcode&0x0080)>>4),(opcode&0x0078)>>3);
 							break;
 						case 3:
 							if(opcode&0x0080)
@@ -244,43 +244,43 @@ int dec_thumb(short opcode,int place)
 						if(opcode&0x80)
 						{
 							strcat(asm_buf,"R7");
-							if(opcode&0x7F)
+							if(opcode&0x17F)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x40)
 						{
 							strcat(asm_buf,"R6");
-							if(opcode&0x3F)
+							if(opcode&0x13F)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x20)
 						{
 							strcat(asm_buf,"R5");
-							if(opcode&0x1F)
+							if(opcode&0x11F)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x10)
 						{
 							strcat(asm_buf,"R4");
-							if(opcode&0xF)
+							if(opcode&0x10F)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x8)
 						{
 							strcat(asm_buf,"R3");
-							if(opcode&0x7)
+							if(opcode&0x107)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x4)
 						{
 							strcat(asm_buf,"R2");
-							if(opcode&0x3)
+							if(opcode&0x103)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x2)
 						{
 							strcat(asm_buf,"R1");
-							if(opcode&0x1)
+							if(opcode&0x101)
 								strcat(asm_buf,",");
 						}
 						if(opcode&0x1)

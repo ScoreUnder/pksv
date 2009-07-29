@@ -15,13 +15,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define INTERNAL_VERSION "2.0.4"
+#define INTERNAL_VERSION "2.0.5"
 #ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
 #include "windows.h"
 char dyntype=1;
 HINSTANCE inst=NULL;
+int dyndec=0;
+int dynplace=0;
 #define malloc(x) GlobalAlloc(GPTR,x)
+/*
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ ":" TOSTRING(__LINE__)
+
+#define malloc(x) GlobalAlloc(GPTR,x);OutputDebugString("Malloc at "AT);
+*/
 #define free(x) GlobalFree(x)
 #define FIRE_RED  0
 #define RUBY      1
@@ -58,6 +67,41 @@ int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 int TxtDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG,HW_TXT;
 #endif
+char printf_result[65536];
+void dlldecfunc(FILE*nothing,char*format,...)
+{
+	int len,alloc;
+	char*newchr;
+	va_list args;
+	va_start(args,format);
+	vsprintf(printf_result,format,args);
+	len=strlen(printf_result);
+	if (decompiled==NULL)
+	{
+		alloc=max(4096,len+1024);
+		decompiled=GlobalAlloc(GPTR,alloc);
+		allocated=alloc;
+		memcpy(decompiled,printf_result,len+1);
+		dec_len=len;
+	}
+	else
+	{
+		if (dec_len+len>=allocated)
+		{
+			alloc=dec_len+len+2048;
+			newchr=GlobalAlloc(GPTR,alloc);
+			allocated=alloc;
+			memcpy(newchr,decompiled,dec_len+1);
+			GlobalFree(decompiled);
+			decompiled=newchr;
+		}
+		memcpy(decompiled+dec_len,printf_result,len+1);
+		dec_len+=len;
+	}
+	va_end(args);
+}
+#define fprintf dlldecfunc
+#define fsend NULL
 #include "textproc.h"
 #include "codeproc.h"
 //Determining mode
@@ -152,13 +196,50 @@ __declspec(dllexport) __cdecl int DetermineMode(char*rom)
   fclose(romfile);
   return mode;
 }
+__declspec(dllexport) __cdecl void SetDynamic(int dyn,int place)
+{
+  dyndec=dyn;
+  dynplace=place;
+}
+void ClearDefines()
+{
+  register int i;
+  if(basedef)
+    free(basedef);
+  for(i=0;i<def_size;i++)
+    free(defnames[i]);
+  def_alloc=0;
+  def_size=0;
+  if(defnames)
+    free(defnames);
+  defnames=NULL;
+  basedef=NULL;
+  if(basedef2)
+    free(basedef2);
+  for(i=0;i<def_size2;i++)
+    free(defnames2[i]);
+  def_alloc2=0;
+  def_size2=0;
+  if(defnames2)
+    free(defnames2);
+  defnames2=NULL;
+  basedef2=NULL;
+  codenum=0;
+  levelnum=0;
+  textnum=0;
+  movenum=0;
+  martnum=0;
+  thumbnum=0;
+  dwordnum=0;
+  comparetype=0;
+}
 __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
 {
   register FILE*romfile;
 
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
-  if (!romfile)return NULL;
+  if (!romfile)return "'Error opening ROM";
   decompiled=NULL;
   allocated=dec_len=0;
   if (mode==DIAMOND)
@@ -169,6 +250,7 @@ __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
   {
     DecodeProc(romfile,0,loc,fname);
   }
+  ClearDefines();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
   return decompiled;
@@ -179,10 +261,26 @@ __declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
 
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
-  if (!romfile)return NULL;
+  if (!romfile)return "'Error opening ROM";
   decompiled=NULL;
   allocated=dec_len=0;
   DecodeProcASM(romfile,loc,fname);
+  ClearDefines();
+  OutputDebugString("Finished decompiling");
+  fclose(romfile);
+  return decompiled;
+}
+__declspec(dllexport) __cdecl char* decompileText(char*fname,int loc)
+{
+  register FILE*romfile;
+
+  OutputDebugString("Start decompile...");
+  romfile=fopen(fname,"r+b");
+  if (!romfile)return "'Error opening ROM";
+  decompiled=NULL;
+  allocated=dec_len=0;
+  DecodeProcText(romfile,loc,fname);
+  ClearDefines();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
   return decompiled;
@@ -193,27 +291,74 @@ __declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
 
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
-  if (!romfile)return NULL;
+  if (!romfile)return "'Error opening ROM";
   decompiled=NULL;
   allocated=dec_len=0;
   DecodeProcLevel(romfile,loc,fname);
+  ClearDefines();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
   return decompiled;
 }
-void ClearDefines()
+__declspec(dllexport) __cdecl char* decompilePointer(char*fname,int loc)
 {
-  register definition*a;
-  register definition*b;
-  a=basedef;
-  while (a)
-  {
-    b=a->next;
-    free(a->name);
-    free(a);
-    a=b;
-  }
-  basedef=NULL;
+  register FILE*romfile;
+
+  OutputDebugString("Start decompile...");
+  romfile=fopen(fname,"r+b");
+  if (!romfile)return "'Error opening ROM";
+  decompiled=NULL;
+  allocated=dec_len=0;
+  DecodeProcPointer(romfile,loc,fname);
+  ClearDefines();
+  OutputDebugString("Finished decompiling");
+  fclose(romfile);
+  return decompiled;
+}
+__declspec(dllexport) __cdecl char* decompileMoves(char*fname,int loc)
+{
+  register FILE*romfile;
+
+  OutputDebugString("Start decompile...");
+  romfile=fopen(fname,"r+b");
+  if (!romfile)return "'Error opening ROM";
+  decompiled=NULL;
+  allocated=dec_len=0;
+  DecodeProcMoves(romfile,loc,fname);
+  ClearDefines();
+  OutputDebugString("Finished decompiling");
+  fclose(romfile);
+  return decompiled;
+}
+__declspec(dllexport) __cdecl char* decompileMart(char*fname,int loc)
+{
+  register FILE*romfile;
+
+  OutputDebugString("Start decompile...");
+  romfile=fopen(fname,"r+b");
+  if (!romfile)return "'Error opening ROM";
+  decompiled=NULL;
+  allocated=dec_len=0;
+  DecodeProcMart(romfile,loc,fname);
+  ClearDefines();
+  OutputDebugString("Finished decompiling");
+  fclose(romfile);
+  return decompiled;
+}
+__declspec(dllexport) __cdecl char* decompileAttacks(char*fname,int loc)
+{
+  register FILE*romfile;
+
+  OutputDebugString("Start decompile...");
+  romfile=fopen(fname,"r+b");
+  if (!romfile)return "'Error opening ROM";
+  decompiled=NULL;
+  allocated=dec_len=0;
+  DecodeProcAttacks(romfile,loc,fname);
+  ClearDefines();
+  OutputDebugString("Finished decompiling");
+  fclose(romfile);
+  return decompiled;
 }
 int dlg_active,compiling=0;
 __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)

@@ -34,7 +34,6 @@ void e_c(char*Script,int*ii
         )
 {
   register unsigned int i=*ii;
-  int arg1,arg2,arg3;
   while (Script[i+1]==' ') {
     i++;
   }
@@ -315,8 +314,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
         while (chr==' ')i++;
         if (chr=='-')
         {
-          arg2=0;
-        } else arg2=0x80;
+          arg2=0x80;
+        } else arg2=0;
         i++;
         arg1=HEX();
         arg1/=4;
@@ -1039,8 +1038,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-beq")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1055,8 +1054,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bne")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1071,8 +1070,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bcs")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1087,8 +1086,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bcc")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1103,8 +1102,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bmi")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1119,8 +1118,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bpl")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1135,8 +1134,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bvs")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1151,8 +1150,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bvc")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1167,8 +1166,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bhi")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1183,8 +1182,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bls")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1199,8 +1198,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bge")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1215,8 +1214,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-blt")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1231,8 +1230,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-bgt")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1247,8 +1246,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-ble")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1299,8 +1298,8 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
     aa("-b")
     {
       while (chr==' ')i++;
-      if (chr=='-')arg1=0;
-      else arg1=1;
+      if (chr=='-')arg1=1;
+      else arg1=0;
       i++;
       arg2=HEX();
       if (arg1)
@@ -1370,7 +1369,7 @@ void DoDefines()
     fread(buf,1,l,f);
     fread(&a,1,4,f);
     Define(buf,a);
-    i+=8+l;
+    i+=5+l;
   }
   fclose(f);
 #ifdef WIN32
@@ -1705,7 +1704,8 @@ dp:
             if (!gffs) {
               return;
             }
-            rom(k|0x08000000,4);
+            k|=0x08000000;
+            rom(k,4);
             ec();
           }
           aa("wildbattle")
@@ -1807,15 +1807,8 @@ dp:
               {
                 i++;
               }
-              j=0;
-              while (((char*)("0123456789abcdef"))[j]!=0)
-              {
-                if (((char*)("0123456789abcdef"))[j]==chr)
-                {
-                  break;
-                }
-                j+=1;
-              }
+              if(chr>='0'&&chr<='9')j=chr-'0';
+              else if(chr>='A'&&chr<='F')j=10+(chr-'A');
               if (((char*)("0123456789abcdef"))[j]==0)
               {
                 sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
@@ -1922,6 +1915,7 @@ dp:
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
+            ReDefine("findfrom",start);
             ec();
           }
           aa("#dyn2")
@@ -1938,6 +1932,7 @@ dp:
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
+            ReDefine("findfrom",start);
             ec();
           }
           aa("#org")
@@ -1958,7 +1953,7 @@ dp:
               }
               buf[j]=0;
               sprintf(buf2,"   -> %s\r\n",buf);
-              log_txt(buf2,strlen(buf2));
+              vlog_txt(buf2);
             }
             else
             {
@@ -1995,7 +1990,7 @@ dp:
               }
               buf[j]=0;
               sprintf(buf2,"   -> %s\r\n",buf);
-              log_txt(buf2,strlen(buf2));
+              vlog_txt(buf2);
             }
             else
             {
@@ -4246,6 +4241,7 @@ cry:
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
+            ReDefine("findfrom",start);
             ec();
           }
           aa("#dyn2")
@@ -4262,6 +4258,7 @@ cry:
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
+            ReDefine("findfrom",start);
             ec();
           }
           aa("#org")
@@ -4282,7 +4279,7 @@ cry:
               }
               buf[j]=0;
               sprintf(buf2,"   -> %s\r\n",buf);
-              log_txt(buf2,strlen(buf2));
+              vlog_txt(buf2);
             }
             else
             {
@@ -4319,7 +4316,7 @@ cry:
               }
               buf[j]=0;
               sprintf(buf2,"   -> %s\r\n",buf);
-              log_txt(buf2,strlen(buf2));
+              vlog_txt(buf2);
             }
             else
             {
@@ -6574,6 +6571,7 @@ rse:
               start=GetNum("#DYN");
               if (!gffs)return;
               dyntype=0;
+              ReDefine("findfrom",start);
             }
             aa("#dyn2")
             {
@@ -6588,6 +6586,7 @@ rse:
               start=GetNum("#DYNAMIC");
               if (!gffs)return;
               dyntype=0;
+              ReDefine("findfrom",start);
             }
             aa("#org")
             {
@@ -6607,7 +6606,7 @@ rse:
                 }
                 buf[j]=0;
                 sprintf(buf2,"   -> %s\r\n",buf);
-                log_txt(buf2,strlen(buf2));
+                vlog_txt(buf2);
               }
               else
               {
@@ -6627,6 +6626,47 @@ rse:
                 c->next=d;
               c=d;
             }
+            aa("#orgal")
+            {
+              eorg=0;
+              vlog_txt("#ORGAL\r\n");
+              while (chr==' ')i++;
+              buf[0]=0;
+              if (chr=='@')
+              {
+                dynu=1;
+                j=0;
+                while (chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
+                {
+                  buf[j]=chr;
+                  i++;
+                  j++;
+                }
+                buf[j]=0;
+                sprintf(buf2,"   -> %s\r\n",buf);
+                vlog_txt(buf2);
+              }
+              else
+              {
+                k=GetNum("#ORGAL");
+                if (!gffs)
+                  return;
+              }
+              d=malloc(sizeof(codeblock));
+              if (*buf==0)
+                init_codeblock(d,NULL);
+              else
+                init_codeblock(d,buf);
+              if (*buf==0)
+                d->org=k;
+              d->prev=c;
+              if (c!=NULL)
+                c->next=d;
+              c=d;
+              c->align=GetNum("#ORGAL");
+              if (!gffs)
+                return;
+            }
             aa("#eorg")
             {
               eorg=1;
@@ -6644,7 +6684,7 @@ rse:
                 }
                 buf[j]=0;
                 sprintf(buf2,"   -> %s\r\n",buf);
-                log_txt(buf2,strlen(buf2));
+                vlog_txt(buf2);
               }
               else
               {
@@ -6732,7 +6772,8 @@ rse:
               if (!gffs) {
                 return;
               }
-              rom(k|0x08000000,4);
+              k|=0x08000000;
+              rom(k,4);
             }
             aa("#dword")
             {
@@ -7297,18 +7338,18 @@ rse:
               rom(arg1,2);
               rom(arg2,2);
             }
-            aa("checkitemamount")
+            aa("checkitemspaceinbag")
             {
-              vlog_txt("CHECKITEMAMOUNT\r\n");
-              arg1=GetNum("CHECKITEMAMOUNT");
+              vlog_txt("CHECKITEMSPACEINBAG\r\n");
+              arg1=GetNum("CHECKITEMSPACEINBAG");
               if (!gffs) {
                 return;
               }
-              arg2=GetNum("CHECKITEMAMOUNT");
+              arg2=GetNum("CHECKITEMSPACEINBAG");
               if (!gffs) {
                 return;
               }
-              BASIC(CMD_CHECKITEMAMOUNT);
+              BASIC(CMD_CHECKITEMSPACEINBAG);
               rom(arg1,2);
               rom(arg2,2);
             }
@@ -7710,7 +7751,11 @@ rse:
             }
             aa("fadeout")
             {
+							vlog_txt("FADEOUT\r\n");
+							arg1=GetNum("FADEOUT");
+							if(!gffs)return;
               BASIC(CMD_FADEOUT);
+              rom(arg1,1);
             }
             aa("fadein")
             {
@@ -9088,18 +9133,18 @@ rse:
               rom(arg1,1);
               rom(arg2,2);
             }
-            aa("storeatk")
+            aa("storeattack")
             {
-              vlog_txt("STOREATK\r\n");
-              arg1=GetNum("STOREATK");
+              vlog_txt("STOREATTACK\r\n");
+              arg1=GetNum("STOREATTACK");
               if (!gffs) {
                 return;
               }
-              arg2=GetNum("STOREATK");
+              arg2=GetNum("STOREATTACK");
               if (!gffs) {
                 return;
               }
-              BASIC(CMD_STOREATK);
+              BASIC(CMD_STOREATTACK);
               rom(arg1,1);
               rom(arg2,2);
             }
@@ -9256,7 +9301,7 @@ rse:
               }
               BASIC(CMD_SPRITEBEHAVE);
               rom(arg1,2);
-              rom(arg2,2);
+              rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
           }
@@ -9936,11 +9981,8 @@ unk_cmd_fr:
   else
   {
     vlog_txt("\r\n#ORG: data\r\n");
-    if (dynu)
-    {
-      calc_org(c,start,romfn);
-      process_inserts(c,cl);
-    }
+    calc_org(c,start,romfn);
+    process_inserts(c,cl);
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");
 #endif

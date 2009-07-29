@@ -24,6 +24,8 @@ RECT rect;
 HINSTANCE inst;
 #endif
 #include "pksv_dll.c"
+int dyndec=0;
+int dynplace=0;
 char VersionOverride=0;
 #include <stdio.h>
 #include <strings.h>
