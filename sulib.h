@@ -11,7 +11,6 @@ typedef struct __define {
 
 typedef struct __insert {
   unsigned int pos;
-  unsigned int IsGoldDyn;
   char*name;
   struct __insert*next;
   struct __insert*prev;
@@ -57,7 +56,7 @@ unsigned int add_label(char*name,codeblock*c,unsigned int loc,codelabel**chain)
   return !!ncl;
 }
 
-unsigned int init_codeblock(codeblock*c,char*name)
+unsigned int init_codeblock(codeblock*c,char*name,int org)
 {
   if (c==NULL)return 0;
   c->data=malloc(128);
@@ -76,7 +75,7 @@ unsigned int init_codeblock(codeblock*c,char*name)
     c->name=NULL;
   }
   c->insert=NULL;
-  c->org=0;
+  c->org=org;
 #ifdef WIN32
   if (c->data==NULL)
   {
@@ -131,7 +130,6 @@ codeinsert* end_insert(codeinsert*c)
   }
   return z;
 }
-unsigned int GoldDyn=0;
 unsigned int add_insert(codeblock*c,unsigned int p,char*n)
 {
   codeinsert*z;
@@ -159,7 +157,6 @@ unsigned int add_insert(codeblock*c,unsigned int p,char*n)
     strcpy(z->name,n);
     if (z==NULL)return 0;
   }
-  z->IsGoldDyn=GoldDyn;
   return 1;
 }
 
@@ -224,6 +221,7 @@ void calc_org(codeblock*c,unsigned int start,char*file)
 {
   register unsigned int a;
   register codeblock*b;
+  char buf[1024];
   a=start;
   a|=0x08000000;
   b=rewind_codeblock(c);
@@ -259,6 +257,13 @@ void calc_org(codeblock*c,unsigned int start,char*file)
             b->org=FindFreeSpace(file,b->size);
           }
         }
+#ifdef WIN32
+        else if(mode==GOLD||mode==CRYSTAL)
+        {
+          snprintf(buf,sizeof(buf),"Offset %s cannot be used as it is too large.",b->name);
+          MessageBox(NULL,buf,"Error",0x10);
+        }
+#endif
       }
     }
     b=b->next;
@@ -286,10 +291,10 @@ void process_inserts(codeblock*c,codelabel*cl) //process inserts for everything.
           if (cl2->name)
             if (!strcmp(cl2->name,x->name))
             {
-              if (x->IsGoldDyn)
+              if (mode==GOLD||mode==CRYSTAL)
               {
-                j=OffsetToPointer(cl2->pos);
-                memcpy((void*)(y->data+x->pos),&j,3);
+                j=OffsetToPointer((cl2->pos+cl2->block->org)&0x07FFFFFF)>>8;
+                memcpy((void*)(y->data+x->pos),&j,2);
               }
               else
               {
@@ -308,9 +313,9 @@ void process_inserts(codeblock*c,codelabel*cl) //process inserts for everything.
           if (z->name)
             if (!strcmp(z->name,x->name))
             {
-              if (x->IsGoldDyn)
+              if (mode==GOLD||mode==CRYSTAL)
               {
-                j=OffsetToPointer(z->org);
+                j=OffsetToPointer(z->org&0x07FFFFFF);
                 memcpy((void*)(y->data+x->pos),&j,3);
               }
               else

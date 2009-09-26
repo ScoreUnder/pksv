@@ -15,7 +15,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-char gabe=0,comparetype=0;
+char comparetype=0;
 char* GetFlagName(unsigned int a)
 {
 	if(mode==FIRE_RED)
@@ -1473,11 +1473,6 @@ void DecodeProc2(FILE* fileM_,
 		else
 			fprintf(fsend,"#org 0x%X\r\n",(FileZoomPos|0x08000000));
 	}
-	/*if(!gabe&&mode==DIAMOND)
-	{
-		fprintf(fsend,"'gabe_k made DIAMOND scripting possible!\r\n");
-		gabe=1;
-	}*/
 	fprintf(fsend,"'-----------------------------------\r\n");
 	if (mode==DIAMOND)
 	{
@@ -3343,7 +3338,8 @@ void DecodeProc2(FILE* fileM_,
 					fprintf(fsend,"fadeout 0x%X\r\n",arg1);
 					break;
 				case CMD_FADEIN:
-					GENERIC("fadein");
+					fread(&arg1,1,1,fileM);
+					fprintf(fsend,"fadein 0x%X\r\n",arg1);
 					break;
 				case CMD_COUNTPOKEMON:
 					GENERIC("countpokemon");
@@ -3641,7 +3637,8 @@ void DecodeProc2(FILE* fileM_,
 						fseek(fileM,arg3,SEEK_SET);
 					}
 					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
-					Do(arg4);
+					DoDword(arg2);
+					Do(PointerToOffset(arg4));
 					break;
 				case GLD_2JUMP:
 					fread(&arg1,1,2,fileM);
@@ -3676,7 +3673,8 @@ void DecodeProc2(FILE* fileM_,
 					}
 					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
-					Do(arg4);
+					DoDword(arg2);
+					Do(PointerToOffset(arg4));
 					break;
 				case GLD_PTPRIORITYJUMP:
 					fread(&arg1,1,2,fileM);
@@ -3760,6 +3758,7 @@ void DecodeProc2(FILE* fileM_,
 						fseek(fileM,arg3,SEEK_SET);
 					}
 					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					DoDword(arg2);
 					break;
 				case GLD_CHECKMAPTRIGGERS:
 					fread(&arg1,1,1,fileM);
@@ -4511,7 +4510,8 @@ void DecodeProc2(FILE* fileM_,
 						fseek(fileM,arg3,SEEK_SET);
 					}
 					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
-					Do(arg4);
+					DoDword(arg2);
+					Do(PointerToOffset(arg4));
 					break;
 				case CRY_2JUMP:
 					fread(&arg1,1,2,fileM);
@@ -4546,7 +4546,8 @@ void DecodeProc2(FILE* fileM_,
 					}
 					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
-					Do(arg4);
+					DoDword(arg2);
+					Do(PointerToOffset(arg4));
 					break;
 				case CRY_PTPRIORITYJUMP:
 					fread(&arg1,1,2,fileM);
@@ -4630,6 +4631,7 @@ void DecodeProc2(FILE* fileM_,
 						fseek(fileM,arg3,SEEK_SET);
 					}
 					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					DoDword(arg2);
 					break;
 				case CRY_CHECKMAPTRIGGERS:
 					fread(&arg1,1,1,fileM);
@@ -5558,8 +5560,17 @@ void DecodeProcLevel(FILE*fileM,
 		else
 			fprintf(fsend,"#org 0x%X\r\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-		fread(&arg2,1,4,fileM);
-		fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		if(mode!=GOLD&&mode!=CRYSTAL)
+		{
+		  fread(&arg2,1,4,fileM);
+		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		}
+		else
+		{
+		  arg2=0;
+		  fread(&arg2,1,3,fileM);
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		}
 	}
 }
 
@@ -5637,7 +5648,7 @@ void DecodeProc(FILE*fileM,
 				fprintf(fsend,"#org 0x%X\r\n= %s\r\n",arg1,transtxt(arg1&0x07ffffff,fname));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n%s\r\n",arg1,transtxt(arg1,fname));
+			fprintf(fsend,"#org 0x%X\r\n%s",arg1,transtxt(arg1,fname));
 	}
 	while (!AllDoneMove())
 	{
@@ -5738,8 +5749,17 @@ void DecodeProc(FILE*fileM,
 		else
 			fprintf(fsend,"#org 0x%X\r\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-		fread(&arg2,1,4,fileM);
-		fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		if(mode!=GOLD&&mode!=CRYSTAL)
+		{
+		  fread(&arg2,1,4,fileM);
+		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		}
+		else
+		{
+		  arg2=0;
+		  fread(&arg2,1,3,fileM);
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		}
 	}
 }
 
@@ -5831,8 +5851,17 @@ void DecodeProcASM(FILE*fileM,
 		else
 			fprintf(fsend,"#org 0x%X\r\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
-		fread(&arg2,1,4,fileM);
-		fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		if(mode!=GOLD&&mode!=CRYSTAL)
+		{
+		  fread(&arg2,1,4,fileM);
+		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		}
+		else
+		{
+		  arg2=0;
+		  fread(&arg2,1,3,fileM);
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		}
 	}
 }
 
@@ -5910,11 +5939,19 @@ void DecodeProcPointer(FILE*fileM,
 		}
 	}
 	fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
-	fread(&arg2,1,4,fileM);
-	if(arg2&0x08000000)
-		fprintf(fsend,"#org 0x%X\r\n#ptr 0x%X\r\n",FileZoomPos,arg2);
+	if(mode!=GOLD&&mode!=CRYSTAL)
+	{
+	  fread(&arg2,1,4,fileM);
+	  if(arg2&0x08000000)
+  		fprintf(fsend,"#org 0x%X\r\n#ptr 0x%X\r\n",FileZoomPos,arg2);
+  	else
+		  fprintf(fsend,"#org 0x%X\r\n#dword 0x%X\r\n",FileZoomPos,arg2);
+	}
 	else
-		fprintf(fsend,"#org 0x%X\r\n#dword 0x%X\r\n",FileZoomPos,arg2);
+	{
+	  fread(&arg2,1,3,fileM);
+	  fprintf(fsend,"#org 0x%X\r\n#3ptr 0x%X ' 0x%X\r\n",FileZoomPos,arg2,PointerToOffset(arg2));
+	}
 }
 
 void DecodeProcMoves(FILE*fileM,

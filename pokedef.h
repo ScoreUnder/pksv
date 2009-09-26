@@ -80,7 +80,7 @@
 #define CMD_FADEDEFAULT             0x35 //C,D,T
 #define CMD_FADESONG                0x36 //C,D,T song(2)
 #define CMD_FADEOUT                 0x37 //C,D,T speed?(1)
-#define CMD_FADEIN                  0x38 //C,D,T
+#define CMD_FADEIN                  0x38 //C,D,T speed?(1)
 #define CMD_WARP                    0x39 //C,D,T bank map exit - ALL 1 BYTE FRONLY:x(2) y(2)
 #define CMD_WARPMUTED               0x3A //C,D,T bank map exit - ALL 1 BYTE FRONLY:x(2) y(2)
 #define CMD_WARPWALKING             0x3B //C,D,T bank map exit - ALL 1 BYTE FRONLY:x(2) y(2)

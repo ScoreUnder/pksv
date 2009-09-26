@@ -1317,7 +1317,7 @@ char*transmove(int howfar,char*file)
 char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 {
 	char*NewSpace,*ret;
-	char cch;
+	char cch,noend=0;
 	char str[65536];
 	unsigned int i=0,j=0,k,l;
 	char lb[5]; //Little Buffer
@@ -1561,11 +1561,12 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 		}
 		if (NewSpace[j-1]!=0x57) {
 			NewSpace[j]=0x50;
-			j++;
 		}
+		j++;
 	}
 	else
 	{
+		noend=0;
 		while (i<strlen(str))
 		{
 			if (str[i]>='A'&&str[i]<='Z') {
@@ -1606,6 +1607,9 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 				i++;
 				if (str[i]=='n') {
 					NewSpace[j]=0xFE;
+				}
+				else if (str[i]=='x') {
+					noend=1;
 				}
 				else if (str[i]=='w') {
 					NewSpace[j]=0xFC;
@@ -1690,8 +1694,11 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 			i++;
 			j++;
 		}
-		NewSpace[j]=0xFF;
-		j++;
+		if(!noend)
+		{
+			NewSpace[j]=0xFF;
+			j++;
+		}
 	}
 	if (eorg)
 		for (k=0;k<j;k++)
