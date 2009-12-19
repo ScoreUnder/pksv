@@ -6557,8 +6557,9 @@ rse:
 //log   is self-explanatory
 //rom   writes to rom
 //basic is shorthand for rom(x,1)
-          if (*buf=='#')
+          switch(*buf)
           {
+					case '#':
             if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
             {
               vlog_txt("#DEFINE\r\n");
@@ -6822,9 +6823,8 @@ rse:
               rom(k,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='a')
-          {
+            break;
+          case 'a':
             if (!strcmp(buf,"applymovement"))
             {
               vlog_txt("APPLYMOVEMENT\r\n");
@@ -6953,9 +6953,8 @@ rse:
               rom(arg2,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='b')
-          {
+            break;
+          case 'b':
             if (!strcmp(buf,"boxset"))
             {
               vlog_txt("BOXSET\r\n");
@@ -7003,9 +7002,8 @@ rse:
               rom(arg3,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='c')
-          {
+            break;
+          case 'c':
             if (!strcmp(buf,"checkgender"))
             {
               BASIC(CMD_CHECKGENDER);
@@ -7679,9 +7677,8 @@ rse:
               rom(arg1,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='d')
-          {
+            break;
+          case 'd':
             if (!strcmp(buf,"doweather"))
             {
               BASIC(CMD_DOWEATHER);
@@ -7741,9 +7738,8 @@ rse:
               rom(arg3,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='e')
-          {
+            break;
+          case 'e':
             if (!strcmp(buf,"end"))
             {
               BASIC(CMD_END);                    //BASIC() writes 1 byte to ROM
@@ -7766,9 +7762,8 @@ rse:
               rom(0,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='f')
-          {
+            break;
+          case 'f':
             if (!strcmp(buf,"faceplayer"))
             {
               BASIC(CMD_FACEPLAYER);
@@ -7937,9 +7932,8 @@ rse:
               rom(arg3,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='g')
-          {
+            break;
+          case 'g':
             if (!strcmp(buf,"getplayerxy"))
             {
               vlog_txt("GETPLAYERXY\r\n");
@@ -8007,9 +8001,8 @@ rse:
               rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='h')
-          {
+            break;
+          case 'h':
             if (!strcmp(buf,"hidepokepic"))
             {
               BASIC(CMD_HIDEPOKEPIC);
@@ -8070,9 +8063,8 @@ rse:
               rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='i')
-          {
+            break;
+          case 'i':
             if (!strcmp(buf,"if"))
             {
               vlog_txt("IF\r\n");
@@ -8165,9 +8157,8 @@ rse:
               rom(arg1,2);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='j')
-          {
+            break;
+          case 'j':
             if (!strcmp(buf,"jumpram"))
             {
               BASIC(CMD_JUMPRAM);
@@ -8214,17 +8205,15 @@ rse:
               rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='k')
-          {
+            break;
+          case 'k':
             if (!strcmp(buf,"killscript"))
             {
               BASIC(CMD_KILLSCRIPT);
               ec();
             } else goto unk_cmd_fr;
-          }
-          else if (*buf=='l')
-          {
+            break;
+          case 'l':
             if (!strcmp(buf,"lockall"))
             {
               BASIC(CMD_LOCKALL);
@@ -8288,9 +8277,8 @@ rse:
               rom(arg1,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='m')
-          {
+            break;
+          case 'm':
             if (!strcmp(buf,"msgboxsign"))
             {
               BASIC(CMD_MSGBOXSIGN);
@@ -8490,9 +8478,8 @@ rse:
               add_data(c,trans,transbackmove(Script,&i));
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='n')
-          {
+            break;
+          case 'n':
             if (!strcmp(buf,"nop")||!strcmp(buf,"nop0"))
             {
               BASIC(CMD_NOP0);
@@ -8510,9 +8497,8 @@ rse:
               BASIC(CMD_WAITSPECIAL);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='p')
-          {
+            break;
+          case 'p':
             if (!strcmp(buf,"pause"))
             {
               vlog_txt("PAUSE\r\n");
@@ -8638,9 +8624,8 @@ rse:
               rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='r')
-          {
+            break;
+          case 'r':
             if (!strcmp(buf,"return"))
             {
               BASIC(CMD_RETURN);
@@ -8736,9 +8721,8 @@ rse:
               rom(arg2,1);
               rom(arg3,1);
             }
-          }
-          else if (*buf=='s')
-          {
+            break;
+          case 's':
             if (!strcmp(buf,"showmsg"))
             {
               BASIC(CMD_SHOWMSG);
@@ -9338,9 +9322,8 @@ rse:
               rom(arg2,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='t')
-          {
+            break;
+          case 't':
             if (!strcmp(buf,"takefurniture"))
             {
               vlog_txt("TAKEFURNITURE\r\n");
@@ -9446,9 +9429,8 @@ rse:
               rom(arg1,1);
             } else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='u')
-          {
+            break;
+          case 'u':
             if (!strcmp(buf,"updatecoins"))
             {
               vlog_txt("UPDATECOINS\r\n");
@@ -9485,9 +9467,8 @@ rse:
               rom(arg3,1);
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='w')
-          {
+            break;
+          case 'w':
             if (!strcmp(buf,"waitbutton"))
             {
               BASIC(CMD_WAITBUTTON);
@@ -9881,19 +9862,17 @@ rse:
               }
             }else goto unk_cmd_fr;
             ec();
-          }
-          else if (*buf=='-')
-          {
+            break;
+          case '-':
             try_asm();
-          }
-          else if (*buf==':')
-          {
+            break;
+          case ':':
             if(c)
               add_label(buf,c,c->size,&cl);
             ec();
-          }
-          aa("=")
-          {
+            break;
+          case '=':
+            if(strcmp(buf,"="))goto unk_cmd_fr;
             vlog_txt("[STRING]\r\n");
             if (chr==' ') {
               i++;
@@ -9914,9 +9893,8 @@ rse:
             sprintf(buf2,"   -> %s\r\n",(char*)temp_ptr);
             free(temp_ptr);
             vlog_txt(buf2);
-          }
-          else if(*buf=='.')
-          {
+            break;
+          case '.':
             vlog_txt("[BINARY]\r\n   ->");
             i=buf_loc+1;
             while (chr==' ') {
@@ -9942,7 +9920,7 @@ rse:
               if (k==0)
               {
                 l|=j;
-                rom(j,1);
+                rom(l,1);
                 if (IsVerbose)
                 {
                   sprintf(buf2," %02X",l);
@@ -9960,9 +9938,8 @@ rse:
               }
             }
             vlog_txt("\r\n");
-          }
-          else
-          {
+            break;
+          default:
 unk_cmd_fr:
             sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
             log_txt(buf2,strlen(buf2));

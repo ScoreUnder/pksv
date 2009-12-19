@@ -20,8 +20,7 @@
 int*basedef=NULL;
 char**defnames=NULL;
 
-int def_alloc=0;
-int def_size=0;
+int def_alloc=0,def_size=0,PCS=0;
 
 void Define(char*thing,unsigned int otherthing)
 {

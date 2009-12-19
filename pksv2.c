@@ -128,6 +128,7 @@ int main(unsigned int argc,char**argv)
 pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
 pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
 pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
+You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" syntax) to decompile as text, movement, or braille respectively.\
 ");
       return 0;
     }

@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define INTERNAL_VERSION "2.1.0"
+#define INTERNAL_VERSION "2.1.1"
 #ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
 #include "windows.h"
@@ -369,6 +369,8 @@ __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
   testing=0;
   needdlg=0;
   ffoff=0;
+  
+  PCS=0;
 
   RecodeProc(to_recompile,fname);
 
@@ -385,18 +387,39 @@ __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
   SetWindowPos(HW_TXT,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
   SetForegroundWindow(HW_TXT);
   SetFocus(GetDlgItem(HW_TXT,1));
-  dlg_active=needdlg+1;
   OutputDebugString("Finished compiling");
-  /*while (dlg_active&&GetMessage(&msg,NULL,0,0))
-  {
-  	if (!IsDialogMessage(HW_DLG,&msg)&&!IsDialogMessage(HW_TXT,&msg))
-  	{
-  		TranslateMessage(&msg);
-  		DispatchMessage(&msg);
-  	}
-  }*/
   return 0;
 }
+/*
+__declspec(dllexport) __cdecl int compilePCS(char*fname,char*to_recompile)
+{
+  while (compiling)Sleep(1);
+  OutputDebugString("Start compile...");
+  compiling=1;
+  testing=0;
+  needdlg=0;
+  ffoff=0;
+  
+  PCS=1;
+
+  RecodeProc(to_recompile,fname);
+
+  if (logtxt)
+  {
+    SetDlgItemText(HW_TXT,1,logtxt);
+    GlobalFree(logtxt);
+    logtxt=NULL;
+    log_allocated=log_size=0;
+  }
+  ClearDefines();
+  compiling=0;
+  ShowWindow(HW_TXT,SW_SHOW);
+  SetWindowPos(HW_TXT,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
+  SetForegroundWindow(HW_TXT);
+  SetFocus(GetDlgItem(HW_TXT,1));
+  OutputDebugString("Finished compiling");
+  return 0;
+}*/
 __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
 {
   while (compiling)Sleep(1);
@@ -404,6 +427,8 @@ __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
   testing=1;
   needdlg=0;
   ffoff=0;
+  
+  PCS=0;
 
   OutputDebugString("Started compile...");
 
@@ -426,16 +451,6 @@ __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
   SetWindowPos(HW_TXT,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
   SetForegroundWindow(HW_TXT);
   SetFocus(GetDlgItem(HW_TXT,1));
-
-  dlg_active=needdlg+1;
-  /*while (dlg_active&&GetMessage(&msg,NULL,0,0))
-  {
-  	if (!IsDialogMessage(HW_DLG,&msg)&&!IsDialogMessage(HW_TXT,&msg))
-  	{
-  		TranslateMessage(&msg);
-  		DispatchMessage(&msg);
-  	}
-  }*/
   return 0;
 }
 int OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
