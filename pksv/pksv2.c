@@ -28,14 +28,6 @@
 #include "decompiler.h"
 #include "recompiler.h"
 
-#ifdef WIN32
-#define _CRT_SECURE_NO_DEPRECATE
-#include <windows.h>
-HWND UI_WIN;
-RECT rect;
-HINSTANCE inst;
-#endif
-
 bool dyndec = false;
 int dynplace=0;
 bool VersionOverride = false;
@@ -49,10 +41,6 @@ FILE*LogFile;
 char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
-#ifdef WIN32
-int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
-HWND HW_DLG;
-#endif
 
 int main(int argc,char**argv)
 {
@@ -62,16 +50,10 @@ int main(int argc,char**argv)
   char*export_name;
   FILE*romfile;
   FILE*otherfile;
-#ifdef WIN32
-  MSG msg;
-#endif
   unsigned int i;
   unsigned int file_location=0;
   unsigned int decompile_at;
   unsigned int narc;
-#ifdef WIN32
-  inst=GetModuleHandle(NULL);
-#endif
   i=(unsigned int)strlen(argv[0]);
   while (argv[0][i]!='\\'&&argv[0][i]!='/'&&i!=0)
   {
@@ -250,94 +232,7 @@ You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" synta
   else if (command_line==RECOMPILE)
   {
     RecodeProc(file_name,export_name);
-#ifdef WIN32
-    ShellExecute(NULL,NULL,"PokeScrE.log",NULL,NULL,SW_SHOWNORMAL);
-    if (needdlg)
-    {
-      while (GetMessage(&msg,NULL,0,0))
-      {
-        HWND hActiveWindow = GetActiveWindow();
-        if (!IsDialogMessage(HW_DLG,&msg))
-        {
-          TranslateMessage(&msg);
-          DispatchMessage(&msg);
-        }
-      }
-    }
-#endif
   }
   fclose(romfile);
   return 0;
 }
-#ifdef WIN32
-int OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  unsigned int selection,len,i;
-  char*ptr;
-  char*ptr2;
-  switch (msg)
-  {
-  case WM_QUIT:
-  case WM_CLOSE:
-  case WM_DESTROY:
-    if (a==HW_DLG)
-    {
-      ShowWindow(a,SW_HIDE);
-      ExitProcess(0);
-    }
-    break;
-  case WM_COMMAND:
-    if (a==HW_DLG)
-      switch (LOWORD(wParam))
-      {
-      case 1:
-        ShowWindow(a,SW_HIDE);
-        ExitProcess(0);
-        break;
-      case 2:
-        selection=(unsigned int)SendMessage(GetDlgItem(HW_DLG,3),LB_GETCURSEL,0,0);
-        if (selection==LB_ERR)break;
-        if (OpenClipboard(NULL))
-        {
-          EmptyClipboard();
-          len=(unsigned int)SendMessage(GetDlgItem(HW_DLG,3),LB_GETTEXTLEN,selection,0);
-          ptr=GlobalAlloc(GMEM_MOVEABLE|GMEM_DDESHARE,len+1);
-          ptr2=(char*)GlobalLock(ptr);
-          SendMessage(GetDlgItem(HW_DLG,3),LB_GETTEXT,selection,(LPARAM)ptr2);
-          GlobalUnlock(ptr);
-          SetClipboardData(CF_TEXT,ptr);
-          CloseClipboard();
-        }
-        break;
-      case 4:
-        selection=(unsigned int)SendMessage(GetDlgItem(HW_DLG,3),LB_GETCOUNT,0,0);
-        if (selection==LB_ERR)break;
-        if (OpenClipboard(NULL))
-        {
-          EmptyClipboard();
-          len=0;
-          for (i=0;i<selection;i++)
-          {
-            len+=2+(unsigned int)SendMessage(GetDlgItem(HW_DLG,3),LB_GETTEXTLEN,i,0);
-          }
-          ptr=GlobalAlloc(GMEM_MOVEABLE|GMEM_DDESHARE,len+1);
-          ptr2=(char*)GlobalLock(ptr);
-          *ptr2=0;
-          for (i=0;i<selection;i++)
-          {
-            SendMessage(GetDlgItem(HW_DLG,3),LB_GETTEXT,i,(LPARAM)ptr2+strlen(ptr2));
-            strcat(ptr2,"\r\n");
-          }
-          GlobalUnlock(ptr);
-          SetClipboardData(CF_TEXT,ptr);
-          CloseClipboard();
-        }
-        break;
-      }
-    break;
-  default:
-    return 0;
-  }
-  return 1;
-}
-#endif
