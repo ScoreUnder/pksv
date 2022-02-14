@@ -123,21 +123,23 @@ You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" synta
   file_name=argv[file_location];
   if (command_line!=RECOMPILE)
   {
-    sscanf(argv[file_location+1],"%x",&decompile_at);
-    export_name=argv[file_location+2];
-    if (argc<file_location+2)
+    if (argc <= file_location+2)
     {
-      printf("Please specify a filename to export the script to.\n");
+      fprintf(stderr, "Please specify a filename to export the script to.\n");
       return 1;
     }
+
+    sscanf(argv[file_location+1],"%x",&decompile_at);
+    export_name=argv[file_location+2];
   }
   else
   {
-    export_name=argv[file_location+1];
-    if (argc<file_location+1)
+    if (argc <= file_location+1)
     {
+      fprintf(stderr, "Please specify a ROM to write to\n");
       return 1;
     }
+    export_name=argv[file_location+1];
   }
   if (command_line==RECOMPILE)
     romfile=fopen(export_name,"r+b");

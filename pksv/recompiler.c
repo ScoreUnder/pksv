@@ -1375,16 +1375,38 @@ void DoDefines()
     log_txt("Cannot open defines.dat!\r\n",26);
     return;
   }
-  fseek(f,0,SEEK_END);
-  fl=ftell(f);
-  fseek(f,0,SEEK_SET);
+  bool ok = true;
   for (i=0;i<fl;)
   {
-    fread(&l,1,1,f);
-    fread(buf,1,l,f);
-    fread(&a,1,4,f);
+    if (fread(&l,1,1,f) == 0)
+    {
+      if (!feof(f))
+        ok = false;
+      break;
+    }
+    if (fread(buf,1,l,f) < l) {
+      ok = false;
+      break;
+    }
+    if (fread(&a,1,4,f) < 4) {
+      ok = false;
+      break;
+    }
     Define(buf,a);
     i+=5+l;
+  }
+  if (!ok)
+  {
+    char *s;
+    if (feof(f))
+    {
+      s = "defines.dat is truncated and not fully valid\r\n";
+    }
+    else if (ferror(f))
+    {
+      s = "Error reading defines.dat\r\n";
+    }
+    log_txt(s, strlen(s));
   }
   fclose(f);
 #ifdef WIN32
@@ -1481,11 +1503,18 @@ void RecodeProc(char*script,char*romfn)
       *Script=0;
     strcat(Script,"\n\n");
 #ifndef DLL
-    fread((char*)(Script+fst+2),1,fs,CurrFile);
+    if (fread((char*)(Script+fst+2),1,fs,CurrFile) != fs) {
+      fprintf(stderr,"Error reading script file\n");
+      fclose(CurrFile);
+      fclose(IncFile);
+      free(Script);
+      return;
+    }
+    strcpy(&Script[fs],"\n\n");
 #else
     strcpy(Script+fst+2,script);
-#endif
     strcat(Script,"\n\n");
+#endif
 
 #ifndef DLL
     LogFile=fopen("PokeScrE.log","wb");

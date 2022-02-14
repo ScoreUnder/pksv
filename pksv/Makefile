@@ -6,7 +6,8 @@ EXE_EXT =
 SHLIB_EXT = .so
 CC = $(TOOLCHAIN_PREFIX)gcc
 
-CFLAGS = -Os -ggdb
+CPPFLAGS =
+CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic
 LDFLAGS =
 
