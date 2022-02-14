@@ -22,7 +22,7 @@ OBJ_MAIN = $(SRC_MAIN:.c=.o)
 OBJ_SHLIB = $(SRC_SHLIB:.c=.sh_o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 
-DEPS = $(OBJ_MAIN:.o=.d) $(OBJ_SHLIB:.sh_o=.sh_d)
+DEPS = $(OBJ_MAIN:.o=.d) $(OBJ_SHLIB:.sh_o=.sh_d) $(OBJ_PROCESS_DEFINES:.o=.d)
 
 MAIN = pksv$(EXE_EXT)
 SHLIB = pksv$(SHLIB_EXT)
@@ -35,10 +35,10 @@ check: $(MAIN)
 	./$(MAIN) -d tests/fakerom.gba 6B09F8 tests/compare.pks
 
 clean: mostlyclean
-	rm -f -- $(MAIN) $(SHLIB)
+	rm -f -- $(MAIN) $(SHLIB) tools/process-defines defines.dat
 
 mostlyclean:
-	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) PokeScrE.log
+	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) $(OBJ_PROCESS_DEFINES) $(DEPS) PokeScrE.log
 
 defines.dat: pokeinc.txt tools/process-defines
 	tools/process-defines
