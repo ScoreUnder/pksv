@@ -11,19 +11,23 @@ CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic
 LDFLAGS =
 
+LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
+
 SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c
 SRC_MAIN = pksv2.c $(SRC_COMMON)
 SRC_SHLIB = pksv_dll.c $(SRC_COMMON)
+SRC_PROCESS_DEFINES = tools/process-defines.c binarysearch.c
 
 OBJ_MAIN = $(SRC_MAIN:.c=.o)
 OBJ_SHLIB = $(SRC_SHLIB:.c=.sh_o)
+OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 
 DEPS = $(OBJ_MAIN:.o=.d) $(OBJ_SHLIB:.sh_o=.sh_d)
 
 MAIN = pksv$(EXE_EXT)
 SHLIB = pksv$(SHLIB_EXT)
 
-all: $(MAIN) $(SHLIB)
+all: $(MAIN) $(SHLIB) defines.dat
 
 check: $(MAIN)
 	bunzip2 -fkq tests/fakerom.gba.bz2
@@ -36,8 +40,14 @@ clean: mostlyclean
 mostlyclean:
 	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) PokeScrE.log
 
+defines.dat: pokeinc.txt tools/process-defines
+	tools/process-defines
+
+tools/process-defines: $(OBJ_PROCESS_DEFINES)
+	$(LINK.c) $(OBJ_PROCESS_DEFINES) -o $@
+
 $(MAIN): $(OBJ_MAIN)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJ_MAIN) -o $@
+	$(LINK.c) $(OBJ_MAIN) -o $@
 
 $(SHLIB): $(OBJ_SHLIB)
 	$(CC) $(CFLAGS) $(CFLAGS_SH) $(LDFLAGS) $(OBJ_SHLIB) -o $@
