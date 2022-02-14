@@ -28,7 +28,7 @@ all: $(MAIN) $(SHLIB)
 check: $(MAIN)
 	bunzip2 -fkq tests/fakerom.gba.bz2
 	./$(MAIN) -r tests/test.pks tests/fakerom.gba
-	./$(MAIN) tests/fakerom.gba 6B09F8
+	./$(MAIN) -d tests/fakerom.gba 6B09F8 tests/compare.pks
 
 clean: mostlyclean
 	rm -f -- $(MAIN) $(SHLIB)
