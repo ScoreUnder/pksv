@@ -17,8 +17,6 @@
 */
 #include <string.h>
 
-#include "isdone.h"
-
 int*basedef=NULL;
 char**defnames=NULL;
 
@@ -445,6 +443,3 @@ unsigned int GenForFunc(char*func,
   *ii=i;
   return k;
 }
-#include "gba_asm.h"
-#include "decompiler.h"
-#include "recompiler.h"

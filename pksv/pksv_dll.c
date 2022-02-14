@@ -15,10 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define INTERNAL_VERSION "2.1.1"
+#include "version.h"
 #ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
-#include "windows.h"
+#include <windows.h>
 char dyntype=1;
 HINSTANCE inst=NULL;
 int dyndec=0;
@@ -40,9 +40,6 @@ int dynplace=0;
 char mode=FIRE_RED;
 char VersionOverride=0;
 char GlobBuf[65536];
-#include "sulib.h"
-#include "golddef.h"
-#include "pokedef.h"
 #define DECOMPILE 0
 #define RECOMPILE 1
 #define TXT       2
@@ -102,8 +99,6 @@ void dlldecfunc(FILE*nothing,char*format,...)
 }
 #define fprintf dlldecfunc
 #define fsend NULL
-#include "textproc.h"
-#include "codeproc.h"
 //Determining mode
 char determine_mode[5];
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,

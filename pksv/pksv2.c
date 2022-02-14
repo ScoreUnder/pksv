@@ -15,23 +15,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#ifndef DLL
+#include "version.h"
+
 #ifdef WIN32
 #define _CRT_SECURE_NO_DEPRECATE
-#include "windows.h"
+#include <windows.h>
 HWND UI_WIN;
 RECT rect;
 HINSTANCE inst;
 #endif
-#include "pksv_dll.c"
+
 int dyndec=0;
 int dynplace=0;
 char VersionOverride=0;
-#include <stdio.h>
-#include <strings.h>
-#include <stdlib.h>
 char dyntype=1;
 #define FIRE_RED  0
 #define RUBY      1
@@ -39,9 +40,6 @@ char dyntype=1;
 #define DIAMOND   3
 #define CRYSTAL   4
 char mode=FIRE_RED;
-#include "sulib.h"
-#include "golddef.h"
-#include "pokedef.h"
 #define DECOMPILE 0
 #define RECOMPILE 1
 #define TXT       2
@@ -59,8 +57,6 @@ signed int OffsetToPointer(unsigned int offset);
 int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG;
 #endif
-#include "textproc.h"
-#include "codeproc.h"
 
 int main(unsigned int argc,char**argv)
 {
@@ -349,4 +345,3 @@ int OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
   return 1;
 }
 #endif
-#endif //ifndef dll
