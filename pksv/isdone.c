@@ -15,6 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <string.h>
+
+#include "isdone.h"
+
 unsigned int doprocs[1024],doneprocs[2048];
 unsigned int dotexts[1024],donetexts[2048];
 unsigned int domoves[1024],donemoves[2048];
@@ -22,24 +27,24 @@ unsigned int domarts[1024],donemarts[2048];
 unsigned int dothumb[1024],donethumb[2048];
 unsigned int dodword[1024],donedword[2048];
 unsigned int dolevel[1024],donelevel[2048];
-#define initDoneProcs() {\
-memset(doprocs,0,sizeof(doprocs));\
-memset(doneprocs,0,sizeof(doneprocs));\
-memset(dotexts,0,sizeof(dotexts));\
-memset(donetexts,0,sizeof(donetexts));\
-memset(domoves,0,sizeof(domoves));\
-memset(donemoves,0,sizeof(donemoves));\
-memset(domarts,0,sizeof(domarts));\
-memset(donemarts,0,sizeof(donemarts));\
-memset(dothumb,0,sizeof(dothumb));\
-memset(donethumb,0,sizeof(donethumb));\
-memset(dodword,0,sizeof(dodword));\
-memset(donedword,0,sizeof(donedword));\
-memset(dolevel,0,sizeof(dolevel));\
-memset(donelevel,0,sizeof(donelevel));\
+
+void initDoneProcs()
+{
+  memset(doprocs,0,sizeof(doprocs));
+  memset(doneprocs,0,sizeof(doneprocs));
+  memset(dotexts,0,sizeof(dotexts));
+  memset(donetexts,0,sizeof(donetexts));
+  memset(domoves,0,sizeof(domoves));
+  memset(donemoves,0,sizeof(donemoves));
+  memset(domarts,0,sizeof(domarts));
+  memset(donemarts,0,sizeof(donemarts));
+  memset(dothumb,0,sizeof(dothumb));
+  memset(donethumb,0,sizeof(donethumb));
+  memset(dodword,0,sizeof(dodword));
+  memset(donedword,0,sizeof(donedword));
+  memset(dolevel,0,sizeof(dolevel));
+  memset(donelevel,0,sizeof(donelevel));
 }
-//for debugging only:
-//#define crash() __asm("int $0x3\n")
 
 unsigned int Do(unsigned int proc)
 {

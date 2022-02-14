@@ -17,6 +17,18 @@
 */
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "recompiler.h"
+#include "textproc.h"
+#include "codeproc.h"
+#include "pokedef.h"
+#include "golddef.h"
+#include "sulib.h"
+#include "pksv.h"
+
+#define chr Script[i]
 
 #define aa(x) else if (!strcmp(buf,x))
 #ifndef DLL
@@ -29,7 +41,7 @@
 #define rom(x,s) {if(eorg){j=0xFFFFFFFF;}else{j=x;}if(c!=NULL)add_data(c,(char*)&j,s);}
 #define BASIC(x) rom(x,1)
 int thumb=1;
-void e_c(char*Script,int*ii
+void e_c(char*Script,unsigned int*ii
 #ifndef DLL
          ,FILE*LogFile
 #endif
@@ -68,7 +80,7 @@ void vlogProc(
 #ifdef WIN32
 unsigned int needdlg=0;
 #endif
-int GetReg(char*s,int*i)
+int GetReg(char*s,unsigned int*i)
 {
   register char*a=s+*i;
   register int b=0;
@@ -92,7 +104,7 @@ int GetReg(char*s,int*i)
   return b;
 }
 #define REG() GetReg(Script,&i)
-int GetHex(char*s,int*i)
+int GetHex(char*s,unsigned int*i)
 {
   register char*a=s+*i;
   register int b=0;
@@ -117,9 +129,10 @@ int GetHex(char*s,int*i)
   return b;
 }
 #define HEX() GetHex(Script,&i)
-void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
+void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
 {
-  int i=*ii,j;
+  unsigned int i=*ii;
+  int j; // used in rom macro
   register int arg1,arg2,arg3;
   ///////////////////ASM////////////////////
   if (thumb)
@@ -1414,17 +1427,7 @@ void RecodeProc(char*script,char*romfn)
 #else
   IncFile=fopen("pokeinc.txt","rb");
 #endif
-  /*if(IncFile==NULL)
-  {
-    printf("Cannot open pokeinc.txt\n");
-  #ifdef WIN32
-    MessageBox(NULL,"The default includes (pokeinc.txt) could not be opened","Error",0x10);
-  #endif
-  #ifndef DLL
-    fclose(CurrFile);
-  #endif
-    return;
-  }*/
+
   if (RomFile==NULL)
   {
     printf("Cannot open ROM\n");

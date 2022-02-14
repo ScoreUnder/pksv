@@ -1,4 +1,7 @@
 #include <string.h>
+#include <stdio.h>
+
+#include "isdone.h"
 
 char asm_buf[200];
 int dec_thumb(short opcode,int place)
@@ -424,9 +427,9 @@ int dec_thumb(short opcode,int place)
 					  arg1=4-(2*(2048-(opcode&0x07FF)));
 					  if((signed)arg1>=0)
   						sprintf(asm_buf,"-B     +%X '%X",arg1,place+4-(2*(2048-(opcode&0x07FF))));
-						else
-						  sprintf(asm_buf,"-B     -%X '%X",-arg1,place+4-(2*(2048-(opcode&0x07FF))));
-						DoThumb(place+4-(2*(2048-(opcode&0x07FF))));
+					  else
+					    sprintf(asm_buf,"-B     -%X '%X",-arg1,place+4-(2*(2048-(opcode&0x07FF))));
+					  DoThumb(place+4-(2*(2048-(opcode&0x07FF))));
 					}
 					else
 					{

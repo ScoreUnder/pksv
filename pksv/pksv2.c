@@ -18,9 +18,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
+#include "pksv.h"
 #include "version.h"
+#include "textproc.h"
+#include "isdone.h"
+#include "decompiler.h"
+#include "recompiler.h"
 
 #ifdef WIN32
 #define _CRT_SECURE_NO_DEPRECATE
@@ -30,25 +36,15 @@ RECT rect;
 HINSTANCE inst;
 #endif
 
-int dyndec=0;
+bool dyndec = false;
 int dynplace=0;
-char VersionOverride=0;
+bool VersionOverride = false;
 char dyntype=1;
-#define FIRE_RED  0
-#define RUBY      1
-#define GOLD      2
-#define DIAMOND   3
-#define CRYSTAL   4
 char mode=FIRE_RED;
-#define DECOMPILE 0
-#define RECOMPILE 1
-#define TXT       2
-#define MOVEMENT  3
-#define BRAILLE   4
-char IsVerbose=1;
+bool IsVerbose = true;
 unsigned char search=0xFF; //Free Space character
-char eorg=0;
-char testing=0;
+bool eorg = false;
+bool testing = false;
 FILE*LogFile;
 char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
@@ -58,7 +54,7 @@ int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG;
 #endif
 
-int main(unsigned int argc,char**argv)
+int main(int argc,char**argv)
 {
   char determine_mode[4];
   char command_line=DECOMPILE;

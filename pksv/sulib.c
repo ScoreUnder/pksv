@@ -1,39 +1,9 @@
-#ifndef __HAVE_SULIB
-#define __HAVE_SULIB
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-typedef struct __define {
-  char*name;
-  unsigned int means;
-  struct __define*next;
-} definition;
-
-typedef struct __insert {
-  unsigned int pos;
-  char*name;
-  struct __insert*next;
-  struct __insert*prev;
-} codeinsert;
-
-typedef struct __block {
-  unsigned int allocated,size;
-  char*data;
-  struct __block*next;
-  struct __block*prev;
-  char*name;
-  struct __insert*insert;
-  unsigned int org;
-  unsigned int align;
-} codeblock;
-
-typedef struct __label {
-  unsigned int pos;
-  char*name;
-  codeblock*block;
-  struct __label*next;
-  struct __label*prev;
-} codelabel;
+#include "sulib.h"
+#include "pksv.h"
 
 unsigned int add_label(char*name,codeblock*c,unsigned int loc,codelabel**chain)
 {
@@ -345,5 +315,3 @@ void add_data(codeblock*c,char*data,unsigned int len)
   memcpy((c->data)+(c->size),data,len);
   c->size+=len;
 }
-
-#endif//__HAVE_SULIB

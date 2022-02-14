@@ -16,6 +16,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <string.h>
+#include <stdlib.h>
+
+#include "codeproc.h"
+#include "textproc.h"
+#include "sulib.h"
+#include "pksv.h"
 
 int*basedef=NULL;
 char**defnames=NULL;
@@ -133,35 +139,6 @@ char* WhatIs2(int thing)
   fail=1;
   return 0;
 }
-#define Defined2(thing) (WhatIs2(thing),!fail)
-
-char*LowerCase(char*orig)
-{
-  register unsigned int i=0;
-  while (orig[i]!=0)
-  {
-    if (orig[i]>='A'&&orig[i]<='Z')
-    {
-      orig[i]+=0x20;
-    }
-    i++;
-  }
-  return orig;
-}
-
-char* RemAll0D(char*scr)
-{
-  register unsigned int i=0;
-  while (i<strlen(scr))
-  {
-    if (scr[i]==0x0d)
-    {
-      scr[i]=0x0a;
-    }
-    i++;
-  }
-  return scr;
-}
 
 void LowerCaseAndRemAll0D(char*orig)
 {
@@ -260,11 +237,6 @@ signed int OffsetToPointer(unsigned int offset)
 
 #define Defined(thing) ((WhatIs(thing)&0)|!fail)
 #define chr Script[i]
-#ifndef DLL
-#define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn,c)
-#else
-#define GetNum(x) GenForFunc(x,&i,Script,romfn,c)
-#endif
 unsigned char gffs;
 unsigned int GenForFunc(char*func,
                         unsigned int*ii,

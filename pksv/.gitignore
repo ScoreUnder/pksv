@@ -1,0 +1,6 @@
+*.o
+*.d
+*.sh_o
+*.sh_d
+/pksv
+/pksv.so

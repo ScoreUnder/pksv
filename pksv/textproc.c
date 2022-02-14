@@ -15,23 +15,29 @@
 		You should have received a copy of the GNU General Public License
 		along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "textproc.h"
+#include "codeproc.h"
+#include "pksv.h"
+
 char trans[65536];
 
-#ifdef DLL
-//char*logtxt;
-//unsigned int log_allocated;
-//unsigned int log_size;
-void log_txt(char*format)
+void log_txt(char*str, size_t length)
 {
+#ifdef DLL
 	int len,alloc;
 	char*newchr;
-	len=strlen(format);
+	len=strlen(str);
 	if (logtxt==NULL)
 	{
 		alloc=max(4096,len+1024);
 		logtxt=GlobalAlloc(GPTR,alloc);
 		log_allocated=alloc;
-		memcpy(logtxt,format,len+1);
+		memcpy(logtxt,str,len+1);
 		log_size=len;
 	}
 	else
@@ -45,14 +51,13 @@ void log_txt(char*format)
 			GlobalFree(logtxt);
 			logtxt=newchr;
 		}
-		memcpy(logtxt+log_size,format,len+1);
+		memcpy(logtxt+log_size,str,len+1);
 		log_size+=len;
 	}
-}
-#define log_txt(x,y) log_txt(x)
 #else
-#define log_txt(asd,fgh) fwrite(asd,1,fgh,LogFile)
+ 	fwrite(str,1,length,LogFile);
 #endif
+}
 
 char*transtxt(int howfar,char*file)
 {
@@ -366,7 +371,7 @@ char*transtxt(int howfar,char*file)
 							strcat(trans,"[PLAYER]");
 						}
 						else if (p==0x54) {
-							strcat(trans,"[POKé]");
+							strcat(trans,"[POKï¿½]");
 						}
 						else if (p==0x55) {
 							strcat(trans,"\\l");

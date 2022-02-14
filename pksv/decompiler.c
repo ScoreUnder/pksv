@@ -16,6 +16,16 @@
 		along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <string.h>
+#include <stdlib.h>
+
+#include "decompiler.h"
+#include "codeproc.h"
+#include "textproc.h"
+#include "pokedef.h"
+#include "golddef.h"
+#include "gba_asm.h"
+#include "isdone.h"
+#include "pksv.h"
 
 char comparetype=0;
 char* GetFlagName(unsigned int a)
@@ -1557,7 +1567,7 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf2,"@move%u",movenum);
 								Define2(arg2|0x08000000,buf2);
 							}
-							fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' %s\r\n",buf,WhatIs2(arg2|0x08000000),arg3,arg4,trans);
+							fprintf(fsend,"applymovementfinishat %s %s 0x%X 0x%X ' %s\r\n",buf,WhatIs2(arg2|0x08000000),arg3,arg4,trans);
 						}
 						else
 							fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' %s\r\n",buf,arg2,arg3,arg4,trans);
@@ -2063,43 +2073,43 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					strcpy(buf,"");
 					if(comparetype)
-					switch(arg1)
-					{
-						case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
-						case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
-						default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+							case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
+							case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
+							default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
+						}
 					else
-					switch(arg1)
-					{
-					case 0:
-						strcpy(buf,"Smaller Than");
-						strcpy(buf2,"<");
-						break;
-					case 1:
-						strcpy(buf,"Equal To");
-						strcpy(buf2,"==");
-						break;
-					case 2:
-						strcpy(buf,"Larger Than");
-						strcpy(buf2,">");
-						break;
-					case 3:
-						strcpy(buf,"Smaller Than or Equal To");
-						strcpy(buf2,"<=");
-						break;
-					case 4:
-						strcpy(buf,"Larger Than or Equal To");
-						strcpy(buf2,">=");
-						break;
-					case 5:
-						strcpy(buf,"Not Equal To");
-						strcpy(buf2,"!=");
-						break;
-					default:
-						strcpy(buf,"Unknown Compare/IF condition");
-						sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+						case 0:
+							strcpy(buf,"Smaller Than");
+							strcpy(buf2,"<");
+							break;
+						case 1:
+							strcpy(buf,"Equal To");
+							strcpy(buf2,"==");
+							break;
+						case 2:
+							strcpy(buf,"Larger Than");
+							strcpy(buf2,">");
+							break;
+						case 3:
+							strcpy(buf,"Smaller Than or Equal To");
+							strcpy(buf2,"<=");
+							break;
+						case 4:
+							strcpy(buf,"Larger Than or Equal To");
+							strcpy(buf2,">=");
+							break;
+						case 5:
+							strcpy(buf,"Not Equal To");
+							strcpy(buf2,"!=");
+							break;
+						default:
+							strcpy(buf,"Unknown Compare/IF condition");
+							sprintf(buf2,"0x%X",arg1);
+						}
 					fprintf(fsend,"if %s callstd 0x%X ' %s\r\n",buf2,arg2,buf);
 					break;
 				case CMD_SHOWPOKEPIC:
@@ -2120,43 +2130,43 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					strcpy(buf,"");
 					if(comparetype)
-					switch(arg1)
-					{
-						case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
-						case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
-						default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+							case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
+							case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
+							default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
+						}
 					else
-					switch(arg1)
-					{
-					case 0:
-						strcpy(buf,"Smaller Than");
-						strcpy(buf2,"<");
-						break;
-					case 1:
-						strcpy(buf,"Equal To");
-						strcpy(buf2,"==");
-						break;
-					case 2:
-						strcpy(buf,"Larger Than");
-						strcpy(buf2,">");
-						break;
-					case 3:
-						strcpy(buf,"Smaller Than or Equal To");
-						strcpy(buf2,"<=");
-						break;
-					case 4:
-						strcpy(buf,"Larger Than or Equal To");
-						strcpy(buf2,">=");
-						break;
-					case 5:
-						strcpy(buf,"Not Equal To");
-						strcpy(buf2,"!=");
-						break;
-					default:
-						strcpy(buf,"Unknown Compare/IF condition");
-						sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+						case 0:
+							strcpy(buf,"Smaller Than");
+							strcpy(buf2,"<");
+							break;
+						case 1:
+							strcpy(buf,"Equal To");
+							strcpy(buf2,"==");
+							break;
+						case 2:
+							strcpy(buf,"Larger Than");
+							strcpy(buf2,">");
+							break;
+						case 3:
+							strcpy(buf,"Smaller Than or Equal To");
+							strcpy(buf2,"<=");
+							break;
+						case 4:
+							strcpy(buf,"Larger Than or Equal To");
+							strcpy(buf2,">=");
+							break;
+						case 5:
+							strcpy(buf,"Not Equal To");
+							strcpy(buf2,"!=");
+							break;
+						default:
+							strcpy(buf,"Unknown Compare/IF condition");
+							sprintf(buf2,"0x%X",arg1);
+						}
 					fprintf(fsend,"if %s jumpstd 0x%X ' %s\r\n",buf2,arg2,buf);
 					break;
 				case CMD_SETWORLDMAPFLAG:
@@ -2510,7 +2520,7 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@text%u",textnum);
 								Define2(arg2|0x08000000,buf);
 							}
-							fprintf(fsend,"storetext %s 0x%X ' %s\r\n",arg1,WhatIs2(arg2|0x08000000),trans);
+							fprintf(fsend,"storetext 0x%X %s ' %s\r\n",arg1,WhatIs2(arg2|0x08000000),trans);
 						}
 						else
 						{
@@ -2588,7 +2598,7 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"@mart%u",martnum);
 							Define2(arg1|0x08000000,buf);
 						}
-						fprintf(fsend,"pokemart 0x%X\r\n",WhatIs2(arg1|0x08000000));
+						fprintf(fsend,"pokemart %s\r\n",WhatIs2(arg1|0x08000000));
 					}
 					else
 						fprintf(fsend,"pokemart 0x%X\r\n",arg1);
@@ -2656,43 +2666,43 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,4,fileM);
 					strcpy(buf,"");
 					if(comparetype)
-					switch(arg1)
-					{
-						case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
-						case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
-						default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+							case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
+							case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
+							default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
+						}
 					else
-					switch(arg1)
-					{
-					case 0:
-						strcpy(buf,"Smaller Than");
-						strcpy(buf2,"<");
-						break;
-					case 1:
-						strcpy(buf,"Equal To");
-						strcpy(buf2,"==");
-						break;
-					case 2:
-						strcpy(buf,"Larger Than");
-						strcpy(buf2,">");
-						break;
-					case 3:
-						strcpy(buf,"Smaller Than or Equal To");
-						strcpy(buf2,"<=");
-						break;
-					case 4:
-						strcpy(buf,"Larger Than or Equal To");
-						strcpy(buf2,">=");
-						break;
-					case 5:
-						strcpy(buf,"Not Equal To");
-						strcpy(buf2,"!=");
-						break;
-					default:
-						strcpy(buf,"Unknown Compare/IF condition");
-						sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+						case 0:
+							strcpy(buf,"Smaller Than");
+							strcpy(buf2,"<");
+							break;
+						case 1:
+							strcpy(buf,"Equal To");
+							strcpy(buf2,"==");
+							break;
+						case 2:
+							strcpy(buf,"Larger Than");
+							strcpy(buf2,">");
+							break;
+						case 3:
+							strcpy(buf,"Smaller Than or Equal To");
+							strcpy(buf2,"<=");
+							break;
+						case 4:
+							strcpy(buf,"Larger Than or Equal To");
+							strcpy(buf2,">=");
+							break;
+						case 5:
+							strcpy(buf,"Not Equal To");
+							strcpy(buf2,"!=");
+							break;
+						default:
+							strcpy(buf,"Unknown Compare/IF condition");
+							sprintf(buf2,"0x%X",arg1);
+						}
 					if ((arg2&0xF8000000)==0x08000000)
 					{
 						if(dyndec)
@@ -2807,43 +2817,43 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,4,fileM);
 					strcpy(buf,"");
 					if(comparetype)
-					switch(arg1)
-					{
-						case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
-						case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
-						default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+							case 0:strcpy(buf,"Flag is unset");strcpy(buf2,"false");break;
+							case 1:strcpy(buf,"Flag is set");strcpy(buf2,"true");break;
+							default:strcpy(buf,"Unknown Checkflag/IF condition");sprintf(buf2,"0x%X",arg1);
+						}
 					else
-					switch(arg1)
-					{
-					case 0:
-						strcpy(buf,"Smaller Than");
-						strcpy(buf2,"<");
-						break;
-					case 1:
-						strcpy(buf,"Equal To");
-						strcpy(buf2,"==");
-						break;
-					case 2:
-						strcpy(buf,"Larger Than");
-						strcpy(buf2,">");
-						break;
-					case 3:
-						strcpy(buf,"Smaller Than or Equal To");
-						strcpy(buf2,"<=");
-						break;
-					case 4:
-						strcpy(buf,"Larger Than or Equal To");
-						strcpy(buf2,">=");
-						break;
-					case 5:
-						strcpy(buf,"Not Equal To");
-						strcpy(buf2,"!=");
-						break;
-					default:
-						strcpy(buf,"Unknown Compare/IF condition");
-						sprintf(buf2,"0x%X",arg1);
-					}
+						switch(arg1)
+						{
+						case 0:
+							strcpy(buf,"Smaller Than");
+							strcpy(buf2,"<");
+							break;
+						case 1:
+							strcpy(buf,"Equal To");
+							strcpy(buf2,"==");
+							break;
+						case 2:
+							strcpy(buf,"Larger Than");
+							strcpy(buf2,">");
+							break;
+						case 3:
+							strcpy(buf,"Smaller Than or Equal To");
+							strcpy(buf2,"<=");
+							break;
+						case 4:
+							strcpy(buf,"Larger Than or Equal To");
+							strcpy(buf2,">=");
+							break;
+						case 5:
+							strcpy(buf,"Not Equal To");
+							strcpy(buf2,"!=");
+							break;
+						default:
+							strcpy(buf,"Unknown Compare/IF condition");
+							sprintf(buf2,"0x%X",arg1);
+						}
 					if ((arg2&0xF8000000)==0x08000000)
 					{
 						if(dyndec)
@@ -4380,7 +4390,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg5,1,2,fileM);
 						fread(&arg6,1,2,fileM);
 						arg7=(OffsetToPointer(FileZoomPos)&0xFF);
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
 										PointerToOffset(arg7|(arg5<<8)),
 										PointerToOffset(arg7|(arg6<<8)));
 					}
@@ -5249,7 +5259,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg5,1,2,fileM);
 						fread(&arg6,1,2,fileM);
 						arg7=(OffsetToPointer(FileZoomPos)&0xFF);
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
 										PointerToOffset(arg7|(arg5<<8)),
 										PointerToOffset(arg7|(arg6<<8)));
 					}

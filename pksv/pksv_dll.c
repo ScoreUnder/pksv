@@ -15,7 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <stdbool.h>
+
 #include "version.h"
+#include "pksv.h"
+
 #ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>
@@ -32,19 +36,9 @@ int dynplace=0;
 #define malloc(x) GlobalAlloc(GPTR,x);OutputDebugString("Malloc at "AT);
 */
 #define free(x) GlobalFree(x)
-#define FIRE_RED  0
-#define RUBY      1
-#define GOLD      2
-#define DIAMOND   3
-#define CRYSTAL   4
 char mode=FIRE_RED;
-char VersionOverride=0;
+bool VersionOverride = false;
 char GlobBuf[65536];
-#define DECOMPILE 0
-#define RECOMPILE 1
-#define TXT       2
-#define MOVEMENT  3
-#define BRAILLE   4
 char IsVerbose=1;
 unsigned char search=0xFF; //Free Space character
 char eorg=0;
