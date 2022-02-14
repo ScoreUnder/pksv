@@ -4,3 +4,5 @@
 *.sh_d
 /pksv
 /pksv.so
+/tests/compare.pks
+/tests/fakerom.gba
