@@ -15,6 +15,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <string.h>
+
 #include "isdone.h"
 
 int*basedef=NULL;
@@ -133,7 +135,7 @@ char* WhatIs2(int thing)
   fail=1;
   return 0;
 }
-#define Defined2(thing) ((((int)WhatIs2(thing))&0)|!fail)
+#define Defined2(thing) (WhatIs2(thing),!fail)
 
 char*LowerCase(char*orig)
 {

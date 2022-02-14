@@ -1,3 +1,5 @@
+#include <string.h>
+
 char asm_buf[200];
 int dec_thumb(short opcode,int place)
 {

@@ -16,6 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+
 #define aa(x) else if (!strcmp(buf,x))
 #ifndef DLL
 #define ec() e_c(Script,&i,LogFile)
@@ -1043,9 +1045,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD000|arg2,2);
       // 1101 0000 IIII IIII
@@ -1059,9 +1061,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD100|arg2,2);
       // 1101 0001 IIII IIII
@@ -1075,9 +1077,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD200|arg2,2);
       // 1101 0010 IIII IIII
@@ -1091,9 +1093,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD300|arg2,2);
       // 1101 0011 IIII IIII
@@ -1107,9 +1109,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD400|arg2,2);
       // 1101 0100 IIII IIII
@@ -1123,9 +1125,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD500|arg2,2);
       // 1101 0101 IIII IIII
@@ -1139,9 +1141,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD600|arg2,2);
       // 1101 0110 IIII IIII
@@ -1155,9 +1157,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD700|arg2,2);
       // 1101 0111 IIII IIII
@@ -1171,9 +1173,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD800|arg2,2);
       // 1101 1000 IIII IIII
@@ -1187,9 +1189,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xD900|arg2,2);
       // 1101 1001 IIII IIII
@@ -1203,9 +1205,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xDA00|arg2,2);
       // 1101 1010 IIII IIII
@@ -1219,9 +1221,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xDB00|arg2,2);
       // 1101 1011 IIII IIII
@@ -1235,9 +1237,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xDC00|arg2,2);
       // 1101 1100 IIII IIII
@@ -1251,9 +1253,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0xFF;
       rom(0xDD00|arg2,2);
       // 1101 1101 IIII IIII
@@ -1303,9 +1305,9 @@ void try_asm_x(char*Script,int*ii,char*buf,codeblock*c)
       i++;
       arg2=HEX();
       if (arg1)
-        (signed)arg2=-(signed)arg2;
-      (signed)arg2-=4;
-      (signed)arg2/=2;
+        arg2=-arg2;
+      arg2-=4;
+      arg2 = (signed)arg2 / 2;
       arg2&=0x7FF;
       rom(0xE000|arg2,2);
       // 1110 0III IIII IIII
