@@ -1,6 +1,6 @@
 /*
-    Charles Daffern (Score_Under)'s PKSV - Pokemon ROM script viewer/editor
-    Copyright (C) 2007  Charles Daffern
+    Sophie Daffern (Score_Under)'s PKSV - Pokemon ROM script viewer/editor
+    Copyright (C) 2007  Sophie Daffern
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

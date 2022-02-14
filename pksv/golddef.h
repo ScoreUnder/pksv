@@ -1,6 +1,6 @@
 /*
-    Charles Daffern (Score_Under)'s PKSV - Pokemon ROM script viewer/editor
-    Copyright (C) 2007  Charles Daffern
+    Sophie Daffern (Score_Under)'s PKSV - Pokemon ROM script viewer/editor
+    Copyright (C) 2007  Sophie Daffern
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-//GoldDef.h by Charles Daffern
+//GoldDef.h by Sophie Daffern
 //Here come the defs!              Compile,Decompile, Args
 //      Text   (#org xx\n= asdfg\e)         ,D
 //      Moves  (#org xx\nM x)               ,
