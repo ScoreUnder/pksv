@@ -1820,13 +1820,7 @@ dp:
             else {
               log_txt("Should have a space after the =\r\n",33);
             }
-            if (IncFile)
-            {
-              fseek(IncFile,0,SEEK_END);
-              arg6=ftell(IncFile);
-            } else
-              arg6=0;
-            temp_ptr=transbackstr(script,i-arg6-2,c);
+            temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
@@ -4132,13 +4126,7 @@ cry:
             else {
               log_txt("Should have a space after the =\r\n",33);
             }
-            if (IncFile)
-            {
-              fseek(IncFile,0,SEEK_END);
-              arg6=ftell(IncFile);
-            } else
-              arg6=0;
-            temp_ptr=transbackstr(script,i-arg6-2,c);
+            temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
@@ -6497,13 +6485,7 @@ gsc:
             else {
               log_txt("Should have a space after the =\r\n",33);
             }
-            if (IncFile)
-            {
-              fseek(IncFile,0,SEEK_END);
-              arg6=ftell(IncFile);
-            } else
-              arg6=0;
-            temp_ptr=transbackstr(script,i-arg6-2,c);
+            temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
@@ -9929,13 +9911,7 @@ rse:
             else {
               log_txt("Should have a space after the =\r\n",33);
             }
-            if (IncFile)
-            {
-              fseek(IncFile,0,SEEK_END);
-              arg6=ftell(IncFile);
-            } else
-              arg6=0;
-            temp_ptr=transbackstr(script,i-arg6-2,c);
+            temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
