@@ -20,6 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include "binarysearch.h"
 #include "recompiler.h"
@@ -33,24 +36,14 @@
 #define chr Script[i]
 
 #define aa(x) else if (!strcmp(buf,x))
-#ifndef DLL
-#define ec() e_c(Script,&i,LogFile)
-#define vlog_txt(x) vlogProc(LogFile,x)
-#else
-#define vlog_txt(x) vlogProc(x)
 #define ec() e_c(Script,&i)
-#endif
 #define rom(x,s) {if(eorg){j=0xFFFFFFFF;}else{j=x;}if(c!=NULL)add_data(c,(char*)&j,s);}
 #define BASIC(x) rom(x,1)
 
 char *defines_dat_location = NULL;
 
 int thumb=1;
-void e_c(char*Script,unsigned int*ii
-#ifndef DLL
-         ,FILE*LogFile
-#endif
-        )
+void e_c(char*Script,unsigned int*ii)
 {
   register unsigned int i=*ii;
   while (Script[i+1]==' ') {
@@ -70,17 +63,12 @@ void e_c(char*Script,unsigned int*ii
   *ii=i;
   return;
 }
-void vlogProc(
-#ifndef DLL
-  FILE* LogFile,
-#endif
-  char*x)
+void vlog_txt(char*x)
 {
   if (IsVerbose)
   {
     log_txt(x,strlen(x));
   }
-  return;
 }
 #ifdef WIN32
 unsigned int needdlg=0;
@@ -10006,23 +9994,10 @@ unk_cmd_fr:
   }
 #endif
 #ifdef WIN32
-#ifndef DLL
-  HW_DLG=CreateDialog(inst,MAKEINTRESOURCE(10),NULL,(DLGPROC)&OffsetDlg);
-  UI_WIN=FindWindow("Score_Under_PKSVUI",NULL);
-  if (UI_WIN!=NULL)
-  {
-    GetWindowRect(UI_WIN,&rect);
-    rect.top+=40;
-    rect.left+=40;
-    SetWindowPos(HW_DLG,HWND_TOPMOST,rect.left,rect.top,0,0,SWP_NOSIZE);
-  }
-  else
-  {
-    SetWindowPos(HW_DLG,HWND_NOTOPMOST,200,200,0,0,SWP_NOSIZE);
-  }
-#endif
   OutputDebugString("Finished compiler loop, processing #ORGs");
+#ifdef DLL
   SendMessage(GetDlgItem(HW_DLG,3),LB_RESETCONTENT,0,0);
+#endif
 #endif
   if (dynu&&start==0)
   {
@@ -10053,6 +10028,7 @@ unk_cmd_fr:
         }
         log_txt(buf,strlen(buf));
 #ifdef WIN32
+#ifdef DLL
         strings=LocalAlloc(LPTR,strlen(c->name)+60);
         if(mode!=GOLD&&mode!=CRYSTAL)
           sprintf(strings,"%s <-> 0x%X (0x%X bytes)",c->name,c->org,c->size);
@@ -10064,6 +10040,7 @@ unk_cmd_fr:
         SendMessage(GetDlgItem(HW_DLG,3),LB_ADDSTRING,0,(LPARAM)strings);
         LocalFree(strings);
         needdlg=1;
+#endif
 #endif
       }
       else
@@ -10084,6 +10061,7 @@ unk_cmd_fr:
           }
           log_txt(buf,strlen(buf));
 #ifdef WIN32
+#ifdef DLL
           strings=LocalAlloc(LPTR,strlen(cl2->name)+60);
           if(mode!=GOLD&&mode!=CRYSTAL)
             sprintf(strings,"-> %s <-> 0x%X",cl2->name,c->org+cl2->pos);
@@ -10095,6 +10073,7 @@ unk_cmd_fr:
           SendMessage(GetDlgItem(HW_DLG,3),LB_ADDSTRING,0,(LPARAM)strings);
           LocalFree(strings);
           needdlg=1;
+#endif
 #endif          
         }
       }
@@ -10128,6 +10107,7 @@ unk_cmd_fr:
     cl=cl2;
   }
 #ifdef WIN32
+#ifdef DLL
   if (needdlg)
   {
     ShowWindow(HW_DLG,SW_SHOW);
@@ -10135,6 +10115,7 @@ unk_cmd_fr:
   }
   else
     ShowWindow(HW_DLG,SW_HIDE);
+#endif
 #endif
 #ifndef DLL
   fclose(LogFile);

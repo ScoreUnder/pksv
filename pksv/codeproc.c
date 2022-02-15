@@ -41,6 +41,29 @@ int martnum=0;
 int thumbnum=0;
 int dwordnum=0;
 
+void pksv_codeproc_reset() {
+  // Reset @dynamic numberings
+  codenum=0;
+  levelnum=0;
+  textnum=0;
+  movenum=0;
+  martnum=0;
+  thumbnum=0;
+  dwordnum=0;
+
+  // Reset associative arrays
+  free(basedef2);
+  basedef2 = NULL;
+
+  for (size_t i = 0; i < def_size2; i++) {
+    free(defnames2[i]);
+  }
+  free(defnames2);
+  defnames2 = NULL;
+  def_size2 = 0;
+  def_alloc2 = 0;
+}
+
 void Define2(unsigned int otherthing,char*thing)
 {
   char*m,*m2;
@@ -194,9 +217,6 @@ signed int OffsetToPointer(unsigned int offset)
 unsigned char gffs;
 unsigned int GenForFunc(char*func,
                         unsigned int*ii,
-#ifndef DLL
-                        FILE* LogFile,
-#endif
                         char*Script,
                         struct bsearch_root *defines,
                         codeblock*c) //Generates number for function

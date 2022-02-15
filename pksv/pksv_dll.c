@@ -15,17 +15,24 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#define _POSIX_C_SOURCE 200809L
 #include <stdbool.h>
+#include <stdio.h>
+
+#include <fmem.h>
 
 #include "version.h"
 #include "pksv.h"
+#include "sulib.h"
+#include "recompiler.h"
+#include "decompiler.h"
+#include "codeproc.h"
 
-#ifdef DLL
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>
 char dyntype=1;
 HINSTANCE inst=NULL;
-int dyndec=0;
+bool dyndec=false;
 int dynplace=0;
 #define malloc(x) GlobalAlloc(GPTR,x)
 /*
@@ -39,60 +46,17 @@ int dynplace=0;
 char mode=FIRE_RED;
 bool VersionOverride = false;
 char GlobBuf[65536];
-char IsVerbose=1;
+FILE*LogFile;
+bool IsVerbose=true;
 unsigned char search=0xFF; //Free Space character
-char eorg=0;
-char testing=0;
-char*decompiled=NULL;
-unsigned int allocated=0;
-unsigned int dec_len=0;
-char*logtxt=NULL;
-unsigned int log_allocated;
-unsigned int log_size;
+bool eorg=false;
+bool testing=false;
 HWND UI_WIN;
-//char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
-#ifdef WIN32
 int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 int TxtDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG,HW_TXT;
-#endif
-char printf_result[65536];
-void dlldecfunc(FILE*nothing,char*format,...)
-{
-	int len,alloc;
-	char*newchr;
-	va_list args;
-	va_start(args,format);
-	vsprintf(printf_result,format,args);
-	len=strlen(printf_result);
-	if (decompiled==NULL)
-	{
-		alloc=max(4096,len+1024);
-		decompiled=GlobalAlloc(GPTR,alloc);
-		allocated=alloc;
-		memcpy(decompiled,printf_result,len+1);
-		dec_len=len;
-	}
-	else
-	{
-		if (dec_len+len>=allocated)
-		{
-			alloc=dec_len+len+2048;
-			newchr=GlobalAlloc(GPTR,alloc);
-			allocated=alloc;
-			memcpy(newchr,decompiled,dec_len+1);
-			GlobalFree(decompiled);
-			decompiled=newchr;
-		}
-		memcpy(decompiled+dec_len,printf_result,len+1);
-		dec_len+=len;
-	}
-	va_end(args);
-}
-#define fprintf dlldecfunc
-#define fsend NULL
 //Determining mode
 char determine_mode[5];
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,
@@ -194,38 +158,38 @@ __declspec(dllexport) __cdecl void SetDynamic(int dyn,int place)
   dyndec=dyn;
   dynplace=place;
 }
-void ClearDefines()
+
+void pksv_reset_all()
 {
-  register int i;
-  if(basedef)
-    free(basedef);
-  for(i=0;i<def_size;i++)
-    free(defnames[i]);
-  def_alloc=0;
-  def_size=0;
-  if(defnames)
-    free(defnames);
-  defnames=NULL;
-  basedef=NULL;
-  if(basedef2)
-    free(basedef2);
-  for(i=0;i<def_size2;i++)
-    free(defnames2[i]);
-  def_alloc2=0;
-  def_size2=0;
-  if(defnames2)
-    free(defnames2);
-  defnames2=NULL;
-  basedef2=NULL;
-  codenum=0;
-  levelnum=0;
-  textnum=0;
-  movenum=0;
-  martnum=0;
-  thumbnum=0;
-  dwordnum=0;
-  comparetype=0;
+  pksv_codeproc_reset();
+  pksv_decompiler_reset();
 }
+
+static void* memdup(void *ptr, size_t len)
+{
+  void *newptr = malloc(len);
+  memcpy(newptr, ptr, len);
+  return newptr;
+}
+
+#define START_FMEM(vname) do{}while(0); \
+  fmem vname##_fmem; \
+  fmem_init(&vname##_fmem); \
+  FILE *vname = fmem_open(&vname##_fmem, "wt"); \
+  LogFile = vname; /* XXX hack */ \
+  do{}while(0)
+
+#define END_FMEM(vname) do{}while(0); \
+  putc('\0', vname); \
+  char *vname##_str = NULL; \
+  size_t vname##_len = 0; \
+  fmem_mem(&vname##_fmem, (void**)&vname##_str, &vname##_len); \
+  vname##_str = memdup(vname##_str, vname##_len); \
+  fclose(vname); \
+  fmem_term(&vname##_fmem); \
+  LogFile = NULL; /* XXX hack */ \
+  do{}while(0)
+
 __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
 {
   register FILE*romfile;
@@ -233,20 +197,17 @@ __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  if (mode==DIAMOND)
-  {
-    DecodeProc(romfile,narc,loc,fname);
-  }
-  else
-  {
-    DecodeProc(romfile,0,loc,fname);
-  }
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProc(romfile, mode == DIAMOND ? narc : 0,loc,fname,log_file);
+
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
 {
@@ -255,13 +216,16 @@ __declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcASM(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcASM(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileText(char*fname,int loc)
 {
@@ -270,13 +234,16 @@ __declspec(dllexport) __cdecl char* decompileText(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcText(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcText(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
 {
@@ -285,13 +252,16 @@ __declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcLevel(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcLevel(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompilePointer(char*fname,int loc)
 {
@@ -300,13 +270,16 @@ __declspec(dllexport) __cdecl char* decompilePointer(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcPointer(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcPointer(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileMoves(char*fname,int loc)
 {
@@ -315,13 +288,16 @@ __declspec(dllexport) __cdecl char* decompileMoves(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcMoves(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcMoves(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileMart(char*fname,int loc)
 {
@@ -330,13 +306,16 @@ __declspec(dllexport) __cdecl char* decompileMart(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcMart(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcMart(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileAttacks(char*fname,int loc)
 {
@@ -345,13 +324,16 @@ __declspec(dllexport) __cdecl char* decompileAttacks(char*fname,int loc)
   OutputDebugString("Start decompile...");
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
-  decompiled=NULL;
-  allocated=dec_len=0;
-  DecodeProcAttacks(romfile,loc,fname);
-  ClearDefines();
+
+  START_FMEM(log_file);
+
+  DecodeProcAttacks(romfile,loc,fname,log_file);
+  pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
-  return decompiled;
+
+  END_FMEM(log_file);
+  return log_file_str;
 }
 int dlg_active,compiling=0;
 __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
@@ -362,19 +344,16 @@ __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
   testing=0;
   needdlg=0;
   ffoff=0;
-  
-  PCS=0;
+
+  START_FMEM(log_file);
 
   RecodeProc(to_recompile,fname);
 
-  if (logtxt)
-  {
-    SetDlgItemText(HW_TXT,1,logtxt);
-    GlobalFree(logtxt);
-    logtxt=NULL;
-    log_allocated=log_size=0;
-  }
-  ClearDefines();
+  END_FMEM(log_file);
+  SetDlgItemText(HW_TXT,1,log_file_str);
+  free(log_file_str);
+
+  pksv_reset_all();
   compiling=0;
   ShowWindow(HW_TXT,SW_SHOW);
   SetWindowPos(HW_TXT,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
@@ -383,36 +362,7 @@ __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
   OutputDebugString("Finished compiling");
   return 0;
 }
-/*
-__declspec(dllexport) __cdecl int compilePCS(char*fname,char*to_recompile)
-{
-  while (compiling)Sleep(1);
-  OutputDebugString("Start compile...");
-  compiling=1;
-  testing=0;
-  needdlg=0;
-  ffoff=0;
-  
-  PCS=1;
 
-  RecodeProc(to_recompile,fname);
-
-  if (logtxt)
-  {
-    SetDlgItemText(HW_TXT,1,logtxt);
-    GlobalFree(logtxt);
-    logtxt=NULL;
-    log_allocated=log_size=0;
-  }
-  ClearDefines();
-  compiling=0;
-  ShowWindow(HW_TXT,SW_SHOW);
-  SetWindowPos(HW_TXT,HWND_TOP,0,0,0,0,SWP_NOSIZE|SWP_NOMOVE);
-  SetForegroundWindow(HW_TXT);
-  SetFocus(GetDlgItem(HW_TXT,1));
-  OutputDebugString("Finished compiling");
-  return 0;
-}*/
 __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
 {
   while (compiling)Sleep(1);
@@ -420,8 +370,8 @@ __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
   testing=1;
   needdlg=0;
   ffoff=0;
-  
-  PCS=0;
+
+  START_FMEM(log_file);
 
   OutputDebugString("Started compile...");
 
@@ -429,15 +379,11 @@ __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
 
   OutputDebugString("Finished compile");
 
-  if (logtxt)
-  {
-    SetDlgItemText(HW_TXT,1,logtxt);
-    GlobalFree(logtxt);
-    logtxt=NULL;
-    log_allocated=log_size=0;
-  }
+  END_FMEM(log_file);
+  SetDlgItemText(HW_TXT,1,log_file_str);
+  free(log_file_str);
 
-  ClearDefines();
+  pksv_reset_all();
 
   compiling=0;
   ShowWindow(HW_TXT,SW_SHOW);
@@ -536,4 +482,3 @@ int TxtDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
   }
   return 1;
 }
-#endif

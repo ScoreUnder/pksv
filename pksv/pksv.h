@@ -1,6 +1,12 @@
 #ifndef PKSV_H
 #define PKSV_H 1
 
+#ifdef DLL
+#ifdef WIN32
+#include <windows.h>
+#endif
+#endif
+
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -13,9 +19,13 @@ extern char mode;
 extern int dynplace;
 extern char dyntype;
 extern unsigned char search;  // Character to look for when searching for free space
-
-#ifndef DLL
 extern FILE *LogFile;
+
+#ifdef DLL
+#ifdef WIN32
+int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
+extern HWND HW_DLG;
+#endif
 #endif
 
 // Pokemon game (de)compilation modes

@@ -4,9 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../binarysearch.h"
-
-#define IN_FILE "pokeinc_default.txt"
+#include "../pksv/binarysearch.h"
 
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t), "intptr_t must be at least 32 bits");
 
@@ -36,9 +34,14 @@ int main(int argc, char **argv)
 
   struct bsearch_root defines;
 
-  FILE *f = fopen(IN_FILE, "r");
+  char *in_filename = "pokeinc_default.txt";
+  if (argc >= 2) {
+    in_filename = argv[1];
+  }
+
+  FILE *f = fopen(in_filename, "r");
   if (!f) {
-    perror("opening " IN_FILE);
+    perror("opening input file");
     return 1;
   }
 

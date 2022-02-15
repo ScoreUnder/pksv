@@ -1,0 +1,13 @@
+*.o
+*.d
+*.sh_o
+*.sh_d
+*.exe
+*.so
+*.dll
+PokeScrE.log
+vgcore.*
+/defines.dat
+# /pksv
+/tools/gperf-but-in-reverse
+/tools/process-defines

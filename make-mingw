@@ -1,0 +1,10 @@
+#!/bin/sh
+exec make \
+    TOOLCHAIN_PREFIX=x86_64-w64-mingw32- \
+    EXE_EXT=.exe \
+    SHLIB_EXT=.dll \
+    TOOL_WRAPPER=wine \
+    LDFLAGS='-mconsole -mwindows' \
+    CFLAGS='-Os -ggdb -flto' \
+    CMAKE='cmake -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_CROSSCOMPILING=1 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY -DCMAKE_FIND_ROOT_PATH=/usr/x86_64-w64-mingw32 -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY -DCMAKE_AR="$$(command -v x86_64-w64-mingw32-gcc-ar)" -DCMAKE_RANLIB="$$(command -v x86_64-w64-mingw32-gcc-ranlib)"' \
+    "$@"

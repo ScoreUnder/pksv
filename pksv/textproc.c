@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include "textproc.h"
 #include "codeproc.h"
@@ -30,35 +33,7 @@ char trans[65536];
 
 void log_txt(char*str, size_t length)
 {
-#ifdef DLL
-	int len,alloc;
-	char*newchr;
-	len=strlen(str);
-	if (logtxt==NULL)
-	{
-		alloc=max(4096,len+1024);
-		logtxt=GlobalAlloc(GPTR,alloc);
-		log_allocated=alloc;
-		memcpy(logtxt,str,len+1);
-		log_size=len;
-	}
-	else
-	{
-		if (log_size+len>=log_allocated)
-		{
-			alloc=log_size+len+2048;
-			newchr=GlobalAlloc(GPTR,alloc);
-			log_allocated=alloc;
-			memcpy(newchr,logtxt,log_size+1);
-			GlobalFree(logtxt);
-			logtxt=newchr;
-		}
-		memcpy(logtxt+log_size,str,len+1);
-		log_size+=len;
-	}
-#else
  	fwrite(str, 1, length, LogFile ? LogFile : stderr);
-#endif
 }
 
 char*transtxt(int howfar,char*file)
@@ -573,11 +548,7 @@ char*transtxt(int howfar,char*file)
 	return trans;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-char*transbrl(int howfar,char*file
-#ifndef DLL
-							,FILE*fsend
-#endif
-							)
+char*transbrl(int howfar,char*file,FILE*fsend)
 {
 	unsigned int pt=0;
 	unsigned char p;

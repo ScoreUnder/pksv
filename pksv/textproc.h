@@ -10,11 +10,7 @@ extern char trans[];
 void log_txt(char *str, size_t length);
 
 char*transtxt(int howfar,char*file);
-char*transbrl(int howfar,char*file
-#ifndef DLL
-							,FILE*fsend
-#endif
-);
+char*transbrl(int howfar,char*file,FILE*fsend);
 char*transmove(int howfar,char*file);
 char* transbackstr(char*scrfn,unsigned int pos,codeblock*c);
 unsigned int transbackmove(char*script,unsigned int*ii);

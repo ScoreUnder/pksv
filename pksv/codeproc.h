@@ -14,20 +14,14 @@ extern int thumbnum;
 extern int dwordnum;
 extern unsigned int fail;
 
-#define Defined2(thing) (WhatIs2(thing),!fail)
+void pksv_codeproc_reset();
 
-#ifndef DLL
-#define GetNum(x) GenForFunc(x,&i,LogFile,Script,defines,c)
-#else
+#define Defined2(thing) (WhatIs2(thing),!fail)
 #define GetNum(x) GenForFunc(x,&i,Script,defines,c)
-#endif
 
 extern unsigned char gffs;
 unsigned int GenForFunc(char*func,
                         unsigned int*ii,
-#ifndef DLL
-                        FILE* LogFile,
-#endif
                         char*Script,
                         struct bsearch_root *defines,
                         codeblock*c);

@@ -1,14 +1,3 @@
-*.o
-*.d
-*.sh_o
-*.sh_d
-/PokeScrE.log
-/defines.dat
-/pksv
-/pksv.so
 /sublang/*.c
 /tests/compare*.pks
 /tests/fake*.gb?
-/tools/gperf-but-in-reverse
-/tools/process-defines
-/vgcore.*

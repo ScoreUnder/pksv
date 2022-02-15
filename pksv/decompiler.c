@@ -17,6 +17,9 @@
 */
 #include <string.h>
 #include <stdlib.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 #include "decompiler.h"
 #include "codeproc.h"
@@ -28,6 +31,12 @@
 #include "pksv.h"
 
 char comparetype=0;
+
+void pksv_decompiler_reset(void)
+{
+  comparetype=0;
+}
+
 char* GetFlagName(unsigned int a)
 {
 	if(mode==FIRE_RED)
@@ -1377,10 +1386,8 @@ FILE* scrf;
 void DecodeProc2(FILE* fileM_,
 								 unsigned int narc,
 								 unsigned int FileZoomPos,
-								 char*filename
-#ifndef DLL
-								 ,FILE*fsend
-#endif
+								 char*filename,
+								 FILE*fsend
 								)
 {
 	unsigned int still_going,arg1,arg2,arg3,arg4,arg5,arg6,arg7,endat,failsafe=0,lastdata,lastdata2;
@@ -3152,11 +3159,7 @@ void DecodeProc2(FILE* fileM_,
 					fprintf(fsend,"braille 0x%X\r\n",arg1);
 					if ((arg1&0xF8000000)==0x08000000)
 					{
-						transbrl(arg1,filename
-#ifndef DLL
-						,fsend
-#endif
-						);
+						transbrl(arg1,filename,fsend);
 					}
 					else
 					{
@@ -3168,11 +3171,7 @@ void DecodeProc2(FILE* fileM_,
 					fprintf(fsend,"CMD_D3 0x%X\r\n",arg1);
 					if ((arg1&0xF8000000)==0x08000000)
 					{
-						transbrl(arg1,filename
-#ifndef DLL
-						,fsend
-#endif
-						);
+						transbrl(arg1,filename,fsend);
 					}
 					else
 					{
@@ -5350,10 +5349,8 @@ void DecodeProc2(FILE* fileM_,
 
 void DecodeProcLevel(FILE*fileM,
 										 unsigned int FileZoomPos,
-										 char*fname
-#ifndef DLL
-										 ,FILE*fsend
-#endif
+										 char*fname,
+										 FILE*fsend
 										 )
 {
 	register unsigned int arg1,failsafe;
@@ -5444,11 +5441,7 @@ void DecodeProcLevel(FILE*fileM,
 	}
 	while (!AllDone())
 	{
-		DecodeProc2(fileM,0,Done(FindNotDone()),fname
-#ifndef DLL
-								,fsend
-#endif
-							 );
+		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
 #define nl() fprintf(fsend,"\r\n")
 	while (!AllDoneText())
@@ -5589,11 +5582,8 @@ void DecodeProcLevel(FILE*fileM,
 void DecodeProc(FILE*fileM,
 								unsigned int narc,
 								unsigned int FileZoomPos,
-								char*fname
-#ifndef DLL
-								,FILE*fsend
-#endif
-								)
+								char*fname,
+								FILE*fsend)
 {
 	register unsigned int arg1,failsafe;
 	unsigned int arg2,arg3;
@@ -5626,18 +5616,10 @@ void DecodeProc(FILE*fileM,
 	}
 	if(dyndec)
 		fprintf(fsend,"#org 0x%X\r\njump @start ' This redirects the script to your dynamic-offset version. Remove this line if you don't want this.\r\n\r\n",FileZoomPos);
-	DecodeProc2(fileM,narc,FileZoomPos,fname
-#ifndef DLL
-							,fsend
-#endif
-						 );
+	DecodeProc2(fileM,narc,FileZoomPos,fname,fsend);
 	while (!AllDone())
 	{
-		DecodeProc2(fileM,0,Done(FindNotDone()),fname
-#ifndef DLL
-								,fsend
-#endif
-							 );
+		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
 #define nl() fprintf(fsend,"\r\n")
 	while (!AllDoneText())
@@ -5777,11 +5759,8 @@ void DecodeProc(FILE*fileM,
 
 void DecodeProcASM(FILE*fileM,
 									 unsigned int FileZoomPos,
-									 char*fname
-#ifndef DLL
-									 ,FILE*fsend
-#endif
-									 )
+									 char*fname,
+									 FILE*fsend)
 {
 	register unsigned int arg1,failsafe;
 	unsigned int arg2,arg3;
@@ -5878,12 +5857,9 @@ void DecodeProcASM(FILE*fileM,
 }
 
 void DecodeProcText(FILE*fileM,
-										unsigned int FileZoomPos,
-										char*fname
-#ifndef DLL
-										,FILE*fsend
-#endif
-										)
+                    unsigned int FileZoomPos,
+                    char*fname,
+                    FILE*fsend)
 {
 	initDoneProcs();
 	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
@@ -5917,12 +5893,9 @@ void DecodeProcText(FILE*fileM,
 }
 
 void DecodeProcPointer(FILE*fileM,
-										unsigned int FileZoomPos,
-										char*fname
-#ifndef DLL
-										,FILE*fsend
-#endif
-										)
+                       unsigned int FileZoomPos,
+                       char*fname,
+                       FILE*fsend)
 {
 	unsigned int arg2;
 	initDoneProcs();
@@ -5967,12 +5940,9 @@ void DecodeProcPointer(FILE*fileM,
 }
 
 void DecodeProcMoves(FILE*fileM,
-										 unsigned int FileZoomPos,
-										 char*fname
-#ifndef DLL
-										 ,FILE*fsend
-#endif
-										 )
+                     unsigned int FileZoomPos,
+                     char*fname,
+                     FILE*fsend)
 {
 	initDoneProcs();
 	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
@@ -6006,12 +5976,9 @@ void DecodeProcMoves(FILE*fileM,
 }
 
 void DecodeProcMart(FILE*fileM,
-										 unsigned int FileZoomPos,
-										 char*fname
-#ifndef DLL
-										 ,FILE*fsend
-#endif
-										 )
+                    unsigned int FileZoomPos,
+                    char*fname,
+                    FILE*fsend)
 {
 	register char*m;
 	int arg2;
@@ -6064,12 +6031,9 @@ void DecodeProcMart(FILE*fileM,
 }
 
 void DecodeProcAttacks(FILE*fileM,
-											 unsigned int FileZoomPos,
-											 char*fname
-#ifndef DLL
-											 ,FILE*fsend
-#endif
-											 )
+                       unsigned int FileZoomPos,
+                       char*fname,
+                       FILE*fsend)
 {
 	register char*m;
 	int arg2;
