@@ -1715,7 +1715,7 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 
 unsigned int transbackmove(char*script,unsigned int*ii)
 {
-	unsigned int i,len=0,j=0,k=0;
+	unsigned int i,len=0,k=0;
 	char cmdbuf[100];
 	char xbuf[100];
 	//unsigned int read;
@@ -1725,14 +1725,14 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 		while (script[i]==' ') {
 			i++;
 		}
-		j=0;
+		size_t cmdbuf_size = 0;
 		while (script[i]!=' '&&script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 		{
-			cmdbuf[j]=script[i];
+			cmdbuf[cmdbuf_size]=script[i];
 			i++;
-			j++;
+			cmdbuf_size++;
 		}
-		cmdbuf[j]=0;
+		cmdbuf[cmdbuf_size]=0;
 #define aaa(x) else if(!strcmp(cmdbuf,x))
 #define move trans[len]=
 		if (mode==GOLD||mode==CRYSTAL)
@@ -1958,10 +1958,10 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				j=0;
+				unsigned int j=0;
 				while (j<16)
 				{
 					if (cmdbuf[4]=="0123456789abcdef"[j])
@@ -2218,10 +2218,10 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				j=0;
+				unsigned int j=0;
 				while (j<16)
 				{
 					if (cmdbuf[4]=="0123456789abcdef"[j])
@@ -2400,10 +2400,10 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf[0]=='r'&&cmdbuf[1]=='a'&&cmdbuf[2]=='w'&&cmdbuf[3]=='_'&&strlen(cmdbuf)==6)
+			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				j=0;
+				unsigned int j=0;
 				while (j<16)
 				{
 					if (cmdbuf[4]=="0123456789abcdef"[j])
