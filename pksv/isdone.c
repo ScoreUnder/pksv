@@ -133,7 +133,7 @@ unsigned int FindNotDone()
         }
         j++;
       }
-      if (doneprocs[j]!=doprocs[i])
+      if (j==2048)
         return doprocs[i];
     }
     i++;
@@ -227,7 +227,7 @@ unsigned int FindNotDoneText()
         }
         j++;
       }
-      if (donetexts[j]!=dotexts[i])
+      if (j == 2048)
         return dotexts[i];
     }
     i++;
@@ -321,7 +321,7 @@ unsigned int FindNotDoneMove()
         }
         j++;
       }
-      if (donemoves[j]!=domoves[i])
+      if (j==2048)
         return domoves[i];
     }
     i++;
@@ -415,7 +415,7 @@ unsigned int FindNotDoneMart()
         }
         j++;
       }
-      if (donemarts[j]!=domarts[i])
+      if (j==2048)
         return domarts[i];
     }
     i++;
@@ -510,7 +510,7 @@ unsigned int FindNotDoneThumb()
         }
         j++;
       }
-      if (donethumb[j]!=dothumb[i])
+      if (j==2048)
         return dothumb[i];
     }
     i++;
@@ -604,7 +604,7 @@ unsigned int FindNotDoneDword()
         }
         j++;
       }
-      if (donedword[j]!=dodword[i])
+      if (j==2048)
         return dodword[i];
     }
     i++;
@@ -698,7 +698,7 @@ unsigned int FindNotDoneLevel()
         }
         j++;
       }
-      if (donelevel[j]!=dolevel[i])
+      if (j==2048)
         return dolevel[i];
     }
     i++;
