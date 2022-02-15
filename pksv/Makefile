@@ -35,8 +35,10 @@ check: $(MAIN) defines.dat
 	./$(MAIN) -d tests/fakerom.gba 6B09F8 tests/compare.pks
 	./$(MAIN) -d tests/fakerom.gba 6B0A01 tests/compare2.pks
 	./$(MAIN) -d tests/fakerom.gba 6B0A13 tests/compare3.pks
+	echo 'f183692e033935c95d085039069a5f64  tests/fakerom.gba' | md5sum -c
 	dd if=/dev/zero of=tests/fakegold.gbc bs=1024 count=256
 	./$(MAIN) -r tests/test_gsc_moves.pks tests/fakegold.gbc
+	echo '6146a2f980bcaacc6ae89ef89813b115  tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
 	rm -f -- $(MAIN) $(SHLIB) tools/process-defines defines.dat
