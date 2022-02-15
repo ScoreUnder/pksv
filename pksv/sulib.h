@@ -1,6 +1,8 @@
 #ifndef PKSV_SULIB_H
 #define PKSV_SULIB_H 1
 
+#include "binarysearch.h"
+
 typedef struct __define {
   char*name;
   unsigned int means;
@@ -40,7 +42,7 @@ unsigned int init_codeblock(codeblock*c,char*name,int org);
 codeblock* rewind_codeblock(codeblock*c);
 unsigned int add_insert(codeblock*c,unsigned int p,char*n);
 void delete_inserts(codeblock*c);
-void calc_org(codeblock*c,unsigned int start,char*file);
+void calc_org(codeblock*c,unsigned int start,char*file, struct bsearch_root *defines);
 void process_inserts(codeblock*c,codelabel*cl);
 void add_data(codeblock*c,char*data,unsigned int len);
 

@@ -17,9 +17,9 @@ extern unsigned int fail;
 #define Defined2(thing) (WhatIs2(thing),!fail)
 
 #ifndef DLL
-#define GetNum(x) GenForFunc(x,&i,LogFile,Script,romfn,c)
+#define GetNum(x) GenForFunc(x,&i,LogFile,Script,defines,c)
 #else
-#define GetNum(x) GenForFunc(x,&i,Script,romfn,c)
+#define GetNum(x) GenForFunc(x,&i,Script,defines,c)
 #endif
 
 extern unsigned char gffs;
@@ -29,15 +29,13 @@ unsigned int GenForFunc(char*func,
                         FILE* LogFile,
 #endif
                         char*Script,
-                        char*romfn,
+                        struct bsearch_root *defines,
                         codeblock*c);
-
-void Define(char*thing,unsigned int otherthing);
-unsigned int WhatIs(char*thing);
-void ReDefine(char*thing,int val);
 
 void Define2(unsigned int otherthing,char*thing);
 char* WhatIs2(int thing);
+
+unsigned int FindFreeSpace(char*romname, unsigned int len, struct bsearch_root *defines);
 
 void LowerCaseAndRemAll0D(char*orig);
 

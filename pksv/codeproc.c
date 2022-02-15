@@ -17,72 +17,15 @@
 */
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "codeproc.h"
+#include "binarysearch.h"
 #include "textproc.h"
 #include "sulib.h"
 #include "pksv.h"
 
-int*basedef=NULL;
-char**defnames=NULL;
-
-int def_alloc=0,def_size=0,PCS=0;
-
-void Define(char*thing,unsigned int otherthing)
-{
-  char*m,*m2;
-  
-  if(def_alloc>(def_size<<2))
-  {
-    def_size++;
-  }
-  else
-  {
-    m=malloc(def_alloc+512*4);
-    m2=malloc(def_alloc+512*4);
-    //memcpy(edi,esi,ecx);
-    memcpy(m,basedef,def_alloc);
-    memcpy(m2,defnames,def_alloc);
-    def_size++;
-    def_alloc+=512*4;
-    if(basedef)
-      free(basedef);
-    if(defnames)
-      free(defnames);
-    basedef=(int*)m;
-    defnames=(char**)m2;
-  }
-  m=malloc(strlen(thing)+1);
-  strcpy(m,thing);
-  defnames[def_size-1]=m;
-  basedef[def_size-1]=otherthing;
-  return;
-}
 unsigned int fail;
-unsigned int WhatIs(char*thing)
-{
-  register int i;
-  fail=0;
-  for(i=0;i<def_size;i++)
-    if(!strcmp(thing,defnames[i]))
-      return basedef[i];
-  fail=1;
-  return 0;
-}
-
-void ReDefine(char*thing,int val)
-{
-  register int i;
-  fail=0;
-  for(i=0;i<def_size;i++)
-    if(!strcmp(thing,defnames[i]))
-    {
-      basedef[i]=val;
-      return;
-    }
-  fail=1;
-  return;
-}
 
 int*basedef2=NULL;
 char**defnames2=NULL;
@@ -142,9 +85,9 @@ char* WhatIs2(int thing)
 
 void LowerCaseAndRemAll0D(char*orig)
 {
-  register unsigned char a;
-  a=*orig;
-  while (a)
+  unsigned char a;
+
+  while ((a = *orig))
   {
     if (a>='A'&&a<='Z')
     {
@@ -163,44 +106,55 @@ void LowerCaseAndRemAll0D(char*orig)
       *orig='\'';
     }
     orig++;
-    a=*orig;
   }
 }
 
-unsigned int FindFreeSpace(char*romname,unsigned int len)
+unsigned int FindFreeSpace(char*romname,unsigned int len, struct bsearch_root *defines)
 {
-  FILE*RomFile;
-  unsigned int i,j=0;
+  unsigned int filepos;
+  unsigned int consecutive=0;
   unsigned char cr;
-  RomFile=fopen(romname,"rb");
-  if (mode==GOLD)
+  uint32_t findfrom = 0;
+
+  size_t index = bsearch_find_if_exists(defines,
+      (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom"
+  );
+  if (index != defines->size)
   {
-    i=WhatIs("findfromgold")+ffoff;
+    findfrom = (uint32_t)(intptr_t) defines->pairs[index].value;
   }
-  else
+
+  filepos = findfrom + ffoff;
+
+  FILE *RomFile=fopen(romname,"rb");
+  if (!RomFile)
   {
-    i=WhatIs("findfrom")+ffoff;
+    perror("could not reopen rom to search for free space");
+    return 0;
   }
-  fseek(RomFile,i,SEEK_SET);
-  while (i<0x1000000)
+  fseek(RomFile,filepos,SEEK_SET);
+  while (filepos<0x1000000)
   {
-    fread(&cr,1,1,RomFile);
-    if (cr==search)
-    {
-      j++;
+    cr = getc(RomFile);
+    filepos++;
+
+    if (cr == search) {
+      consecutive++;
     } else {
-      j=0;
+      consecutive=0;
     }
-    i++;
-    if (j>len) {
-      break;    //Yes, larger than, because text ends in 0xFF
+
+    if (consecutive>len) {
+      // Yes, larger than, because text ends in 0xFF so we need one more byte
+      break;
     }
   }
-  ffoff=i-WhatIs("findfrom");
-  i-=j;
-  i++;
   fclose(RomFile);
-  return (0x08000000|i);
+
+  ffoff = filepos - findfrom;
+  filepos -= consecutive;
+  filepos++;
+  return (0x08000000|filepos);
 }
 
 //Gold ptr<->offset functions
@@ -244,7 +198,7 @@ unsigned int GenForFunc(char*func,
                         FILE* LogFile,
 #endif
                         char*Script,
-                        char*romfn,
+                        struct bsearch_root *defines,
                         codeblock*c) //Generates number for function
 {
   unsigned int j=0,k=0,l=0,i;
@@ -274,15 +228,12 @@ unsigned int GenForFunc(char*func,
     *ii=i;
     return 0x08000000;
   }
-  if ((chr>0x2F&&chr<0x3A)||chr=='$'||(chr=='f'&&Script[i+1]=='r'&&Script[i+2]=='e'&&Script[i+3]=='e'&&Script[i+4]=='s'&&Script[i+5]=='p'&&Script[i+6]=='a'&&Script[i+7]=='c'&&Script[i+8]=='e'))
+  if ((chr>0x2F&&chr<0x3A)||chr=='$')
   {
     i++;
-    if ((chr=='x'&&Script[i-1]=='0')||Script[i-1]=='$'||(chr=='r'&&Script[i-1]=='f'&&Script[i+1]=='e'&&Script[i+2]=='e'&&Script[i+3]=='s'&&Script[i+4]=='p'&&Script[i+5]=='a'&&Script[i+6]=='c'&&Script[i+7]=='e'))
+    if ((chr=='x'&&Script[i-1]=='0')||Script[i-1]=='$')
     {
       j=0;
-      if (chr=='r') {
-        i--;
-      }
       if (chr=='x') {
         i++;
       }
@@ -298,47 +249,6 @@ unsigned int GenForFunc(char*func,
       l=buf[9];
       buf[9]=0;
       strcpy(buf2,"0123456789abcdef");
-      if (!strcmp(buf,"freespace")) // freespace(.+)?
-      {
-        buf[9]=l;
-        if (l==0)
-        {
-          strcpy(buf3,"You did not specify the free space length - defaulting to 0x100");
-          log_txt(buf3,strlen(buf3));
-          k=0x100;
-        }
-        else
-        {
-          l=9;
-          while (buf[l]!=0)
-          {
-            k=k<<4;
-            j=0;
-            while (buf2[j]!=0&&buf2[j]!=buf[l])
-            {
-              j++;
-            }
-            if (buf2[j]==0||j>15) {
-              break;
-            }
-            k|=j;
-            l++;
-          }
-        }
-        k=FindFreeSpace(romfn,k);
-        gffs=1;
-        *ii=i;
-        if ((!Defined("findfrom")&&mode!=GOLD)||(!Defined("findfromgold")&&mode==GOLD))
-        {
-          gffs=0;
-        }
-        if (IsVerbose)
-        {
-          sprintf(buf3,"FS -> 0x%X\r\n",k);
-          log_txt(buf3,strlen(buf3));
-        }
-        return k;
-      }
       buf[9]=l;
       l=0;
       while (buf[l]!=0)
@@ -396,16 +306,18 @@ unsigned int GenForFunc(char*func,
       j++;
     }
     buf3[j]=0;
-    if (Defined(buf3))
+    size_t index = bsearch_find_if_exists(defines, buf3);
+    if (index != defines->size)
     {
       gffs=1;
       *ii=i;
+      uint32_t value = (uint32_t)(intptr_t) defines->pairs[index].value;
       if (IsVerbose)
       {
-        sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,WhatIs(buf3));
+        sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,value);
         log_txt(buf2,strlen(buf2));
       }
-      return WhatIs(buf3);
+      return value;
     }
     sprintf(buf2,"Unknown value in %s (Value must be integer)\r\n",func);
     log_txt(buf2,strlen(buf2));

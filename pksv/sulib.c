@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "sulib.h"
+#include "codeproc.h"
+#include "binarysearch.h"
 #include "pksv.h"
 
 unsigned int add_label(char*name,codeblock*c,unsigned int loc,codelabel**chain)
@@ -37,8 +39,7 @@ unsigned int init_codeblock(codeblock*c,char*name,int org)
   c->prev=NULL;
   if (name!=NULL)
   {
-    c->name=malloc(strlen(name)+1);
-    strcpy(c->name,name);
+    c->name=strdup(name);
   }
   else
   {
@@ -185,9 +186,7 @@ void delete_codeblock(codeblock*c)
 }
 
 unsigned int ffoff=0;
-signed int OffsetToPointer(unsigned int offset);
-unsigned int FindFreeSpace(char*romname,unsigned int len);
-void calc_org(codeblock*c,unsigned int start,char*file)
+void calc_org(codeblock*c,unsigned int start,char*file, struct bsearch_root *defines)
 {
   register unsigned int a;
   register codeblock*b;
@@ -216,7 +215,7 @@ void calc_org(codeblock*c,unsigned int start,char*file)
       }
       else
       {
-        b->org=FindFreeSpace(file,b->size+b->align-1);
+        b->org = FindFreeSpace(file, b->size+b->align-1, defines);
         if(b->align&&b->org%b->align)
           b->org+=b->align-(b->org % b->align);
         if ((mode==GOLD||mode==CRYSTAL)&&b->size<0x3FFF)
@@ -224,7 +223,7 @@ void calc_org(codeblock*c,unsigned int start,char*file)
           while ((OffsetToPointer(b->org)&0xFF)!=(OffsetToPointer(b->org+b->size)&0xFF))
           {
             ffoff-=b->size-1;
-            b->org=FindFreeSpace(file,b->size);
+            b->org = FindFreeSpace(file, b->size, defines);
           }
         }
 #ifdef WIN32

@@ -104,11 +104,15 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,
   if (fdwReason!=DLL_PROCESS_ATTACH)return 1;
   if (hinstDLL)
     inst=hinstDLL;
+
   GetModuleFileName(inst,GlobBuf,65536);
   a=strrchr(GlobBuf,'\\');
   if (a)a[1]=0;
   else strcpy(GlobBuf,".\\");
   strcat(GlobBuf,"defines.dat");
+  if (defines_dat_location) free(defines_dat_location);
+  defines_dat_location = strdup(GlobBuf);
+
   HW_DLG=CreateDialog(inst,MAKEINTRESOURCE(10),NULL,(DLGPROC)&OffsetDlg);
   HW_TXT=CreateDialog(inst,MAKEINTRESOURCE(11),NULL,(DLGPROC)&TxtDlg);
   UI_WIN=FindWindow("Score_Under_PKSVUI",NULL);

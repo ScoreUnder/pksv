@@ -6,6 +6,8 @@
 
 #include "../binarysearch.h"
 
+#define IN_FILE "pokeinc_default.txt"
+
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t), "intptr_t must be at least 32 bits");
 
 void strtolower(char *str)
@@ -24,9 +26,9 @@ int main(int argc, char **argv)
 
   struct bsearch_root defines;
 
-  FILE *f = fopen("pokeinc.txt", "r");
+  FILE *f = fopen(IN_FILE, "r");
   if (!f) {
-    perror("opening pokeinc.txt");
+    perror("opening " IN_FILE);
     return 1;
   }
 

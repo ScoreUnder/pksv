@@ -19,7 +19,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
+#include "binarysearch.h"
 #include "recompiler.h"
 #include "textproc.h"
 #include "codeproc.h"
@@ -40,6 +42,9 @@
 #endif
 #define rom(x,s) {if(eorg){j=0xFFFFFFFF;}else{j=x;}if(c!=NULL)add_data(c,(char*)&j,s);}
 #define BASIC(x) rom(x,1)
+
+char *defines_dat_location = NULL;
+
 int thumb=1;
 void e_c(char*Script,unsigned int*ii
 #ifndef DLL
@@ -1356,28 +1361,30 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
   *ii=i;
 }
 #define try_asm() try_asm_x(Script,&i,buf,c)
-void DoDefines()
+struct bsearch_root* DoDefines()
 {
-  register FILE*f;
   char buf[500];
-  unsigned char l;
-  unsigned int a;
-  register unsigned int fl;
-  register unsigned int i;
+  struct bsearch_root* defines = bsearch_create_root();
+
 #ifdef WIN32
   OutputDebugString("Started Defines");
 #endif
-  f=fopen("defines.dat","rb");
+
+  FILE *f = NULL;
+  if (defines_dat_location) {
+    f = fopen(defines_dat_location, "rb");
+  }
   if (!f) {
-    f=fopen(GlobBuf,"rb");
+    f = fopen("defines.dat", "rb");
   }
   if (!f) {
     log_txt("Cannot open defines.dat!\r\n",26);
-    return;
+    return defines;
   }
   bool ok = true;
-  for (i=0;i<fl;)
+  while (!feof(f))
   {
+    uint8_t l;
     if (fread(&l,1,1,f) == 0)
     {
       if (!feof(f))
@@ -1388,12 +1395,18 @@ void DoDefines()
       ok = false;
       break;
     }
-    if (fread(&a,1,4,f) < 4) {
+    uint32_t value;
+    if (fread(&value,1,4,f) < 4) {
       ok = false;
       break;
     }
-    Define(buf,a);
-    i+=5+l;
+    bsearch_ensure_capacity(defines, defines->size + 1);
+    buf[l] = '\0';
+    // Note: safe to insert directly because defines.dat is already sorted
+    defines->pairs[defines->size++] = (struct bsearch_kv) {
+      .key = strdup(buf),
+      .value = (void*)(intptr_t) value,
+    };
   }
   if (!ok)
   {
@@ -1407,11 +1420,14 @@ void DoDefines()
       s = "Error reading defines.dat\r\n";
     }
     log_txt(s, strlen(s));
+    bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
+    bsearch_init_root(defines);  // Still need a struct to return
   }
   fclose(f);
 #ifdef WIN32
   OutputDebugString("Finished Defines, starting main compiler loop");
 #endif
+  return defines;
 }
 void RecodeProc(char*script,char*romfn)
 {
@@ -1442,7 +1458,7 @@ void RecodeProc(char*script,char*romfn)
     strcat(romfn,".gba");
     RomFile=fopen(romfn,"r+b");
   }
-  DoDefines();
+  struct bsearch_root *defines = DoDefines();
 #ifndef DLL
   strcat(GlobBuf,"pokeinc.txt");
   IncFile=fopen(GlobBuf,"rb");
@@ -1496,24 +1512,23 @@ void RecodeProc(char*script,char*romfn)
       fclose(IncFile);
       return;
     }
-    memset(Script,0,strlen(script)+fst+6);
-    if (IncFile)
+    if (IncFile) {
       fread(Script,1,fst,IncFile);
-    else
-      *Script=0;
-    strcat(Script,"\n\n");
+      strcpy(&Script[fst],"\n\n");
+      fst += 2;
+    }
 #ifndef DLL
-    if (fread((char*)(Script+fst+2),1,fs,CurrFile) != fs) {
+    if (fread((char*)(Script+fst),1,fs,CurrFile) != fs) {
       fprintf(stderr,"Error reading script file\n");
       fclose(CurrFile);
       fclose(IncFile);
       free(Script);
       return;
     }
-    strcpy(&Script[fs],"\n\n");
+    strcpy(&Script[fst+fs],"\n\n");
 #else
-    strcpy(Script+fst+2,script);
-    strcat(Script,"\n\n");
+    strcpy(Script+fst, script);
+    strcat(Script+fst, "\n\n");
 #endif
 
 #ifndef DLL
@@ -1597,7 +1612,7 @@ void RecodeProc(char*script,char*romfn)
             if (!gffs) {
               return;
             }
-            Define(buf,k);
+            bsearch_upsert(defines, buf, (void*)(intptr_t)k);
             ec();
           }
           aa("#narc")
@@ -1932,7 +1947,7 @@ dp:
             if (!gffs) {
               return;
             }
-            Define(buf,k);
+            bsearch_upsert(defines, buf, (void*)(intptr_t)k);
             ec();
           }
           aa("#dyn")
@@ -1941,7 +1956,7 @@ dp:
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
-            ReDefine("findfrom",start);
+            bsearch_upsert(defines, "findfromgold", (void*)(intptr_t)start);
             ec();
           }
           aa("#dyn2")
@@ -1958,7 +1973,7 @@ dp:
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
-            ReDefine("findfrom",start);
+            bsearch_upsert(defines, "findfromgold", (void*)(intptr_t)start);
             ec();
           }
           aa("#org")
@@ -4251,7 +4266,7 @@ cry:
             if (!gffs) {
               return;
             }
-            Define(buf,k);
+            bsearch_upsert(defines, buf, (void*)(intptr_t)k);
             ec();
           }
           aa("#dyn")
@@ -4260,7 +4275,7 @@ cry:
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
-            ReDefine("findfrom",start);
+            bsearch_upsert(defines, "findfromgold", (void*)(intptr_t)start);
             ec();
           }
           aa("#dyn2")
@@ -4277,7 +4292,7 @@ cry:
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
-            ReDefine("findfrom",start);
+            bsearch_upsert(defines, "findfromgold", (void*)(intptr_t)start);
             ec();
           }
           aa("#org")
@@ -6626,7 +6641,7 @@ rse:
               k=GetNum("#DEFINE");
               if (!gffs)
                 return;
-              Define(buf,k);
+              bsearch_upsert(defines, buf, (void*)(intptr_t)k);
             }
             aa("#dyn")
             {
@@ -6634,7 +6649,7 @@ rse:
               start=GetNum("#DYN");
               if (!gffs)return;
               dyntype=0;
-              ReDefine("findfrom",start);
+              bsearch_upsert(defines, "findfrom", (void*)(intptr_t)start);
             }
             aa("#dyn2")
             {
@@ -6649,7 +6664,7 @@ rse:
               start=GetNum("#DYNAMIC");
               if (!gffs)return;
               dyntype=0;
-              ReDefine("findfrom",start);
+              bsearch_upsert(defines, "findfrom", (void*)(intptr_t)start);
             }
             aa("#org")
             {
@@ -10025,7 +10040,7 @@ unk_cmd_fr:
   else
   {
     vlog_txt("\r\n#ORG: data\r\n");
-    calc_org(c,start,romfn);
+    calc_org(c,start,romfn, defines);
     process_inserts(c,cl);
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");

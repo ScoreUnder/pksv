@@ -13,7 +13,7 @@ LDFLAGS =
 
 LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
 
-SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c
+SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c binarysearch.c
 SRC_MAIN = pksv2.c $(SRC_COMMON)
 SRC_SHLIB = pksv_dll.c $(SRC_COMMON)
 SRC_PROCESS_DEFINES = tools/process-defines.c binarysearch.c
@@ -40,7 +40,7 @@ clean: mostlyclean
 mostlyclean:
 	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) $(OBJ_PROCESS_DEFINES) $(DEPS) PokeScrE.log
 
-defines.dat: pokeinc.txt tools/process-defines
+defines.dat: pokeinc_default.txt tools/process-defines
 	tools/process-defines
 
 tools/process-defines: $(OBJ_PROCESS_DEFINES)

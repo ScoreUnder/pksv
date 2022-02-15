@@ -29,7 +29,7 @@ void bsearch_deinit_root(struct bsearch_root* root) {
   free(root->pairs);
 }
 
-static void bsearch_ensure_capacity(struct bsearch_root* root, size_t capacity) {
+void bsearch_ensure_capacity(struct bsearch_root* root, size_t capacity) {
   if (root->capacity < capacity) {
     capacity = capacity * 2;
     while ((capacity & (capacity - 1)) != 0) {

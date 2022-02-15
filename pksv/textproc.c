@@ -55,7 +55,7 @@ void log_txt(char*str, size_t length)
 		log_size+=len;
 	}
 #else
- 	fwrite(str,1,length,LogFile);
+ 	fwrite(str, 1, length, LogFile ? LogFile : stderr);
 #endif
 }
 

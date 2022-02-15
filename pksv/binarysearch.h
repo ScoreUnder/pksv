@@ -26,6 +26,9 @@ void bsearch_destroy_root(struct bsearch_root* root);
 /** @brief Free the contents of a bsearch_root structure, but not the structure itself. */
 void bsearch_deinit_root(struct bsearch_root* root);
 
+/** @brief Ensure that the bsearch_root has enough space to hold the given number of elements. */
+void bsearch_ensure_capacity(struct bsearch_root* root, size_t capacity);
+
 /** @brief Insert a key/value pair into a bsearch_root. */
 size_t bsearch_upsert(struct bsearch_root *kvs, const char *key, void const *value);
 

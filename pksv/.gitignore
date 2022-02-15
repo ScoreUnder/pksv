@@ -2,9 +2,11 @@
 *.d
 *.sh_o
 *.sh_d
+/PokeScrE.log
 /defines.dat
 /pksv
 /pksv.so
 /tests/compare.pks
 /tests/fakerom.gba
 /tools/process-defines
+/vgcore.*

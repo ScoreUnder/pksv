@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 extern bool testing;
+extern char *defines_dat_location;
 void RecodeProc(char*script,char*romfn);
 
 #endif
