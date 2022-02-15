@@ -29,18 +29,20 @@ SHLIB = pksv$(SHLIB_EXT)
 
 all: $(MAIN) $(SHLIB) defines.dat
 
-check: $(MAIN)
+check: $(MAIN) defines.dat
 	bunzip2 -fkq tests/fakerom.gba.bz2
 	./$(MAIN) -r tests/test.pks tests/fakerom.gba
 	./$(MAIN) -d tests/fakerom.gba 6B09F8 tests/compare.pks
 	./$(MAIN) -d tests/fakerom.gba 6B0A01 tests/compare2.pks
 	./$(MAIN) -d tests/fakerom.gba 6B0A13 tests/compare3.pks
+	dd if=/dev/zero of=tests/fakegold.gbc bs=1024 count=256
+	./$(MAIN) -r tests/test_gsc_moves.pks tests/fakegold.gbc
 
 clean: mostlyclean
 	rm -f -- $(MAIN) $(SHLIB) tools/process-defines defines.dat
 
 mostlyclean:
-	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) $(OBJ_PROCESS_DEFINES) $(DEPS) PokeScrE.log
+	rm -f -- $(OBJ_MAIN) $(OBJ_SHLIB) $(OBJ_PROCESS_DEFINES) $(DEPS) tests/fakerom.gba tests/fakegold.gbc PokeScrE.log
 
 defines.dat: pokeinc_default.txt tools/process-defines
 	tools/process-defines

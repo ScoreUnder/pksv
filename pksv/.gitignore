@@ -7,6 +7,6 @@
 /pksv
 /pksv.so
 /tests/compare*.pks
-/tests/fakerom.gba
+/tests/fake*.gb?
 /tools/process-defines
 /vgcore.*
