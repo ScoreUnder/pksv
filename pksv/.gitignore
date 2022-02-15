@@ -6,6 +6,7 @@
 /defines.dat
 /pksv
 /pksv.so
+/sublang/*.c
 /tests/compare*.pks
 /tests/fake*.gb?
 /tools/process-defines

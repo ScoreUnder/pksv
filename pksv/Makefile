@@ -5,6 +5,7 @@ TOOLCHAIN_PREFIX =
 EXE_EXT =
 SHLIB_EXT = .so
 CC = $(TOOLCHAIN_PREFIX)gcc
+GPERF = gperf
 
 CPPFLAGS =
 CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
@@ -13,7 +14,7 @@ LDFLAGS =
 
 LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
 
-SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c binarysearch.c
+SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c binarysearch.c sublang/gsc_moves.c
 SRC_MAIN = pksv2.c $(SRC_COMMON)
 SRC_SHLIB = pksv_dll.c $(SRC_COMMON)
 SRC_PROCESS_DEFINES = tools/process-defines.c binarysearch.c
@@ -58,12 +59,15 @@ $(MAIN): $(OBJ_MAIN)
 $(SHLIB): $(OBJ_SHLIB)
 	$(CC) $(CFLAGS) $(CFLAGS_SH) $(LDFLAGS) $(OBJ_SHLIB) -o $@
 
-.SUFFIXES: .sh_o .o .c
+.SUFFIXES: .sh_o .o .c .gperf
 .c.sh_o:
 	$(CC) $(CFLAGS) $(CFLAGS_SH) $(CPPFLAGS) -MD -MF $(@:o=d) -c $< -o $@
 
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -MD -MF $(@:o=d) -c $< -o $@
+
+.gperf.c:
+	$(GPERF) -C -l -L ANSI-C --output-file=$@ $<
 
 .PHONY: all check clean
 
