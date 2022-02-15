@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "../pksv/binarysearch.h"
+#include <binarysearch.h>
 
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t), "intptr_t must be at least 32 bits");
 
