@@ -29,6 +29,8 @@ SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 SRC_PROCESS_DEFINES = tools/process-defines.c src_common/binarysearch.c
 SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
 
+GENERATED_SOURCES = pksv/sublang/gsc_moves.c pksv/sublang/gsc_moves_reverse.c
+
 OBJ_PKSV_MAIN = $(SRC_PKSV_MAIN:.c=.o)
 OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
@@ -56,7 +58,7 @@ clean: mostlyclean
 	rm -f -- $(PKSV) $(PKSV_SHLIB) tools/process-defines$(EXE_EXT) tools/gperf-but-in-reverse$(EXE_EXT) defines.dat
 
 mostlyclean: clean-fmem
-	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(DEPS) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
