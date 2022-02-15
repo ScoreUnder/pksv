@@ -1452,6 +1452,7 @@ void RecodeProc(char*script,char*romfn)
   codeblock*d;
   codelabel*cl=NULL;
   codelabel*cl2;
+
   RomFile=fopen(romfn,"r+b");
   if (RomFile==NULL)
   {
@@ -1477,6 +1478,7 @@ void RecodeProc(char*script,char*romfn)
 #ifndef DLL
     fclose(CurrFile);
 #endif
+    bsearch_destroy_root(defines);
     return;
   }
 #ifndef DLL
@@ -1507,9 +1509,10 @@ void RecodeProc(char*script,char*romfn)
       MessageBox(NULL,"malloc() Failed to allocate memory for the script.","Error",0x10);
 #endif
 #ifndef DLL
-      if (strcmp(script,""))fclose(CurrFile);
+      if (CurrFile) fclose(CurrFile);
 #endif
-      fclose(IncFile);
+      if (IncFile) fclose(IncFile);
+      bsearch_destroy_root(defines);
       return;
     }
     if (IncFile) {
@@ -1520,9 +1523,10 @@ void RecodeProc(char*script,char*romfn)
 #ifndef DLL
     if (fread((char*)(Script+fst),1,fs,CurrFile) != fs) {
       fprintf(stderr,"Error reading script file\n");
-      fclose(CurrFile);
-      fclose(IncFile);
+      if (CurrFile) fclose(CurrFile);
+      if (IncFile) fclose(IncFile);
       free(Script);
+      bsearch_destroy_root(defines);
       return;
     }
     strcpy(&Script[fst+fs],"\n\n");
@@ -1540,9 +1544,9 @@ void RecodeProc(char*script,char*romfn)
       MessageBox(NULL,"Failed to open a log.","Error",0x10);
 #endif
       free(Script);
-      if (strcmp(script,""))fclose(CurrFile);
-      if (IncFile)
-        fclose(IncFile);
+      if (CurrFile) fclose(CurrFile);
+      if (IncFile) fclose(IncFile);
+      bsearch_destroy_root(defines);
       return;
     }
     fprintf(LogFile,"Opened file.\r\n");
