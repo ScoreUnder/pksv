@@ -42,10 +42,12 @@ char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
 
+void determine_mode(FILE *romfile);
+
 int main(int argc,char**argv)
 {
-  char determine_mode[4];
   char command_line=DECOMPILE;
+  bool autodetect_mode = true;
   char*file_name;
   char*export_name;
   FILE*romfile;
@@ -98,13 +100,39 @@ int main(int argc,char**argv)
     {
       command_line=DECOMPILE;
     }
+    else if (!strcmp(argv[i],"--gs"))
+    {
+      mode = GOLD;
+      autodetect_mode = false;
+    }
+    else if (!strcmp(argv[i],"--rse"))
+    {
+      mode = RUBY;
+      autodetect_mode = false;
+    }
+    else if (!strcmp(argv[i],"--dp"))
+    {
+      mode = DIAMOND;
+      autodetect_mode = false;
+    }
+    else if (!strcmp(argv[i],"--crystal"))
+    {
+      mode = CRYSTAL;
+      autodetect_mode = false;
+    }
+    else if (!strcmp(argv[i],"--frlg"))
+    {
+      mode = FIRE_RED;
+      autodetect_mode = false;
+    }
     else if (!strcmp(argv[i],"--help"))
     {
       printf("PKSV V"INTERNAL_VERSION" - backend used for compiling/decompiling.\n\
 pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
 pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
 pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
-You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" syntax) to decompile as text, movement, or braille respectively.\
+You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" syntax) to decompile as text, movement, or braille respectively.\n\
+You can also insert at the same position, one of --gs, --crystal, --rse, --frlg, --dp to override ROM type detection\
 ");
       return 0;
     }
@@ -153,40 +181,8 @@ You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" synta
       printf("Unable to open file %s.",file_name);
     return 1;
   }
-  //Determining mode
-  fseek(romfile,0xAC,SEEK_SET);
-  fread(determine_mode,1,3,romfile);
-  if (determine_mode[0]=='A'&&determine_mode[1]=='X')
-  {
-    mode=RUBY;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P')
-  {
-    mode=FIRE_RED;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P'&&determine_mode[2]=='E')
-  {
-    search=0;
-  }
-  fseek(romfile,0x13F,SEEK_SET);
-  fread(determine_mode,1,2,romfile);
-  if ((determine_mode[0]=='A'&&determine_mode[1]=='A')||(determine_mode[0]=='S'&&determine_mode[1]=='M'))
-  {
-    mode=GOLD;
-    search=0;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='Y')
-  {
-    mode=CRYSTAL;
-    search=0;
-  }
-  fseek(romfile,0x0,SEEK_SET);
-  fread(determine_mode,1,4,romfile);
-  if (determine_mode[0]=='N'&&determine_mode[1]=='A'&&determine_mode[2]=='R'&&determine_mode[3]=='C')
-  {
-    mode=DIAMOND;
-    search=0;
-  }
+  if (autodetect_mode)
+    determine_mode(romfile);
   if (command_line==TXT)
   {
     otherfile=fopen(export_name,"wb");
@@ -237,4 +233,43 @@ You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" synta
   }
   fclose(romfile);
   return 0;
+}
+
+void determine_mode(FILE *romfile)
+{
+  char determine_mode[4];
+  //Determine (de)compilation mode
+  fseek(romfile,0xAC,SEEK_SET);
+  fread(determine_mode,1,3,romfile);
+  if (determine_mode[0]=='A'&&determine_mode[1]=='X')
+  {
+    mode=RUBY;
+  }
+  if (determine_mode[0]=='B'&&determine_mode[1]=='P')
+  {
+    mode=FIRE_RED;
+  }
+  if (determine_mode[0]=='B'&&determine_mode[1]=='P'&&determine_mode[2]=='E')
+  {
+    search=0;
+  }
+  fseek(romfile,0x13F,SEEK_SET);
+  fread(determine_mode,1,2,romfile);
+  if ((determine_mode[0]=='A'&&determine_mode[1]=='A')||(determine_mode[0]=='S'&&determine_mode[1]=='M'))
+  {
+    mode=GOLD;
+    search=0;
+  }
+  if (determine_mode[0]=='B'&&determine_mode[1]=='Y')
+  {
+    mode=CRYSTAL;
+    search=0;
+  }
+  fseek(romfile,0x0,SEEK_SET);
+  fread(determine_mode,1,4,romfile);
+  if (determine_mode[0]=='N'&&determine_mode[1]=='A'&&determine_mode[2]=='R'&&determine_mode[3]=='C')
+  {
+    mode=DIAMOND;
+    search=0;
+  }
 }
