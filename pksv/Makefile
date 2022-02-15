@@ -14,14 +14,16 @@ LDFLAGS =
 
 LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
 
-SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c binarysearch.c sublang/gsc_moves.c
+SRC_COMMON = codeproc.c decompiler.c gba_asm.c isdone.c recompiler.c sulib.c textproc.c binarysearch.c sublang/gsc_moves.c sublang/gsc_moves_reverse.c
 SRC_MAIN = pksv2.c $(SRC_COMMON)
 SRC_SHLIB = pksv_dll.c $(SRC_COMMON)
 SRC_PROCESS_DEFINES = tools/process-defines.c binarysearch.c
+SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
 
 OBJ_MAIN = $(SRC_MAIN:.c=.o)
 OBJ_SHLIB = $(SRC_SHLIB:.c=.sh_o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
+OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 
 DEPS = $(OBJ_MAIN:.o=.d) $(OBJ_SHLIB:.sh_o=.sh_d) $(OBJ_PROCESS_DEFINES:.o=.d)
 
@@ -53,11 +55,17 @@ defines.dat: pokeinc_default.txt tools/process-defines
 tools/process-defines: $(OBJ_PROCESS_DEFINES)
 	$(LINK.c) $(OBJ_PROCESS_DEFINES) -o $@
 
+tools/gperf-but-in-reverse: $(OBJ_GPERF_REVERSE)
+	$(LINK.c) $(OBJ_GPERF_REVERSE) -o $@
+
 $(MAIN): $(OBJ_MAIN)
 	$(LINK.c) $(OBJ_MAIN) -o $@
 
 $(SHLIB): $(OBJ_SHLIB)
 	$(CC) $(CFLAGS) $(CFLAGS_SH) $(LDFLAGS) $(OBJ_SHLIB) -o $@
+
+sublang/gsc_moves_reverse.c: sublang/gsc_moves.gperf tools/gperf-but-in-reverse
+	tools/gperf-but-in-reverse < sublang/gsc_moves.gperf > $@ || { rm -f -- $@; false; }
 
 .SUFFIXES: .sh_o .o .c .gperf
 .c.sh_o:

@@ -48,6 +48,14 @@ fastslide_right, 0x1F
 ???2_up, 0x25
 ???2_left, 0x26
 ???2_right, 0x27
+facehiro_step_down, 0x20
+facehiro_step_up, 0x21
+facehiro_step_left, 0x22
+facehiro_step_right, 0x23
+dontfacehiro_step_down, 0x24
+dontfacehiro_step_up, 0x25
+dontfacehiro_step_left, 0x26
+dontfacehiro_step_right, 0x27
 waterfall_down, 0x28
 waterfall_up, 0x29
 waterfall_left, 0x2A

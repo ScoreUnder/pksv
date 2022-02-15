@@ -9,5 +9,6 @@
 /sublang/*.c
 /tests/compare*.pks
 /tests/fake*.gb?
+/tools/gperf-but-in-reverse
 /tools/process-defines
 /vgcore.*

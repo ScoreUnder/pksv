@@ -8,5 +8,6 @@ struct move_data {
 
 const struct move_data *
 lookup_gsc_move (register const char *str, register size_t len);
+const char* lookup_gsc_move_reverse (int value);
 
 #endif

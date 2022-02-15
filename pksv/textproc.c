@@ -677,236 +677,25 @@ char*transmove(int howfar,char*file)
 			}
 			if (mode==GOLD||mode==CRYSTAL)
 			{
-				nextraw=0;
-				switch (p)
-				{
-				case 0x47:
-					strcat(trans,"end");
-					still_going=0;
-					break;
-				case 0x00:
-					strcat(trans,"look_down");
-					break;
-				case 0x01:
-					strcat(trans,"look_up");
-					break;
-				case 0x02:
-					strcat(trans,"look_left");
-					break;
-				case 0x03:
-					strcat(trans,"look_right");
-					break;
-				case 0x04:
-					strcat(trans,"halfstep_down");
-					break;
-				case 0x05:
-					strcat(trans,"halfstep_up");
-					break;
-				case 0x06:
-					strcat(trans,"halfstep_left");
-					break;
-				case 0x07:
-					strcat(trans,"halfstep_right");
-					break;
-				case 0x08:
-					strcat(trans,"slowstep_down");
-					break;
-				case 0x09:
-					strcat(trans,"slowstep_up");
-					break;
-				case 0x0A:
-					strcat(trans,"slowstep_left");
-					break;
-				case 0x0B:
-					strcat(trans,"slowstep_right");
-					break;
-				case 0x0C:
-					strcat(trans,"step_down");
-					break;
-				case 0x0D:
-					strcat(trans,"step_up");
-					break;
-				case 0x0E:
-					strcat(trans,"step_left");
-					break;
-				case 0x0F:
-					strcat(trans,"step_right");
-					break;
-				case 0x10:
-					strcat(trans,"halfstep2_down");
-					break;
-				case 0x11:
-					strcat(trans,"halfstep2_up");
-					break;
-				case 0x12:
-					strcat(trans,"halfstep2_left");
-					break;
-				case 0x13:
-					strcat(trans,"halfstep2_right");
-					break;
-				case 0x14:
-					strcat(trans,"slowslide_down");
-					break;
-				case 0x15:
-					strcat(trans,"slowslide_up");
-					break;
-				case 0x16:
-					strcat(trans,"slowslide_left");
-					break;
-				case 0x17:
-					strcat(trans,"slowslide_right");
-					break;
-				case 0x18:
-					strcat(trans,"slide_down");
-					break;
-				case 0x19:
-					strcat(trans,"slide_up");
-					break;
-				case 0x1A:
-					strcat(trans,"slide_left");
-					break;
-				case 0x1B:
-					strcat(trans,"slide_right");
-					break;
-				case 0x1C:
-					strcat(trans,"fastslide_down");
-					break;
-				case 0x1D:
-					strcat(trans,"fastslide_up");
-					break;
-				case 0x1E:
-					strcat(trans,"fastslide_left");
-					break;
-				case 0x1F:
-					strcat(trans,"fastslide_right");
-					break;
-				case 0x20:
-					strcat(trans,"facehiro_step_down");
-					break;
-				case 0x21:
-					strcat(trans,"facehiro_step_up");
-					break;
-				case 0x22:
-					strcat(trans,"facehiro_step_left");
-					break;
-				case 0x23:
-					strcat(trans,"facehiro_step_right");
-					break;
-				case 0x24:
-					strcat(trans,"dontfacehiro_step_down");
-					break;
-				case 0x25:
-					strcat(trans,"dontfacehiro_step_up");
-					break;
-				case 0x26:
-					strcat(trans,"dontfacehiro_step_left");
-					break;
-				case 0x27:
-					strcat(trans,"dontfacehiro_step_right");
-					break;
-				case 0x28:
-					strcat(trans,"waterfall_down");
-					break;
-				case 0x29:
-					strcat(trans,"waterfall_up");
-					break;
-				case 0x2A:
-					strcat(trans,"waterfall_left");
-					break;
-				case 0x2B:
-					strcat(trans,"waterfall_right");
-					break;
-				case 0x2C:
-					strcat(trans,"slowjump_down");
-					break;
-				case 0x2D:
-					strcat(trans,"slowjump_up");
-					break;
-				case 0x2E:
-					strcat(trans,"slowjump_left");
-					break;
-				case 0x2F:
-					strcat(trans,"slowjump_right");
-					break;
-				case 0x30:
-					strcat(trans,"jump_down");
-					break;
-				case 0x31:
-					strcat(trans,"jump_up");
-					break;
-				case 0x32:
-					strcat(trans,"jump_left");
-					break;
-				case 0x33:
-					strcat(trans,"jump_right");
-					break;
-				case 0x34:
-					strcat(trans,"fastjump_down");
-					break;
-				case 0x35:
-					strcat(trans,"fastjump_up");
-					break;
-				case 0x36:
-					strcat(trans,"fastjump_left");
-					break;
-				case 0x37:
-					strcat(trans,"fastjump_right");
-					break;
-					//???
-				case 0x3A:
-					strcat(trans,"remove_fixed_facing");
-					break;
-				case 0x3B:
-					strcat(trans,"apply_fixed_facing");
-					break;
-					//???
-				case 0x3D:
-					strcat(trans,"hide");
-					break;
-					//???
-				case 0x45:
-					strcat(trans,"speed_up");
-					break;
-				case 0x46:
-					strcat(trans,"pause");
-					nextraw=1;
-					break;
-					//47 = end
-					//???
-				case 0x49:
-					strcat(trans,"hide2");
-					break;
-					//???
-				case 0x4C:
-					strcat(trans,"teleport_from");
-					break;
-				case 0x4D:
-					strcat(trans,"teleport_to");
-					break;
-				case 0x4E:
-					strcat(trans,"fall");
-					break;
-				case 0x4F:
-					strcat(trans,"spin");
-					break;
-				case 0x55:
-					strcat(trans,"earthquake");
-					nextraw=1;
-					break;
-				case 0x56:
-					strcat(trans,"tree_animate");
-					break;
-				default:
+				char *cmd = lookup_gsc_move_reverse(p);
+				if (cmd != NULL) {
+					strcat(trans, cmd);
+				} else {
 					sprintf(buf,"raw_%02X",p);
 					strcat(trans,buf);
-					break;
 				}
-				if (still_going)
-					strcat(trans," ");
+
+				nextraw=0;
+				if (p == 0x47) break; // end command
+				else if (p == 0x46) nextraw = 1; // pause command
+				else if (p == 0x55) nextraw = 1; // earthquake command
+
+				strcat(trans," ");
+
 				if (nextraw)
 				{
 					fread(&p,1,1,fileC);
-					sprintf(buf,"raw_0x%X ",p);
+					sprintf(buf,"raw_%X ",p);
 					strcat(trans,buf);
 				}
 			}
