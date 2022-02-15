@@ -1360,11 +1360,22 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
   ///////////////////END////////////////////
   *ii=i;
 }
+
+static int bsearch_key_strcmp(const void *a, const void *b)
+{
+  return strcmp((const char*)a,(const char*)b);
+}
+
+static void* bsearch_key_strdup(const void *a)
+{
+  return strdup((const char*)a);
+}
+
 #define try_asm() try_asm_x(Script,&i,buf,c)
 struct bsearch_root* DoDefines()
 {
   char buf[500];
-  struct bsearch_root* defines = bsearch_create_root();
+  struct bsearch_root* defines = bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
 
 #ifdef WIN32
   OutputDebugString("Started Defines");
@@ -1421,7 +1432,7 @@ struct bsearch_root* DoDefines()
     }
     log_txt(s, strlen(s));
     bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
-    bsearch_init_root(defines);  // Still need a struct to return
+    bsearch_init_root(defines, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);  // Still need a struct to return
   }
   fclose(f);
 #ifdef WIN32

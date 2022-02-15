@@ -19,6 +19,16 @@ void strtolower(char *str)
     }
 }
 
+static int bsearch_key_strcmp(const void *a, const void *b)
+{
+  return strcmp((const char*)a,(const char*)b);
+}
+
+static void* bsearch_key_strdup(const void *a)
+{
+  return strdup((const char*)a);
+}
+
 int main(int argc, char **argv)
 {
   (void)argc;
@@ -32,7 +42,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  bsearch_init_root(&defines);
+  bsearch_init_root(&defines, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
 
   char line[1024];
   while (fgets(line, sizeof(line), f)) {
