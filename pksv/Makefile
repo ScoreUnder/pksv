@@ -33,6 +33,8 @@ check: $(MAIN)
 	bunzip2 -fkq tests/fakerom.gba.bz2
 	./$(MAIN) -r tests/test.pks tests/fakerom.gba
 	./$(MAIN) -d tests/fakerom.gba 6B09F8 tests/compare.pks
+	./$(MAIN) -d tests/fakerom.gba 6B0A01 tests/compare2.pks
+	./$(MAIN) -d tests/fakerom.gba 6B0A13 tests/compare3.pks
 
 clean: mostlyclean
 	rm -f -- $(MAIN) $(SHLIB) tools/process-defines defines.dat
