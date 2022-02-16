@@ -176,7 +176,6 @@ static void* memdup(void *ptr, size_t len)
   fmem vname##_fmem; \
   fmem_init(&vname##_fmem); \
   FILE *vname = fmem_open(&vname##_fmem, "wt"); \
-  LogFile = vname; /* XXX hack */ \
   do{}while(0)
 
 #define END_FMEM(vname) do{}while(0); \
@@ -187,7 +186,6 @@ static void* memdup(void *ptr, size_t len)
   vname##_str = memdup(vname##_str, vname##_len); \
   fclose(vname); \
   fmem_term(&vname##_fmem); \
-  LogFile = NULL; /* XXX hack */ \
   do{}while(0)
 
 __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
@@ -347,7 +345,9 @@ __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
 
   START_FMEM(log_file);
 
+  LogFile = log_file; /* XXX hack */
   RecodeProc(to_recompile,fname);
+  LogFile = NULL; /* XXX hack */
 
   END_FMEM(log_file);
   SetDlgItemText(HW_TXT,1,log_file_str);
