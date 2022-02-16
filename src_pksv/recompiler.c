@@ -1474,9 +1474,6 @@ void RecodeProc(char*script,char*romfn)
 #endif
     if (IncFile)
       fclose(IncFile);
-#ifndef DLL
-    fclose(CurrFile);
-#endif
     bsearch_destroy_root(defines);
     return;
   }
