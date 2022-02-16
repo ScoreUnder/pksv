@@ -1,0 +1,871 @@
+#include "resource.h"
+#include "afxres.h"
+#if !defined(__GNUC__)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#else
+1 24 "WindowsXP.manifest"
+#endif
+1                       ICON                    "ball.ico"
+2                       ICON                    "main.ico"
+3                       ICON                    "script.ico"
+#ifdef SCRAP
+5                       ICON                    "Scrappunklogosmallest.ico"
+#endif
+5                       BITMAP                  "toolbar.bmp"
+6                       BITMAP                  "toolbar2.bmp"
+200                     BITMAP                  "up.bmp"
+201                     BITMAP                  "right.bmp"
+202                     BITMAP                  "left.bmp"
+203                     BITMAP                  "down.bmp"
+204                     BITMAP                  "hero.bmp"
+205                     BITMAP                  "arrows.bmp"
+206                     BITMAP                  "say_!!.bmp"
+207                     BITMAP                  "say_!.bmp"
+208                     BITMAP                  "say_q.bmp"
+209                     BITMAP                  "say_smile.bmp"
+210                     BITMAP                  "say_x.bmp"
+#ifdef SCRAP
+4                       BITMAP                  "Scrappunklogotiny.bmp"
+#endif
+3069 DIALOGEX 5, 5, 356, 260
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Page Setup"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Paper",1073,8,8,224,56,WS_GROUP
+    LTEXT           "Si&ze:",1089,16,24,36,8
+    COMBOBOX        1137,64,23,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Source:",1090,16,45,36,8
+    COMBOBOX        1138,64,42,160,160,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Orientation",1072,8,69,64,56,WS_GROUP
+    CONTROL         "P&ortrait",1056,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,16,82,52,12
+    CONTROL         "L&andscape",1057,"Button",BS_AUTORADIOBUTTON,16,103,52,12
+    GROUPBOX        "Margins",1075,80,69,152,56,WS_GROUP
+    LTEXT           "&Left:",1102,88,85,32,8
+    EDITTEXT        1155,120,82,28,12,WS_GROUP
+    LTEXT           "&Top:",1104,88,104,32,8
+    EDITTEXT        1156,120,103,28,12,WS_GROUP
+    LTEXT           "&Right:",1103,164,85,32,8
+    EDITTEXT        1157,196,82,28,12,WS_GROUP
+    LTEXT           "&Bottom:",1105,164,104,32,8
+    EDITTEXT        1158,196,103,28,12,WS_GROUP
+    GROUPBOX        "Headers and Footers",1074,8,130,224,56,WS_GROUP
+    LTEXT           "&Header:",IDC_STATIC,16,146,36,8
+    COMBOBOX        32,64,145,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Footer:",IDC_STATIC,16,167,36,8
+    COMBOBOX        33,64,164,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Print Colors",1076,8,191,224,37,WS_GROUP
+    LTEXT           "Mo&de:",IDC_STATIC,16,207,36,8
+    COMBOBOX        34,64,206,160,160,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "Zoom",IDC_STATIC,240,170,108,58,WS_GROUP
+    LTEXT           "Print zoo&m (-10 to +20):",IDC_STATIC,248,188,92,8
+    EDITTEXT        30,298,206,42,12,ES_AUTOHSCROLL
+    CONTROL         "",31,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,282,205,11,14
+    DEFPUSHBUTTON   "OK",1,190,237,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",2,244,237,50,14
+    PUSHBUTTON      "&Printer...",1026,298,237,50,14
+    GROUPBOX        "Preview",IDC_STATIC,240,8,108,157
+    CONTROL         "",1080,"Static",SS_WHITERECT,254,47,80,80
+    CONTROL         "",1081,"Static",SS_GRAYRECT,334,51,4,80
+    CONTROL         "",1082,"Static",SS_GRAYRECT,262,123,80,4
+END
+
+100 DIALOGEX 0, 0, 236, 95
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "PKSVUI - Find and Replace"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Find",1,178,4,53,14
+    PUSHBUTTON      "Replace &All",3,178,36,53,14
+    PUSHBUTTON      "&Replace",2,178,20,53,14
+    PUSHBUTTON      "&Cancel",4,178,52,53,14
+    EDITTEXT        6,4,16,170,12,ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    EDITTEXT        8,4,44,170,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    CONTROL         "&Match Case",9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,120,8
+    CONTROL         "Search &Upwards",10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,72,120,8
+    CONTROL         "Rege&x Search (and Replace)",11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,84,120,8
+    LTEXT           "Find:",12,4,4,120,8
+    LTEXT           "Replace:",13,4,32,120,8
+END
+
+101 DIALOGEX 0, 0, 155, 38
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "PKSVUI - Go to line"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Go!",1,98,4,53,14
+    PUSHBUTTON      "&Cancel",2,98,20,53,14
+    EDITTEXT        3,24,11,25,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    EDITTEXT        4,69,11,25,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    LTEXT           "Line:",12,4,13,20,8
+    LTEXT           "Pos:",13,49,13,20,8
+END
+
+102 DIALOGEX 0, 0, 166, 72
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "PKSVUI - Find Free Space"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Find",1,108,14,54,14
+    PUSHBUTTON      "&Close",2,108,30,54,14
+    EDITTEXT        3,4,12,50,12,ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    EDITTEXT        4,54,12,50,12,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    EDITTEXT        5,4,36,50,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    CONTROL         "0xFF Mode (default)",6,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,4,52,100,8
+    CONTROL         "0x00 Mode",7,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,4,60,100,8
+    LTEXT           "Length:",10,54,4,40,8
+    LTEXT           "Start At:",11,4,4,40,8
+    LTEXT           "Found:",12,4,28,40,8
+END
+
+103 DIALOGEX 0, 0, 170, 127
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "PKSVUI - Decompile"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        3,4,4,100,12,ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    DEFPUSHBUTTON   "&Decompile",1,108,4,54,14
+    PUSHBUTTON      "&Close",2,108,22,54,14
+    LTEXT           "Event bank: 0x",99,6,28,50,13,NOT WS_GROUP,WS_EX_RIGHT
+    EDITTEXT        4,56,28,30,14,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    LTEXT           "Text Block:",98,6,42,50,12,NOT WS_GROUP,WS_EX_RIGHT
+    EDITTEXT        5,56,42,30,14,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    CONTROL         "Text Bank:",97,"Static",SS_LEFTNOWORDWRAP,6,56,50,12,WS_EX_RIGHT
+    EDITTEXT        6,56,56,30,14,ES_AUTOHSCROLL | NOT WS_BORDER,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "&Convert",7,6,71,54,14
+    CONTROL         "Script",8,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,3,113,36,14
+    CONTROL         "ASM",9,"Button",BS_AUTORADIOBUTTON,44,113,31,14
+    CONTROL         "Level Script",10,"Button",BS_AUTORADIOBUTTON,80,113,53,14
+    GROUPBOX        "Version Override",11,93,40,75,43
+    CONTROL         "Override",12,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,98,50,66,10
+    CONTROL         "G/S",13,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | WS_DISABLED | WS_TABSTOP,97,60,17,10
+    CONTROL         "R/S/E",14,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | WS_DISABLED,115,60,24,10
+    CONTROL         "D/P/P",15,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | WS_DISABLED,140,60,24,10
+    CONTROL         "C",16,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | WS_DISABLED,97,70,17,10
+    CONTROL         "FR/LG",17,"Button",BS_AUTORADIOBUTTON | BS_PUSHLIKE | WS_DISABLED,115,70,24,10
+    GROUPBOX        "G/S/C Offsets",IDC_STATIC,1,19,90,71
+    GROUPBOX        "Dynamic offsets",IDC_STATIC,93,83,75,30
+    EDITTEXT        19,109,94,51,14,ES_AUTOHSCROLL
+    CONTROL         "",18,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,97,96,12,10
+END
+
+104 DIALOGEX 0, 0, 374, 144
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "PKSVUI - Script-Generator EXTREME! [FRLG]"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&Close",1,160,80,54,14
+    PUSHBUTTON      "&Find Item script",2,4,4,70,14,WS_GROUP
+    PUSHBUTTON      "&Give Item script",3,78,4,70,14
+    PUSHBUTTON      "Give &Pokemon script",4,152,4,70,14
+    PUSHBUTTON      "&Road-Closed script",7,226,4,70,14
+    PUSHBUTTON      "&Heal Pok?E[auto]",8,4,22,70,14
+    PUSHBUTTON      "&Battle Pokemon",9,300,4,70,14
+    PUSHBUTTON      "P&erson Talking",10,78,22,70,14
+    PUSHBUTTON      "&Trainer Battle",11,152,22,70,14
+    PUSHBUTTON      "E-m&ail a suggestion",5,76,80,80,14
+    PUSHBUTTON      "PM me a &suggestion",6,218,80,80,14
+    LTEXT           "Idea credits:\nHeal Pokemon\t-\tKarsten Alexander\t\tBattle Pokemon\t-\tDaniel Morgan\nRoad-Closed\t-\tJimmyJoeJohnson\t\tPerson Talking\t-\tMew the Pickle\nTrainerBattle\t-\tShinySquirtle3 && Champio30\tFlag Skeleton\t-\ttrebornosliw\nEarthquake\t-\tNarutoActor\nKorronensu:\tHM Move, Item Crafting, Quick-Starter, Item to proceed",0,4,94,366,50,NOT WS_GROUP
+    PUSHBUTTON      "H&M Move",12,226,22,70,14
+    PUSHBUTTON      "&Item Crafting",13,300,22,70,14
+    PUSHBUTTON      "&Quick-Starter",14,4,40,70,14
+    PUSHBUTTON      "&Need item to proceed",15,75,40,75,14
+    PUSHBUTTON      "M&ove Tutor",16,152,40,70,14
+    PUSHBUTTON      "Flag Skeleton &1",17,226,40,70,14
+    PUSHBUTTON      "Flag Skeleton &2",18,300,40,70,14
+    PUSHBUTTON      "Earthq&uake",19,4,58,70,14
+END
+
+105 DIALOGEX 0, 0, 260, 57
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "CAPTION"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&OK",1,200,4,54,14
+    PUSHBUTTON      "&Cancel",2,200,22,54,14
+    LTEXT           "PROMPT",3,4,4,192,32,NOT WS_GROUP
+    EDITTEXT        4,4,40,191,12,ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "&Flags",5,200,39,54,14
+END
+
+106 DIALOGEX 0, 0, 260, 138
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Notes"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        1,4,4,154,130,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_BORDER | WS_VSCROLL | WS_GROUP,WS_EX_CLIENTEDGE
+    EDITTEXT        2,162,4,94,12,ES_RIGHT | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "A",8202,162,20,16,10
+    PUSHBUTTON      "B",8203,178,20,16,10
+    PUSHBUTTON      "C",8204,194,20,16,10
+    PUSHBUTTON      "D",8205,210,20,16,10
+    PUSHBUTTON      "E",8206,226,20,16,10
+    PUSHBUTTON      "F",8207,242,20,16,10
+    PUSHBUTTON      "7",8199,162,30,16,10
+    PUSHBUTTON      "8",8200,178,30,16,10
+    PUSHBUTTON      "9",8201,194,30,16,10
+    PUSHBUTTON      "4",8196,162,40,16,10
+    PUSHBUTTON      "5",8197,178,40,16,10
+    PUSHBUTTON      "6",8198,194,40,16,10
+    PUSHBUTTON      "1",8193,162,50,16,10
+    PUSHBUTTON      "2",8194,178,50,16,10
+    PUSHBUTTON      "3",8195,194,50,16,10
+    PUSHBUTTON      "+",8208,210,30,16,10
+    PUSHBUTTON      "-",8209,210,40,16,10
+    PUSHBUTTON      "*",8210,226,30,16,10
+    PUSHBUTTON      "/",8211,226,40,16,10
+    PUSHBUTTON      "sqrt",8212,242,30,16,10
+    PUSHBUTTON      "^",8213,242,40,16,10
+    PUSHBUTTON      "==",8191,210,50,48,10
+    PUSHBUTTON      "shl",8214,162,70,16,10
+    PUSHBUTTON      "shr",8215,178,70,16,10
+    PUSHBUTTON      "rol",8216,194,70,16,10
+    PUSHBUTTON      "ror",8217,210,70,16,10
+    PUSHBUTTON      "mod",8218,226,70,16,10
+    PUSHBUTTON      "asc",8219,242,70,16,10
+    PUSHBUTTON      "0",8192,162,60,16,10
+    PUSHBUTTON      "xor",8220,178,60,16,10
+    PUSHBUTTON      "or",8221,194,60,16,10
+    PUSHBUTTON      "and",8222,210,60,16,10
+    PUSHBUTTON      "M+",8223,162,80,16,10
+    PUSHBUTTON      "M-",8224,178,80,16,10
+    PUSHBUTTON      "MR",8225,194,80,16,10
+    PUSHBUTTON      "MC",8226,210,80,16,10
+    PUSHBUTTON      "C",8227,162,90,16,10
+    PUSHBUTTON      "CE",8228,178,90,16,10
+    PUSHBUTTON      "Pointer2Offset",8229,162,100,96,10
+    EDITTEXT        3,162,110,20,12,NOT WS_BORDER,WS_EX_CLIENTEDGE
+    LTEXT           ":",0,182,110,3,12,NOT WS_GROUP | WS_TABSTOP
+    EDITTEXT        4,185,110,40,12,NOT WS_BORDER,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Offset2Pointer",8230,162,123,96,10
+END
+
+107 DIALOGEX 0, 0, 100, 24
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Hex<->Dec"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    EDITTEXT        1,15,0,65,12,NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    LTEXT           "Hex",0,0,0,15,12,NOT WS_GROUP | WS_TABSTOP
+    LTEXT           "Dec",9,0,12,15,12,NOT WS_GROUP | WS_TABSTOP
+    EDITTEXT        2,15,12,65,12,NOT WS_BORDER,WS_EX_CLIENTEDGE
+    PUSHBUTTON      ">Dec",3,80,0,20,12
+    PUSHBUTTON      ">Hex",4,80,12,20,12
+END
+
+108 DIALOGEX 0, 0, 316, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Fire Red Movement Planner"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Copy to &Document",3,126,168,70,14,WS_GROUP
+    PUSHBUTTON      "Copy to Clip&board",2,196,168,70,14
+    PUSHBUTTON      "&Close",1,266,168,50,14
+    CONTROL         200,4,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE,273,0,15,14,WS_EX_STATICEDGE
+    CONTROL         201,5,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE,287,13,15,14,WS_EX_STATICEDGE
+    CONTROL         202,6,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE,258,13,15,14,WS_EX_STATICEDGE
+    CONTROL         203,7,"Static",SS_BITMAP | SS_NOTIFY | SS_REALSIZEIMAGE | SS_SUNKEN,273,26,15,14,WS_EX_STATICEDGE
+    GROUPBOX        "Movement Speed",IDC_STATIC,248,40,68,62
+    CONTROL         "Look",100,"Button",BS_AUTORADIOBUTTON | WS_GROUP,255,49,31,10
+    CONTROL         "Walk V Slowly",101,"Button",BS_AUTORADIOBUTTON,255,59,59,10
+    CONTROL         "Walk Slowly",102,"Button",BS_AUTORADIOBUTTON,255,69,53,10
+    CONTROL         "Walk",103,"Button",BS_AUTORADIOBUTTON,255,79,31,10
+    CONTROL         "Run",104,"Button",BS_AUTORADIOBUTTON,255,89,29,10
+    CONTROL         "",14,"Static",SS_OWNERDRAW,0,0,170,130
+    LISTBOX         13,170,0,75,130,LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Delete",10,207,130,38,10
+    PUSHBUTTON      "Delete All",12,207,140,38,10,BS_MULTILINE
+    GROUPBOX        "Jump Length",IDC_STATIC,248,102,68,44
+    CONTROL         "On Spot",105,"Button",BS_AUTORADIOBUTTON,255,112,42,10
+    CONTROL         "1 Square",106,"Button",BS_AUTORADIOBUTTON,255,122,45,10
+    CONTROL         "2 Squares",107,"Button",BS_AUTORADIOBUTTON,255,132,48,10
+    PUSHBUTTON      "^",8,170,130,13,10
+    PUSHBUTTON      "v",9,170,140,13,10
+    CONTROL         206,15,"Static",SS_BITMAP | SS_NOTIFY | WS_TABSTOP,0,130,9,9
+    CONTROL         207,16,"Static",SS_BITMAP | SS_NOTIFY | WS_TABSTOP,9,130,9,9
+    CONTROL         208,17,"Static",SS_BITMAP | SS_NOTIFY | WS_TABSTOP,19,130,9,9
+    CONTROL         209,18,"Static",SS_BITMAP | SS_NOTIFY | WS_TABSTOP,29,130,9,9
+    CONTROL         210,19,"Static",SS_BITMAP | SS_NOTIFY | WS_TABSTOP,39,130,9,9
+END
+
+109 DIALOGEX 0, 0, 316, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Script Search"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        2,0,9,174,120,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "C&ompile",3,0,129,56,15
+    CONTROL         "Script",11,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,60,139,34,10
+    CONTROL         "THUMB",12,"Button",BS_AUTORADIOBUTTON,60,148,39,10
+    CONTROL         "Text",13,"Button",BS_AUTORADIOBUTTON,60,158,31,10
+    CONTROL         "Pointer",25,"Button",BS_AUTORADIOBUTTON,60,168,39,10
+    CONTROL         "Moves",19,"Button",BS_AUTORADIOBUTTON,100,139,37,10
+    CONTROL         "Mart",21,"Button",BS_AUTORADIOBUTTON,100,148,31,10
+    CONTROL         "Attacks",22,"Button",BS_AUTORADIOBUTTON,100,158,40,10
+    CONTROL         "Level Script",17,"Button",BS_AUTORADIOBUTTON,100,168,53,10
+    EDITTEXT        14,173,9,143,120,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    EDITTEXT        4,173,129,61,14,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "Search &Next",5,235,129,50,14,WS_DISABLED
+    PUSHBUTTON      "<<",6,173,144,15,14,WS_DISABLED
+    PUSHBUTTON      "<",7,188,144,16,14,WS_DISABLED
+    PUSHBUTTON      ">",8,204,144,15,14,WS_DISABLED
+    PUSHBUTTON      ">>",9,219,144,15,14,WS_DISABLED
+    PUSHBUTTON      "&Add to Script",16,235,144,50,14,WS_DISABLED
+    CONTROL         "I&gnore Last Byte (for text)",24,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,173,158,97,10
+    DEFPUSHBUTTON   "&Close",1,266,168,50,14
+    LTEXT           "Enter your script to search for: (without #org)",0,0,0,150,8
+    GROUPBOX        "Decompile as",10,56,130,102,50
+    LTEXT           "Decompiled output:",15,174,0,63,8
+    LTEXT           "0xBA matches anything.",23,0,144,53,19
+    PUSHBUTTON      "C&lear Script",26,173,168,50,14
+END
+
+3070 DIALOGEX 0, 0, 260, 57
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "CAPTION"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&OK",1,200,4,54,14
+    PUSHBUTTON      "&Cancel",2,200,22,54,14
+    LTEXT           "PROMPT",3,4,4,192,32,NOT WS_GROUP
+    COMBOBOX        4,4,40,252,12,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+3071 DIALOGEX 0, 0, 262, 147
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "[Fire Red] Flag List"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        1,10,134,65,13,ES_UPPERCASE | ES_AUTOHSCROLL
+    PUSHBUTTON      "&Add",3,75,135,24,12
+    LISTBOX         2,0,0,134,135,LBS_SORT | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        5,162,0,99,15,ES_AUTOHSCROLL
+    EDITTEXT        6,133,15,128,120,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL
+    PUSHBUTTON      "&Delete",7,99,135,36,12
+    DEFPUSHBUTTON   "&Close",9,227,135,34,12
+    LTEXT           "0x",10,0,136,10,11
+    EDITTEXT        4,135,2,26,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER,WS_EX_TRANSPARENT
+    PUSHBUTTON      "&Reset",8,135,135,36,12
+    PUSHBUTTON      "Read this",11,171,135,56,12
+END
+
+3072 DIALOGEX 0, 0, 193, 105
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ROM Locker / Unlocker"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Close",1,143,91,50,14
+    CONTROL         "Detection Method &1",3,"Button",BS_AUTORADIOBUTTON,13,11,79,10
+    CONTROL         "Detection Method &2",4,"Button",BS_AUTORADIOBUTTON,13,21,79,10
+    CONTROL         "Detection Method &3",5,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,13,31,79,10
+    CONTROL         "Detection Method &4",6,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,13,41,79,10
+    CONTROL         "Detection Method &5",7,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,13,51,79,10
+    GROUPBOX        "Unlock",IDC_STATIC,3,1,99,102
+    PUSHBUTTON      "&Detect",8,26,61,50,16
+    EDITTEXT        9,33,83,40,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Save",2,73,83,25,15
+    PUSHBUTTON      "&Lock!",10,111,14,70,26
+    GROUPBOX        "Randomized Lock",IDC_STATIC,104,1,87,47
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,79,99,2,WS_EX_STATICEDGE
+    PUSHBUTTON      "&Load",11,7,83,25,15
+END
+
+#ifdef SCRAP
+3073 DIALOGEX 0, 0, 370, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ScrapPunk Tools"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",1000,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,0,0,370,12
+    LISTBOX         5,43,44,96,131,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",3,"SearchableList",WS_TABSTOP,148,65,119,95
+    EDITTEXT        4,181,160,40,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Load",6,0,183,88,19
+    PUSHBUTTON      "&Save",1,0,203,88,19,WS_DISABLED
+    PUSHBUTTON      "&Close",2,284,203,86,19
+    LTEXT           "Item:",7,147,57,18,8
+    LTEXT           "Chance:",9,147,162,28,8
+    GROUPBOX        "Pickup Data",8,143,49,130,126
+    LTEXT           "ScrapPunk is the name of the Rom Hacking team that Score_Under is now a part of - all extra tools we need for our hacking will go here.",10,94,185,183,35
+    PUSHBUTTON      "&Load",51,0,183,88,19,NOT WS_VISIBLE
+    PUSHBUTTON      "&Save Current Item",52,0,203,88,19,NOT WS_VISIBLE | WS_DISABLED
+    CONTROL         "",50,"SearchableList",NOT WS_VISIBLE | WS_TABSTOP,4,17,134,163
+    GROUPBOX        "Item Data",53,142,17,221,182,NOT WS_VISIBLE
+    LTEXT           "Name:",54,144,27,25,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "(13 characters max)",55,169,40,67,9,NOT WS_VISIBLE
+    EDITTEXT        56,169,25,96,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        57,294,26,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "ID:",58,277,27,16,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "Price:",60,144,56,25,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    EDITTEXT        61,169,54,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "???:",62,155,71,13,9,NOT WS_VISIBLE
+    EDITTEXT        63,169,69,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Not In Battle Func:",66,292,98,70,9,NOT WS_VISIBLE
+    EDITTEXT        67,291,107,70,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Pocket:",68,222,52,45,9,NOT WS_VISIBLE
+    EDITTEXT        69,169,84,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "???:",70,297,59,13,9,NOT WS_VISIBLE
+    EDITTEXT        71,311,57,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "In-Battle Function:",72,292,72,69,9,NOT WS_VISIBLE
+    EDITTEXT        73,291,83,70,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Description:",74,148,131,40,9,NOT WS_VISIBLE
+    EDITTEXT        75,144,141,216,56,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_VISIBLE | WS_VSCROLL
+    EDITTEXT        76,293,42,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "HP/PP Restore:",77,235,43,58,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "???:",64,155,86,13,9,NOT WS_VISIBLE
+    EDITTEXT        65,222,123,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Type:",78,146,100,45,9,NOT WS_VISIBLE
+    EDITTEXT        79,169,110,24,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        81,145,110,24,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Items",82,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,64,34,10
+    CONTROL         "Key Items",83,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,73,48,10
+    CONTROL         "Pokeballs",84,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,83,45,10
+    CONTROL         "TM Case",85,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,93,43,10
+    CONTROL         "Berry Pouch",86,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,103,55,10
+    CONTROL         "Other:",87,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,112,37,10
+    LTEXT           "Remember to save each item before changing to another item - you will not be asked to save your changes.",80,92,202,185,18,NOT WS_VISIBLE
+END
+
+3074 DIALOGEX 0, 0, 370, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ScrapPunk Tools"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Load",51,0,183,88,19,NOT WS_VISIBLE
+    PUSHBUTTON      "&Save Current Item",52,0,203,88,19,NOT WS_VISIBLE | WS_DISABLED
+    CONTROL         "",50,"SearchableList",NOT WS_VISIBLE | WS_TABSTOP,4,17,134,163
+    GROUPBOX        "Item Data",53,142,17,221,182,NOT WS_VISIBLE
+    LTEXT           "Name:",54,144,27,25,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "(13 characters max)",55,169,40,67,9,NOT WS_VISIBLE
+    EDITTEXT        56,169,25,96,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        57,294,26,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "ID:",58,277,27,16,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "Price:",60,144,56,25,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    EDITTEXT        61,169,54,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "???:",62,155,71,13,9,NOT WS_VISIBLE
+    EDITTEXT        63,169,69,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Not In Battle Func:",66,292,98,70,9,NOT WS_VISIBLE
+    EDITTEXT        67,291,107,70,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Pocket:",68,222,52,45,9,NOT WS_VISIBLE
+    EDITTEXT        69,169,84,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "???:",70,297,59,13,9,NOT WS_VISIBLE
+    EDITTEXT        71,311,57,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "In-Battle Function:",72,292,72,69,9,NOT WS_VISIBLE
+    EDITTEXT        73,291,83,70,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Description:",74,148,131,40,9,NOT WS_VISIBLE
+    EDITTEXT        75,144,141,216,56,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | NOT WS_VISIBLE | WS_VSCROLL
+    EDITTEXT        76,293,42,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "HP/PP Restore:",77,235,43,58,9,NOT WS_VISIBLE,WS_EX_RIGHT
+    LTEXT           "???:",64,155,86,13,9,NOT WS_VISIBLE
+    EDITTEXT        65,222,123,46,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    LTEXT           "Type:",78,146,100,45,9,NOT WS_VISIBLE
+    EDITTEXT        79,169,110,24,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    EDITTEXT        81,145,110,24,14,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Items",82,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,64,34,10
+    CONTROL         "Key Items",83,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,73,48,10
+    CONTROL         "Pokeballs",84,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,83,45,10
+    CONTROL         "TM Case",85,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,93,43,10
+    CONTROL         "Berry Pouch",86,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,103,55,10
+    CONTROL         "Other:",87,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE,222,112,37,10
+    LTEXT           "Remember to save each item before changing to another item - you will not be asked to save your changes.",80,92,202,185,18,NOT WS_VISIBLE
+END
+
+3075 DIALOGEX 0, 0, 370, 222
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ScrapPunk Tools"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",1000,"SysTabControl32",TCS_MULTILINE | WS_TABSTOP,0,0,370,12
+    LISTBOX         5,43,44,96,131,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",3,"SearchableList",WS_TABSTOP,148,65,119,95
+    EDITTEXT        4,181,160,40,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Load",6,0,183,88,19
+    PUSHBUTTON      "&Save",1,0,203,88,19,WS_DISABLED
+    PUSHBUTTON      "&Close",2,284,203,86,19
+    LTEXT           "Item:",7,147,57,18,8
+    LTEXT           "Chance:",9,147,162,28,8
+    GROUPBOX        "Pickup Data",8,143,49,130,126
+    LTEXT           "ScrapPunk is the name of the Rom Hacking team that Score_Under is now a part of - all extra tools we need for our hacking will go here.",10,94,185,183,35
+END
+#endif
+
+#ifndef ZH
+#ifndef DOES_NOT_UPDATE
+3076 DIALOGEX 0, 0, 160, 50
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Current version"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Your version of PKSV is up-to-date.",0,0,4,160,12,SS_CENTER
+    CHECKBOX "Check for updates automatically",1,24,16,136,12,BS_AUTOCHECKBOX
+    PUSHBUTTON "OK",2,36,28,88,14
+END
+
+3077 DIALOGEX 0, 0, 160, 60
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Old version"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT "Your version of PKSV is not up-to-date.\nDownload the new version?",0,0,4,160,22,SS_CENTER
+    CHECKBOX "Check for updates automatically",1,24,26,136,12,BS_AUTOCHECKBOX
+    PUSHBUTTON "Yes",2,31,38,44,14
+    PUSHBUTTON "No",3,85,38,44,14
+END
+#endif
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+4 MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_NEW
+        MENUITEM "&Open\tCtrl+O",               ID_OPEN
+        MENUITEM "&Save\tCtrl+S",               ID_SAVE
+        MENUITEM "Save &As\tF12",               ID_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "&Page Setup",                 1200
+        MENUITEM "&Print",                      1201
+        MENUITEM SEPARATOR
+        MENUITEM "Alwa&ys on top",              1031
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tAlt+F4",               1007
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               1015
+        MENUITEM "&Redo\tCtrl+Y",               1016
+        MENUITEM SEPARATOR
+        MENUITEM "Select &All\tCtrl+A",         1017
+        MENUITEM SEPARATOR
+        MENUITEM "C&ut\tCtrl+X",                1008
+        MENUITEM "&Copy\tCtrl+C",               1009
+        MENUITEM "&Paste\tCtrl+V",              1010
+        MENUITEM SEPARATOR
+        MENUITEM "Find / &Replace\tCtrl+F",     1012
+        MENUITEM "&Goto line\tCtrl+G",          1018
+        MENUITEM SEPARATOR
+        MENUITEM "C&ollapse before end",        1020
+        MENUITEM "Collapse e&mpty lines",       1021
+        MENUITEM SEPARATOR
+        MENUITEM "Auto-Au&tocomplete",          1112
+    END
+    POPUP "RO&M"
+    BEGIN
+        MENUITEM "Open &ROM",                   1006
+        MENUITEM SEPARATOR
+        MENUITEM "&Compile\tF9",                1004
+        MENUITEM "&Decompile\tF8",              1014
+        MENUITEM SEPARATOR
+        MENUITEM "&Test!\tCtrl+T",              1030
+        MENUITEM "&Debug (Fake compile)",       1202
+        MENUITEM SEPARATOR
+        MENUITEM "&Find Free Space\tCtrl+P",    1005
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Script Generator",           1013
+        MENUITEM "Movement &Helper\tCtrl+M",    1203
+        MENUITEM SEPARATOR
+        MENUITEM "&Calculator and Notes",       1032
+        MENUITEM "Hex <-> &Dec",                1101
+        MENUITEM SEPARATOR
+        MENUITEM "&Flag List\tCtrl+L",          1103
+        MENUITEM "Scrip&t Search\tCtrl+E",      1102
+        MENUITEM SEPARATOR
+        POPUP "Extras"
+        BEGIN
+#ifdef SCRAP
+            MENUITEM "Sc&rapPunk Tools",            1105
+            MENUITEM SEPARATOR
+#endif
+            MENUITEM "GBA Only:",                   2, GRAYED
+            MENUITEM "ROM Locker / &Unlocker",      1104
+        END
+        MENUITEM SEPARATOR
+#ifndef ZH
+#ifndef DOES_NOT_UPDATE
+        MENUITEM "&Update",                     1204
+#endif
+#endif
+        MENUITEM "&About",                      1100
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+10 ACCELERATORS 
+BEGIN
+    "N",            ID_NEW,                 VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_OPEN,                VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_SAVE,                VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         ID_SAVEAS,              VIRTKEY, NOINVERT
+    VK_F9,          1004,                   VIRTKEY, NOINVERT
+    "P",            1005,                   VIRTKEY, CONTROL, NOINVERT
+    "F",            1012,                   VIRTKEY, CONTROL, NOINVERT
+    "H",            1012,                   VIRTKEY, CONTROL, NOINVERT
+    VK_F8,          1014,                   VIRTKEY, NOINVERT
+    "G",            1018,                   VIRTKEY, CONTROL, NOINVERT
+    "T",            1030,                   VIRTKEY, CONTROL, NOINVERT
+    "E",            1102,                   VIRTKEY, CONTROL, NOINVERT
+    VK_SPACE,       1111,                   VIRTKEY, CONTROL, NOINVERT
+    "M",            1203,                   VIRTKEY, CONTROL, NOINVERT
+    VK_ESCAPE,      2000,                   VIRTKEY, NOINVERT
+    "L",            1103,                   VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+1 VERSIONINFO
+ FILEVERSION 2,1,0,0
+ PRODUCTVERSION 2,1,0,0
+ FILEFLAGSMASK 0x0L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "08090000"
+        BEGIN
+            VALUE "Comments", "Frontend for PKSV Script Editor"
+            VALUE "CompanyName", "Score_Under"
+            VALUE "FileDescription", "Pokemon Script Editor IDE for PKSV"
+            VALUE "FileVersion", "2.1.0"
+            VALUE "InternalName", "pksvui"
+            VALUE "LegalCopyright", "No Copyright - GPL License"
+            VALUE "LegalTrademarks", "No Trademarks - GPL License"
+            VALUE "OriginalFilename", "pksvui.exe"
+            VALUE "ProductName", "PKSV - Pokemon Script Editor + GUI"
+            VALUE "ProductVersion", "2.1.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 0
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\0"
+END
+
+GUIDELINES DESIGNINFO 
+BEGIN
+    105, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 56
+    END
+
+    108, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 180
+    END
+
+    3070, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 56
+    END
+
+    3071, DIALOG
+    BEGIN
+        RIGHTMARGIN, 261
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+#if !defined(__GNUC__)
+3070 DLGINIT
+BEGIN
+    4, 0x403, 14, 0
+0x6554, 0x7473, 0x6e69, 0x5c67, 0x5430, 0x7365, 0x0074, 
+    0
+END
+#endif
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    3000                    "Error while attempting to create a socket."
+    3001                    "PKSV-UI - Error!"
+    3002                    "PKSV-UI - Update Available!"
+    3003                    "A new version is available. Download now?"
+    3004                    "Error while loading WinSock."
+    3005                    "Could not register window. Check integrity of system DLLs."
+    3006                    "Could not register window. It worked last time..."
+    3007                    "Could not load Scintilla.dll! Make sure you extracted PKSV-UI correctly!"
+END
+
+STRINGTABLE 
+BEGIN
+    3008                    "Untitled"
+    3009                    "PKSV-UI - First-run info - CHANGELOG"
+    3010                    "IMPORTANT: If you have not done so with previous versions, run AssociateShell.bat!\n\nHISTORY:\nAll unmarked versions are bugfixes or small features\n\n2.1.1: Fixed title bar, implemented disabling of auto-update (about time!), fixed problems with 16-bit monitors, etc\n\n2.1.0: Gold #dynamic support (:labels for 2-byte, @blocks for 3-byte)\n\n2.0.5: Script searcher (ctrl+e), Flags list (ctrl+l), more decompiling options, code labelling, and a ROM locker. And more behind-the-scenes work, too. A lot of it.\n\n2.0.3: Added more decompiling options, added THUMB disassembly support. Some bugs fixed. Enjoy!\n2.0.0: Drag and Drop files onto the window, syntax-highlighted printing, Fire Red movement planner, and ported to MSVC! Considering creating a plugin system and turning PKSV.exe into a DLL.\n\n1.5.0: Guess what? This program can now script for Pokemon Gold!\nIn other news, I just added tooltips to the toolbar, made some dialogs non-modal,\nand added pointer<->offset conversion for Pokemon Gold.\n\nV1.4.4 Added a toolbar.\n\nV1.4.1: I have sorted all of the autocomplete lists, made them\ncase-insensetive and added an option to enable auto-autocomplete (in edit menu).\nAlso added a question-mark icon to unknown commands.\n\nV1.4.0: Just so you know, CTRL+Space brings up autocomplete. It has 4 different\nsets of autocompletable commands."
+    3011                    "Could not create the main container window."
+    3012                    "Could not create the window for Scintilla."
+    3013                    "An unknown error occured while reading the notes file. Sorry!\n\n[Size mismatch]"
+    3014                    "PKSV User Interface - http://pokecommunity.com/"
+    3015                    "An unknown error occured while reading the file. Sorry!\n\n[Size mismatch]"
+    3016                    "' Write script here, or press Tools -> Script Generator\n' to do it automatically.\n\n"
+    3017                    "Do you want to save your work?"
+    3018                    "PKSV-UI - Exiting"
+    3019                    "PKSV-UI - New File"
+    3020                    "Printing page %i..."
+    3021                    "Choose a file to open"
+    3022                    "PKSV-UI - File Write Error"
+    3023                    "An error just happened to happen. Details to follow, press control-c to copy.\nPress OK to see the error."
+END
+
+STRINGTABLE 
+BEGIN
+    3024                    "PKSV-UI - Error Opening File for Writing"
+    3025                    "Normal|Invert light (dark background)|Black on white|Color on white|Color on white (except line numbers)"
+    3026                    "Choose a ROM to open"
+    3027                    "No ROM open!"
+    3028                    "Warning"
+    3029                    "VERSION "
+    3030                    "\nThis program is by Score_Under.\nTo use with AdvanceMap, once you have chosen this program, select ""No"" on the dialog that appears.\nMost of this program should be self-explanatory,\nIf not, PM me (short link in Script Generator section)"
+    3031                    "About"
+    3032                    "Do you want to save your work?\n\nThis is recommended as ScriptGen overwrites the current script."
+    3033                    "Do you want to save your work?\n\nThis is required to compile it."
+    3034                    "Please make sure a ROM is open."
+    3035                    "Reached end of text - starting at opposite end of document."
+    3036                    "No matches found"
+    3037                    "Replaced %u matches."
+    3038                    "Finished!"
+    3039                    "Wait..."
+END
+
+STRINGTABLE 
+BEGIN
+    3040                    "Decompiling"
+    3041                    "Failed to start PKSV :("
+    3042                    "Find Item ScriptGen"
+    3043                    "Please enter the item ID:"
+    3044                    "Please enter the item amount:\nPrefix with 0x for hexadecimal, (0xF = 15) or do not prefix for decimal (15 = 15)"
+    3045                    "Give Item ScriptGen"
+    3046                    "Please enter the flag number:\nIt's best to start at 0x200 or 0x1000 and then increase by 1 each time."
+    3047                    "Give Pokemon ScriptGen"
+    3048                    "Please enter the Pokemon ID:"
+    3049                    "Please enter the level:\nPrefix with 0x for hexadecimal, (0xF = 15) or do not prefix for decimal (15 = 15)"
+    3050                    "Choose a file to save to"
+    3051                    "Road-Closed ScriptGen"
+    3052                    "Please enter the flag number for the completed event:\nNeeds to be present in another script, handling the event"
+    3053                    "Please enter the the AdvanceMap Person Event Number of the person:"
+    3054                    "Please enter an unused flag number:\nand then set AdvanceMap's Person ID of the person to this number"
+    3055                    "PokeBattle ScriptGen"
+END
+
+STRINGTABLE 
+BEGIN
+    3056                    "Please enter an unused flag number:\nand then set AdvanceMap's Person ID of the pokemon to this number"
+    3057                    "Talking ScriptGen"
+    3058                    "Please enter the required text:"
+    3059                    "Please enter the type of message:\nMSG_NORMAL, MSG_SIGN, MSG_NOCLOSE?"
+    3060                    "Incorrect pointer format."
+    3061                    "Incorrect offset format."
+    3062                    "TrainerBattle ScriptGen"
+    3063                    "Enter the Trainer ID:\nEdit and find IDs with PET or equivalent."
+    3064                    "Enter the Attack ID:\nE.G. FURYSWIPES, or WILLOWISP"
+    3065                    "HM-Move ScriptGen"
+    3066                    "This document doesn't contain any text to be printed."
+    3067                    "Filename, Current Date and Time|Filename, Current Date|Filename|Leave blank"
+    3068                    "Page Number|Leave blank"
+    3069                    "Failed to load PKSV.DLL or failed to load one of PKSV.DLL's functions."
+    3070                    "Warning: PKSV.dll version mismatch! Try downloading the package again."
+    3071                    "PKSV-UI - Warning!"
+END
+
+STRINGTABLE 
+BEGIN
+    3072                    "Item Crafting ScriptGen"
+    3073                    "Please enter the item that will not be destroyed:"
+    3074                    "Please enter the item to use up:"
+    3075                    "Please enter the amount of that item to use up:"
+    3076                    "Please enter the item that will be made:"
+    3077                    "Quick Starter ScriptGen"
+    3078                    "Choose a starter Pokemon:"
+    3079                    "Choose the starter's level:"
+    3080                    "Choose a hold item for the starter:"
+    3081                    "Choose the TM you want to start with:"
+    3082                    "Choose an item to start with:"
+    IDS_STRING3083          "Choose the amount:"
+    IDS_STRING3084          "Choose another item to start with:"
+    IDS_STRING3085          "Reset flags list"
+    IDS_STRING3086          "Choose a hold item:"
+    IDS_STRING3087          "Need item to proceed ScriptGen"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STRING3088          "One of the files could not be opened."
+    IDS_STRING3089          "Flags mean nothing. They are defined completely by the scripts that use them.\nIf you want to remove one of the items, then the flag that item used is now free to use with anything else.\nThis list is also not exhaustive; it starts out filled with some default flags and is intended as a place to record your flag usage and to find unused flags.\nIf you delete the guy at Nugget Bridge, you can then use his flag for something entirely different, like a ""Give Pokemon"" event."
+    IDS_STRING3090          "Read This"
+    IDS_STRING3091          "Reset Flags"
+    IDS_STRING3092          "Are you really sure you want to reset the flags list? This is not reversible!"
+    IDS_STRING3093          "Move Tutor ScriptGen"
+    IDS_STRING3094          "What attack should be taught? (This is currently a table index, don't use an attack ID)"
+    IDS_STRING3095          "Script Search"
+    IDS_STRING3096          "ROM could not be read from."
+    IDS_STRING3097          "This is for GBA only - you will have to do it manually for GBC games."
+    IDS_STRING3098          "This tool is for FR/LG only.\n\n(Most of PKSV, however, works with any game)"
+    IDS_STRING3099          "No such item! Please correct any spelling errors and use the correct case."
+    3100                    "Flag Skeleton ScriptGen"
+    3101                    "Earthquake ScriptGen"
+    3102                    "How strong should the earthquake be horizontally?\n(Recommended below 15)"
+    3103                    "How strong should the earthquake be vertically?\n(Recommended below 15)"
+    3104                    "What delay should there be between camera movement?\n(Recommended 3, larger number = slower quake)"
+END
