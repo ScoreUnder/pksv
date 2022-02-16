@@ -35,6 +35,7 @@ SRC_PKSV_COMMON = \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
+RES_PKSV_SHLIB = src_pksv/pksv.rc
 
 SRC_PKSVUI = src_pksvui/pksvui.c
 RES_PKSVUI = src_pksvui/vcpksv2.rc
@@ -49,7 +50,7 @@ OBJ_PKSVUI_P_win = $(RES_PKSVUI:.rc=.o)
 OBJ_PKSVUI = $(SRC_PKSVUI:.c=.o) $(OBJ_PKSVUI_P_$(PLATFORM))
 
 OBJ_PKSV_MAIN = $(SRC_PKSV_MAIN:.c=.o)
-OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o)
+OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o) $(RES_PKSV_SHLIB:.rc=.o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
@@ -58,7 +59,7 @@ BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
 BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
 
-DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:.sh_o=.sh_d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
+DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
 
 PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)

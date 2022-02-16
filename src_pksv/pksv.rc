@@ -1,0 +1,61 @@
+#include <windows.h>
+
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+#endif //_WIN32
+
+10 DIALOGEX 0, 0, 240, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_PALETTEWINDOW
+CAPTION "Dynamic Offsets"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",1,190,88,50,14
+    PUSHBUTTON      "&Copy",2,0,88,50,14
+    LISTBOX         3,0,0,240,88,LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "Copy &All",4,50,88,140,14
+END
+
+11 DIALOGEX 0, 0, 191, 100
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_PALETTEWINDOW
+CAPTION "Compiler log"
+FONT 10, "Courier New", 400, 0, 0x0
+BEGIN
+    EDITTEXT        1,0,0,191,100,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL
+END
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 2,0,5,0
+ PRODUCTVERSION 2,0,5,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x0L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904b0"
+        BEGIN
+            VALUE "Comments", "Free software! Use it now!"
+            VALUE "CompanyName", "Score_Under"
+            VALUE "FileDescription", "PKSV backend DLL"
+            VALUE "FileVersion", "2, 0, 5, 0"
+            VALUE "InternalName", "pksv"
+            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "OriginalFilename", "pksv.dll"
+            VALUE "ProductName", "PKSV"
+            VALUE "ProductVersion", "2, 0, 5, 0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 1200
+    END
+END
