@@ -1844,17 +1844,17 @@ commentstyle:
 			case 1007:
 				if (NotSaved)
 				{
-					i=MessageBox(MainWnd,GetString1(3017),GetString2(3018),0x23);//yes 6 no 7 cancel 2
-					if (i==6)
+					i=MessageBox(MainWnd,GetString1(3017),GetString2(3018), MB_YESNOCANCEL | MB_ICONQUESTION);
+					if (i == IDYES)
 					{
 						SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
 						if (NotSaved)
 						{
-							i=2;
+							i = IDCANCEL;
 						}
 					}
 				}
-				if (i!=2)
+				if (i != IDCANCEL)
 				{
 					exiting();
 					ExitProcess(0);
@@ -1864,7 +1864,7 @@ commentstyle:
 				i=0;
 				if (NotSaved)
 				{
-					i=MessageBox(MainWnd,GetString1(3017),GetString2(3019),0x23);//yes 6 no 7 cancel 2
+					i=MessageBox(MainWnd,GetString1(3017),GetString2(3019), MB_YESNOCANCEL | MB_ICONQUESTION);
 					if (i==6)
 					{
 						SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
@@ -1901,16 +1901,16 @@ commentstyle:
 			case ID_OPEN:
 				if (NotSaved)
 				{
-					i=MessageBox(MainWnd,GetString1(3017),GetString2(3019),0x23);//yes 6 no 7 cancel 2
-					if (i==6)
+					i=MessageBox(MainWnd,GetString1(3017),GetString2(3019), MB_YESNOCANCEL | MB_ICONQUESTION);
+					if (i == IDYES)
 					{
 						SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
 						if (NotSaved)
 						{
-							i=2;
+							i = IDCANCEL;
 						}
 					}
-					if (i==2)
+					if (i == IDCANCEL)
 					{
 						break;
 					}
@@ -2352,17 +2352,17 @@ ScrapPunkCode:
 				i=0;
 				if (NotSaved)
 				{
-					i=MessageBox(MainWnd,GetString1(3032),GetString2(3028),0x23);//yes 6 no 7 cancel 2
-					if (i==6)
+					i=MessageBox(MainWnd,GetString1(3032),GetString2(3028), MB_YESNOCANCEL | MB_ICONQUESTION);
+					if (i == IDYES)
 					{
 						SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
 						if (NotSaved)
 						{
-							i=2;
+							i = IDCANCEL;
 						}
 					}
 				}
-				if (i!=2)
+				if (i != IDCANCEL)
 				{
 					if (*RomOpen2!=0)
 					{
@@ -2748,17 +2748,17 @@ teleport_from;1|teleport_to;1|tree_animate;1|waterfall_down;1|waterfall_left;1|w
 			i=0;
 			if (NotSaved)
 			{
-				i=MessageBox(MainWnd,GetString1(3017),GetString2(3018),0x23);//yes 6 no 7 cancel 2
-				if (i==6)
+				i=MessageBox(MainWnd,GetString1(3017),GetString2(3018), MB_YESNOCANCEL | MB_ICONQUESTION);
+				if (i == IDYES)
 				{
 					SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
 					if (NotSaved)
 					{
-						i=2;
+						i = IDCANCEL;
 					}
 				}
 			}
-			if (i!=2)
+			if (i != IDCANCEL)
 			{
 				exiting();
 				ExitProcess(0);
@@ -3094,16 +3094,16 @@ BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			{
 				if (NotSaved)
 				{
-					i=MessageBox(MainWnd,GetString1(3017),GetString2(3040),0x23);//yes 6 no 7 cancel 2
-					if (i==6)
+					i=MessageBox(MainWnd,GetString1(3017),GetString2(3040), MB_YESNOCANCEL | MB_ICONQUESTION);
+					if (i == IDYES)
 					{
 						SendMessage(MainWnd,WM_COMMAND,ID_SAVE,0);
 						if (NotSaved)
 						{
-							i=2;
+							i = IDCANCEL;
 						}
 					}
-					if (i==2)break;
+					if (i == IDCANCEL)break;
 				}
 				GetDlgItemText(DecWin,3,posbuf,40);
 				/*SetCurrentDirectory(DirBuffer);
