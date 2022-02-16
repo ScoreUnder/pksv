@@ -3079,44 +3079,6 @@ BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 					if (i == IDCANCEL)break;
 				}
 				GetDlgItemText(DecWin,3,posbuf,40);
-				/*SetCurrentDirectory(DirBuffer);
-				strcpy(SuperBuffer,"pksv \"");
-				strcat(SuperBuffer,RomOpen2);
-				strcat(SuperBuffer,"\" \"");
-				strcat(SuperBuffer,posbuf);
-				strcat(SuperBuffer,"\" _d_.pks.tmp");
-				ZeroMemory(&si,sizeof(si));
-				ZeroMemory(&pi,sizeof(pi));
-				si.cb=sizeof(si);
-				strcpy(GreatBuffer,DirBuffer);
-				strcat(GreatBuffer,"pksv.exe");
-				if(!CreateProcess(GreatBuffer,SuperBuffer,NULL,NULL,0,DETACHED_PROCESS,NULL,NULL,&si,&pi))
-				{
-				  MessageBox(MainWnd,GetString1(3041),GetString2(3001),0x10);
-				  return 0;
-				}
-				WaitForSingleObject(pi.hProcess,60000);
-				strcpy(FileOpen2,"_d_.pks.tmp");
-				strcpy(FileOpen3,"_d_.pks.tmp");
-				strcpy(FileOpen,FileOpen3);
-				strcat(FileOpen2," - Score_Under's PKSV-UI");
-				SetWindowText(MainWnd,FileOpen2);
-				fileM=CreateFile(FileOpen3,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-				if(GetLastError()!=0)
-				{
-				  FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,0,GetLastError(),0,(char*)&ptr,2000,NULL);
-				  MessageBox(MainWnd,ptr,ptr,0x10);
-				  LocalFree(ptr);
-				  return 0;
-				}
-				fsize=SetFilePointer(fileM,0,NULL,FILE_END);
-				ptr=GlobalAlloc(GPTR,fsize+1);
-				SetFilePointer(fileM,0,NULL,FILE_BEGIN);
-				ReadFile(fileM,ptr,fsize,&read,NULL);
-				if(read!=fsize)
-				{
-				  MessageBox(MainWnd,GetString1(3015),GetString2(3001),0x10);
-				}*/
 				strcpy(FileOpen2,GetString1(3008));
 				strcat(FileOpen2," - Score_Under's PKSV-UI");
 				SetWindowText(MainWnd,FileOpen2);
@@ -3176,10 +3138,7 @@ BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				SendEditor(SCI_GOTOPOS,0,0);
 				SendEditor(SCI_CHOOSECARETX,0,0);
 				if (ptr)
-					GlobalFree(ptr);
-				/*
-				CloseHandle(fileM);
-				*/
+					free(ptr);
 				ShowWindow(DecWin,SW_HIDE);
 				EnableWindow(MainWnd,1);
 				SetFocus(Text);
@@ -5716,7 +5675,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				if (mem)
 				{
 					SetWindowText(GetDlgItem(ScriptSearchWin,14),mem);
-					GlobalFree(mem);
+					free(mem);
 				}
 			}
 			else
@@ -5765,7 +5724,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			if (mem)
 			{
 				SetWindowText(GetDlgItem(ScriptSearchWin,14),mem);
-				GlobalFree(mem);
+				free(mem);
 			}
 			break;
 		case 8:
@@ -5809,7 +5768,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			if (mem)
 			{
 				SetWindowText(GetDlgItem(ScriptSearchWin,14),mem);
-				GlobalFree(mem);
+				free(mem);
 			}
 			break;
 		case 6:
@@ -5853,7 +5812,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			if (mem)
 			{
 				SetWindowText(GetDlgItem(ScriptSearchWin,14),mem);
-				GlobalFree(mem);
+				free(mem);
 			}
 			break;
 		case 9:
@@ -5897,7 +5856,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			if (mem)
 			{
 				SetWindowText(GetDlgItem(ScriptSearchWin,14),mem);
-				GlobalFree(mem);
+				free(mem);
 			}
 			break;
 		case 16:

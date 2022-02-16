@@ -34,15 +34,6 @@ char dyntype=1;
 HINSTANCE inst=NULL;
 bool dyndec=false;
 int dynplace=0;
-#define malloc(x) GlobalAlloc(GPTR,x)
-/*
-#define STRINGIFY(x) #x
-#define TOSTRING(x) STRINGIFY(x)
-#define AT __FILE__ ":" TOSTRING(__LINE__)
-
-#define malloc(x) GlobalAlloc(GPTR,x);OutputDebugString("Malloc at "AT);
-*/
-#define free(x) GlobalFree(x)
 char mode=FIRE_RED;
 bool VersionOverride = false;
 char GlobBuf[65536];
