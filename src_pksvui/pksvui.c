@@ -1441,33 +1441,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 #define StrDefault GetString1(3016)
 	switch (msg)
 	{
-#ifdef SCRAP
-	case WM_DRAWITEM:
-		if (((LPDRAWITEMSTRUCT)lParam)->hwndItem==ScrapPunk)
-		{
-			dc=CreateCompatibleDC(((LPDRAWITEMSTRUCT)lParam)->hDC);
-			SelectObject(dc,(HBRUSH)(COLOR_WINDOW+11));
-			Rectangle(((LPDRAWITEMSTRUCT)lParam)->hDC,0,0,32,32);
-			SelectObject(dc,SPIcon);/*
-        GetVersionEx(&ver);
-		if(ver.dwMajorVersion<=4)
-		{*/
-			BitBlt(((LPDRAWITEMSTRUCT)lParam)->hDC,
-			       0,0,32,32,dc,0,0,SRCCOPY);/*
-		}
-		else
-		{
-		  blend.AlphaFormat=AC_SRC_ALPHA;
-		  blend.BlendFlags=0;
-		  blend.BlendOp=AC_SRC_OVER;
-		  blend.SourceConstantAlpha=255;
-		  AlphaBlend(((LPDRAWITEMSTRUCT)lParam)->hDC,
-			0,0,32,32,dc,0,0,32,32,blend);
-		}*/
-			DeleteDC(dc);
-		}
-		return 1;
-#endif
 	case WM_NOTIFY:
 		if (hwnd==MainWnd)
 		{
