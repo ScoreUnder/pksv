@@ -39,6 +39,7 @@ RES_PKSVUI = src_pksvui/vcpksv2.rc
 
 SRC_PROCESS_DEFINES = tools/process-defines.c src_common/binarysearch.c
 SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
+SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c
 
 GENERATED_SOURCES = pksv/sublang/gsc_moves.c pksv/sublang/gsc_moves_reverse.c
 
@@ -49,6 +50,7 @@ OBJ_PKSV_MAIN = $(SRC_PKSV_MAIN:.c=.o)
 OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
+OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
 
 DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:.sh_o=.sh_d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
 
@@ -70,10 +72,10 @@ check: $(PKSV) defines.dat
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) tools/process-defines$(EXE_EXT) tools/gperf-but-in-reverse$(EXE_EXT) defines.dat
+	rm -f -- $(PKSV) $(PKSV_SHLIB) tools/process-defines$(EXE_EXT) tools/gperf-but-in-reverse$(EXE_EXT) tools/process-defines-reverse$(EXE_EXT) defines.dat
 
 mostlyclean: clean-fmem
-	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
@@ -93,6 +95,9 @@ tools/process-defines$(EXE_EXT): $(OBJ_PROCESS_DEFINES)
 
 tools/gperf-but-in-reverse$(EXE_EXT): $(OBJ_GPERF_REVERSE)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_GPERF_REVERSE) -o $@
+
+tools/process-defines-reverse$(EXE_EXT): $(OBJ_PROCESS_DEFINES_REVERSE)
+	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES_REVERSE) -o $@
 
 $(PKSV): $(OBJ_PKSV_MAIN)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(CFLAGS)  $(OBJ_PKSV_MAIN) -o $@

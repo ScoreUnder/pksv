@@ -9,5 +9,5 @@ PokeScrE.log
 vgcore.*
 /defines.dat
 # /pksv
-/tools/gperf-but-in-reverse
-/tools/process-defines
+/tools/*
+!/tools/*.c
