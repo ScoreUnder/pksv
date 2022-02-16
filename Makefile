@@ -53,6 +53,10 @@ OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
 
+BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
+BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
+BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
+
 DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:.sh_o=.sh_d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
 
 PKSV = pksv$(EXE_EXT)
@@ -73,7 +77,7 @@ check: $(PKSV) defines.dat
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) tools/process-defines$(EXE_EXT) tools/gperf-but-in-reverse$(EXE_EXT) tools/process-defines-reverse$(EXE_EXT) defines.dat
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) defines.dat
 
 mostlyclean: clean-fmem
 	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
@@ -88,16 +92,16 @@ $(LIB_FMEM)/Makefile:
 	mkdir -p $(LIB_FMEM)
 	cd $(LIB_FMEM) && $(CMAKE) -DBUILD_TESTING=false ..
 
-defines.dat: src_pksv/pokeinc_default.txt tools/process-defines$(EXE_EXT)
-	$(TOOL_WRAPPER) tools/process-defines$(EXE_EXT) src_pksv/pokeinc_default.txt
+defines.dat: src_pksv/pokeinc_default.txt $(BIN_PROCESS_DEFINES)
+	$(TOOL_WRAPPER) $(BIN_PROCESS_DEFINES) src_pksv/pokeinc_default.txt
 
-tools/process-defines$(EXE_EXT): $(OBJ_PROCESS_DEFINES)
+$(BIN_PROCESS_DEFINES): $(OBJ_PROCESS_DEFINES)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES) -o $@
 
-tools/gperf-but-in-reverse$(EXE_EXT): $(OBJ_GPERF_REVERSE)
+$(BIN_GPERF_REVERSE): $(OBJ_GPERF_REVERSE)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_GPERF_REVERSE) -o $@
 
-tools/process-defines-reverse$(EXE_EXT): $(OBJ_PROCESS_DEFINES_REVERSE)
+$(BIN_PROCESS_DEFINES_REVERSE): $(OBJ_PROCESS_DEFINES_REVERSE)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES_REVERSE) -o $@
 
 $(PKSV): $(OBJ_PKSV_MAIN)
@@ -109,8 +113,8 @@ $(PKSV_SHLIB): $(OBJ_PKSV_SHLIB) $(LIB_FMEM_A)
 $(PKSVUI): $(OBJ_PKSVUI)
 	$(LINK.c) $(OBJ_PKSVUI) $(LIBS_PKSVUI) -o $@
 
-src_pksv/sublang/gsc_moves_reverse.c: src_pksv/sublang/gsc_moves.gperf tools/gperf-but-in-reverse$(EXE_EXT)
-	$(TOOL_WRAPPER) tools/gperf-but-in-reverse < src_pksv/sublang/gsc_moves.gperf > $@ || { rm -f -- $@; false; }
+src_pksv/sublang/gsc_moves_reverse.c: src_pksv/sublang/gsc_moves.gperf $(BIN_GPERF_REVERSE)
+	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < src_pksv/sublang/gsc_moves.gperf > $@ || { rm -f -- $@; false; }
 
 .SUFFIXES: .sh_o .o .c .gperf .rc
 .c.sh_o:
