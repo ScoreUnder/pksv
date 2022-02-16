@@ -111,7 +111,6 @@ char*GetString2(unsigned short id)
 	LoadString(inst,id,strbuffer2,sizeof(strbuffer2));
 	return strbuffer2;
 }
-#include "print.h"
 BOOL CALLBACK FindReplaceFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 BOOL CALLBACK GotoFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 BOOL CALLBACK FFSFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -864,7 +863,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 	else
 		ToolBar=CreateToolbarEx(MainWnd,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|CCS_ADJUSTABLE|CCS_NODIVIDER|CCS_NOMOVEY|TBSTYLE_TOOLTIPS,5000,20,inst,5,ToolButtons,sizeof(ToolButtons)/sizeof(TBBUTTON),16,16,16,16,sizeof(TBBUTTON));
 	DragAcceptFiles(MainWnd,1);
-	EditPrintInit();
 	if (MainWnd==NULL)
 	{
 		MessageBox(NULL,GetString1(3011),GetString2(3001),0x10);
@@ -2267,12 +2265,6 @@ OpenRoms:
 				strcat(GreatBuffer,INTERNAL_VERSION);
 				strcat(GreatBuffer,GetString1(3030));
 				MessageBox(MainWnd,GreatBuffer,GetString1(3031),0x40);
-				break;
-			case 1200:
-				EditPrintSetup(Text);
-				break;
-			case 1201:
-				EditPrint(Text,FileOpen2,"Page %u");
 				break;
 			case 1202:
 				if (*RomOpen2!=0)
