@@ -3430,7 +3430,7 @@ DWORD WINAPI HealScript(LPVOID x)
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	//fspace=FindFreeSpace(RomOpen2,0x100,0x740000);
-	sprintf(MegaBuffer,"#dyn 0x740000\n#org @\nlockall\nmessage @healmsg\nshowmsg\nwaitbutton\nfadescreen 1\nclosemsg\nspecial 0\nfadescreen 0\nmsgbox @bettermsg\ncallstd MSG_NORMAL\nreleaseall\nend\n\n#org @healmsg\n= Your POKÈMON look tired[.]\\nYou should give them a rest.\n\n#org @bettermsg\n= There. All better now!\n");
+	sprintf(MegaBuffer,"#dyn 0x740000\n#org @\nlockall\nmessage @healmsg\nshowmsg\nwaitbutton\nfadescreen 1\nclosemsg\nspecial 0\nfadescreen 0\nmsgbox @bettermsg\ncallstd MSG_NORMAL\nreleaseall\nend\n\n#org @healmsg\n= Your POK\\eMON look tired[.]\\nYou should give them a rest.\n\n#org @bettermsg\n= There. All better now!\n");
 	SendEditor(SCI_CANCEL,0,0);
 	SendEditor(SCI_SETUNDOCOLLECTION,0,0);
 	SendEditor(SCI_EMPTYUNDOBUFFER,0,0);
