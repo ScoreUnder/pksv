@@ -198,16 +198,16 @@ __declspec(dllexport) __cdecl char* decompile(char*fname,int loc,int narc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProc(romfile, mode == DIAMOND ? narc : 0,loc,fname,log_file);
+  DecodeProc(romfile, mode == DIAMOND ? narc : 0,loc,fname,script_file);
 
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
 {
@@ -217,15 +217,15 @@ __declspec(dllexport) __cdecl char* decompileASM(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcASM(romfile,loc,fname,log_file);
+  DecodeProcASM(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileText(char*fname,int loc)
 {
@@ -235,15 +235,15 @@ __declspec(dllexport) __cdecl char* decompileText(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcText(romfile,loc,fname,log_file);
+  DecodeProcText(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
 {
@@ -253,15 +253,15 @@ __declspec(dllexport) __cdecl char* decompileLevel(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcLevel(romfile,loc,fname,log_file);
+  DecodeProcLevel(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompilePointer(char*fname,int loc)
 {
@@ -271,15 +271,15 @@ __declspec(dllexport) __cdecl char* decompilePointer(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcPointer(romfile,loc,fname,log_file);
+  DecodeProcPointer(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileMoves(char*fname,int loc)
 {
@@ -289,15 +289,15 @@ __declspec(dllexport) __cdecl char* decompileMoves(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcMoves(romfile,loc,fname,log_file);
+  DecodeProcMoves(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileMart(char*fname,int loc)
 {
@@ -307,15 +307,15 @@ __declspec(dllexport) __cdecl char* decompileMart(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcMart(romfile,loc,fname,log_file);
+  DecodeProcMart(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 __declspec(dllexport) __cdecl char* decompileAttacks(char*fname,int loc)
 {
@@ -325,15 +325,15 @@ __declspec(dllexport) __cdecl char* decompileAttacks(char*fname,int loc)
   romfile=fopen(fname,"r+b");
   if (!romfile)return "'Error opening ROM";
 
-  START_FMEM(log_file);
+  START_FMEM(script_file);
 
-  DecodeProcAttacks(romfile,loc,fname,log_file);
+  DecodeProcAttacks(romfile,loc,fname,script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
 
-  END_FMEM(log_file);
-  return log_file_str;
+  END_FMEM(script_file);
+  return script_file_str;
 }
 int dlg_active,compiling=0;
 __declspec(dllexport) __cdecl int compile(char*fname,char*to_recompile)
