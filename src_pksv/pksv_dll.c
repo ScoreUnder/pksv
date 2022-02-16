@@ -180,6 +180,7 @@ static void* memdup(void *ptr, size_t len)
 
 #define END_FMEM(vname) do{}while(0); \
   putc('\0', vname); \
+  fflush(vname); \
   char *vname##_str = NULL; \
   size_t vname##_len = 0; \
   fmem_mem(&vname##_fmem, (void**)&vname##_str, &vname##_len); \
