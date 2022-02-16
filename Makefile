@@ -23,7 +23,8 @@ CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic -DDLL
 LDFLAGS_CONSOLE =
 LDFLAGS =
-LDFLAGS_SH =
+LDFLAGS_SH = -L$(LIB_FMEM)
+LDLIBS_SH = -lfmem
 
 LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
 
@@ -100,10 +101,10 @@ tools/process-defines-reverse$(EXE_EXT): $(OBJ_PROCESS_DEFINES_REVERSE)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES_REVERSE) -o $@
 
 $(PKSV): $(OBJ_PKSV_MAIN)
-	$(LINK.c) $(LDFLAGS_CONSOLE) $(CFLAGS)  $(OBJ_PKSV_MAIN) -o $@
+	$(LINK.c) $(LDFLAGS_CONSOLE) $(CFLAGS) $(OBJ_PKSV_MAIN) -o $@
 
 $(PKSV_SHLIB): $(OBJ_PKSV_SHLIB) $(LIB_FMEM_A)
-	$(LINK.c) $(CFLAGS_SH) $(LDFLAGS_SH) $(OBJ_PKSV_SHLIB) -L$(LIB_FMEM) -lfmem -o $@
+	$(LINK.c) $(CFLAGS_SH) $(LDFLAGS_SH) $(OBJ_PKSV_SHLIB) $(LDLIBS_SH) -o $@
 
 $(PKSVUI): $(OBJ_PKSVUI)
 	$(LINK.c) $(OBJ_PKSVUI) $(LIBS_PKSVUI) -o $@
