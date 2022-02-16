@@ -63,7 +63,7 @@ PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
 PKSVUI = pksvui$(EXE_EXT)
 
-all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat
+all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll
 
 check: $(PKSV) defines.dat
 	bunzip2 -fkq src_pksv/tests/fakerom.gba.bz2
@@ -84,6 +84,10 @@ mostlyclean: clean-fmem
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
+
+# Lets us run pksvui from the root of the source tree
+Scintilla.dll: src_pksvui/Scintilla.dll
+	ln -s src_pksvui/Scintilla.dll Scintilla.dll
 
 $(LIB_FMEM)/gen/fmem.h $(LIB_FMEM_A): $(LIB_FMEM)/Makefile
 	$(MAKE) -C $(LIB_FMEM) VERBOSE=1
