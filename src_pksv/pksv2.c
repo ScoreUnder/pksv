@@ -27,6 +27,7 @@
 #include "isdone.h"
 #include "decompiler.h"
 #include "recompiler.h"
+#include "romutil.h"
 
 bool dyndec = false;
 int dynplace=0;
@@ -41,8 +42,6 @@ FILE*LogFile;
 char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
-
-void determine_mode(FILE *romfile);
 
 int main(int argc,char**argv)
 {
@@ -182,7 +181,14 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
     return 1;
   }
   if (autodetect_mode)
-    determine_mode(romfile);
+  {
+    struct rom_mode rom_mode = determine_mode(romfile);
+    if (rom_mode.type != ROM_UNKNOWN)
+    {
+      mode = rom_mode.type;
+      search = rom_mode.search;
+    }
+  }
   if (command_line==TXT)
   {
     otherfile=fopen(export_name,"wb");
@@ -233,43 +239,4 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
   }
   fclose(romfile);
   return 0;
-}
-
-void determine_mode(FILE *romfile)
-{
-  char determine_mode[4];
-  //Determine (de)compilation mode
-  fseek(romfile,0xAC,SEEK_SET);
-  fread(determine_mode,1,3,romfile);
-  if (determine_mode[0]=='A'&&determine_mode[1]=='X')
-  {
-    mode=RUBY;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P')
-  {
-    mode=FIRE_RED;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P'&&determine_mode[2]=='E')
-  {
-    search=0;
-  }
-  fseek(romfile,0x13F,SEEK_SET);
-  fread(determine_mode,1,2,romfile);
-  if ((determine_mode[0]=='A'&&determine_mode[1]=='A')||(determine_mode[0]=='S'&&determine_mode[1]=='M'))
-  {
-    mode=GOLD;
-    search=0;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='Y')
-  {
-    mode=CRYSTAL;
-    search=0;
-  }
-  fseek(romfile,0x0,SEEK_SET);
-  fread(determine_mode,1,4,romfile);
-  if (determine_mode[0]=='N'&&determine_mode[1]=='A'&&determine_mode[2]=='R'&&determine_mode[3]=='C')
-  {
-    mode=DIAMOND;
-    search=0;
-  }
 }

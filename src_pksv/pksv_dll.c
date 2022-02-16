@@ -27,6 +27,7 @@
 #include "recompiler.h"
 #include "decompiler.h"
 #include "codeproc.h"
+#include "romutil.h"
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>
@@ -48,8 +49,6 @@ signed int OffsetToPointer(unsigned int offset);
 int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 int TxtDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG,HW_TXT;
-//Determining mode
-char determine_mode[5];
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,
                     DWORD fdwReason,
                     LPVOID lpvReserved)
@@ -102,44 +101,17 @@ __declspec(dllexport) __cdecl int NewMode(int nmode)
 }
 __declspec(dllexport) __cdecl int DetermineMode(char*rom)
 {
-  register FILE*romfile;
+  FILE*romfile;
   VersionOverride=0;
   if (!(romfile=fopen(rom,"rb")))
   {
     return -1;
   }
-  fseek(romfile,0xAC,SEEK_SET);
-  fread(determine_mode,1,3,romfile);
-  if (determine_mode[0]=='A'&&determine_mode[1]=='X')
+  struct rom_mode rom_mode = determine_mode(romfile);
+  if (rom_mode.type != ROM_UNKNOWN)
   {
-    mode=RUBY;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P')
-  {
-    mode=FIRE_RED;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='P'&&determine_mode[2]=='E')
-  {
-    search=0;
-  }
-  fseek(romfile,0x13F,SEEK_SET);
-  fread(determine_mode,1,2,romfile);
-  if ((determine_mode[0]=='A'&&determine_mode[1]=='A')||(determine_mode[0]=='S'&&determine_mode[1]=='M'))
-  {
-    mode=GOLD;
-    search=0;
-  }
-  if (determine_mode[0]=='B'&&determine_mode[1]=='Y')
-  {
-    mode=CRYSTAL;
-    search=0;
-  }
-  fseek(romfile,0x0,SEEK_SET);
-  fread(determine_mode,1,4,romfile);
-  if (determine_mode[0]=='N'&&determine_mode[1]=='A'&&determine_mode[2]=='R'&&determine_mode[3]=='C')
-  {
-    mode=DIAMOND;
-    search=0;
+    mode = rom_mode.type;
+    search = rom_mode.search;
   }
   fclose(romfile);
   return mode;
