@@ -25,18 +25,19 @@
 
 #include "textproc.h"
 #include "codeproc.h"
+#include "textutil.h"
 #include "pksv.h"
 
 #include "sublang/moves.h"
 
 char trans[65536];
 
-void log_txt(char*str, size_t length)
+void log_txt(const char *str, size_t length)
 {
  	fwrite(str, 1, length, LogFile ? LogFile : stderr);
 }
 
-char*transtxt(int howfar,char*file)
+char*transtxt(int howfar,const char*file)
 {
 	unsigned int pt=0,sl,arg1,arg2;
 	unsigned char p,code;
@@ -548,7 +549,7 @@ char*transtxt(int howfar,char*file)
 	return trans;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
-char*transbrl(int howfar,char*file,FILE*fsend)
+char*transbrl(int howfar,const char*file,FILE*fsend)
 {
 	unsigned int pt=0;
 	unsigned char p;
@@ -622,14 +623,12 @@ char*transbrl(int howfar,char*file,FILE*fsend)
 	return 0;
 }
 
-char*transmove(int howfar,char*file)
+char*transmove(int howfar,const char*file)
 {
-	unsigned int read;
 	char still_going,nextraw,failsafe=0;
 	FILE*fileC;
 	unsigned char p;
 	char buf[10];
-	read=0;
 	fileC=fopen(file,"rb");
 	if (fileC!=NULL)
 	{
@@ -648,7 +647,7 @@ char*transmove(int howfar,char*file)
 			}
 			if (mode==GOLD||mode==CRYSTAL)
 			{
-				char *cmd = lookup_gsc_move_reverse(p);
+				const char *cmd = lookup_gsc_move_reverse(p);
 				if (cmd != NULL) {
 					strcat(trans, cmd);
 				} else {
@@ -1079,6 +1078,18 @@ char*transmove(int howfar,char*file)
 	}
 	return trans;
 }
+
+void err_bad_hex(const char*ptr, size_t len) {
+  char *cpy = malloc(len + 1);
+  char *log_str = malloc(len + 100);
+  memcpy(cpy, ptr, len);
+  cpy[len] = '\0';
+  int log_str_len = sprintf(log_str, "Invalid hex string: \"%s\"\n", cpy);
+  log_txt(log_str, log_str_len);
+  free(log_str);
+  free(cpy);
+}
+
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
@@ -1087,7 +1098,6 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 	char cch,noend=0;
 	char str[65536];
 	unsigned int i=0,j=0,k,l;
-	char lb[5]; //Little Buffer
 #ifndef DLL
 	unsigned int read;
 	FILE*scrfile;
@@ -1214,12 +1224,12 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 					break;
 				}
 				else if (str[i]=='h') {
-					i++;
-					lb[0]=str[i];
-					i++;
-					lb[1]=str[i];
-					lb[2]=0;
-					sscanf(lb,"%x",&k);
+          // Raw hex escape
+          if (hex_to_uint32(str + i + 1, 2, &k) != str + i + 3) {
+            err_bad_hex(str + i + 1, 2);
+            // return?
+          }
+          i += 2;
 					k=k&0xff;
 					NewSpace[j]=k;
 				}
@@ -1399,12 +1409,11 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 					NewSpace[j]=0xFC;
 				}
 				else if (str[i]=='h') {
-					i++;
-					lb[0]=str[i];
-					i++;
-					lb[1]=str[i];
-					lb[2]=0;
-					sscanf(lb,"%x",&k);
+          // Hex escape
+          if (hex_to_uint32(str + i + 1, 2, &k) != str + i + 3) {
+            err_bad_hex(str + i + 1, 2);
+          }
+					i += 2;
 					k=k&0xff;
 					NewSpace[j]=k;
 				}
@@ -1484,9 +1493,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 	i=*ii;
 	while (script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 	{
-		while (script[i]==' ') {
-			i++;
-		}
+    i = skip_whitespace(script, i);
 		size_t cmdbuf_size = 0;
 		while (script[i]!=' '&&script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 		{

@@ -21,9 +21,12 @@
 
 #include "codeproc.h"
 #include "binarysearch.h"
+#include "textutil.h"
 #include "textproc.h"
 #include "sulib.h"
 #include "pksv.h"
+
+const char ARG_END_CHARS[] = "\' ,\n";
 
 unsigned int fail;
 
@@ -212,27 +215,35 @@ signed int OffsetToPointer(unsigned int offset)
   return (pointer<<8)|bank;
 }
 
+static void log_bad_int(const char *where)
+{
+  char *format = "Unknown value in %s (Value must be integer)\r\n";
+  char *buf = malloc(strlen(where) + strlen(format) + 1);
+  sprintf(buf, format, where);
+  log_txt(buf, strlen(buf));
+  free(buf);
+}
+
 #define Defined(thing) ((WhatIs(thing)&0)|!fail)
 #define chr Script[i]
+/// GenForFunc Success
 unsigned char gffs;
-unsigned int GenForFunc(char*func,
-                        unsigned int*ii,
+
+/** @brief Gets a numeric value for a given pokescript function. */
+uint32_t GenForFunc(char*func,
+                        pos_int *ppos,
                         char*Script,
                         struct bsearch_root *defines,
-                        codeblock*c) //Generates number for function
+                        codeblock*c)
 {
-  unsigned int j=0,k=0,l=0,i;
-  //unsigned int read;
-  char buf[1024],buf2[1024],buf3[1024];
+  uint32_t result = 0;
+  char buf[1024], log_buf[1024];
   gffs=0;
-  i=*ii;
-  while (chr==' ')
-  {
-    i++;
-  }
+  pos_int i = skip_whitespace(Script, *ppos);
+
   if (chr=='@'||chr==':')
   {
-    j=0;
+    size_t j=0;
     while (chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
     {
       buf[j]=chr;
@@ -241,109 +252,70 @@ unsigned int GenForFunc(char*func,
     }
     buf[j]=0;
     add_insert(c,c->size,buf);
-    sprintf(buf3,"DYN-> %s\r\n",buf);
+    sprintf(log_buf,"DYN-> %s\r\n",buf);
     if(IsVerbose)
-			log_txt(buf3,strlen(buf3));
+			log_txt(log_buf,strlen(log_buf));
     gffs=1;
-    *ii=i;
+    *ppos=i;
     return 0x08000000;
   }
-  if ((chr>0x2F&&chr<0x3A)||chr=='$')
+  else if ((chr >= '0' && chr <= '9') || chr == '$')
   {
-    i++;
-    if ((chr=='x'&&Script[i-1]=='0')||Script[i-1]=='$')
-    {
-      j=0;
-      if (chr=='x') {
-        i++;
-      }
-      while (chr!=' '&&chr!='\n'&&chr!=0&&chr!='\'')
-      {
-        buf[j]=chr;
-        i++;
-        j++;
-      }
-      buf[j]=0;
-      j=0;
-      k=0;
-      l=buf[9];
-      buf[9]=0;
-      strcpy(buf2,"0123456789abcdef");
-      buf[9]=l;
-      l=0;
-      while (buf[l]!=0)
-      {
-        k=k<<4;
-        j=0;
-        while (buf2[j]!=0&&buf2[j]!=buf[l])
-        {
-          j++;
-        }
-        if (buf2[j]==0||j>15) {
-          break;
-        }
-        k|=j;
-        l++;
-      }
-      if (IsVerbose)
-      {
-        sprintf(buf3,"   -> 0x%X\r\n",k);
-        log_txt(buf3,strlen(buf3));
-      }
+    const char *end;
+    if ((Script[i] == '0' && Script[i + 1] == 'x') || Script[i] == '$') {
+      if (Script[i] == '$') i++;
+      else i += 2;
+
+      end = hex_to_uint32(&Script[i], SIZE_MAX, &result);
+    } else {
+      end = dec_to_uint32(&Script[i], SIZE_MAX, &result);
     }
-    else
-    {
-      i--;
-      j=0;
-      while (chr>0x2F&&chr<0x3A)
-      {
-        buf2[j]=chr;
-        i++;
-        j++;
-      }
-      buf2[j]=0;
-      if (buf2[0]==0)
-      {
-        sprintf(buf2,"You need to enter more arguments to %s\r\n",func);
-        log_txt(buf2,strlen(buf2));
-        return 0;
-      }
-      k=atoi(buf2);
-      if (IsVerbose)
-      {
-        sprintf(buf3,"   -> 0x%X\r\n",k);
-        log_txt(buf3,strlen(buf3));
-      }
+
+    i += end - &Script[i];
+
+    if (strchr(ARG_END_CHARS, *end) == NULL && *end != '\0') {
+      *ppos=i;
+      log_bad_int(func);
+      return 0;
     }
+
+    if (IsVerbose) {
+      sprintf(log_buf,"   -> 0x%X\r\n", result);
+      log_txt(log_buf,strlen(log_buf));
+    }
+
+    gffs=1;
+    *ppos=i;
+    return result;
   }
   else
   {
-    j=0;
+    size_t j=0;
     while (chr!=' '&&chr!='\n'&&chr!='\''&&chr!=0)
     {
-      buf3[j]=chr;
+      buf[j]=chr;
       i++;
       j++;
     }
-    buf3[j]=0;
-    size_t index = bsearch_find_if_exists(defines, buf3);
+    buf[j]=0;
+    *ppos=i;
+
+    size_t index = bsearch_find_if_exists(defines, buf);
     if (index != defines->size)
     {
       gffs=1;
-      *ii=i;
       uint32_t value = (uint32_t)(intptr_t) defines->pairs[index].value;
       if (IsVerbose)
       {
-        sprintf(buf2,"   -> %s\r\n      -> 0x%X\r\n",buf3,value);
-        log_txt(buf2,strlen(buf2));
+        sprintf(log_buf,"   -> %s\r\n      -> 0x%X\r\n",buf,value);
+        log_txt(log_buf,strlen(log_buf));
       }
       return value;
     }
-    sprintf(buf2,"Unknown value in %s (Value must be integer)\r\n",func);
-    log_txt(buf2,strlen(buf2));
-    return 0;
+    else
+    {
+      log_bad_int(func);
+      return 0;
+    }
   }
-  gffs=1;
-  *ii=i;
-  return k;
 }

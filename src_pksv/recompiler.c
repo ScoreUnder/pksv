@@ -28,6 +28,7 @@
 #include "recompiler.h"
 #include "textproc.h"
 #include "codeproc.h"
+#include "textutil.h"
 #include "pokedef.h"
 #include "golddef.h"
 #include "sulib.h"
@@ -36,95 +37,101 @@
 #define chr Script[i]
 
 #define aa(x) else if (!strcmp(buf,x))
-#define ec() e_c(Script,&i)
-#define rom(x,s) {if(eorg){j=0xFFFFFFFF;}else{j=x;}if(c!=NULL)add_data(c,(char*)&j,s);}
-#define BASIC(x) rom(x,1)
+#define ec() end_command(Script,&i)
+
+// TODO: when is c==NULL? is that acceptable?
+#define rom(x,s) do{ \
+    uint32_t rom_m_data; \
+    if(eorg) rom_m_data = search | (search << 8) | (search << 16) | (search << 24); \
+    else rom_m_data = (x); \
+    if (c != NULL) add_data(c, (char*)&rom_m_data, (s)); \
+  }while(0)
+
+#define BASIC(x) rom((x), 1)
 
 char *defines_dat_location = NULL;
 
 int thumb=1;
-void e_c(char*Script,unsigned int*ii)
+void end_command(const char *in, pos_int *ppos)
 {
-  register unsigned int i=*ii;
-  while (Script[i+1]==' ') {
-    i++;
-  }
-  if (Script[i+1]=='\'') {
-    while (Script[i+1]!='\n'&&Script[i+1]!=0) {
-      i++;
+  pos_int pos = skip_whitespace(in, *ppos);
+
+  if (in[pos] == '\'') {
+    // Skip line comment
+    while (in[pos] != '\0' && in[pos] != '\n') {
+      pos++;
+    }
+  } else {
+    // Make sure the line has ended
+    if (in[pos] != '\0' && in[pos] != '\n') {
+      // TODO: make this an error
+      log_txt("Extra characters on line. Ignoring.\r\n",37);
+      while (in[pos] != '\0' && in[pos] != '\n') {
+        pos++;
+      }
     }
   }
-  if (Script[i+1]!='\n'&&chr!='\n') {
-    log_txt("Extra characters on line. Ignoring.\r\n",37);
-  }
-  while (chr!='\n') {
-    i++;
-  }
-  *ii=i;
+
+  *ppos = pos;
   return;
 }
-void vlog_txt(char*x)
+
+void vlog_txt(const char *x)
 {
-  if (IsVerbose)
-  {
+  if (IsVerbose) {
     log_txt(x,strlen(x));
   }
 }
 #ifdef WIN32
 unsigned int needdlg=0;
 #endif
-int GetReg(char*s,unsigned int*i)
+int GetReg(const char *in, pos_int *ppos)
 {
-  register char*a=s+*i;
-  register int b=0;
-  while (*a==' ')a++;
-  if (*a!='r')return -1;
-  a++;
-  while (*a>='0'&&*a<='9')
-  {
-    b*=10;
-    b+=*a-'0';
-    a++;
+  pos_int pos = skip_whitespace(in, *ppos);
+
+  if (in[pos] != 'r') return -1;
+  pos++;
+
+  uint32_t result;
+  const char* end = dec_to_uint32(&in[pos], SIZE_MAX, &result);
+  if (strchr(ARG_END_CHARS, *end) == NULL) {
+    pos--;
+    char *token = extract_text_interval(&in[pos], end);
+    char *errmsg = malloc(end - &in[pos] + 64);
+    sprintf(errmsg, "Bad register number: %s\n", token);
+    free(token);
+    free(errmsg);
+    log_txt(errmsg, strlen(errmsg));
   }
-  while (*a==' ')a++;
-  if (*a==',') {
-    a++;
-    while (*a==' ')a++;
-    a--;
-  }
-  a++;
-  *i=a-s;
-  return b;
+
+  *ppos = skip_whitespace_and_comma(in, pos);
+  return result;
 }
 #define REG() GetReg(Script,&i)
-int GetHex(char*s,unsigned int*i)
+
+uint32_t GetHex(const char *in, pos_int *ppos)
 {
-  register char*a=s+*i;
-  register int b=0;
-  while (*a==' ')a++;
-  while ((*a>='0'&&*a<='9')||(*a>='a'&&*a<='f'))
-  {
-    b<<=4;
-    if (*a>='0'&&*a<='9')
-      b|=*a-'0';
-    else
-      b|=*a+0xA-'a';
-    a++;
+  pos_int pos = skip_whitespace(in, *ppos);
+  uint32_t result;
+
+  const char* end = hex_to_uint32(&in[pos], SIZE_MAX, &result);
+  if (strchr(ARG_END_CHARS, *end) == NULL) {
+    char *token = extract_text_interval(&in[pos], end);
+    char *errmsg = malloc(end - &in[pos] + 64);
+    sprintf(errmsg, "Bad hex constant: %s\n", token);
+    free(token);
+    free(errmsg);
+    log_txt(errmsg, strlen(errmsg));
   }
-  while (*a==' ')a++;
-  if (*a==',') {
-    a++;
-    while (*a==' ')a++;
-    a--;
-  }
-  a++;
-  *i=a-s;
-  return b;
+
+  *ppos = skip_whitespace_and_comma(in, pos);
+  return result;
 }
 #define HEX() GetHex(Script,&i)
-void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
+
+void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
 {
-  unsigned int i=*ii;
+  unsigned int i=*ppos;
   int j; // used in rom macro
   register int arg1,arg2,arg3;
   ///////////////////ASM////////////////////
@@ -139,7 +146,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
         log_txt("Bad arguments to THUMB LSL\r\n",28);
         return;
       }
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if ((chr>='0'&&chr<='9')||(chr>='a'&&chr<='f'))
       {
         arg3=HEX()&0x1F;
@@ -162,7 +169,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
         log_txt("Bad arguments to THUMB LSR\r\n",28);
         return;
       }
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if ((chr>='0'&&chr<='9')||(chr>='a'&&chr<='f'))
       {
         arg3=HEX()&0x1F;
@@ -185,7 +192,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
         log_txt("Bad arguments to THUMB ASR\r\n",28);
         return;
       }
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if ((chr>='0'&&chr<='9')||(chr>='a'&&chr<='f'))
       {
         arg3=HEX()&0x1F;
@@ -201,7 +208,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-add")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='s')
       {
         i++;
@@ -211,9 +218,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
           return;
         }
         i++;
-        while (chr==' ')i++;
-        if (chr==',')i++;
-        while (chr==' ')i++;
+        i = skip_whitespace_and_comma(Script, i);
         if (chr=='-')
         {
           arg2=0x80;
@@ -236,7 +241,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
             log_txt("Bad arguments to THUMB ADD\r\n",28);
             return;
           }
-          while (chr==' ')i++;
+          i = skip_whitespace(Script, i);
           if (chr=='r')
           {
             arg3=REG();
@@ -269,9 +274,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
             return;
           }
           i++;
-          while (chr==' ')i++;
-          if (chr==',')i++;
-          while (chr==' ')i++;
+          i = skip_whitespace_and_comma(Script, i);
           arg2=HEX();
           arg2/=4;
           arg2&=0xFF;
@@ -287,9 +290,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
             return;
           }
           i++;
-          while (chr==' ')i++;
-          if (chr==',')i++;
-          while (chr==' ')i++;
+          i = skip_whitespace_and_comma(Script, i);
           arg2=HEX();
           arg2/=4;
           arg2&=0xFF;
@@ -307,7 +308,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-sub")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='s')
       {
         i++;
@@ -317,9 +318,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
           return;
         }
         i++;
-        while (chr==' ')i++;
-        if (chr==',')i++;
-        while (chr==' ')i++;
+        i = skip_whitespace_and_comma(Script, i);
         if (chr=='-')
         {
           arg2=0x80;
@@ -342,7 +341,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
             log_txt("Bad arguments to THUMB SUB\r\n",28);
             return;
           }
-          while (chr==' ')i++;
+          i = skip_whitespace(Script, i);
           if (chr=='r')
           {
             arg3=REG();
@@ -378,9 +377,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
         log_txt("Bad arguments to THUMB MOV\r\n",28);
         return;
       }
-      while (i==' ')i++;
-      if (i==',')i++;
-      while (i==' ')i++;
+      i = skip_whitespace_and_comma(Script, i);
       if (chr=='r')
       {
         arg2=REG();
@@ -408,9 +405,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
         log_txt("Bad arguments to THUMB CMP\r\n",28);
         return;
       }
-      while (i==' ')i++;
-      if (i==',')i++;
-      while (i==' ')i++;
+      i = skip_whitespace_and_comma(Script, i);
       if (chr=='r')
       {
         arg2=REG();
@@ -1045,7 +1040,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-beq")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1061,7 +1056,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bne")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1077,7 +1072,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bcs")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1093,7 +1088,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bcc")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1109,7 +1104,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bmi")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1125,7 +1120,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bpl")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1141,7 +1136,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bvs")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1157,7 +1152,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bvc")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1173,7 +1168,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bhi")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1189,7 +1184,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bls")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1205,7 +1200,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bge")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1221,7 +1216,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-blt")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1237,7 +1232,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-bgt")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1253,7 +1248,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-ble")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1290,7 +1285,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
       arg3=REG();
       while (chr==','||chr==' '||chr=='{')i++;
       arg1=0;
-      while (chr!='}')
+      while (chr!='}' && chr != '\0' && chr != '\n')
       {
         arg2=REG();
         if ((unsigned)arg2<=7)
@@ -1305,7 +1300,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     }
     aa("-b")
     {
-      while (chr==' ')i++;
+      i = skip_whitespace(Script, i);
       if (chr=='-')arg1=1;
       else arg1=0;
       i++;
@@ -1346,7 +1341,7 @@ void try_asm_x(char*Script,unsigned int*ii,char*buf,codeblock*c)
     //do nothing at all :) not implemented yet
   }
   ///////////////////END////////////////////
-  *ii=i;
+  *ppos=i;
 }
 
 static int bsearch_key_strcmp(const void *a, const void *b)
@@ -1582,9 +1577,7 @@ void RecodeProc(char*script,char*romfn)
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
             vlog_txt("#DEFINE\r\n");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -1600,9 +1593,7 @@ void RecodeProc(char*script,char*romfn)
             buf[j]=0; //Append null
             sprintf(buf2,"   -> %s\r\n",buf);
             vlog_txt(buf2);
-            while (chr==' ') {
-              i++;    //The same old same old.
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -1733,7 +1724,7 @@ dp:
 								return;
 							}
 							BASIC(k);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -1831,17 +1822,12 @@ dp:
           aa(".")
           {
             vlog_txt("[BINARY]\r\n   ->");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
             {
               k=1-k;
-              while (chr==' ')
-              {
-                i++;
-              }
+              i = skip_whitespace(Script, i);
               if(chr>='0'&&chr<='9')j=chr-'0';
               else if(chr>='A'&&chr<='F')j=10+(chr-'A');
               if (((char*)("0123456789abcdef"))[j]==0)
@@ -1911,9 +1897,7 @@ dp:
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
             vlog_txt("#DEFINE\r\n");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -1929,9 +1913,7 @@ dp:
             buf[j]=0; //Append null
             sprintf(buf2,"   -> %s\r\n",buf);
             vlog_txt(buf2);
-            while (chr==' ') {
-              i++;    //The same old same old.
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -1974,7 +1956,7 @@ dp:
           {
             eorg=0;
             vlog_txt("#ORG\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
@@ -2016,7 +1998,7 @@ dp:
           {
             eorg=1;
             vlog_txt("#EORG\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
@@ -2108,7 +2090,7 @@ cry:
 								return;
 							}
 							BASIC(k);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -2516,7 +2498,7 @@ cry:
               return;
             }
             arg2&=0x1F;
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             j=0;
             while (chr!='\n'&&chr!=' '&&chr!=0&&chr!='\'')
             {
@@ -2562,7 +2544,7 @@ cry:
           aa("if")
           {
             vlog_txt("IF\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Incorrect arguments to IF.\r\n",28);
@@ -4137,17 +4119,12 @@ cry:
           aa(".")
           {
             vlog_txt("[BINARY]\r\n   ->");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
             {
               k=1-k;
-              while (chr==' ')
-              {
-                i++;
-              }
+              i = skip_whitespace(Script, i);
               j=0;
               while (((char*)("0123456789abcdef"))[j]!=0)
               {
@@ -4224,9 +4201,7 @@ cry:
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
             vlog_txt("#DEFINE\r\n");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -4242,9 +4217,7 @@ cry:
             buf[j]=0; //Append null
             sprintf(buf2,"   -> %s\r\n",buf);
             vlog_txt(buf2);
-            while (chr==' ') {
-              i++;    //The same old same old.
-            }
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Premature end to #DEFINE!\r\n",27);
@@ -4287,7 +4260,7 @@ cry:
           {
             eorg=0;
             vlog_txt("#ORG\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
@@ -4329,7 +4302,7 @@ cry:
           {
             eorg=1;
             vlog_txt("#EORG\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
@@ -4418,7 +4391,7 @@ gsc:
 								return;
 							}
 							BASIC(k);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -4434,7 +4407,7 @@ gsc:
 								return;
 							}
 							rom(k,2);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -4450,7 +4423,7 @@ gsc:
 								return;
 							}
 							rom(k,3);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -4466,7 +4439,7 @@ gsc:
 								return;
 							}
 							rom(k,4);
-							while(chr==' ')i++;
+							i = skip_whitespace(Script, i);
 							arg1=(chr>='0'&&chr<='9')||chr=='$';
 						}
 						ec();
@@ -4876,7 +4849,7 @@ gsc:
               return;
             }
             arg2&=0x1F;
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             j=0;
             while (chr!='\n'&&chr!=' '&&chr!=0&&chr!='\'')
             {
@@ -4920,7 +4893,7 @@ gsc:
           aa("if")
           {
             vlog_txt("IF\r\n");
-            while (chr==' ')i++;
+            i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
               log_txt("Incorrect arguments to IF.\r\n",28);
@@ -6496,17 +6469,12 @@ gsc:
           aa(".")
           {
             vlog_txt("[BINARY]\r\n   ->");
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
             {
               k=1-k;
-              while (chr==' ')
-              {
-                i++;
-              }
+              i = skip_whitespace(Script, i);
               j=0;
               while (((char*)("0123456789abcdef"))[j]!=0)
               {
@@ -6594,9 +6562,7 @@ rse:
             if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
             {
               vlog_txt("#DEFINE\r\n");
-              while (chr==' ') {
-                i++;
-              }
+              i = skip_whitespace(Script, i);
               if (chr=='\n'||chr==0||chr=='\'')
               {
                 log_txt("Premature end to #DEFINE!\r\n",27);
@@ -6612,9 +6578,7 @@ rse:
               buf[j]=0; //Append null
               sprintf(buf2,"   -> %s\r\n",buf);
               vlog_txt(buf2);
-              while (chr==' ') {
-                i++;    //The same old same old.
-              }
+              i = skip_whitespace(Script, i);
               if (chr=='\n'||chr==0||chr=='\'')
               {
                 log_txt("Premature end to #DEFINE!\r\n",27);
@@ -6652,7 +6616,7 @@ rse:
             {
               eorg=0;
               vlog_txt("#ORG\r\n");
-              while (chr==' ')i++;
+              i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
               {
@@ -6693,7 +6657,7 @@ rse:
             {
               eorg=0;
               vlog_txt("#ORGAL\r\n");
-              while (chr==' ')i++;
+              i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
               {
@@ -6737,7 +6701,7 @@ rse:
             {
               eorg=1;
               vlog_txt("#EORG\r\n");
-              while (chr==' ')i++;
+              i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
               {
@@ -6820,7 +6784,7 @@ rse:
 									return;
 								}
 								BASIC(k);
-								while(chr==' ')i++;
+								i = skip_whitespace(Script, i);
 								arg1=(chr>='0'&&chr<='9')||chr=='$';
 							}
 							ec();
@@ -8103,10 +8067,7 @@ rse:
               if (!gffs) {
                 return;
               }
-              while (chr==' ')
-              {
-                i++;
-              }
+              i = skip_whitespace(Script, i);
               j=0;
               while (chr!=' '&&chr!=0&&chr!='\''&&chr!=':'&&chr!='@')
               {
@@ -9922,9 +9883,7 @@ rse:
           case '.':
             vlog_txt("[BINARY]\r\n   ->");
             i=buf_loc+1;
-            while (chr==' ') {
-              i++;
-            }
+            i = skip_whitespace(Script, i);
             k=0;
             while (chr==' '||chr=='-'||chr=='.'||chr==':')
             {

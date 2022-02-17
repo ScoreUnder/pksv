@@ -5,6 +5,11 @@
 
 #include "sulib.h"
 
+typedef unsigned int pos_int;  // TODO: change to size_t at some point
+
+/** Characters which are considered the end to an argument in PokeScript */
+extern const char ARG_END_CHARS[];
+
 extern int codenum;
 extern int levelnum;
 extern int textnum;

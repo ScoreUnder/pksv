@@ -32,7 +32,7 @@ LINK.c = $(CC) $(CFLAGS) $(LDFLAGS)
 SRC_PKSV_COMMON = \
 	src_pksv/codeproc.c src_pksv/decompiler.c src_pksv/gba_asm.c src_pksv/isdone.c \
 	src_pksv/recompiler.c src_pksv/sulib.c src_pksv/textproc.c src_common/binarysearch.c \
-	src_pksv/romutil.c \
+	src_pksv/romutil.c src_pksv/textutil.c \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)

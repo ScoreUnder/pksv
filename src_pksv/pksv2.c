@@ -19,9 +19,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "pksv.h"
+#include "textutil.h"
 #include "version.h"
 #include "textproc.h"
 #include "isdone.h"
@@ -43,7 +45,7 @@ char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
 
-int main(int argc,char**argv)
+int main(int argc, char** argv)
 {
   char command_line=DECOMPILE;
   bool autodetect_mode = true;
@@ -52,9 +54,9 @@ int main(int argc,char**argv)
   FILE*romfile;
   FILE*otherfile;
   unsigned int i;
-  unsigned int file_location=0;
-  unsigned int decompile_at;
-  unsigned int narc;
+  int file_location=0;
+  uint32_t decompile_at;
+  uint32_t narc;
   i=(unsigned int)strlen(argv[0]);
   while (argv[0][i]!='\\'&&argv[0][i]!='/'&&i!=0)
   {
@@ -156,7 +158,11 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
       return 1;
     }
 
-    sscanf(argv[file_location+1],"%x",&decompile_at);
+    if (*hex_to_uint32(argv[file_location+1], SIZE_MAX, &decompile_at))
+    {
+      fprintf(stderr, "Please specify a valid offset to decompile at.\n");
+      return 1;
+    }
     export_name=argv[file_location+2];
   }
   else
@@ -216,9 +222,13 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
     otherfile=fopen(export_name,"wb");
     if (mode==DIAMOND)
     {
-      sscanf(argv[file_location+2],"%x",&narc);
+      if (*hex_to_uint32(argv[file_location+2], SIZE_MAX, &narc))
+      {
+        printf("Invalid hex value for nARC index\n");
+        return 1;
+      }
       export_name=argv[file_location+3];
-      if (argc<file_location+3)
+      if (argc < file_location+3)
       {
         printf("Please specify a filename to export the script to.\n");
         return 1;
