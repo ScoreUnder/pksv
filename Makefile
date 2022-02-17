@@ -12,7 +12,8 @@ GPERF = gperf
 CMAKE = cmake
 TOOL_WRAPPER =  # Might be wine
 
-LIB_FMEM = lib/fmem/build
+LIB_FMEM_BASE = lib/fmem
+LIB_FMEM = $(LIB_FMEM_BASE)/build
 LIB_FMEM_A = $(LIB_FMEM)/libfmem.a
 
 LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lwsock32 -lcomctl32
@@ -94,9 +95,13 @@ Scintilla.dll: src_pksvui/Scintilla.dll
 $(LIB_FMEM)/gen/fmem.h $(LIB_FMEM_A): $(LIB_FMEM)/Makefile
 	$(MAKE) -C $(LIB_FMEM) VERBOSE=1
 
-$(LIB_FMEM)/Makefile:
+$(LIB_FMEM)/Makefile: $(LIB_FMEM_BASE)/CMakeLists.txt
 	mkdir -p $(LIB_FMEM)
 	cd $(LIB_FMEM) && $(CMAKE) -DBUILD_TESTING=false ..
+
+$(LIB_FMEM_BASE)/CMakeLists.txt:
+	# Git repo not checked out properly
+	git submodule update --init --force --recursive
 
 defines.dat: src_pksv/pokeinc_default.txt $(BIN_PROCESS_DEFINES)
 	$(TOOL_WRAPPER) $(BIN_PROCESS_DEFINES) src_pksv/pokeinc_default.txt
