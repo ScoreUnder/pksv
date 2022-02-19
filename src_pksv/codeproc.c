@@ -44,7 +44,7 @@ int martnum=0;
 int thumbnum=0;
 int dwordnum=0;
 
-void pksv_codeproc_reset() {
+void pksv_codeproc_reset(void) {
   // Reset @dynamic numberings
   codenum=0;
   levelnum=0;

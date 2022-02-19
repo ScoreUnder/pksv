@@ -32,7 +32,7 @@
 #define STYLE_LABEL     16
 
 LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-void UpdateScintLine();
+void UpdateScintLine(void);
 void GoToLine(unsigned int,unsigned int);
 unsigned int modechar;
 
@@ -644,7 +644,7 @@ void AddFlag(char*a,char*b,char*c)
 	SaveRegSettingBin("Flags","UsedFlags",(char*)FlagArr,FlagArrLen<<1);
 }
 
-void SortFlags()
+void SortFlags(void)
 {
 	register int i,j=1;
 	short k;
@@ -664,7 +664,7 @@ void SortFlags()
 	}
 }
 
-void DeleteLastFlag()
+void DeleteLastFlag(void)
 {
 	register int i;
 	char a[5];
@@ -679,7 +679,7 @@ void DeleteLastFlag()
 	SaveRegSettingBin("Flags","UsedFlags",(char*)FlagArr,FlagArrLen<<1);
 }
 
-void ReAddFlags()
+void ReAddFlags(void)
 {
 	char buf[5];
 	register int i;

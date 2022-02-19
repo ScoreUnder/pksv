@@ -19,7 +19,7 @@ extern int thumbnum;
 extern int dwordnum;
 extern unsigned int fail;
 
-void pksv_codeproc_reset();
+void pksv_codeproc_reset(void);
 
 #define Defined2(thing) (WhatIs2(thing),!fail)
 #define GetNum(x) GenForFunc(x,&i,Script,defines,c)

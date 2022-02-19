@@ -28,7 +28,7 @@ unsigned int dothumb[1024],donethumb[2048];
 unsigned int dodword[1024],donedword[2048];
 unsigned int dolevel[1024],donelevel[2048];
 
-void initDoneProcs()
+void initDoneProcs(void)
 {
   memset(doprocs,0,sizeof(doprocs));
   memset(doneprocs,0,sizeof(doneprocs));
@@ -92,7 +92,7 @@ unsigned int Done(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDone()
+unsigned char AllDone(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -117,7 +117,7 @@ unsigned char AllDone()
   }
   return 1;
 }
-unsigned int FindNotDone()
+unsigned int FindNotDone(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -186,7 +186,7 @@ unsigned int DoneText(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneText()
+unsigned char AllDoneText(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -211,7 +211,7 @@ unsigned char AllDoneText()
   }
   return 1;
 }
-unsigned int FindNotDoneText()
+unsigned int FindNotDoneText(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -280,7 +280,7 @@ unsigned int DoneMove(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneMove()
+unsigned char AllDoneMove(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -305,7 +305,7 @@ unsigned char AllDoneMove()
   }
   return 1;
 }
-unsigned int FindNotDoneMove()
+unsigned int FindNotDoneMove(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -374,7 +374,7 @@ unsigned int DoneMart(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneMart()
+unsigned char AllDoneMart(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -399,7 +399,7 @@ unsigned char AllDoneMart()
   }
   return 1;
 }
-unsigned int FindNotDoneMart()
+unsigned int FindNotDoneMart(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -469,7 +469,7 @@ unsigned int DoneThumb(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneThumb()
+unsigned char AllDoneThumb(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -494,7 +494,7 @@ unsigned char AllDoneThumb()
   }
   return 1;
 }
-unsigned int FindNotDoneThumb()
+unsigned int FindNotDoneThumb(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -563,7 +563,7 @@ unsigned int DoneDword(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneDword()
+unsigned char AllDoneDword(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -588,7 +588,7 @@ unsigned char AllDoneDword()
   }
   return 1;
 }
-unsigned int FindNotDoneDword()
+unsigned int FindNotDoneDword(void)
 {
   register int i=0,j=0;
   while (i<1024)
@@ -657,7 +657,7 @@ unsigned int DoneLevel(unsigned int proc)
   }
   return proc;
 }
-unsigned char AllDoneLevel()
+unsigned char AllDoneLevel(void)
 {
   register int i=0,j;
   while (i<1024)
@@ -682,7 +682,7 @@ unsigned char AllDoneLevel()
   }
   return 1;
 }
-unsigned int FindNotDoneLevel()
+unsigned int FindNotDoneLevel(void)
 {
   register int i=0,j=0;
   while (i<1024)
