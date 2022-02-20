@@ -5,8 +5,6 @@
 #endif
 
 #define _CRT_SECURE_NO_DEPRECATE
-#pragma comment( lib, "comctl32.lib" )
-
 #include <stdbool.h>
 #include <string.h>
 #include "sqrt.h"
@@ -33,6 +31,8 @@
 #define STYLE_MESSAGE   15
 #define STYLE_LABEL     16
 
+#define UNUSED_ARG(x) ((void)(x))
+
 LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 void UpdateScintLine(void);
 void GoToLine(unsigned int,unsigned int);
@@ -55,19 +55,19 @@ HANDLE ScintLib,PKSV,RomFile=NULL,FileSave
                              ,SearchBox
 #endif
                              ;
-int (__cdecl *VersionMismatch)(unsigned char*);
-int (__cdecl *DetermineMode)(unsigned char*);
-char* (__cdecl *decompile)(unsigned char*,int,int);
-char* (__cdecl *decompileASM)(unsigned char*,int);
-char* (__cdecl *decompileLevel)(unsigned char*,int);
-char* (__cdecl *decompileText)(unsigned char*,int);
-char* (__cdecl *decompileMart)(unsigned char*,int);
-char* (__cdecl *decompileMoves)(unsigned char*,int);
-char* (__cdecl *decompilePointer)(unsigned char*,int);
-char* (__cdecl *decompileAttacks)(unsigned char*,int);
+int (__cdecl *VersionMismatch)(char*);
+int (__cdecl *DetermineMode)(char*);
+char* (__cdecl *decompile)(char*,int,int);
+char* (__cdecl *decompileASM)(char*,int);
+char* (__cdecl *decompileLevel)(char*,int);
+char* (__cdecl *decompileText)(char*,int);
+char* (__cdecl *decompileMart)(char*,int);
+char* (__cdecl *decompileMoves)(char*,int);
+char* (__cdecl *decompilePointer)(char*,int);
+char* (__cdecl *decompileAttacks)(char*,int);
 char* (__cdecl *NewMode)(int);
-int (__cdecl *compile)(unsigned char*,unsigned char*);
-int (__cdecl *DebugCompile)(unsigned char*,unsigned char*);
+int (__cdecl *compile)(char*,char*);
+int (__cdecl *DebugCompile)(char*,char*);
 int (__cdecl *SetDynamic)(int,int);
 #ifdef SCRAP
 int (__cdecl *CreateListClass)();
@@ -202,7 +202,7 @@ void SaveRegSettingStr(char*sub,char*set,char*val)
 		strcat(subbuf,sub);
 	}
 	RegCreateKeyEx(HKEY_CURRENT_USER,subbuf,0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&regkey,&dummy);
-	RegSetValueEx(regkey,set,0,REG_SZ,val,strlen(val)+1);
+	RegSetValueEx(regkey,set,0,REG_SZ,(LPBYTE)val,strlen(val)+1);
 	RegCloseKey(regkey);
 }
 
@@ -230,7 +230,6 @@ signed int PointerToOffset(unsigned int ptr)
 {
 	unsigned int pointer=0;
 	unsigned int bank=0;
-	unsigned int offset=0;
 	bank=ptr&0xFF;
 	pointer=(ptr&0xFFFF00)>>8;
 	if (pointer<0x4000||pointer>0x7FFF)return -1;
@@ -260,7 +259,6 @@ signed int OffsetToPointer(unsigned int offset)
 
 #ifndef DOES_NOT_UPDATE
 #ifndef ZH
-#pragma comment( lib, "wsock32.lib" )
 //UPDATEME
 BOOL CALLBACK UpdatesDlgProc(HWND,UINT,WPARAM,LPARAM);
 DWORD WINAPI UpdateMe(LPVOID explicit_update_check)
@@ -354,6 +352,7 @@ DWORD WINAPI UpdateMe(LPVOID explicit_update_check)
 }
 BOOL CALLBACK UpdatesDlgProc(HWND h,UINT m,WPARAM w,LPARAM l)
 {
+	UNUSED_ARG(l);
 	switch(m)
 	{
 		case WM_INITDIALOG:
@@ -531,39 +530,42 @@ int foundfont=0;
 //FONTENUMARATOR
 int CALLBACK FontEnumerator(ENUMLOGFONT *enf,NEWTEXTMETRIC*z,int x,LPARAM c)
 {
-	ToLower(enf->elfFullName);
-	if (!strcmp(enf->elfFullName,"lucida console"))
+	UNUSED_ARG(z);
+	UNUSED_ARG(x);
+	UNUSED_ARG(c);
+	ToLower((char*)enf->elfFullName);
+	if (!strcmp((char*)enf->elfFullName,"lucida console"))
 		foundfont=1;
 	return 1;
 }
 TBBUTTON ToolButtons[]={
-	{0,ID_NEW,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{1,ID_OPEN,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{2,ID_SAVE,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{3,ID_SAVEAS,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{7,1015,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{8,1016,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{4,1008,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{5,1009,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{6,1010,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{17,1012,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{15,1032,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{14,1006,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{9,1005,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{10,1014,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{11,1004,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{12,1030,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{19,1202,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{16,1111,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{18,1013,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0},
-	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,0,-1},
-	{13,1100,TBSTATE_ENABLED,TBSTYLE_BUTTON,0,0,0}
+	{0,ID_NEW,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{1,ID_OPEN,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{2,ID_SAVE,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{3,ID_SAVEAS,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{7,1015,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{8,1016,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{4,1008,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{5,1009,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{6,1010,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{17,1012,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{15,1032,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{14,1006,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{9,1005,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{10,1014,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{11,1004,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{12,1030,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{19,1202,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{16,1111,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{18,1013,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
+	{0,0,TBSTATE_ENABLED,TBSTYLE_SEP,{0},-1,0},
+	{13,1100,TBSTATE_ENABLED,TBSTYLE_BUTTON,{0},0,0},
 };
 
 void SaveRegSettingBin(char*sub,char*set,char*val,int len)
@@ -636,7 +638,7 @@ void AddFlag(char*a,char*b,char*c)
 		}
 		FlagArr=newarr;
 	}
-	sscanf(a,"%X",&flag);
+	sscanf(a,"%X", (unsigned int*)&flag);
 	FlagArr[FlagArrLen]=flag;
 	FlagArrLen++;
 	strcpy(MegaBuffer,"0x");
@@ -711,6 +713,9 @@ HBITMAP bmpHero,bmpArrow
 ;
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,INT nCmdShow)
 {
+	UNUSED_ARG(hPrevInstance);
+	UNUSED_ARG(lpCmdLine);
+	UNUSED_ARG(nCmdShow);
 	MSG msg;
 	HDC dc;
 	char tch[256],determineMode[4],*x,*y,*ptr,IsRom=0;
@@ -723,7 +728,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 	HANDLE fileM;
 	MENUITEMINFO mii;
 	HKEY regkey;
-	TC_ITEM tab;
 
 	maintid=GetCurrentThreadId();
 	ZeroMemory(DefRomPath,sizeof(DefRomPath));
@@ -763,19 +767,19 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 		//Failed to load PKSV.DLL or failed to load one of PKSV.DLL's functions.
 		return 0;
 	}
-	VersionMismatch=(int (__cdecl *)(unsigned char*))GetProcAddress(PKSV,"VersionMismatch");
-	DetermineMode=(int (__cdecl *)(unsigned char*))GetProcAddress(PKSV,"DetermineMode");
-	decompile=(char* (__cdecl *)(unsigned char*,int,int))GetProcAddress(PKSV,"decompile");
-	decompileASM=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileASM");
-	decompileLevel=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileLevel");
-	decompileText=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileText");
-	decompileMart=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileMart");
-	decompileMoves=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileMoves");
-	decompilePointer=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompilePointer");
-	decompileAttacks=(char* (__cdecl *)(unsigned char*,int))GetProcAddress(PKSV,"decompileAttacks");
+	VersionMismatch=(int (__cdecl *)(char*))GetProcAddress(PKSV,"VersionMismatch");
+	DetermineMode=(int (__cdecl *)(char*))GetProcAddress(PKSV,"DetermineMode");
+	decompile=(char* (__cdecl *)(char*,int,int))GetProcAddress(PKSV,"decompile");
+	decompileASM=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileASM");
+	decompileLevel=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileLevel");
+	decompileText=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileText");
+	decompileMart=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileMart");
+	decompileMoves=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileMoves");
+	decompilePointer=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompilePointer");
+	decompileAttacks=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileAttacks");
 	NewMode=(char* (__cdecl *)(int))GetProcAddress(PKSV,"NewMode");
-	compile=(int (__cdecl *)(unsigned char*,unsigned char*))GetProcAddress(PKSV,"compile");
-	DebugCompile=(int (__cdecl *)(unsigned char*,unsigned char*))GetProcAddress(PKSV,"DebugCompile");
+	compile=(int (__cdecl *)(char*,char*))GetProcAddress(PKSV,"compile");
+	DebugCompile=(int (__cdecl *)(char*,char*))GetProcAddress(PKSV,"DebugCompile");
 	SetDynamic=(int (__cdecl *)(int,int))GetProcAddress(PKSV,"SetDynamic");
 	if (!VersionMismatch||!NewMode||!DetermineMode||!decompile||!decompileASM||!decompileLevel||!decompileText||!compile||!decompileMart||!decompileMoves||!decompilePointer||!decompileAttacks||!SetDynamic)
 	{
@@ -1007,7 +1011,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 	SendMessage(StatusBar,SB_SETTEXT,0,(LPARAM)GetString1(3014));
 
 	SendEditor(SCI_CLEARDOCUMENTSTYLE,0,0);
-	EnumFontFamilies(dc,NULL,(void*)FontEnumerator,0);
+	EnumFontFamilies(dc,NULL,(FONTENUMPROC)FontEnumerator,0);
 	ReleaseDC(MainWnd,dc);
 	if (!foundfont)
 	{
@@ -1165,17 +1169,17 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 		while (x[0]==' '||x[0]=='"') x++;
 		if (x[0]!=0)
 		{
-			GoToPlace=-1;
+			GoToPlace=(unsigned)-1;
 			sscanf(x,"%X",&GoToPlace);
-			if (GoToPlace==-1)
+			if (GoToPlace==(unsigned)-1)
 			{
 				sscanf(x,"0x%X",&GoToPlace);
-				if (GoToPlace==-1)
+				if (GoToPlace==(unsigned)-1)
 				{
 					sscanf(x,"$%X",&GoToPlace);
 				}
 			}
-			if (GoToPlace!=-1)IsRom=1;
+			if (GoToPlace!=(unsigned)-1)IsRom=1;
 		}
 		if (y!=0&&!IsRom)
 		{
@@ -1201,7 +1205,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 			ptr=GlobalAlloc(GPTR,fsize+1);
 			SetFilePointer(fileM,0,NULL,FILE_BEGIN);
 			ReadFile(fileM,ptr,fsize,&read,NULL);
-			if (read!=fsize)
+			if (read!=(DWORD)fsize)
 			{
 				MessageBox(MainWnd,GetString1(3015),GetString2(3001),0x10);
 			}
@@ -1400,7 +1404,7 @@ void exiting()
 }
 
 struct SCNotification* scn;
-int TCompile(char*a)
+int __stdcall TCompile(char*a)
 {
 	char*b;
 	b=malloc(strlen(RomOpen2)+1);
@@ -1410,7 +1414,7 @@ int TCompile(char*a)
 	GlobalFree(a);
 	return 0;
 }
-int TDebugCompile(char*a)
+int __stdcall TDebugCompile(char*a)
 {
 	char*b;
 	b=malloc(strlen(RomOpen2)+1);
@@ -1436,7 +1440,6 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 	char determineMode[4];
 	DWORD read;
 	HKEY regkey;
-	HDC dc;
 	unsigned int sges;
 	LPTOOLTIPTEXT text;
 	//OSVERSIONINFO ver;
@@ -1523,7 +1526,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			case TBN_QUERYDELETE:
 				return 1;
 			case TBN_GETBUTTONINFO:
-				if (((TBNOTIFY*)nmh)->iItem>=0&&((TBNOTIFY*)nmh)->iItem<(sizeof(ToolButtons)/sizeof(TBBUTTON)))
+				if (((TBNOTIFY*)nmh)->iItem>=0&& (size_t) ((TBNOTIFY*)nmh)->iItem<(sizeof(ToolButtons)/sizeof(TBBUTTON)))
 				{
 					((TBNOTIFY*)nmh)->tbButton=ToolButtons[((TBNOTIFY*)nmh)->iItem];
 					return 1;
@@ -1564,7 +1567,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				NotSaved = FALSE;
 				lbuf=strrchr(FileOpen3,'\\')+1;
 				if((ptr=strrchr(FileOpen3,'/'))>(void*)lbuf)
-					lbuf=ptr+1;
+					lbuf=(char*)ptr+1;
 				if(lbuf<(char*)2)lbuf=FileOpen3;
 				strcpy(FileOpen2,lbuf);
 				strcat(FileOpen2," - Score_Under's PKSV-UI");
@@ -1575,7 +1578,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				strcpy(FileOpen2,"* ");
 				lbuf=strrchr(FileOpen3,'\\')+1;
 				if((ptr=strrchr(FileOpen3,'/'))>(void*)lbuf)
-					lbuf=ptr+1;
+					lbuf=(char*)ptr+1;
 				if(lbuf<(char*)2)lbuf=FileOpen3;
 				strcat(FileOpen2,lbuf);
 				strcat(FileOpen2," - Score_Under's PKSV-UI");
@@ -1583,7 +1586,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				break;
 			case SCN_STYLENEEDED:
 				sges=(unsigned int)SendEditor(SCI_GETENDSTYLED,0,0)-1;
-				while (sges!=SendEditor(SCI_GETENDSTYLED,0,0))
+				while (sges!=(unsigned int)SendEditor(SCI_GETENDSTYLED,0,0))
 				{
 					sges=(unsigned int)SendEditor(SCI_GETENDSTYLED,0,0);
 					dontsetlevel=0;
@@ -2198,9 +2201,9 @@ OpenRoms:
 				EnableWindow(MainWnd,0);
 				ShowWindow(GotoWin,SW_SHOW);
 				SetFocus(GetDlgItem(GotoWin,3));
-				sprintf(buf,"%u",SendEditor(SCI_LINEFROMPOSITION,SendEditor(SCI_GETSELECTIONSTART,0,0),0));
+				sprintf(buf, "%lu", SendEditor(SCI_LINEFROMPOSITION,SendEditor(SCI_GETSELECTIONSTART,0,0),0));
 				SetDlgItemText(GotoWin,3,buf);
-				sprintf(buf,"%u",SendEditor(SCI_GETSELECTIONSTART,0,0)-SendEditor(SCI_POSITIONFROMLINE,SendEditor(SCI_LINEFROMPOSITION,SendEditor(SCI_GETSELECTIONSTART,0,0),0),0));
+				sprintf(buf, "%lu", SendEditor(SCI_GETSELECTIONSTART,0,0)-SendEditor(SCI_POSITIONFROMLINE,SendEditor(SCI_LINEFROMPOSITION,SendEditor(SCI_GETSELECTIONSTART,0,0),0),0));
 				SetDlgItemText(GotoWin,4,buf);
 				break;
 			case 1032:
@@ -2779,6 +2782,8 @@ char MatchCase=0,Upwards=0,RegExpr=0;
 
 BOOL CALLBACK FindReplaceFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char buf[32];
 	char findbuf[4096],repbuf[4096];
 	signed int found;
@@ -2903,6 +2908,8 @@ BOOL CALLBACK FindReplaceFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK GotoFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char linebuf[4096],posbuf[4096];
 	unsigned int line,pos;
 	switch (msg)
@@ -2916,7 +2923,7 @@ BOOL CALLBACK GotoFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			sscanf(linebuf,"%u",&line);
 			sscanf(posbuf,"%u",&pos);
 			GoToLine(line,pos);
-			//don't break;
+			// fall through
 		case 0x2: //Cancel
 			ShowWindow(GotoWin,SW_HIDE);
 			EnableWindow(MainWnd,1);
@@ -2988,6 +2995,8 @@ DWORD WINAPI FindInThread(LPVOID lp)
 }
 BOOL CALLBACK FFSFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char posbuf[41],lenbuf[41];
 	unsigned int pos,len;
 	unsigned int*ptr;
@@ -3054,6 +3063,8 @@ BOOL CALLBACK FFSFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 char ChosenMode=17;
 BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char posbuf[41];
 	unsigned int i,pos,bank,block,tbank;
 	//STARTUPINFO si;
@@ -3113,11 +3124,11 @@ BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				else
 					DetermineMode(RomOpen2);
 				GetDlgItemText(DecWin,19,GreatBuffer,sizeof(GreatBuffer));
-				block=-1;
+				block=(unsigned)-1;
 				sscanf(GreatBuffer,"0x%X",&block);
-				if (block==-1)
+				if (block==(unsigned)-1)
 					sscanf(GreatBuffer,"%X",&block);
-				if (block==-1)
+				if (block==(unsigned)-1)
 					sscanf(GreatBuffer,"$%X",&block);
 				SaveRegSetting("Decompiler","Use Dynamic",IsDlgButtonChecked(DecWin,18));
 				SaveRegSettingStr("Decompiler","Dynamic Offset",GreatBuffer);
@@ -3218,7 +3229,6 @@ BOOL CALLBACK DecFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 void FillItems(HWND hwndList)
 {
-	int i;
 	char *pVarName[] = {"NONE","MASTERBALL","ULTRABALL","GREATBALL","POKEBALL",
 	                    "SAFARIBALL","NETBALL","DIVEBALL","NESTBALL","REPEATBALL",
 	                    "TIMERBALL","LUXURYBALL","PREMIERBALL","POTION","ANTIDOTE",
@@ -3271,14 +3281,14 @@ void FillItems(HWND hwndList)
 	                    "POWDERJAR","RUBY","SAPPHIRE","MAGMAEMBLEM","OLDSEAMAP"
 	                   };
 	SendMessage(hwndList, CB_RESETCONTENT, 0, 0);
-	for (i=0; i<sizeof(pVarName)/sizeof(char*); i++)
-		SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)pVarName[i]);
-
+	for (size_t i = 0; i < sizeof(pVarName)/sizeof(pVarName[0]); i++)
+		SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM) pVarName[i]);
 }
 
 
-DWORD WINAPI FindItemScript(LPVOID x)
+DWORD WINAPI FindItemScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3329,16 +3339,16 @@ DWORD WINAPI FindItemScript(LPVOID x)
 
 void FillMsgs(HWND hwndList)
 {
-	int i;
 	char *pVarName[] = {"MSG_ITEM","MSG_NORMAL","MSG_YESNO","MSG_NOCLOSE","MSG_SIGN","MSG_STANDARD","MSG_FIND","MSG_OBTAIN"};
 	SendMessage(hwndList, CB_RESETCONTENT, 0, 0);
-	for (i=0; i<sizeof(pVarName)/sizeof(char*); i++)
+	for (size_t i=0; i<sizeof(pVarName)/sizeof(pVarName[0]); i++)
 		SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)pVarName[i]);
 
 }
 
-DWORD WINAPI TalkScript(LPVOID x)
+DWORD WINAPI TalkScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3388,8 +3398,9 @@ DWORD WINAPI TalkScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI HealScript(LPVOID x)
+DWORD WINAPI HealScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3415,8 +3426,9 @@ DWORD WINAPI HealScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI GiveItemScript(LPVOID x)
+DWORD WINAPI GiveItemScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3478,7 +3490,6 @@ DWORD WINAPI GiveItemScript(LPVOID x)
 
 void FillPokemon(HWND hwndList)
 {
-	int i;
 	char *pVarName[] = {"MISSINGNO","BULBASAUR","IVYSAUR","VENUSAUR",
 	                    "CHARMANDER","CHARMELEON","CHARIZARD","SQUIRTLE","WARTORTLE",
 	                    "BLASTOISE","CATERPIE","METAPOD","BUTTERFREE","WEEDLE","KAKUNA",
@@ -3540,13 +3551,13 @@ void FillPokemon(HWND hwndList)
 	                    "RAYQUAZA","LATIAS","LATIOS","JIRACHI","DEOXYS","CHIMECHO"
 	                   };
 	SendMessage(hwndList, CB_RESETCONTENT, 0, 0);
-	for (i=0; i<sizeof(pVarName)/sizeof(char*); i++)
+	for (size_t i=0; i<sizeof(pVarName)/sizeof(pVarName[0]); i++)
 		SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)pVarName[i]);
-
 }
 
-DWORD WINAPI GivePokeScript(LPVOID x)
+DWORD WINAPI GivePokeScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2,*buf3;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3617,8 +3628,9 @@ DWORD WINAPI GivePokeScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI BattleScript(LPVOID x)
+DWORD WINAPI BattleScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2,*buf3;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3689,8 +3701,9 @@ DWORD WINAPI BattleScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI RoadClosedScript(LPVOID x)
+DWORD WINAPI RoadClosedScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3750,8 +3763,9 @@ DWORD WINAPI RoadClosedScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI TrainerBattleScript(LPVOID x)
+DWORD WINAPI TrainerBattleScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Trainer");
@@ -3790,7 +3804,6 @@ DWORD WINAPI TrainerBattleScript(LPVOID x)
 
 void FillAttacks(HWND hwndList)
 {
-	int i;
 	char *pVarName[] = {"POUND","KARATECHOP","DOUBLESLAP",
 	                    "COMETPUNCH","MEGAPUNCH","PAYDAY","FIREPUNCH","ICEPUNCH",
 	                    "THUNDERPUNCH","SCRATCH","VICEGRIP","GUILLOTINE","RAZORWIND",
@@ -3855,15 +3868,16 @@ void FillAttacks(HWND hwndList)
 	                    "PSYCHOBOOST"
 	                   };
 	SendMessage(hwndList, CB_RESETCONTENT, 0, 0);
-	for (i=0; i<sizeof(pVarName)/sizeof(char*); i++)
+	for (size_t i=0; i<sizeof(pVarName)/sizeof(pVarName[0]); i++)
 		SendMessage(hwndList, CB_ADDSTRING, 0, (LPARAM)pVarName[i]);
 
 }
 
 
 
-DWORD WINAPI HMMoveScript(LPVOID x)
+DWORD WINAPI HMMoveScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Attack");
@@ -3900,8 +3914,9 @@ DWORD WINAPI HMMoveScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI ItemCraftScript(LPVOID x)
+DWORD WINAPI ItemCraftScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2,*buf3;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -3972,8 +3987,9 @@ DWORD WINAPI ItemCraftScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI QuickStarterScript(LPVOID x)
+DWORD WINAPI QuickStarterScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char *buf1,*buf2,*buf3,*buf4,*buf5,*buf6,*buf7;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -4088,8 +4104,9 @@ DWORD WINAPI QuickStarterScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI RockBlockScript(LPVOID x)
+DWORD WINAPI RockBlockScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Item");
@@ -4126,8 +4143,9 @@ DWORD WINAPI RockBlockScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI MoveTutorScript(LPVOID x)
+DWORD WINAPI MoveTutorScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","MTID");
@@ -4164,8 +4182,9 @@ DWORD WINAPI MoveTutorScript(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI FlagSkeleton1Script(LPVOID x)
+DWORD WINAPI FlagSkeleton1Script(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Flag");
@@ -4202,8 +4221,9 @@ DWORD WINAPI FlagSkeleton1Script(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI FlagSkeleton2Script(LPVOID x)
+DWORD WINAPI FlagSkeleton2Script(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Flag");
@@ -4240,8 +4260,9 @@ DWORD WINAPI FlagSkeleton2Script(LPVOID x)
 	return 0;
 }
 
-DWORD WINAPI EarthquakeScript(LPVOID x)
+DWORD WINAPI EarthquakeScript(LPVOID arg1)
 {
+	UNUSED_ARG(arg1);
 	char*buf1,*buf2;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
@@ -4303,6 +4324,8 @@ DWORD WINAPI EarthquakeScript(LPVOID x)
 
 BOOL CALLBACK GenFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	DWORD tid;
 	switch (msg)
 	{
@@ -4386,6 +4409,8 @@ BOOL CALLBACK GenFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK Input2Func(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	switch (msg)
 	{
 	case WM_COMMAND:
@@ -4415,6 +4440,8 @@ BOOL CALLBACK Input2Func(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK InputFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	switch (msg)
 	{
 	case WM_COMMAND:
@@ -4451,6 +4478,8 @@ BOOL CALLBACK InputFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK NoteFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char thestr[10];
 	char buffer[20];
 	unsigned int j,k,l;
@@ -4487,7 +4516,7 @@ BOOL CALLBACK NoteFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				k<<=8;
 				l=j|k;
 				l=PointerToOffset(l);
-				if (l!=-1)
+				if (l!=(unsigned)-1)
 				{
 					sprintf(thestr,"%X",l);
 					SetDlgItemText(NoteWin,2,thestr);
@@ -4499,7 +4528,7 @@ BOOL CALLBACK NoteFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				l=OffsetToPointer(calc);
 				j=l&0xFF;
 				k=l>>8;
-				if (l!=-1)
+				if (l!=(unsigned)-1)
 				{
 					sprintf(thestr,"%X",j);
 					sprintf(buffer,"%X",k);
@@ -4695,6 +4724,7 @@ BOOL CALLBACK NoteFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				break;
 			case 0x2024:
 				LastCalcOp=OP_NONE;
+				// fall through
 			case 0x2023:
 				SetDlgItemText(NoteWin,2,"0");
 				break;
@@ -4747,6 +4777,8 @@ BOOL CALLBACK NoteFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK HexFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	char thestr[15];
 	unsigned int i;
 	switch (msg)
@@ -4989,6 +5021,7 @@ void AddToList(unsigned int a,char*b)
 
 BOOL CALLBACK MovePlanFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
 	unsigned int len,i,j,x,y;
 	char*ptr;
 	char*ptr2;
@@ -5263,12 +5296,12 @@ BOOL CALLBACK MovePlanFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 		case 8:
 			i=SendMessage(GetDlgItem(MovePlanWin,13),LB_GETCURSEL,0,0);
-			if (i-1>=0&&i!=LB_ERR)
+			if (i != 0 && i != (unsigned)LB_ERR)
 				SwapItems(i-1,i-1);
 			break;
 		case 9:
 			i=SendMessage(GetDlgItem(MovePlanWin,13),LB_GETCURSEL,0,0);
-			if (i!=LB_ERR)
+			if (i!=(unsigned)LB_ERR)
 				SwapItems(i,i+1);
 			break;
 		case 100:
@@ -5305,7 +5338,7 @@ BOOL CALLBACK MovePlanFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 		case 10:
 			i=(unsigned int)SendMessage(GetDlgItem(MovePlanWin,13),LB_GETCURSEL,0,0);
-			if (i==LB_ERR)break;
+			if (i == (unsigned)LB_ERR)break;
 			SendMessage(GetDlgItem(MovePlanWin,13),LB_DELETESTRING,i,0);
 			if (SendMessage(GetDlgItem(MovePlanWin,13),LB_SETCURSEL,i,0)==LB_ERR)
 				SendMessage(GetDlgItem(MovePlanWin,13),LB_SETCURSEL,i-1,0);
@@ -5344,6 +5377,7 @@ BOOL CALLBACK MovePlanFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 12:
 			if (moves==NULL)break;
 			SendMessage(GetDlgItem(MovePlanWin,13),LB_RESETCONTENT,0,0);
+			d = NULL;
 			c=moves;
 			while (c!=NULL)
 			{
@@ -5425,6 +5459,7 @@ BOOL CALLBACK MovePlanFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 
 BOOL CALLBACK FlagsFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(lParam);
 	int x,i;
 	char buf[5],buf2[7];
 	switch (msg)
@@ -5455,7 +5490,7 @@ BOOL CALLBACK FlagsFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 3:
 			SaveFlag();
 			GetDlgItemText(FlagsWin,1,GreatBuffer,sizeof(GreatBuffer));
-			sscanf(GreatBuffer,"%X",&x);
+			sscanf(GreatBuffer,"%X", (unsigned int*) &x);
 			for (i=0;i<FlagArrLen;i++)
 			{
 				if (FlagArr[i]==x)
@@ -5555,6 +5590,8 @@ int romlen=0,romloaded=0;
 char*mem2=NULL;
 BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	int txtlen,i,j,binlen;
 	char*mem;
 	char buf[50];
@@ -5566,8 +5603,8 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 1:
 			ShowWindow(ScriptSearchWin,SW_HIDE);
 			romloaded=0;
-			if (mem2);
-			GlobalFree(mem2);
+			if (mem2)
+				GlobalFree(mem2);
 			mem2=NULL;
 			break;
 		case 3:
@@ -5612,11 +5649,11 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 5:
 			GetWindowText(GetDlgItem(ScriptSearchWin,4),buf,50);
 			i=-1;
-			sscanf(buf,"0x%X",&i);
+			sscanf(buf,"0x%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"%X",&i);
+				sscanf(buf,"%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"$%X",&i);
+				sscanf(buf,"$%X", (unsigned int*) &i);
 			binlen=ReadWholeFile("tmp.bin",&mem);
 			if (!romloaded)
 				romlen=ReadWholeFile(RomOpen2,&mem2);
@@ -5631,6 +5668,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			}
 			if (IsDlgButtonChecked(ScriptSearchWin,24))
 				binlen--;
+			j = 0;
 			for (i++;i<romlen;i++)
 			{
 				for (j=0;j<binlen;j++)
@@ -5647,7 +5685,7 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			GlobalFree(mem);
 			if (j==binlen)
 			{
-				sprintf(buf,"0x%X",i);
+				sprintf(buf,"0x%X", i);
 				SetWindowText(GetDlgItem(ScriptSearchWin,4),buf);
 
 				switch (ScriptSearchType)
@@ -5691,11 +5729,11 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 7:
 			GetWindowText(GetDlgItem(ScriptSearchWin,4),buf,50);
 			i=-1;
-			sscanf(buf,"0x%X",&i);
+			sscanf(buf,"0x%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"%X",&i);
+				sscanf(buf,"%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"$%X",&i);
+				sscanf(buf,"$%X", (unsigned int*) &i);
 			i--;
 			sprintf(buf,"0x%X",i);
 			SetWindowText(GetDlgItem(ScriptSearchWin,4),buf);
@@ -5735,11 +5773,11 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 8:
 			GetWindowText(GetDlgItem(ScriptSearchWin,4),buf,50);
 			i=-1;
-			sscanf(buf,"0x%X",&i);
+			sscanf(buf,"0x%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"%X",&i);
+				sscanf(buf,"%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"$%X",&i);
+				sscanf(buf,"$%X", (unsigned int*) &i);
 			i++;
 			sprintf(buf,"0x%X",i);
 			SetWindowText(GetDlgItem(ScriptSearchWin,4),buf);
@@ -5779,11 +5817,11 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 6:
 			GetWindowText(GetDlgItem(ScriptSearchWin,4),buf,50);
 			i=-1;
-			sscanf(buf,"0x%X",&i);
+			sscanf(buf,"0x%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"%X",&i);
+				sscanf(buf,"%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"$%X",&i);
+				sscanf(buf,"$%X", (unsigned int*) &i);
 			i-=16;
 			sprintf(buf,"0x%X",i);
 			SetWindowText(GetDlgItem(ScriptSearchWin,4),buf);
@@ -5823,11 +5861,11 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 		case 9:
 			GetWindowText(GetDlgItem(ScriptSearchWin,4),buf,50);
 			i=-1;
-			sscanf(buf,"0x%X",&i);
+			sscanf(buf,"0x%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"%X",&i);
+				sscanf(buf,"%X", (unsigned int*) &i);
 			if (i==-1)
-				sscanf(buf,"$%X",&i);
+				sscanf(buf,"$%X", (unsigned int*) &i);
 			i+=16;
 			sprintf(buf,"0x%X",i);
 			SetWindowText(GetDlgItem(ScriptSearchWin,4),buf);
@@ -5881,8 +5919,8 @@ BOOL CALLBACK ScriptSearchFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 	case WM_CLOSE:
 		ShowWindow(ScriptSearchWin,SW_HIDE);
 		romloaded=0;
-		if (mem2);
-		GlobalFree(mem2);
+		if (mem2)
+			GlobalFree(mem2);
 		mem2=NULL;
 		break;
 	default:
@@ -5895,8 +5933,10 @@ char detecttype=1;
 
 BOOL CALLBACK LockFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
+	UNUSED_ARG(hwnd);
+	UNUSED_ARG(lParam);
 	HANDLE file;
-	char thing;
+	unsigned char thing;
 	DWORD bytes;
 	char buf[50];
 	switch (msg)
@@ -6058,9 +6098,9 @@ BOOL CALLBACK LockFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 #ifdef SCRAP
 int DescLen;
 
-int GetVal(char*buf)
+unsigned int GetVal(char*buf)
 {
-	int i=-1;
+	unsigned int i=-1;
 	sscanf(buf,"0x%X",&i);
 	if (i==-1)
 	{

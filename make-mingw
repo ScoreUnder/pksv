@@ -1,6 +1,6 @@
 #!/bin/sh
 TOOLCHAIN_PREFIX=x86_64-w64-mingw32-
-CFLAGS="$CFLAGS -Os -ggdb -flto"
+CFLAGS="$CFLAGS -Os -ggdb -flto -Wall -Wextra -Wpedantic -pedantic"
 case $1 in
     32)
         TOOLCHAIN_PREFIX=i686-w64-mingw32-
