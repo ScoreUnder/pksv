@@ -82,6 +82,10 @@ PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
 PKSVUI = pksvui$(EXE_EXT)
 
+DIST_FILES = $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll license.txt
+DIST_OUT = pksv-"$$(git describe --long --dirty --always)".zip
+DIST_OUT_WC = pksv-*.zip
+
 all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll
 
 check: $(PKSV) defines.dat
@@ -96,13 +100,17 @@ check: $(PKSV) defines.dat
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) defines.dat Scintilla.dll
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(DIST_OUT_WC) defines.dat Scintilla.dll
 
 mostlyclean: clean-fmem
 	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
+
+dist: $(DIST_FILES)
+	rm -f -- $(DIST_OUT_WC)
+	7z a -tzip $(DIST_OUT) $(DIST_FILES)
 
 # Lets us run pksvui from the root of the source tree
 Scintilla.dll: src_pksvui/Scintilla.dll
@@ -156,7 +164,7 @@ src_pksv/sublang/gsc_moves_reverse.c: src_pksv/sublang/gsc_moves.gperf $(BIN_GPE
 .rc.o:
 	$(WINDRES) $(CPPFLAGS) -o $@ $<
 
-.PHONY: all check clean clean-fmem
+.PHONY: all check clean clean-fmem dist
 
 src_pksv/pksv_dll.c: $(LIB_FMEM)/gen/fmem.h
 
