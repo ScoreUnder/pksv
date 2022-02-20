@@ -1,10 +1,20 @@
 .POSIX:
 
-PROFILE = debug  # set to "release" to enable updating, show version, etc.
-PLATFORM = any   # set to "win" to enable more windows specific stuff
+# set to "release" to enable updating, show version, etc.
+PROFILE = debug
+# set to "win" to enable more windows specific stuff
+PLATFORM = any
 TOOLCHAIN_PREFIX =
-EXE_EXT =
-SHLIB_EXT = .so
+
+EXE_EXT_P_win = .exe
+SHLIB_EXT_P_win = .dll
+SHLIB_EXT_P_mac = .dylib
+SHLIB_EXT_P_lin = .so
+SHLIB_EXT_P_any = .so
+
+EXE_EXT = $(EXE_EXT_P_$(PLATFORM))
+SHLIB_EXT = $(SHLIB_EXT_P_$(PLATFORM))
+
 CC = $(TOOLCHAIN_PREFIX)gcc
 WINDRES = $(TOOLCHAIN_PREFIX)windres
 GPERF = gperf
@@ -24,8 +34,12 @@ CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE
 CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic -DDLL
-LDFLAGS_CONSOLE =
-LDFLAGS =
+
+LDFLAGS_CONSOLE_P_win = -mconsole
+LDFLAGS_P_win = -mwindows
+
+LDFLAGS_CONSOLE = $(LDFLAGS_CONSOLE_P_$(PLATFORM))
+LDFLAGS = $(LDFLAGS_P_$(PLATFORM))
 LDFLAGS_SH = -L$(LIB_FMEM)
 LDLIBS_SH = -lfmem
 
