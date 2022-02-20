@@ -792,11 +792,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 		//Failed to load PKSV.DLL or failed to load one of PKSV.DLL's functions.
 		return 0;
 	}
-	if (VersionMismatch(INTERNAL_VERSION))
-	{
-		MessageBox(NULL,GetString1(3070),GetString2(3071),0x30);
-		//Warning: PKSV.dll version mismatch! Try downloading the package again.
-	}
 #ifdef SCRAP
 	SearchBox=LoadLibrary("searchbox.dll");
 	if (!SearchBox)
