@@ -1,8 +1,4 @@
-#ifndef DOES_NOT_UPDATE
-#define INTERNAL_VERSION "2.1.1"
-#else
-#define INTERNAL_VERSION "Debug Build"
-#endif
+#include "version.h"
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <stdbool.h>
@@ -303,10 +299,10 @@ DWORD WINAPI UpdateMe(LPVOID explicit_update_check)
 						return 0;
 
 					bool same_version = true;
-					size_t version_end = pos + strlen(INTERNAL_VERSION);
+					size_t version_end = pos + strlen(PKSV_VERSION);
 					if (version_end > sl_sock
 					    || (version_end < sl_sock && buffer[version_end] != '\r' && buffer[version_end] != '\n')
-							|| memcmp(INTERNAL_VERSION, &buffer[pos], strlen(INTERNAL_VERSION)) != 0
+							|| memcmp(PKSV_VERSION, &buffer[pos], strlen(PKSV_VERSION)) != 0
 							)
 						same_version = false;
 
@@ -768,7 +764,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 		return 0;
 	}
 	VersionMismatch=(int (__cdecl *)(char*))GetProcAddress(PKSV,"VersionMismatch");
-	if (VersionMismatch && VersionMismatch(INTERNAL_VERSION))
+	if (VersionMismatch && VersionMismatch(ABI_COMPAT_VERSION))
 	{
 		MessageBox(NULL,GetString1(3070),GetString2(3071),0x30);
 		//Warning: PKSV.dll version mismatch! Try downloading the package again.
@@ -845,10 +841,10 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 	RegCloseKey(regkey);
 
 	LoadRegSettingStr(NULL,"Version");
-	if (strcmp(GreatBuffer,INTERNAL_VERSION))
+	if (strcmp(GreatBuffer,PKSV_VERSION))
 	{
 		MessageBox(MainWnd,GetString1(3010),GetString2(3009),0x40);
-		SaveRegSettingStr(NULL,"Version",INTERNAL_VERSION);
+		SaveRegSettingStr(NULL,"Version",PKSV_VERSION);
 	}
 
 	//Create it!
@@ -2243,7 +2239,7 @@ OpenRoms:
 				break;
 			case 1100:
 				strcpy(GreatBuffer,GetString1(3029));
-				strcat(GreatBuffer,INTERNAL_VERSION);
+				strcat(GreatBuffer,PKSV_VERSION);
 				strcat(GreatBuffer,GetString1(3030));
 				MessageBox(MainWnd,GreatBuffer,GetString1(3031),0x40);
 				break;
@@ -2264,9 +2260,11 @@ OpenRoms:
 			case 1203:
 				ShowWindow(MovePlanWin,SW_SHOW);
 				break;
+#ifndef DOES_NOT_UPDATE
 			case 1204:
 				UpdateMe((void*)1);
 				break;
+#endif
 			case 1102:
 				if (*RomOpen2)
 				{

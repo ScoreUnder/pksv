@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     }
     else if (!strcmp(argv[i],"--help"))
     {
-      printf("PKSV V"INTERNAL_VERSION" - backend used for compiling/decompiling.\n\
+      printf("PKSV V"PKSV_VERSION" - backend used for compiling/decompiling.\n\
 pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
 pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
 pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\

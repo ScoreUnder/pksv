@@ -1,7 +1,6 @@
 .POSIX:
-# ... But don't try to run under pdpmake, it doesn't like substitution on non-straightforward macros
-# https://github.com/rmyorston/pdpmake/issues/1
 
+PROFILE = debug  # set to "release" to enable updating, show version, etc.
 PLATFORM = any   # set to "win" to enable more windows specific stuff
 TOOLCHAIN_PREFIX =
 EXE_EXT =
@@ -16,10 +15,13 @@ LIB_FMEM_BASE = lib/fmem
 LIB_FMEM = $(LIB_FMEM_BASE)/build
 LIB_FMEM_A = $(LIB_FMEM)/libfmem.a
 
-LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lwsock32 -lcomctl32
-LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM))
+LIBS_PKSVUI_P_win_PR_release = -lwsock32
+LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lcomctl32
+LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROFILE))
 
-CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common
+CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE
+
+CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic -DDLL
 LDFLAGS_CONSOLE =
@@ -138,7 +140,7 @@ src_pksv/sublang/gsc_moves_reverse.c: src_pksv/sublang/gsc_moves.gperf $(BIN_GPE
 	$(GPERF) -C -l -L ANSI-C --output-file=$@ $<
 
 .rc.o:
-	$(WINDRES) -o $@ $<
+	$(WINDRES) $(CPPFLAGS) -o $@ $<
 
 .PHONY: all check clean clean-fmem
 

@@ -89,7 +89,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,
 }
 __declspec(dllexport) __cdecl int VersionMismatch(char*v)
 {
-  return strcmp(v,INTERNAL_VERSION);
+  return strcmp(v, ABI_COMPAT_VERSION);
 }
 __declspec(dllexport) __cdecl int NewMode(int nmode)
 {
