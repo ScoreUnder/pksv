@@ -7,6 +7,8 @@
 #define _CRT_SECURE_NO_DEPRECATE
 #pragma comment( lib, "comctl32.lib" )
 
+#include <stdbool.h>
+#include <string.h>
 #include "sqrt.h"
 #include "XPMData.h"
 #include <stdio.h>
@@ -261,14 +263,13 @@ signed int OffsetToPointer(unsigned int offset)
 #pragma comment( lib, "wsock32.lib" )
 //UPDATEME
 BOOL CALLBACK UpdatesDlgProc(HWND,UINT,WPARAM,LPARAM);
-DWORD WINAPI UpdateMe(LPVOID nothing)
+DWORD WINAPI UpdateMe(LPVOID explicit_update_check)
 {
 	WSADATA wsaData;
-	SOCKET sock;
+	SOCKET sock = INVALID_SOCKET;
 	struct sockaddr_in address;
 	struct hostent * host;
-	int i,j,sl_sock;
-	char buffer[4096],*UpdateBuffer;
+	char buffer[4096];
 
 	if (WSAStartup(MAKEWORD(1,1),&wsaData)==0)
 	{
@@ -281,70 +282,74 @@ DWORD WINAPI UpdateMe(LPVOID nothing)
 		if ((host=gethostbyname("pk-script-view.sourceforge.net"))!=NULL)
 		{
 			address.sin_addr.s_addr=*((unsigned long*)host->h_addr);
-			connect(sock,(struct sockaddr*)&address,sizeof(address));
+			if (connect(sock,(struct sockaddr*)&address,sizeof(address)) == 0) {
 #define get_update "GET /ver.txt HTTP/1.1\nHost: pk-script-view.sourceforge.net\nAccept-Encoding: None\nConnection: Close\n\n"
-			send(sock,get_update,(int)strlen(get_update),0);
-			recv(sock,buffer,4096,0);
-			i=0;
-			while (((buffer[i]>'9'||buffer[i]<'0')||(buffer[i+1]>'9'||buffer[i+1]<'0'))&&buffer[i]!=0)
-			{
-				i++;
-			}
-			if (buffer[i]=='2')
-			{
-				i=0;
-				sl_sock=(int)strlen(buffer);
-				while (i<sl_sock)
+				send(sock,get_update,(int)strlen(get_update),0);
+				size_t sl_sock = recv(sock,buffer,sizeof buffer,0);
+
+				size_t pos=0;
+				while (buffer[pos] != ' ' && pos < sl_sock) pos++;
+				pos++;
+
+				if (pos + 3 <= sl_sock && memcmp(&buffer[pos], "200", 3) == 0)
 				{
-					if (buffer[i]=='V'&&buffer[i+1]=='='&&buffer[i+2]=='=')
+					for (pos = 0; pos < sl_sock; pos++)
 					{
-						break;
-					}
-					i++;
-				}
-				if (i==sl_sock)
-					return 0;
-				j=0;
-				while (j+i<sl_sock)
-				{
-					if (buffer[i+j]=='\n') {
-						buffer[i+j]=0;
-						break;
-					}
-					j++;
-				}
-				if (strcmp(INTERNAL_VERSION,(buffer+i+3)))
-				{
-					i+=3;
-					j=0;
-					while (j<(int)strlen(buffer+i))
-					{
-						if (buffer[i+j]=='.') {
-							buffer[i+j]='-';
+						if (memcmp(&buffer[pos], "V==", 3) == 0)
+						{
+							pos += 3;
+							break;
 						}
-						j++;
 					}
-					if (DialogBox(inst,MAKEINTRESOURCE(3077),MainWnd,UpdatesDlgProc))
+					if (pos==sl_sock)
+						return 0;
+
+					bool same_version = true;
+					size_t version_end = pos + strlen(INTERNAL_VERSION);
+					if (version_end > sl_sock
+					    || (version_end < sl_sock && buffer[version_end] != '\r' && buffer[version_end] != '\n')
+							|| memcmp(INTERNAL_VERSION, &buffer[pos], strlen(INTERNAL_VERSION)) != 0
+							)
+						same_version = false;
+
+					if (!same_version)
 					{
-						UpdateBuffer=alloca(79+strlen(buffer+i));
-						strcpy(UpdateBuffer,"http://downloads.sourceforge.net/pk-script-view/pksvui_pkg");
-						strcat(UpdateBuffer,buffer+i);
-						strcat(UpdateBuffer,".zip?use_mirror=osdn");
-						ShellExecute(GenWin,NULL,UpdateBuffer,NULL,NULL,SW_SHOWDEFAULT);
+						size_t ver_len = sl_sock - pos;
+						for (size_t j = 0; j < sl_sock - pos; j++)
+						{
+							if (buffer[pos + j] == '.')
+								buffer[pos + j]='-';
+							if (buffer[pos + j] == '\r' || buffer[pos + j] == '\n')
+							{
+								ver_len = j;
+								break;
+							}
+						}
+
+						if (DialogBox(inst,MAKEINTRESOURCE(3077),MainWnd,UpdatesDlgProc))
+						{
+							char *UpdateBuffer=alloca(79+strlen(buffer+pos));
+							#define URL_BASE "http://downloads.sourceforge.net/pk-script-view/pksvui_pkg"
+							#define URL_BASE_LEN (sizeof(URL_BASE)-1)
+							strcpy(UpdateBuffer, URL_BASE);
+							memcpy(&UpdateBuffer[URL_BASE_LEN], &buffer[pos], ver_len);
+							strcpy(&UpdateBuffer[URL_BASE_LEN + ver_len], ".zip?use_mirror=osdn");
+							ShellExecute(GenWin,NULL,UpdateBuffer,NULL,NULL,SW_SHOWDEFAULT);
+						}
 					}
-				}
-				else if(nothing)
-				{
-					DialogBox(inst,MAKEINTRESOURCE(3076),MainWnd,UpdatesDlgProc);//Dialog, NO UPDATE AVAILABLE
+					else if(explicit_update_check)
+					{
+						DialogBox(inst,MAKEINTRESOURCE(3076),MainWnd,UpdatesDlgProc);//Dialog, NO UPDATE AVAILABLE
+					}
 				}
 			}
 		}
+		WSACleanup();
 	}
 	else
 	{
 		MessageBox(NULL,GetString1(3004),GetString2(3001),0x10);
 	}
-	WSACleanup();
 	return 0;
 }
 BOOL CALLBACK UpdatesDlgProc(HWND h,UINT m,WPARAM w,LPARAM l)
