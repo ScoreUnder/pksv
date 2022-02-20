@@ -768,6 +768,11 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,I
 		return 0;
 	}
 	VersionMismatch=(int (__cdecl *)(char*))GetProcAddress(PKSV,"VersionMismatch");
+	if (VersionMismatch && VersionMismatch(INTERNAL_VERSION))
+	{
+		MessageBox(NULL,GetString1(3070),GetString2(3071),0x30);
+		//Warning: PKSV.dll version mismatch! Try downloading the package again.
+	}
 	DetermineMode=(int (__cdecl *)(char*))GetProcAddress(PKSV,"DetermineMode");
 	decompile=(char* (__cdecl *)(char*,int,int))GetProcAddress(PKSV,"decompile");
 	decompileASM=(char* (__cdecl *)(char*,int))GetProcAddress(PKSV,"decompileASM");
