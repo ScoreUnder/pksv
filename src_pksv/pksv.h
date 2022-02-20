@@ -23,7 +23,7 @@ extern FILE *LogFile;
 
 #ifdef DLL
 #ifdef WIN32
-int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
+int __stdcall OffsetDlg(HWND,UINT,WPARAM,LPARAM);
 extern HWND HW_DLG;
 #endif
 #endif

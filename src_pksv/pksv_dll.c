@@ -46,8 +46,7 @@ bool testing=false;
 HWND UI_WIN;
 signed int PointerToOffset(unsigned int ptr); //prototype
 signed int OffsetToPointer(unsigned int offset);
-int OffsetDlg(HWND,UINT,WPARAM,LPARAM);
-int TxtDlg(HWND,UINT,WPARAM,LPARAM);
+int __stdcall TxtDlg(HWND,UINT,WPARAM,LPARAM);
 HWND HW_DLG,HW_TXT;
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,
                     DWORD fdwReason,
@@ -356,7 +355,7 @@ __declspec(dllexport) __cdecl int DebugCompile(char*fname,char*to_recompile)
   SetFocus(GetDlgItem(HW_TXT,1));
   return 0;
 }
-int OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
+int __stdcall OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   unsigned int selection,len,i;
   char*ptr;
@@ -426,7 +425,7 @@ int OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
   }
   return 1;
 }
-int TxtDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
+int __stdcall TxtDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
 {
   switch (msg)
   {
