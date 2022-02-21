@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
       autodetect_mode = false;
     } else if (!strcmp(argv[i], "--help")) {
       printf("PKSV V" PKSV_VERSION
-             " - backend used for compiling/decompiling.\n\
+             " - Command line tool to compile/decompile PokeScript.\n\
 pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
 pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
 pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
