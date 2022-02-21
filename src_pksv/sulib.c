@@ -305,15 +305,11 @@ void process_inserts(codeblock*c,codelabel*cl) //process inserts for everything.
 
 void add_data(codeblock*c,char*data,unsigned int len)
 {
-  char*temp;
-  while ((c->size)+len>c->allocated)
+  if (c->size + len > c->allocated)
   {
-    c->allocated=(2*c->allocated)+len;
-    temp=malloc(c->allocated);
-    memcpy(temp,c->data,c->size);
-    free(c->data);
-    c->data=temp;
+    c->allocated = (2*c->allocated) + len;
+    c->data = realloc(c->data, c->allocated);
   }
-  memcpy((c->data)+(c->size),data,len);
-  c->size+=len;
+  memcpy(&c->data[c->size], data, len);
+  c->size += len;
 }

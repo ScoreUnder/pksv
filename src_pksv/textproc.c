@@ -1146,8 +1146,8 @@ char* transbackstr(char*scrfn, unsigned int pos, codeblock*c)
 		}
 	}
 	if (eorg)
-		for (k=0;k<j;k++)
-			NewSpace[k]=search;
+	  memset(NewSpace, search, j);
+
 	add_data(c,NewSpace,j);
 	free(NewSpace);
 	return ret;
