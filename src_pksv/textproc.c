@@ -1542,48 +1542,16 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
+			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				unsigned int j=0;
-				while (j<16)
-				{
-					if (cmdbuf[4]=="0123456789abcdef"[j])
-					{
-						break;
-					}
-					j++;
-				}
-				if (j==16)
-				{
-					len--;
-					sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+				uint32_t j;
+				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
+				if (hex_end != &cmdbuf[cmdbuf_size]) {
+					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
 					log_txt(xbuf,strlen(xbuf));
-				}
-				else
-				{
-					k=j;
-					j=0;
-					while (j<16)
-					{
-						if (cmdbuf[5]=="0123456789abcdef"[j])
-						{
-							break;
-						}
-						j++;
-					}
-					if (j==16)
-					{
-						len--;
-						sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-						log_txt(xbuf,strlen(xbuf));
-					}
-					else
-					{
-						k=k<<4;
-						k|=j;
-						move k;
-					}
+				} else {
+					move k;
 				}
 			}
 			else {
@@ -1802,48 +1770,16 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
+			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				unsigned int j=0;
-				while (j<16)
-				{
-					if (cmdbuf[4]=="0123456789abcdef"[j])
-					{
-						break;
-					}
-					j++;
-				}
-				if (j==16)
-				{
-					len--;
-					sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+				uint32_t j;
+				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
+				if (hex_end != &cmdbuf[cmdbuf_size]) {
+					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
 					log_txt(xbuf,strlen(xbuf));
-				}
-				else
-				{
-					k=j;
-					j=0;
-					while (j<16)
-					{
-						if (cmdbuf[5]=="0123456789abcdef"[j])
-						{
-							break;
-						}
-						j++;
-					}
-					if (j==16)
-					{
-						len--;
-						sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-						log_txt(xbuf,strlen(xbuf));
-					}
-					else
-					{
-						k=k<<4;
-						k|=j;
-						move k;
-					}
+				} else {
+					move k;
 				}
 			}
 			else if (*cmdbuf)
@@ -2008,48 +1944,16 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 				*ii=i;
 				return len;
 			}
-			else if (cmdbuf_size == 6 && memcmp(cmdbuf, "raw_", 4) == 0)
+			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
 			{
 				//RAW handler.
-				unsigned int j=0;
-				while (j<16)
-				{
-					if (cmdbuf[4]=="0123456789abcdef"[j])
-					{
-						break;
-					}
-					j++;
-				}
-				if (j==16)
-				{
-					len--;
-					sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[4]);
+				uint32_t j;
+				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
+				if (hex_end != &cmdbuf[cmdbuf_size]) {
+					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
 					log_txt(xbuf,strlen(xbuf));
-				}
-				else
-				{
-					k=j;
-					j=0;
-					while (j<16)
-					{
-						if (cmdbuf[5]=="0123456789abcdef"[j])
-						{
-							break;
-						}
-						j++;
-					}
-					if (j==16)
-					{
-						len--;
-						sprintf(xbuf,"Invalid hex char '%c'.\r\n",cmdbuf[5]);
-						log_txt(xbuf,strlen(xbuf));
-					}
-					else
-					{
-						k=k<<4;
-						k|=j;
-						move k;
-					}
+				} else {
+					move k;
 				}
 			}
 			else {
