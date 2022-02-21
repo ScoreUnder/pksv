@@ -6,8 +6,8 @@
 #define ROM_UNKNOWN 255
 
 struct rom_mode {
-    unsigned type: 8;
-    unsigned search: 8;
+  unsigned type : 8;
+  unsigned search : 8;
 };
 
 struct rom_mode determine_mode(FILE *romfile);

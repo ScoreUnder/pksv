@@ -1,10 +1,13 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdbool.h>
 
 int main(int argc, char **argv) {
   if (argc > 1) {
-    fprintf(stderr, "Usage: %s < input > output\nThere are no arguments, please use shell redirections.\n", argv[0]);
+    fprintf(stderr,
+            "Usage: %s < input > output\nThere are no arguments, please use "
+            "shell redirections.\n",
+            argv[0]);
     return 1;
   }
 
@@ -62,7 +65,10 @@ int main(int argc, char **argv) {
   }
   printf("};\n\n");
   printf("char const* %s_reverse(int value) {\n", lookup_function_name);
-  printf("  if (value < 0 || value >= (int)(sizeof(%s_reverse_arr)/sizeof(%s_reverse_arr[0]))) return NULL;\n", lookup_function_name, lookup_function_name);
+  printf(
+      "  if (value < 0 || value >= "
+      "(int)(sizeof(%s_reverse_arr)/sizeof(%s_reverse_arr[0]))) return NULL;\n",
+      lookup_function_name, lookup_function_name);
   printf("  return %s_reverse_arr[value];\n", lookup_function_name);
   printf("}\n");
 

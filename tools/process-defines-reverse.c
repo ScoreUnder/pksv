@@ -1,21 +1,18 @@
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <ctype.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
-void strupper(char *s)
-{
+void strupper(char *s) {
   while (*s) {
     *s = toupper(*s);
     s++;
   }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   const char *infile = "defines.dat";
-  if (argc > 1)
-    infile = argv[1];
+  if (argc > 1) infile = argv[1];
   FILE *in = fopen(infile, "rb");
   if (!in) {
     perror(infile);
@@ -26,10 +23,9 @@ int main(int argc, char **argv)
   bool ok = true;
   while (!feof(in)) {
     int c = fgetc(in);
-    if (c == EOF)
-      break;
+    if (c == EOF) break;
 
-    if (fread(namebuf, 1, c, in) != (size_t) c) {
+    if (fread(namebuf, 1, c, in) != (size_t)c) {
       ok = false;
       break;
     }

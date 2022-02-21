@@ -21,22 +21,20 @@ extern unsigned int fail;
 
 void pksv_codeproc_reset(void);
 
-#define Defined2(thing) (WhatIs2(thing),!fail)
-#define GetNum(x) GenForFunc(x,&i,Script,defines,c)
+#define Defined2(thing) (WhatIs2(thing), !fail)
+#define GetNum(x) GenForFunc(x, &i, Script, defines, c)
 
 extern unsigned char gffs;
-unsigned int GenForFunc(char*func,
-                        unsigned int*ii,
-                        char*Script,
-                        struct bsearch_root *defines,
-                        codeblock*c);
+unsigned int GenForFunc(char *func, unsigned int *ii, char *Script,
+                        struct bsearch_root *defines, codeblock *c);
 
-void Define2(unsigned int otherthing,char*thing);
-char* WhatIs2(int thing);
+void Define2(unsigned int otherthing, char *thing);
+char *WhatIs2(int thing);
 
-unsigned int FindFreeSpace(char*romname, unsigned int len, struct bsearch_root *defines);
+unsigned int FindFreeSpace(char *romname, unsigned int len,
+                           struct bsearch_root *defines);
 
-void LowerCaseAndRemAll0D(char*orig);
+void LowerCaseAndRemAll0D(char *orig);
 
 signed int PointerToOffset(unsigned int ptr);
 signed int OffsetToPointer(unsigned int offset);

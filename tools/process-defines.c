@@ -1,34 +1,29 @@
-#include <stdio.h>
-#include <string.h>
+#include <binarysearch.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <binarysearch.h>
+_Static_assert(sizeof(intptr_t) >= sizeof(uint32_t),
+               "intptr_t must be at least 32 bits");
 
-_Static_assert(sizeof(intptr_t) >= sizeof(uint32_t), "intptr_t must be at least 32 bits");
-
-void strtolower(char *str)
-{
-    while (*str)
-    {
-        *str = tolower(*str);
-        str++;
-    }
+void strtolower(char *str) {
+  while (*str) {
+    *str = tolower(*str);
+    str++;
+  }
 }
 
-static int bsearch_key_strcmp(const void *a, const void *b)
-{
-  return strcmp((const char*)a,(const char*)b);
+static int bsearch_key_strcmp(const void *a, const void *b) {
+  return strcmp((const char *)a, (const char *)b);
 }
 
-static void* bsearch_key_strdup(const void *a)
-{
-  return strdup((const char*)a);
+static void *bsearch_key_strdup(const void *a) {
+  return strdup((const char *)a);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
 
@@ -45,7 +40,8 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  bsearch_init_root(&defines, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+  bsearch_init_root(&defines, bsearch_key_strcmp, bsearch_key_strdup, free,
+                    NULL);
 
   char line[1024];
   while (fgets(line, sizeof(line), f)) {
@@ -55,10 +51,16 @@ int main(int argc, char **argv)
 
     if (!strcmp(p, "#d") || !strcmp(p, "#define")) {
       char *identifier = strtok_r(NULL, " \t\r\n", &saveptr);
-      if (!identifier) { fputs("#define without identifier", stderr); return 1; }
+      if (!identifier) {
+        fputs("#define without identifier", stderr);
+        return 1;
+      }
 
       char *value = strtok_r(NULL, " \t\r\n", &saveptr);
-      if (!value) { fputs("#define without value", stderr); return 1;}
+      if (!value) {
+        fputs("#define without value", stderr);
+        return 1;
+      }
 
       strtolower(identifier);
       strtolower(value);
@@ -66,9 +68,18 @@ int main(int argc, char **argv)
       int base = 10;
       if (value[0] == '0') {
         switch (value[1]) {
-          case 'x': base = 16; value += 2; break;
-          case 'o': base = 8; value += 2; break;
-          case 'b': base = 2; value += 2; break;
+          case 'x':
+            base = 16;
+            value += 2;
+            break;
+          case 'o':
+            base = 8;
+            value += 2;
+            break;
+          case 'b':
+            base = 2;
+            value += 2;
+            break;
         }
       }
 
@@ -77,14 +88,15 @@ int main(int argc, char **argv)
       if (!endptr || *endptr != '\0') {
         size_t index = bsearch_find_if_exists(&defines, value);
         if (index != defines.size) {
-          value_parsed = (uint32_t)(intptr_t) defines.pairs[index].value;
+          value_parsed = (uint32_t)(intptr_t)defines.pairs[index].value;
         } else {
-          fprintf(stderr, "#define of %s with invalid value: %s\n", identifier, value);
+          fprintf(stderr, "#define of %s with invalid value: %s\n", identifier,
+                  value);
           return 1;
         }
       }
 
-      bsearch_upsert(&defines, identifier, (void*)(intptr_t) value_parsed);
+      bsearch_upsert(&defines, identifier, (void *)(intptr_t)value_parsed);
     } else if (!strcmp(p, "#quiet") || !strcmp(p, "#loud")) {
       // ignore verbosity indicator
     } else if (p[0] == '\'') {

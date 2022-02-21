@@ -1,4 +1,5 @@
-char* Gary_xpm="/* XPM */\n\
+char* Gary_xpm =
+    "/* XPM */\n\
 static char * Gary_xpm[] = {\n\
 \"16 16 13 1\",\n\
 \"z	c #E8E8F0\",\n\
@@ -30,7 +31,8 @@ static char * Gary_xpm[] = {\n\
 \"z*=>&&&**&&&>=*z\",\n\
 \"z*==&&&**&&&==@z\",\n\
 \"zz&&&&>>>>&&&@.z\"};";
-char* sign_xpm="/* XPM */\n\
+char* sign_xpm =
+    "/* XPM */\n\
 static char * sign_xpm[] = {\n\
 \"16 16 7 1\",\n\
 \"z	c #A8B8C8\",\n\
@@ -56,7 +58,8 @@ static char * sign_xpm[] = {\n\
 \"%%.+.%%%%%%.+.%%\",\n\
 \"%%...%%%%%%...%%\",\n\
 \"%%%%%%%%%%%%%%%%\"};";
-char* pokeball_xpm="/* XPM */\n\
+char* pokeball_xpm =
+    "/* XPM */\n\
 static char * pokeball_xpm[] = {\n\
 \"16 16 8 1\",\n\
 \"z	c None\",\n\
@@ -83,7 +86,8 @@ static char * pokeball_xpm[] = {\n\
 \"zzzzz%&@@&%zzzzz\",\n\
 \"zzzzzz%%%%zzzzzz\",\n\
 \"zzzzzzzzzzzzzzzz\"};";
-char* poke_xpm="/* XPM */\n\
+char* poke_xpm =
+    "/* XPM */\n\
 static char * pokemon_xpm[] = {\n\
 \"16 16 9 1\",\n\
 \" 	c None\",\n\
@@ -111,7 +115,8 @@ static char * pokemon_xpm[] = {\n\
 \"   %*$.$.$*%    \",\n\
 \"  %...%%%...%   \",\n\
 \"   %       %    \"};";
-char* furniture_xpm="/* XPM */\n\
+char* furniture_xpm =
+    "/* XPM */\n\
 static char * chair_xpm[] = {\n\
 \"16 16 9 1\",\n\
 \" 	c None\",\n\
@@ -139,7 +144,8 @@ static char * chair_xpm[] = {\n\
 \"+@@@%%%%%%%%%%.@\",\n\
 \".@@@%*%....%*%.@\",\n\
 \".@@@#%.@#@@@%..@\"};";
-char* flag_xpm="/* XPM */\n\
+char* flag_xpm =
+    "/* XPM */\n\
 static char * flag_xpm[] = {\n\
 \"16 16 92 1\",\n\
 \"  c None\",\n\
@@ -250,7 +256,8 @@ static char * flag_xpm[] = {\n\
 \"      XYZ       \",\n\
 \"       `Z       \",\n\
 \"                \"};";
-char* hero_xpm="/* XPM */\n\
+char* hero_xpm =
+    "/* XPM */\n\
 static char * hero_xpm[] = {\n\
 \"16 16 14 1\",\n\
 \"z	c #70C8A0\",\n\
@@ -283,7 +290,8 @@ static char * hero_xpm[] = {\n\
 \"z;==-++**++-==;z\",\n\
 \"zz;$$+@%%@+$$;zz\",\n\
 \"zzz-,-$$$$-,-zzz\"};";
-char* special_xpm="/* XPM */\n\
+char* special_xpm =
+    "/* XPM */\n\
 static char * special_xpm[] = {\n\
 \"16 16 62 1\",\n\
 \"z	c #000000\",\n\
@@ -364,7 +372,8 @@ static char * special_xpm[] = {\n\
 \"zzzzzzzzzzzzzwzz\",\n\
 \"zzzzzzzzzzzzzzzz\",\n\
 \"zzzzzzzzzzzzzzzz\"};";
-char* bin_xpm="/* XPM */\n\
+char* bin_xpm =
+    "/* XPM */\n\
 static char * bin_xpm[] = {\n\
 \"16 16 2 1\",\n\
 \" 	c none\",\n\
@@ -385,7 +394,8 @@ static char * bin_xpm[] = {\n\
 \" . .  .  . .  . \",\n\
 \"  .  ...  .  ...\",\n\
 \"                \"};";
-char* music_xpm="/* XPM */\n\
+char* music_xpm =
+    "/* XPM */\n\
 static char * music_xpm[] = {\n\
 \"16 16 15 1\",\n\
 \".	c #FFFFFF\",\n\
@@ -419,7 +429,8 @@ static char * music_xpm[] = {\n\
 \"...@+++++.......\",\n\
 \"...-+++*%.......\",\n\
 \"...&*+)%........\"};";
-char* money_xpm="/* XPM */\n\
+char* money_xpm =
+    "/* XPM */\n\
 static char * money_xpm[] = {\n\
 \"16 16 15 1\",\n\
 \" 	c #FFFFFF\",\n\
@@ -453,7 +464,8 @@ static char * money_xpm[] = {\n\
 \"  ;>,======,>;  \",\n\
 \"   +%&*=-*&%+   \",\n\
 \"    .+@#$@+.    \"};";
-char* frmove_xpm="/* XPM */\n\
+char* frmove_xpm =
+    "/* XPM */\n\
 static char * GaryFR_xpm[] = {\n\
 \"16 16 18 1\",\n\
 \" 	c None\",\n\
@@ -490,7 +502,8 @@ static char * GaryFR_xpm[] = {\n\
 \".;')''';;')'')'.\",\n\
 \".;')))';;''))''.\",\n\
 \"..'''''~~~''''+.\"};";
-char* rsmove_xpm="/* XPM */\n\
+char* rsmove_xpm =
+    "/* XPM */\n\
 static char * GaryRS_xpm[] = {\n\
 \"16 16 20 1\",\n\
 \" 	c None\",\n\
@@ -529,7 +542,8 @@ static char * GaryRS_xpm[] = {\n\
 \".,']))),,---]',.\",\n\
 \".,''---,,---''#.\",\n\
 \"..----]]]]---#+.\"};";
-char* unknown_xpm="/* XPM */\n\
+char* unknown_xpm =
+    "/* XPM */\n\
 static char * unbeknownst_xpm[] = {\n\
 \"16 16 29 1\",\n\
 \" 	c None\",\n\

@@ -1,11 +1,11 @@
-#include <stdint.h>
+#include "textutil.h"
+
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "textutil.h"
-
-const char* hex_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
+const char *hex_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   uint32_t result = 0;
   while (*c && maxlen) {
     uint32_t digit;
@@ -30,7 +30,7 @@ const char* hex_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   return c;
 }
 
-const char* dec_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
+const char *dec_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   uint32_t result = 0;
   while (*c && maxlen) {
     uint32_t digit;
@@ -51,7 +51,7 @@ const char* dec_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   return c;
 }
 
-char* extract_text_interval(const char *start, const char *end) {
+char *extract_text_interval(const char *start, const char *end) {
   size_t len = end - start;
   char *result = malloc(len + 1);
   memcpy(result, start, len);
