@@ -30,6 +30,8 @@
 #include "isdone.h"
 #include "pksv.h"
 
+#define WORD_WRAP_LEN 120
+
 char comparetype=0;
 
 void pksv_decompiler_reset(void)
@@ -1914,7 +1916,7 @@ void DecodeProc2(FILE* fileM_,
 					}
 					else
 					{
-						transtxt(arg2,filename);
+						transtxt(arg2, filename, 0, NULL);
 						if (trans[20]!=0)
 						{
 							strcpy(trans+20,"...");
@@ -2514,7 +2516,7 @@ void DecodeProc2(FILE* fileM_,
 					}
 					else
 					{
-						transtxt(arg2,filename);
+						transtxt(arg2, filename, 0, NULL);
 						if (trans[20]!=0)
 						{
 							strcpy(trans+20,"...");
@@ -2804,7 +2806,7 @@ void DecodeProc2(FILE* fileM_,
 					}
 					else
 					{
-						transtxt(arg1,filename);
+						transtxt(arg1, filename, 0, NULL);
 						if (trans[20]!=0)
 						{
 							strcpy(trans+20,"...");
@@ -3061,7 +3063,7 @@ void DecodeProc2(FILE* fileM_,
 						}
 						else
 						{
-							transtxt(arg2,filename);
+							transtxt(arg2, filename, 0, NULL);
 							if (trans[20]!=0)
 							{
 								strcpy(trans+20,"...");
@@ -5358,6 +5360,43 @@ void DecodeProc2(FILE* fileM_,
 	fprintf(fsend,"\r\n");
 }
 
+static void decompile_single_text(FILE *fsend, const char *fname, uint32_t seek) {
+	uint32_t offset = seek;
+	char orgbuf[32];
+	char prefix[4];
+	const char* orgname = orgbuf;
+	fprintf(fsend,"\r\n");
+	if (mode == GOLD) {
+		prefix[0] = '\0';  // Unprefixed; gsc text is a full scripting language
+	} else {
+		strcpy(prefix, "= ");
+	}
+
+	if (mode==GOLD || !dyndec) {
+		sprintf(orgbuf, "0x%X", offset);
+	} else {
+		if (!Defined2(offset|0x08000000)) {
+			textnum++;
+			sprintf(orgbuf,"@text%u",textnum);
+			Define2(offset|0x08000000,orgbuf);
+		}
+		orgname = WhatIs2(offset|0x08000000);
+	}
+	fprintf(fsend,"#org %s\r\n",orgname);
+
+	while (offset) {
+		fprintf(fsend, "%s%s\r\n", prefix, transtxt(offset, fname, WORD_WRAP_LEN, &offset));
+	}
+}
+
+static void decompile_all_text(FILE *fsend, const char *fname) {
+	while (!AllDoneText()) {
+		uint32_t offset = DoneText(FindNotDoneText());
+		if (mode != GOLD) offset &= 0x07ffffff;
+		decompile_single_text(fsend, fname, offset);
+	}
+}
+
 void DecodeProcLevel(FILE*fileM,
 										 unsigned int FileZoomPos,
 										 char*fname,
@@ -5455,28 +5494,7 @@ void DecodeProcLevel(FILE*fileM,
 		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
 #define nl() fprintf(fsend,"\r\n")
-	while (!AllDoneText())
-	{
-		nl();
-		arg1=DoneText(FindNotDoneText());
-		if (mode!=GOLD)
-		{
-			if(dyndec)
-			{
-				if(!Defined2(arg1|0x08000000))
-				{
-					textnum++;
-					sprintf(buf,"@text%u",textnum);
-					Define2(arg1|0x08000000,buf);
-				}
-				fprintf(fsend,"#org %s\r\n= %s\r\n",WhatIs2(arg1|0x08000000),transtxt(arg1&0x07ffffff,fname));
-			}
-			else
-				fprintf(fsend,"#org 0x%X\r\n= %s\r\n",arg1,transtxt(arg1&0x07ffffff,fname));
-		}
-		else
-			fprintf(fsend,"#org 0x%X\r\n%s\r\n",arg1,transtxt(arg1,fname));
-	}
+	decompile_all_text(fsend, fname);
 	while (!AllDoneMove())
 	{
 		nl();
@@ -5633,28 +5651,7 @@ void DecodeProc(FILE*fileM,
 		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
 #define nl() fprintf(fsend,"\r\n")
-	while (!AllDoneText())
-	{
-		nl();
-		arg1=DoneText(FindNotDoneText());
-		if (mode!=GOLD)
-		{
-			if(dyndec)
-			{
-				if(!Defined2(arg1|0x08000000))
-				{
-					textnum++;
-					sprintf(buf,"@text%u",textnum);
-					Define2(arg1|0x08000000,buf);
-				}
-				fprintf(fsend,"#org %s\r\n= %s\r\n",WhatIs2(arg1|0x08000000),transtxt(arg1&0x07ffffff,fname));
-			}
-			else
-				fprintf(fsend,"#org 0x%X\r\n= %s\r\n",arg1,transtxt(arg1&0x07ffffff,fname));
-		}
-		else
-			fprintf(fsend,"#org 0x%X\r\n%s",arg1,transtxt(arg1,fname));
-	}
+	decompile_all_text(fsend, fname);
 	while (!AllDoneMove())
 	{
 		nl();
@@ -5897,10 +5894,7 @@ void DecodeProcText(FILE*fileM,
 			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
 		}
 	}
-	if (mode!=GOLD)
-		fprintf(fsend,"#org 0x%X\r\n= %s\r\n",FileZoomPos,transtxt(FileZoomPos&0x07ffffff,fname));
-	else
-		fprintf(fsend,"#org 0x%X\r\n%s\r\n",FileZoomPos,transtxt(FileZoomPos&0x07ffffff,fname));
+	decompile_single_text(fsend, fname, FileZoomPos);
 }
 
 void DecodeProcPointer(FILE*fileM,

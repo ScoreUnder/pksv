@@ -198,7 +198,7 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
   if (command_line==TXT)
   {
     otherfile=fopen(export_name,"wb");
-    transtxt(decompile_at,file_name);
+    transtxt(decompile_at, file_name, 0, NULL);
     fwrite(trans,1,strlen(trans),otherfile);
     fclose(otherfile);
   }

@@ -37,28 +37,29 @@ void log_txt(const char *str, size_t length)
  	fwrite(str, 1, length, LogFile ? LogFile : stderr);
 }
 
-char*transtxt(int howfar,const char*file)
+char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_out)
 {
 	unsigned int pt=0,sl,arg1,arg2;
 	unsigned char p,code;
 	const char hex[17]="0123456789ABCDEF";
 	char buf[128];
 	unsigned int read;
-	char still_going,readagain,sub_going;
+	char readagain,sub_going;
 	FILE* fileC;
+	bool resume = false;
 	read=0;
 	fileC=fopen(file,"rb");
 	*trans=0;
 	if (fileC!=NULL)
 	{
 		fseek(fileC,(howfar&0x7ffffff),SEEK_SET);
-		still_going=1;
 		if (mode!=GOLD&&mode!=CRYSTAL) {
-			while (still_going)
+			while (true)
 			{
 				read=(int)fread(&p,1,1,fileC);
 				if (read==0)
 				{
+					strcpy(&trans[pt], "\\x");
 					break;
 				}
 				else
@@ -73,6 +74,11 @@ char*transtxt(int howfar,const char*file)
 						p-=0x71;
 					}
 					else if (p==0) {
+						if (word_wrap && pt >= word_wrap) {
+							strcpy(&trans[pt], " \\x");
+							resume = true;
+							break;
+						}
 						p=0x20;    //space
 					}
 					else if (p==0x1b) {
@@ -130,6 +136,11 @@ char*transtxt(int howfar,const char*file)
 					}
 					else if (p==0xfe) // \n
 					{
+						if (word_wrap) {
+							strcpy(&trans[pt], "\\n\\x");
+							resume = true;
+							break;
+						}
 						trans[pt]='\\';
 						pt++;
 						p='n';
@@ -144,20 +155,31 @@ char*transtxt(int howfar,const char*file)
 					}
 					else if (p==0xfa) // \l
 					{
+						if (word_wrap) {
+							strcpy(&trans[pt], "\\l\\x");
+							resume = true;
+							break;
+						}
 						trans[pt]='\\';
 						pt++;
 						p='l';
 					}
 					else if (p==0xfb) // \p
 					{
+						if (word_wrap) {
+							strcpy(&trans[pt], "\\p\\x");
+							resume = true;
+							break;
+						}
 						trans[pt]='\\';
 						pt++;
 						p='p';
 					}
 					else if (p==0xff)
 					{
-						p=0; //EOS
-						still_going=0;
+						// end of text
+						trans[pt] = '\0';
+						break;
 					}
 					else if (p==0xf0) {
 						p=':';
@@ -198,9 +220,10 @@ char*transtxt(int howfar,const char*file)
 						pt++;
 						p=hex[p&0xf];
 					}
-					if (pt>=65525) //cut smaller for safety, 10 off because some commands are multichar.
+					if (pt >= sizeof trans - 30)
 					{
-						trans[pt]=0;
+						strcpy(&trans[pt], "\\x");
+						resume = true;
 						break;
 					}
 					trans[pt]=p;
@@ -211,6 +234,7 @@ char*transtxt(int howfar,const char*file)
 		else
 		{
 			strcpy(trans,"");
+			char still_going=1;
 			while (still_going)
 			{
 				read=(unsigned int)fread(&code,1,1,fileC);
@@ -349,7 +373,7 @@ char*transtxt(int howfar,const char*file)
 							strcat(trans,"[PLAYER]");
 						}
 						else if (p==0x54) {
-							strcat(trans,"[POK�]");
+							strcat(trans,"[POKe]");
 						}
 						else if (p==0x55) {
 							strcat(trans,"\\l");
@@ -540,11 +564,21 @@ char*transtxt(int howfar,const char*file)
 				}
 			}
 		}
+		if (resume_out != NULL) {
+			if (resume) {
+				*resume_out = (uint32_t) ftell(fileC);
+			} else {
+				*resume_out = 0;
+			}
+		}
 		fclose(fileC);
 	}
 	else
 	{
-		strcpy(trans,"Error in translating string...");
+		if (resume_out != NULL) {
+			*resume_out = 0;
+		}
+		strcpy(trans,"\\x\n' Could not reopen ROM file to translate string");
 	}
 	return trans;
 }
@@ -721,7 +755,7 @@ void err_bad_hex(const char*ptr, size_t len) {
 
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
-char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
+char* transbackstr(char*scrfn, unsigned int pos, codeblock*c)
 {
 	char*NewSpace,*ret;
 	char cch,noend=0;
@@ -850,7 +884,12 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 					NewSpace[j]=0x57;
 					j++;
 					NewSpace[j]=0x0;
+          j++;
 					break;
+				}
+				else if (str[i]=='x') {
+					noend=1;
+					j--;
 				}
 				else if (str[i]=='h') {
           // Raw hex escape
@@ -965,10 +1004,10 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 			i++;
 			j++;
 		}
-		if (NewSpace[j-1]!=0x57) {
+		if (!noend && (j < 2 || NewSpace[j-2]!=0x57)) {
 			NewSpace[j]=0x50;
+			j++;
 		}
-		j++;
 	}
 	else
 	{
@@ -1016,6 +1055,7 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 				}
 				else if (str[i]=='x') {
 					noend=1;
+					j--;
 				}
 				else if (str[i]=='w') {
 					NewSpace[j]=0xFC;
