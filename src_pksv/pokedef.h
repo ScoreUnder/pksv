@@ -76,7 +76,7 @@
 #define CMD_CRY 0x30          // C,D,T bank(1) poke(2) unk(2) (fr=checksound)
 #define CMD_FANFARE 0x31      // C,D,T snd(2)
 #define CMD_WAITFANFARE 0x32  // C,D,T
-#define CMD_PLAYSOUND 0x33    // C,D,T snd(2) (fr: +1)
+#define CMD_PLAYSOUND 0x33    // C,D,T snd(2) save:bool(1)
 #define CMD_PLAYSONG 0x34     // C,D,T song(2)
 #define CMD_FADEDEFAULT 0x35  // C,D,T
 #define CMD_FADESONG 0x36     // C,D,T song(2)
@@ -281,8 +281,8 @@ Waits a certain amount of time Setflag Sets a flag to 1 (a flag is a variable
 that can be only 1 or 0) clearflag Sets a flag to 0 checkflag Checks if a flag
 is 1 cmd_2f No idea. cry Makes the same sound a pokemon (that you decide) makes
 when it comes into battle. fanfare Plays any pre-defined sound waitfanfare Waits
-for that command to complete playsound Plays a pre-defined sound. fadedefault
-Fades into the normal bg music. fadesound Fades into a pre-defined sound.
+for that command to complete playsound Plays a pre-defined sound.
+fadedefault Fades into the normal bg music.
 fadeout Fades out of music
 fadein Fades into music
 warp Teleports the player

@@ -2307,7 +2307,7 @@ comparehiddenvar;9|comparevars;9|comparevars2;9|comparevartobyte;9|comparevartof
 copyscriptbanks;9|copyvar;9|\
 copyvarifnotzero;9|countpokemon;3|createtempsprite;1|cry;3|darkenroom;8|disappear;1|disappearat;1|\
 doanimation;8|doorchange;8|doweather;8|end;9|endtrainerbattle;1|endtrainerbattle2;1|executeram;9|faceplayer;1|\
-fadedefault;10|fadein;10|fadeout;10|fadescreen;8|fadescreendelay;8|fadesong;10|fadesound;10|fakecallstd;2|fakejumpstd;2|\
+fadedefault;10|fadein;10|fadeout;10|fadescreen;8|fadescreendelay;8|fadesong;10|fakecallstd;2|fakejumpstd;2|\
 falldownhole;7|fardisappear;1|farreappear;1|fanfare;10|getplayerxy;7|giveegg;3|giveitemtopc;4|\
 givemoney;11|givetocoincase;11|hidebox;2|hidecoins;11|hidepokepic;2|hidemoney;2|if;9|jump;9|\
 jumpram;9|jumpstd;2|jumpstdif;2|killscript;9|lastbattle;3|lasttrainerbattle;1|lightroom;8|\

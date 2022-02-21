@@ -4154,20 +4154,11 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             break;
           case CMD_PLAYSOUND:
             fread(&arg1, 1, 2, fileM);
-            if (mode == FIRE_RED) {
-              fread(&arg2, 1, 1, fileM);
-              fprintf(fsend, "playsound 0x%X 0x%X\n", arg1, arg2);
-            } else {
-              fprintf(fsend, "playsound 0x%X\n", arg1);
-            }
+            fread(&arg2, 1, 1, fileM);
+            fprintf(fsend, "playsound 0x%X 0x%X\n", arg1, arg2);
             break;
           case CMD_FADEDEFAULT:
-            if (mode == RUBY) {
-              fread(&arg1, 1, 2, fileM);
-              fprintf(fsend, "fadesound 0x%X\n", arg1);
-            } else if (mode == FIRE_RED) {
-              fprintf(fsend, "fadedefault\n");
-            }
+            fprintf(fsend, "fadedefault\n");
             break;
           case CMD_FADEOUT:
             fread(&arg1, 1, 1, fileM);

@@ -7028,15 +7028,6 @@ void RecodeProc(char *script, char *romfn) {
                   BASIC(CMD_FANFARE);
                   rom(arg1, 2);
                 }
-                aa("fadesound") {
-                  vlog_txt("FADESOUND\n");
-                  arg1 = GetNum("FADESOUND");
-                  if (!gffs) {
-                    return;
-                  }
-                  BASIC(CMD_FADEDEFAULT);
-                  rom(arg1, 2);
-                }
                 aa("fadesong") {
                   vlog_txt("FADESONG\n");
                   arg1 = GetNum("FADESONG");
@@ -7638,17 +7629,13 @@ void RecodeProc(char *script, char *romfn) {
                   if (!gffs) {
                     return;
                   }
-                  if (mode == FIRE_RED) {
-                    arg1 = GetNum("PLAYSOUND");
-                    if (!gffs) {
-                      return;
-                    }
+                  arg2 = GetNum("PLAYSOUND");
+                  if (!gffs) {
+                    return;
                   }
                   BASIC(CMD_PLAYSOUND);
                   rom(arg1, 2);
-                  if (mode == FIRE_RED) {
-                    rom(arg2, 1);
-                  }
+                  rom(arg2, 1);
                 }
                 aa("playsong") {
                   vlog_txt("PLAYSONG\n");
