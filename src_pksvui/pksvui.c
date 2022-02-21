@@ -403,78 +403,6 @@ char cToLower(char chr)
 //GETDIRFROMGREATBUFFER
 void GetDirFromGreatBuffer()
 {
-	/*
-	#ifdef MSVC
-	  char*a=GreatBuffer;
-	  __asm
-	  {
-		mov eax,a
-		cmp byte ptr [eax],0x22
-		pushf
-		xor edx,edx
-		mov ebx,eax
-		popf
-		jne NoQuote
-		mov dl,0x22
-	BkToLp:
-		inc ebx
-	NoQuote:
-		cmp byte ptr [ebx],dl
-		jnz BkToLp
-	BkToSLp:
-		dec ebx
-		cmp byte ptr [ebx],0x5C
-		jnz BkToSLp
-		inc ebx
-		mov byte ptr [ebx],0
-		xor ecx,ecx
-		cmp edx,0
-		je GDGBEnd
-	BkToTlp:
-		mov bl,byte ptr [eax+ecx+1]
-		mov byte ptr [eax+ecx],bl
-		inc ecx
-		cmp byte ptr [eax+ecx],0
-		jnz BkToTlp
-	GDGBEnd:
-	  }
-	  return;
-	#else
-	  asm volatile ( ".intel_syntax noprefix\n"
-	        "push %%ebx\n"
-	        "push %%ecx\n"
-	        "push %%edx\n"
-	        "cmp byte ptr [%%eax],0x22\n"
-	        "pushf\n"
-	        "xor %%edx,%%edx\n"
-	        "mov %%ebx,%%eax\n"
-	        "popf\n"
-	        "jne NoQuote\n"
-	        "mov %%dl,0x22\n"
-	 "BkToLp:inc %%ebx\n"
-	"NoQuote:cmp byte ptr [%%ebx],%%dl\n"
-	        "jnz BkToLp\n"
-	"BkToSLp:dec %%ebx\n"
-	        "cmp byte ptr [%%ebx],0x5C\n"
-	        "jnz BkToSLp\n"
-	        "inc %%ebx\n"
-	        "mov byte ptr [%%ebx],0\n"
-	        "xor %%ecx,%%ecx\n"
-	        "cmp %%edx,0\n"
-	        "je GDGBEnd\n"
-	"BkToTlp:mov %%bl,byte ptr [%%eax+%%ecx+1]\n"
-	        "mov byte ptr [%%eax+%%ecx],%%bl\n"
-	        "inc %%ecx\n"
-	        "cmp byte ptr [%%eax+%%ecx],0\n"
-	        "jnz BkToTlp\n"
-	        "GDGBEnd:\n"
-	        "pop %%edx\n"
-	        "pop %%ecx\n"
-	        "pop %%ebx\n"
-	        ".att_syntax\n"::"a"(GreatBuffer));
-	        return;
-	#endif
-	*/
 	register char* b=GreatBuffer;
 	register int using_quotes=0;
 	if (*b=='"')
@@ -1976,10 +1904,8 @@ OpenMe:
 				if (GetSaveFileName(&ofn)&&strcmp(ofn.lpstrFile,""))
 				{
 					i=(int)strlen(FileOpen);
-					strcpy(GreatBuffer,FileOpen);
-					ToLower(GreatBuffer);
-					if (GreatBuffer[i-1]!='s'||GreatBuffer[i-2]!='k'||GreatBuffer[i-3]!='p'||GreatBuffer[i-4]!='.')
-						strcat(FileOpen,".pks");
+					if (i < 4 || strcasecmp(&FileOpen[i - 4], ".pks") != 0)
+						strcpy(&FileOpen[i], ".pks");
 					strcpy(FileOpen3,FileOpen);
 					strcpy(FileOpen2,FileOpen);
 					strcpy(GreatBuffer,FileOpen);
@@ -1989,11 +1915,6 @@ OpenMe:
 						strcpy(FileOpen2,(char*)(FileOpen+strlen(GreatBuffer)));
 					strcat(FileOpen2," - Score_Under's PKSV-UI");
 					SetWindowText(MainWnd,FileOpen2);
-					/*Wait... what?
-					strcpy(FileOpen2,FileOpen);
-					strcat(FileOpen2,".bak");
-					CopyFile(FileOpen2,FileOpen,0);
-					*/
 					FileSave=CreateFile(FileOpen3,GENERIC_WRITE,FILE_SHARE_READ,NULL,CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
 					if (FileSave!=INVALID_HANDLE_VALUE)
 					{
@@ -2969,6 +2890,9 @@ uint32_t FindFreeSpace(char*romname, uint32_t len, uint32_t start)
 		CreateFile(romname,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL),
 		"rb"
 	);
+
+	if (rom_file == NULL)
+		return (uint32_t)-1;  // TODO: error message?
 
 	off_t real_start = start & 0x01ffffff;
 	fseeko(rom_file, real_start, SEEK_SET);
