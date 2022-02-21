@@ -3,12 +3,6 @@
 
 #include "binarysearch.h"
 
-typedef struct __define {
-  char* name;
-  unsigned int means;
-  struct __define* next;
-} definition;
-
 typedef struct __insert {
   unsigned int pos;
   char* name;

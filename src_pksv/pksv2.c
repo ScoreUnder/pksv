@@ -42,8 +42,6 @@ unsigned char search = 0xFF;  // Free Space character
 bool eorg = false;
 bool testing = false;
 FILE* LogFile;
-signed int PointerToOffset(unsigned int ptr);  // prototype
-signed int OffsetToPointer(unsigned int offset);
 
 int main(int argc, char** argv) {
   char command_line = DECOMPILE;
