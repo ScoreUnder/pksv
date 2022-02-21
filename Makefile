@@ -31,7 +31,7 @@ LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROF
 
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE
 
-CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common $(CPPFLAGS_PR_$(PROFILE))
+CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
 CFLAGS_SH = -shared -fpic -DDLL
 
@@ -54,7 +54,7 @@ SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 RES_PKSV_SHLIB = src_pksv/pksv.rc
 
-SRC_PKSVUI = src_pksvui/pksvui.c
+SRC_PKSVUI = src_pksvui/pksvui.c src_pksvui/windows_portability.c
 RES_PKSVUI = src_pksvui/vcpksv2.rc
 
 SRC_PROCESS_DEFINES = tools/process-defines.c src_common/binarysearch.c

@@ -1,4 +1,5 @@
 #include "version.h"
+#include <stdint.h>
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <stdbool.h>
@@ -15,6 +16,7 @@
 #include <winsock.h>
 #endif
 #include "resource.h"
+#include "windows_portability.h"
 
 #define WIDTH  640
 #define HEIGHT 480
@@ -2944,49 +2946,61 @@ BOOL CALLBACK GotoFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 	}
 	return 1;
 }
-unsigned int FindFreeSpace(char*romname,unsigned int len,unsigned int start)
+
+off_t find_free_space_raw(FILE *file, size_t required, uint8_t searchFor)
 {
-	HANDLE RomFile;
-	unsigned int i,j=0;
-	unsigned char cr,src2;
-	DWORD read;
-	src2=search;
-	RomFile=CreateFile(romname,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
-	i=start&0x00ffffff;
-	SetFilePointer(RomFile,i,NULL,FILE_BEGIN);
-	while (i<0x1000000)
+	size_t consecutive = 0;
+	int chr;
+	while (consecutive < required && (chr = fgetc(file)) != EOF)
 	{
-		ReadFile(RomFile,&cr,1,&read,NULL);
-		if (cr==src2)
-		{
-			j++;
-		}else {
-			j=0;
-		}
-		i++;
-		if (j>len) {
-			break;    //Yes, larger than
-		}
+		if (chr == searchFor)
+			consecutive++;
+		else
+			consecutive = 0;
 	}
-	i-=j;
-	i++;
-	CloseHandle(RomFile);
-	return (0x08000000|i);
+	if (consecutive < required)
+		return -1;
+	return ftello(file) - consecutive;
 }
+
+uint32_t FindFreeSpace(char*romname, uint32_t len, uint32_t start)
+{
+	FILE *rom_file = windows_handle_as_stdio(
+		CreateFile(romname,GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL),
+		"rb"
+	);
+
+	off_t real_start = start & 0x01ffffff;
+	fseeko(rom_file, real_start, SEEK_SET);
+
+	off_t found_pos = find_free_space_raw(rom_file, len + 1, search);
+
+	if (found_pos < real_start) {
+		return (uint32_t)-1;
+	}
+
+	fclose(rom_file);
+	return 0x08000000|(uint32_t)(found_pos + 1);
+}
+
 char doing=0;
 DWORD WINAPI FindInThread(LPVOID lp)
 {
-	unsigned int*lenpos;
-	unsigned int pos,len;
+	uint32_t *lenpos;
+	uint32_t pos;
+	uint32_t len;
 	char posbuf[32];
-	lenpos=lp;
-	len=*lenpos;
-	pos=*(lenpos+4);
+	lenpos = lp;
+	len = lenpos[0];
+	pos = lenpos[1];
 	SetDlgItemText(FFSWin,5,GetString1(3039));
 	pos=FindFreeSpace(RomOpen2,len,pos);
-	sprintf(posbuf,"0x%X",pos);
+	if (pos == (uint32_t)-1)
+		strcpy(posbuf,GetString1(3020));
+	else
+		sprintf(posbuf,"0x%X",pos);
 	SetDlgItemText(FFSWin,5,posbuf);
-	GlobalFree(lenpos);
+	free(lenpos);
 	EnableWindow(GetDlgItem(FFSWin,1),1);
 	doing=0;
 	return 0;
@@ -2997,7 +3011,7 @@ BOOL CALLBACK FFSFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 	UNUSED_ARG(lParam);
 	char posbuf[41],lenbuf[41];
 	unsigned int pos,len;
-	unsigned int*ptr;
+	uint32_t *ptr;
 	switch (msg)
 	{
 	case WM_COMMAND:
@@ -3024,9 +3038,9 @@ BOOL CALLBACK FFSFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 				{
 					sscanf(lenbuf,"%X",&len);
 				}
-				ptr=GlobalAlloc(GPTR,8);
-				*ptr=len;
-				*(ptr+4)=pos;
+				ptr = malloc(2 * sizeof ptr[0]);
+				ptr[0] = len;
+				ptr[1] = pos;
 				if (!doing)
 				{
 					EnableWindow(GetDlgItem(FFSWin,1),0);
@@ -3287,7 +3301,6 @@ void FillItems(HWND hwndList)
 DWORD WINAPI FindItemScript(LPVOID arg1)
 {
 	UNUSED_ARG(arg1);
-	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Item");
@@ -3309,7 +3322,6 @@ DWORD WINAPI FindItemScript(LPVOID arg1)
 		if (!cancelled)
 		{
 			SaveRegSettingStr("ScriptGen","ItemAmt",GreatBuffer);
-			//fspace=FindFreeSpace(RomOpen2,0x100,0x740000);
 			sprintf(MegaBuffer,"#dyn 0x740000\n#org @start\ncopyvarifnotzero 0x8000 %s\ncopyvarifnotzero 0x8001 %s\ncallstd MSG_FIND\nend\n",SuperBuffer,GreatBuffer);
 			SendEditor(SCI_CANCEL,0,0);
 			SendEditor(SCI_SETUNDOCOLLECTION,0,0);
@@ -3347,7 +3359,6 @@ void FillMsgs(HWND hwndList)
 DWORD WINAPI TalkScript(LPVOID arg1)
 {
 	UNUSED_ARG(arg1);
-	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
 	LoadRegSettingStr("ScriptGen","Message");
@@ -3369,7 +3380,6 @@ DWORD WINAPI TalkScript(LPVOID arg1)
 		if (!cancelled)
 		{
 			SaveRegSettingStr("ScriptGen","MessageType",GreatBuffer);
-			//fspace=FindFreeSpace(RomOpen2,0x400,0x740000);
 			sprintf(MegaBuffer,"#dyn 0x740000\n#org @start\nlock\nfaceplayer\nmsgbox @text ' %s\ncallstd %s\nrelease\nend\n\n#org @text\n= %s\n",
 			        SuperBuffer,GreatBuffer,SuperBuffer);
 			SendEditor(SCI_CANCEL,0,0);
@@ -3399,10 +3409,8 @@ DWORD WINAPI TalkScript(LPVOID arg1)
 DWORD WINAPI HealScript(LPVOID arg1)
 {
 	UNUSED_ARG(arg1);
-	//unsigned int fspace;
 	AttachThreadInput(GetCurrentThreadId(),maintid,1);
 	ShowWindow(GenWin,SW_HIDE);
-	//fspace=FindFreeSpace(RomOpen2,0x100,0x740000);
 	sprintf(MegaBuffer,"#dyn 0x740000\n#org @\nlockall\nmessage @healmsg\nshowmsg\nwaitbutton\nfadescreen 1\nclosemsg\nspecial 0\nfadescreen 0\nmsgbox @bettermsg\ncallstd MSG_NORMAL\nreleaseall\nend\n\n#org @healmsg\n= Your POK\\eMON look tired[.]\\nYou should give them a rest.\n\n#org @bettermsg\n= There. All better now!\n");
 	SendEditor(SCI_CANCEL,0,0);
 	SendEditor(SCI_SETUNDOCOLLECTION,0,0);
@@ -3459,7 +3467,6 @@ DWORD WINAPI GiveItemScript(LPVOID arg1)
 			if (!cancelled)
 			{
 				SaveRegSettingStr("ScriptGen","Flag",GreatBuffer);
-				//fspace=FindFreeSpace(RomOpen2,0x100,0x740000);
 				sprintf(MegaBuffer,"#dyn 0x740000\n#org @start\ncheckflag %s\nif 0x1 jump :end\ncopyvarifnotzero 0x8000 %s\ncopyvarifnotzero 0x8001 %s\ncallstd MSG_OBTAIN\nsetflag %s\n:end\nend\n",GreatBuffer,buf1,buf2,GreatBuffer);
 				SendEditor(SCI_CANCEL,0,0);
 				SendEditor(SCI_SETUNDOCOLLECTION,0,0);
@@ -6181,7 +6188,7 @@ BOOL CALLBACK PickupFunc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 			memcpy(buf2,buf,sizeof(buf));
 			if (i>DescLen)
 			{
-				i=0x08000000|FindFreeSpace(RomOpen2,i+100,0x740000);
+				i=FindFreeSpace(RomOpen2,i+100,0x740000);
 				WriteFile(file,&i,4,&read,NULL);
 			}
 			else
