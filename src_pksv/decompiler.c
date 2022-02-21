@@ -3848,7 +3848,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             break;
           case CMD_PAUSE:
             fread(&arg1, 1, 2, fileM);
-            fprintf(fsend, "pause 0x%X\n", arg1);
+            fprintf(fsend, "pause %u\n", arg1);
             break;
           case CMD_WAITMOVEMENT:
             fread(&arg1, 1, 2, fileM);
