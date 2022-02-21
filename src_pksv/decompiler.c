@@ -3497,7 +3497,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
               sprintf(buf, "0x%X", arg1);
             fprintf(fsend, "checkflag %s\n", buf);
             break;
-          case CMD_SPECIAL2: {
+          case CMD_SPECIALVAR: {
             fread(&arg1, 1, 2, fileM);
             fread(&arg2, 1, 2, fileM);
             const char* special = special_name_by_id(arg2);
@@ -3514,7 +3514,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             }
             lastdata = arg2;
             lastdata2 = arg1;
-            fprintf(fsend, "special2 %s %s\n", buf, special);
+            fprintf(fsend, "specialvar %s %s\n", buf, special);
             break;
           }
           case CMD_SETFLAG:
@@ -3784,7 +3784,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             } else if (arg1 == 0x800F) {
               strcpy(buf, "LASTTALKED");
             }
-            if ((lastcmd == CMD_SPECIAL2 && arg1 == lastdata2) ||
+            if ((lastcmd == CMD_SPECIALVAR && arg1 == lastdata2) ||
                 (lastcmd == CMD_SPECIAL && arg1 == 0x800D)) {
               if (lastdata == 0x39) {
                 switch (arg2) {

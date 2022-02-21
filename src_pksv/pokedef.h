@@ -59,7 +59,7 @@
 #define CMD_CALLASM 0x23                  // C,D,T addr(4)
 #define CMD_CALLASM2 0x24                 // C,D,T addr(4)
 #define CMD_SPECIAL 0x25                  // C,D,T type(2)
-#define CMD_SPECIAL2 0x26                 // C,D,T var(2) type(2)
+#define CMD_SPECIALVAR 0x26               // C,D,T var(2) type(2)
 #define CMD_WAITSPECIAL 0x27              // C,D,T
 // NamePokemon fadescreen 1 special 0x9E waitspecial
 // Don't decompile this. Put it in code    C,X,T
@@ -272,16 +272,20 @@ it does nothing. ( if(b>0)a=b; ) comparevartobyte Compares a variable to a byte.
 offset.( var(a)==*b ) comparefarbytetovar Exactly the same, the other way round.
 ( *a==var(b) ) comparefarbytetobyte Compares a byte at an offset to another
 byte. ( *a==b ) comparefarbytetofarbyte Compares the value of 2 offsets ( *a==*b
-) compare Compares a variable to another, or to a number. cmd_22 No idea callasm
-Calls a code in ARM or THUMB format for direct access to the game. The most
-powerful command. special Calls a predefined routine special2 Calls a predefined
-routine and stores the result in a variable. waitspecial Waits for either of
-these commands to complete (does not decompile correctly in pokescript) pause
-Waits a certain amount of time Setflag Sets a flag to 1 (a flag is a variable
-that can be only 1 or 0) clearflag Sets a flag to 0 checkflag Checks if a flag
-is 1 cmd_2f No idea. cry Makes the same sound a pokemon (that you decide) makes
-when it comes into battle. fanfare Plays any pre-defined sound waitfanfare Waits
-for that command to complete playsound Plays a pre-defined sound.
+) compare Compares a variable to another, or to a number. cmd_22 No idea
+callasm Calls code in ARM or THUMB format for direct access to the game. The most powerful command.
+special Calls a predefined routine
+specialvar Calls a predefined routine and stores the result in a variable.
+waitspecial Waits for either of these commands to complete (does not decompile correctly in pokescript)
+pause Waits a certain amount of time
+Setflag Sets a flag to 1 (a flag is a variable that can be only 1 or 0)
+clearflag Sets a flag to 0
+checkflag Checks if a flag is 1
+sound Plays a sound, even when BGM is turned off
+cry Makes the same sound a pokemon (that you decide) makes when it comes into battle.
+fanfare Plays any pre-defined sound
+waitfanfare Waits for that command to complete
+playsound Plays a pre-defined sound.
 fadedefault Fades into the normal bg music.
 fadeout Fades out of music
 fadein Fades into music

@@ -8032,17 +8032,17 @@ void RecodeProc(char *script, char *romfn) {
                   BASIC(CMD_SETWORLDMAPFLAG);
                   rom(arg1, 2);
                 }
-                aa("special2") {
-                  vlog_txt("SPECIAL2\n");
-                  arg1 = GetNum("SPECIAL2");
+                aa("specialvar") {
+                  vlog_txt("SPECIALVAR\n");
+                  arg1 = GetNum("SPECIALVAR");
                   if (!gffs) {
                     return;
                   }
-                  arg2 = GetNum("SPECIAL2");
+                  arg2 = GetNum("SPECIALVAR");
                   if (!gffs) {
                     return;
                   }
-                  BASIC(CMD_SPECIAL2);
+                  BASIC(CMD_SPECIALVAR);
                   rom(arg1, 2);
                   rom(arg2, 2);
                 }

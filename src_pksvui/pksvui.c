@@ -2317,7 +2317,7 @@ multichoice2;2|multichoice3;2|nop|nop0|nop1|paymoney;11|pause;8|picture;2|savebg
 random;9|reappear;1|reappearat;1|release;1|releaseall;1|removeitem;4|resetspritelevel;1|resetvars;9|resetweather;8|return;9|setanimation;8|setbyte;9|setbyte2;9|setcatchlocation;3|\
 setdoorclosed;8|setdoorclosedstatic;8|setdooropened;8|setdooropenedstatic;8|setfarbyte;9|setflag;6|sethealingplace;3|setmapfooter;9|setmaptile;8|setobedience;3|setpokemonpp;3|setstepcallback;0|settrainerflag;1|setvar;9|\
 setweather;8|setworldmapflag;6|showcoins;11|showmoney;11|showmsg;2|showpokepic;3|showyesno;2|slotmachine;4|sound;10|\
-special;8|special2;8|spritebehave;1|spriteface;1|startcontest;8|startwireless;8|storeattack;2|storeboxname;2|storecomp;2|storefirstpokemon;2|storefurniture;2|\
+special;8|specialvar;8|spritebehave;1|spriteface;1|startcontest;8|startwireless;8|storeattack;2|storeboxname;2|storecomp;2|storefirstpokemon;2|storefurniture;2|\
 storeitem;2|storeitems;2|storepokemon;2|storepokemonvar;2|storetext;2|storevar;2|subtractvar;9|takefromcoincase;11|takefurniture;5|tempspriteface;1|textcolor;2|trainerbattle;1|updatecoins;11|updatemoney;11|\
 waitanimation;8|waitbutton;9|waitcry;3|waitfanfare;10|waitmovement;1|waitspecial;8|warp;7|warp3;7|warp4;7|warp5;7|warp6;7|warpelevator;7|warpmuted;7|warpteleport;7|warpteleport2;7|warpwalking;7|writebytetooffset;9");
               else if (end == 1)
@@ -3590,7 +3590,7 @@ DWORD WINAPI BattleScript(LPVOID arg1) {
               "2\nif == jump 0x81A7AE0\nspecial "
               "0x188\nlock\nfaceplayer\nchecksound\ncry %s 2\nwaitcry\npause "
               "0x14\nplaysound 0x156 0x0\nbattle %s %s %s\nsetflag "
-              "0x807\nspecial 0x138\nwaitspecial\nclearflag 0x807\nspecial2 "
+              "0x807\nspecial 0x138\nwaitspecial\nclearflag 0x807\nspecialvar "
               "0x800D 0xB4\ncompare LASTRESULT 1\nif == jump "
               "0x8162558\ncompare LASTRESULT 4\nif == jump 0x8162561\ncompare "
               "LASTRESULT 5\nif == jump 0x8162561\nsetflag %s\nrelease\nend\n",
