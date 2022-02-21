@@ -66,9 +66,6 @@ __attribute__((malloc)) char* get_module_filename(void) {
   return filename;
 }
 
-#define DEFINITIONS_FILE "defines.dat"
-#define INCLUDES_FILE "pokeinc.txt"
-
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   RECT rect;
   if (fdwReason != DLL_PROCESS_ATTACH) return 1;

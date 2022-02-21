@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <libgen.h>
 
 #include "pksv.h"
 #include "textutil.h"
@@ -55,14 +56,25 @@ int main(int argc, char** argv) {
   int file_location = 0;
   uint32_t decompile_at;
   uint32_t narc;
-  i = (unsigned int)strlen(argv[0]);
-  while (argv[0][i] != '\\' && argv[0][i] != '/' && i != 0) {
-    i--;
-  }
-  if (i == 0) {
-    argv[0][0] = 0;
-  }
-  argv[0][i + 1] = 0;
+
+  // n.b. dirname doesn't make a copy of the input, so we do it ourselves
+  // because we are not supposed to modify argv
+  char *exename = strdup(argv[0]);
+  char *exe_dirname = dirname(exename);
+  size_t exe_dirlen = strlen(exe_dirname);
+
+  defines_dat_location = malloc(exe_dirlen + strlen(DEFINITIONS_FILE) + 2);
+  strcpy(defines_dat_location, exe_dirname);
+  defines_dat_location[exe_dirlen] = '/';
+  strcpy(defines_dat_location + exe_dirlen + 1, DEFINITIONS_FILE);
+
+  pokeinc_txt_location = malloc(exe_dirlen + strlen(INCLUDES_FILE) + 2);
+  strcpy(pokeinc_txt_location, exe_dirname);
+  pokeinc_txt_location[exe_dirlen] = '/';
+  strcpy(pokeinc_txt_location + exe_dirlen + 1, INCLUDES_FILE);
+
+  free(exename);
+
   // Argument Processing
   for (i = 1; i < argc; i++) {
     if (argv[i][0] != '-') {

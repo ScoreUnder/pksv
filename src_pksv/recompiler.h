@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define DEFINITIONS_FILE "defines.dat"
+#define INCLUDES_FILE "pokeinc.txt"
+
 #ifdef DLL
 extern unsigned int needdlg;
 #endif
