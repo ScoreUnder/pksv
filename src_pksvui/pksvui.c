@@ -2313,13 +2313,13 @@ givemoney;11|givetocoincase;11|hidebox;2|hidecoins;11|hidepokepic;2|hidemoney;2|
 jumpram;9|jumpstd;2|jumpstdif;2|killscript;9|lastbattle;3|lasttrainerbattle;1|lightroom;8|\
 loadbytefrompointer;9|loadpointer;9|lock;1|lockall;1|\
 m;1|message;2|moveoffscreen;1|movesprite;1|movesprite2;1|msgbox;2|msgbox2;2|msgboxnormal;2|msgboxsign;2|multichoice;2|\
-multichoice2;2|multichoice3;2|nop|nop0|nop1|paymoney;11|pause;8|pauseevent;1|picture;2|savebgm;10|playsound;10|pokemart;4|pokemart2;4|pokemart3;4|\
+multichoice2;2|multichoice3;2|nop|nop0|nop1|paymoney;11|pause;8|picture;2|savebgm;10|playsound;10|pokemart;4|pokemart2;4|pokemart3;4|\
 random;9|reappear;1|reappearat;1|release;1|releaseall;1|removeitem;4|resetspritelevel;1|resetvars;9|resetweather;8|return;9|setanimation;8|setbyte;9|setbyte2;9|setcatchlocation;3|\
 setdoorclosed;8|setdoorclosedstatic;8|setdooropened;8|setdooropenedstatic;8|setfarbyte;9|setflag;6|sethealingplace;3|setmapfooter;9|setmaptile;8|setobedience;3|setpokemonpp;3|setstepcallback;0|settrainerflag;1|setvar;9|\
 setweather;8|setworldmapflag;6|showcoins;11|showmoney;11|showmsg;2|showpokepic;3|showyesno;2|slotmachine;4|sound;10|\
 special;8|special2;8|spritebehave;1|spriteface;1|startcontest;8|startwireless;8|storeattack;2|storeboxname;2|storecomp;2|storefirstpokemon;2|storefurniture;2|\
 storeitem;2|storeitems;2|storepokemon;2|storepokemonvar;2|storetext;2|storevar;2|subtractvar;9|takefromcoincase;11|takefurniture;5|tempspriteface;1|textcolor;2|trainerbattle;1|updatecoins;11|updatemoney;11|\
-waitanimation;8|waitbutton;9|waitcry;3|waitfanfare;10|waitspecial;8|warp;7|warp3;7|warp4;7|warp5;7|warp6;7|warpelevator;7|warpmuted;7|warpteleport;7|warpteleport2;7|warpwalking;7|writebytetooffset;9");
+waitanimation;8|waitbutton;9|waitcry;3|waitfanfare;10|waitmovement;1|waitspecial;8|warp;7|warp3;7|warp4;7|warp5;7|warp6;7|warpelevator;7|warpmuted;7|warpteleport;7|warpteleport2;7|warpwalking;7|writebytetooffset;9");
               else if (end == 1)
                 SendEditor(SCI_AUTOCSHOW,len,(LPARAM)
 						           "\\v\\h01|\\v\\h02|\\v\\h01 found one \\v\\h02!|\\v\\h01 obtained one \\v\\h02!|\
@@ -4100,7 +4100,7 @@ DWORD WINAPI RockBlockScript(LPVOID arg1) {
         "message\ncompare LASTRESULT 0\nif == jump :end\nremoveitem %s "
         "1\nmsgbox @IusedThis ' \\v\\h02 used \\v\\h03!\ncallstd MSG_NOCLOSE ' "
         "Non-closing message\napplymovement LASTTALKED @move ' rock_animate "
-        "end\npauseevent 0\ndisappear "
+        "end\nwaitmovement 0\ndisappear "
         "LASTTALKED\n:end\nreleaseall\nend\n\n#org "
         "@donthave\n'-----------------------------------\nmsgbox @donthavemsg "
         "' It's a cursed rock, ...\ncallstd MSG_SIGN\nend\n\n\n\n#org "

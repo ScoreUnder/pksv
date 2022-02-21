@@ -7646,10 +7646,10 @@ void RecodeProc(char *script, char *romfn) {
                   BASIC(CMD_SAVEBGM);
                   rom(arg1, 2);
                 }
-                aa("pauseevent") {
-                  BASIC(CMD_PAUSEEVENT);
-                  vlog_txt("PAUSEEVENT\n");
-                  arg1 = GetNum("PAUSEEVENT");
+                aa("waitmovement") {
+                  BASIC(CMD_WAITMOVEMENT);
+                  vlog_txt("WAITMOVEMENT\n");
+                  arg1 = GetNum("WAITMOVEMENT");
                   if (!gffs) {
                     return;
                   }

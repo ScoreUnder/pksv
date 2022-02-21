@@ -109,7 +109,7 @@
 #define CMD_CHECKFURNITURE 0x4E           // C,D,T type(2)
 #define CMD_APPLYMOVEMENT 0x4F            // C,D,T spr(2) addr(4)
 #define CMD_APPLYMOVEMENTFINISHAT 0x50    // C,D,T spr(2) addr(4) x,y(1,1)
-#define CMD_PAUSEEVENT 0x51               // C,D,T event(2)
+#define CMD_WAITMOVEMENT 0x51             // C,D,T event(2)
 #define CMD_DISAPPEAR 0x53                // C,D,T sprite(2)
 #define CMD_DISAPPEARAT 0x54              // C,D,T sprite(2)x(1)y(1)
 #define CMD_REAPPEAR 0x55                 // C,D,T sprite(2)
@@ -290,7 +290,7 @@ countpokemon Counts the player's party. (0-6) Stored in LASTRESULT
 removeitem Ebil-ly steals an item from the player!
 checkitem Checks if a player has an item
 applymovement Applies movement commands to any sprite.
-pauseevent Pauses and waits for an event (usually the end of applymovement.)
+waitmovement Pauses and waits for an event (usually the end of applymovement.)
 disappear Causes a sprite to magically disappear.
 faceplayer Causes the sprite that called the script to face the protagonist.
 trainerbattle Initiates a ferocious battle with powerful trainers and their
