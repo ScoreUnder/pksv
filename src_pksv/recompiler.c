@@ -7321,13 +7321,19 @@ rse:
               {
                 BASIC(CMD_CRYFR);
                 rom(arg1,2);
+                rom(arg2,2);
               }
               else
               {
+                arg3=GetNum("CRY");
+                if (!gffs) {
+                  return;
+                }
                 BASIC(CMD_CRY);
                 rom(arg1,1);
+                rom(arg2,2);
+                rom(arg3,2);
               }
-              rom(arg2,2);
             }
             aa("checksound")
             {
@@ -9124,9 +9130,16 @@ rse:
                 return;
               }
               BASIC(CMD_SETWEATHER);
-              arg2=1;
-              if (mode==FIRE_RED)arg2=2;
-              rom(arg1,arg2);
+							if (mode == FIRE_RED) {
+								rom(arg1, 2);
+							} else {
+								arg2=GetNum("SETWEATHER");
+								if (!gffs) {
+									return;
+								}
+                rom(arg1, 1);
+								rom(arg2, 1);
+							}
             }
             aa("storeitem")
             {

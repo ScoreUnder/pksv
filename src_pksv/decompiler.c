@@ -2560,9 +2560,14 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_SETWEATHER:
 					arg2=1;
-					if (mode==FIRE_RED)arg2=2;
-					fread(&arg1,1,arg2,fileM);
-					fprintf(fsend,"setweather 0x%X\r\n",arg1);
+					if (mode==FIRE_RED) {
+						fread(&arg1,1,2,fileM);
+						fprintf(fsend,"setweather 0x%X\r\n", arg1);
+					} else {
+						fread(&arg1,1,1,fileM);
+						fread(&arg2,1,1,fileM);
+						fprintf(fsend,"setweather 0x%X 0x%X\r\n", arg1, arg2);
+					}
 					break;
 				case CMD_BATTLE:
 					fread(&arg1,1,2,fileM);
@@ -3316,12 +3321,13 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg1,1,1,fileM);
 						fread(&arg2,1,2,fileM);
+						fread(&arg3,1,2,fileM);
 						char *pokeName = GetPokeName(arg2);
 						if (pokeName == NULL)
 							sprintf(buf,"0x%X",arg2);
 						else
 							strcpy(buf, pokeName);
-						fprintf(fsend,"cry 0x%X %s\r\n",arg1,buf);
+						fprintf(fsend,"cry 0x%X %s 0x%X\r\n",arg1, buf, arg3);
 					}
 					else
 						GENERIC("checksound");

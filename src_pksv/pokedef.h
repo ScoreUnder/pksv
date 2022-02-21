@@ -72,7 +72,7 @@
 #define CMD_2D                      0x2D //?,?,?
 #define CMD_RESETVARS               0x2E //C,D,T
 #define CMD_SOUND                   0x2F //C,D,T id(2)
-#define CMD_CRY                     0x30 //C,D,T bank(1) poke(2) (fr=checksound)
+#define CMD_CRY                     0x30 //C,D,T bank(1) poke(2) unk(2) (fr=checksound)
 #define CMD_FANFARE                 0x31 //C,D,T snd(2)
 #define CMD_WAITFANFARE             0x32 //C,D,T
 #define CMD_PLAYSOUND               0x33 //C,D,T snd(2) (fr: +1)
@@ -193,7 +193,7 @@
 #define CMD_CRYFR                   0xA1 //C,D,  (2)(1)
 #define CMD_SETMAPTILE              0xA2 //C,D,  X(2) Y(2) tile(2) attr(2)
 #define CMD_RESETWEATHER            0xA3 //C,D, 
-#define CMD_SETWEATHER              0xA4 //C,D,  weather(1) (fr=2)
+#define CMD_SETWEATHER              0xA4 //C,D,  weather(1) unk(1) (fr=2)
 #define CMD_DOWEATHER               0xA5 //C,D, 
 #define CMD_A6                      0xA6 //?,?,  (1)
 #define CMD_SETMAPFOOTER            0xA7 //C,D,  (2)

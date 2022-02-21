@@ -1025,6 +1025,30 @@ char*transmove(int howfar,const char*file)
 				case 0x16:
 					strcat(trans,"walk_right");
 					break;
+				case 0x21:
+					strcat(trans,"onspot_down_slow");
+					break;
+				case 0x22:
+					strcat(trans,"onspot_up_slow");
+					break;
+				case 0x23:
+					strcat(trans,"onspot_left_slow");
+					break;
+				case 0x24:
+					strcat(trans,"onspot_right_slow");
+					break;
+				case 0x25:
+					strcat(trans,"onspot_down");
+					break;
+				case 0x26:
+					strcat(trans,"onspot_up");
+					break;
+				case 0x27:
+					strcat(trans,"onspot_left");
+					break;
+				case 0x28:
+					strcat(trans,"onspot_right");
+					break;
 				case 0x2D:
 					strcat(trans,"walk_down_fast");
 					break;
@@ -1918,6 +1942,30 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 			}
 			aaa("walk_right") {
 				move 0x16;
+			}
+			aaa("onspot_down_slow") {
+				move 0x21;
+			}
+			aaa("onspot_up_slow") {
+				move 0x22;
+			}
+			aaa("onspot_left_slow") {
+				move 0x23;
+			}
+			aaa("onspot_right_slow") {
+				move 0x24;
+			}
+			aaa("onspot_down") {
+				move 0x25;
+			}
+			aaa("onspot_up") {
+				move 0x26;
+			}
+			aaa("onspot_left") {
+				move 0x27;
+			}
+			aaa("onspot_right") {
+				move 0x28;
 			}
 			aaa("walk_down_fast") {
 				move 0x2D;
