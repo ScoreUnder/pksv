@@ -197,21 +197,21 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
   }
   if (command_line==TXT)
   {
-    otherfile=fopen(export_name,"wb");
+    otherfile=fopen(export_name,"wt");
     transtxt(decompile_at, file_name, 0, NULL);
     fwrite(trans,1,strlen(trans),otherfile);
     fclose(otherfile);
   }
   else if (command_line==MOVEMENT)
   {
-    otherfile=fopen(export_name,"wb");
+    otherfile=fopen(export_name,"wt");
     transmove(decompile_at,file_name);
     fwrite(trans,1,strlen(trans),otherfile);
     fclose(otherfile);
   }
   else if (command_line==BRAILLE)
   {
-    otherfile=fopen(export_name,"wb");
+    otherfile=fopen(export_name,"wt");
     transbrl(decompile_at,file_name,otherfile);
     fwrite(trans,1,strlen(trans),otherfile);
     fclose(otherfile);
@@ -219,7 +219,7 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
   else if (command_line==DECOMPILE)
   {
     initDoneProcs();
-    otherfile=fopen(export_name,"wb");
+    otherfile=fopen(export_name,"wt");
     if (mode==DIAMOND)
     {
       if (*hex_to_uint32(argv[file_location+2], SIZE_MAX, &narc))
@@ -234,7 +234,7 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
         return 1;
       }
       fclose(otherfile);
-      otherfile=fopen(export_name,"wb");
+      otherfile=fopen(export_name,"wt");
       DecodeProc(romfile,narc,decompile_at,file_name,otherfile);
     }
     else

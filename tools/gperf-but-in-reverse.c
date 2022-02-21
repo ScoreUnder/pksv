@@ -30,11 +30,11 @@ int main(int argc, char **argv) {
     }
 
     char *saveptr = NULL;
-    char *cmd = strtok_r(buf, " \t\n", &saveptr);
+    char *cmd = strtok_r(buf, " \t\r\n", &saveptr);
     if (cmd && strcmp(cmd, "%define") == 0) {
-      char *key = strtok_r(NULL, " \t\n", &saveptr);
+      char *key = strtok_r(NULL, " \t\r\n", &saveptr);
       if (key && strcmp(key, "lookup-function-name") == 0) {
-        char *val = strtok_r(NULL, " \t\n", &saveptr);
+        char *val = strtok_r(NULL, " \t\r\n", &saveptr);
         if (val) {
           strcpy(lookup_function_name, val);
         } else {
@@ -56,8 +56,8 @@ int main(int argc, char **argv) {
       break;
     }
     char *saveptr;
-    char *key = strtok_r(buf, ", \t\n", &saveptr);
-    char *value = strtok_r(NULL, ", \t\n", &saveptr);
+    char *key = strtok_r(buf, ", \t\r\n", &saveptr);
+    char *value = strtok_r(NULL, ", \t\r\n", &saveptr);
     printf("  [%s] = \"%s\",\n", value, key);
   }
   printf("};\n\n");

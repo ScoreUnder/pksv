@@ -217,7 +217,7 @@ signed int OffsetToPointer(unsigned int offset)
 
 static void log_bad_int(const char *where)
 {
-  char *format = "Unknown value in %s (Value must be integer)\r\n";
+  char *format = "Unknown value in %s (Value must be integer)\n";
   char *buf = malloc(strlen(where) + strlen(format) + 1);
   sprintf(buf, format, where);
   log_txt(buf, strlen(buf));
@@ -252,7 +252,7 @@ uint32_t GenForFunc(char*func,
     }
     buf[j]=0;
     add_insert(c,c->size,buf);
-    sprintf(log_buf,"DYN-> %s\r\n",buf);
+    sprintf(log_buf,"DYN-> %s\n",buf);
     if(IsVerbose)
 			log_txt(log_buf,strlen(log_buf));
     gffs=1;
@@ -280,7 +280,7 @@ uint32_t GenForFunc(char*func,
     }
 
     if (IsVerbose) {
-      sprintf(log_buf,"   -> 0x%X\r\n", result);
+      sprintf(log_buf,"   -> 0x%X\n", result);
       log_txt(log_buf,strlen(log_buf));
     }
 
@@ -307,7 +307,7 @@ uint32_t GenForFunc(char*func,
       uint32_t value = (uint32_t)(intptr_t) defines->pairs[index].value;
       if (IsVerbose)
       {
-        sprintf(log_buf,"   -> %s\r\n      -> 0x%X\r\n",buf,value);
+        sprintf(log_buf,"   -> %s\n      -> 0x%X\n",buf,value);
         log_txt(log_buf,strlen(log_buf));
       }
       return value;

@@ -411,7 +411,7 @@ int __stdcall OffsetDlg(HWND a, UINT msg, WPARAM wParam, LPARAM lParam)
           for (i=0;i<selection;i++)
           {
             SendMessage(GetDlgItem(HW_DLG,3),LB_GETTEXT,i,(LPARAM)ptr2+strlen(ptr2));
-            strcat(ptr2,"\r\n");
+            strcat(ptr2,"\n");
           }
           GlobalUnlock(ptr);
           SetClipboardData(CF_TEXT,ptr);

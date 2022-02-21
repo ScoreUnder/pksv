@@ -1404,20 +1404,20 @@ void DecodeProc2(FILE* fileM_,
 	{
 		if ((FileZoomPos&0x00ffffff)==1337)
 		{
-			fprintf(fsend,"'Address 1337 is officially L33T!\r\n");
+			fprintf(fsend,"'Address 1337 is officially L33T!\n");
 		}
 		else
 		{
-			fprintf(fsend,"'Address 0x%X is officially L33T!\r\n",(FileZoomPos&0x00ffffff));
+			fprintf(fsend,"'Address 0x%X is officially L33T!\n",(FileZoomPos&0x00ffffff));
 		}
 	}
 	if (mode==GOLD||mode==CRYSTAL)
 	{
-		fprintf(fsend,"#org 0x%X\r\n",FileZoomPos);
+		fprintf(fsend,"#org 0x%X\n",FileZoomPos);
 	}
 	else if (mode==DIAMOND)
 	{
-		fprintf(fsend,"#narc 0x%X 0x%X\r\n",narc,FileZoomPos);
+		fprintf(fsend,"#narc 0x%X 0x%X\n",narc,FileZoomPos);
 		fseek(fileM,0xE,SEEK_SET);
 		arg3=0;
 		fread(&arg3,1,2,fileM);
@@ -1441,7 +1441,7 @@ void DecodeProc2(FILE* fileM_,
 			fseek(fileM,8*(narc+1),SEEK_CUR);
 			fread(&arg1,1,4,fileM);
 			fread(&endat,1,4,fileM);
-			//fprintf(fsend,"'%X %X\r\n",arg1,endat);
+			//fprintf(fsend,"'%X %X\n",arg1,endat);
 			fseek(fileM,0x10,SEEK_SET);
 			fread(&buf,1,4,fileM);
 			buf[4]=0;
@@ -1459,18 +1459,18 @@ void DecodeProc2(FILE* fileM_,
 			{
 				arg2=ftell(fileM);
 				endat+=arg2+4;
-				//fprintf(fsend,"'%X %X\r\n",arg1+FileZoomPos+4+arg2,endat);
+				//fprintf(fsend,"'%X %X\n",arg1+FileZoomPos+4+arg2,endat);
 				fseek(fileM,4+arg1+FileZoomPos,SEEK_CUR);
 			}
 			else
 			{
-				fprintf(fsend,"'ERROR: Incomplete NARC.\r\n");
+				fprintf(fsend,"'ERROR: Incomplete NARC.\n");
 				return;
 			}
 		}
 		else
 		{
-			fprintf(fsend,"'ERROR: Incomplete NARC.\r\n");
+			fprintf(fsend,"'ERROR: Incomplete NARC.\n");
 			return;
 		}
 	}
@@ -1489,12 +1489,12 @@ void DecodeProc2(FILE* fileM_,
 				}
 				codenum++;
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(FileZoomPos|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(FileZoomPos|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",(FileZoomPos|0x08000000));
+			fprintf(fsend,"#org 0x%X\n",(FileZoomPos|0x08000000));
 	}
-	fprintf(fsend,"'-----------------------------------\r\n");
+	fprintf(fsend,"'-----------------------------------\n");
 	if (mode==DIAMOND)
 	{
 		while (still_going&&(signed int)ftell(fileM)<(signed int)endat)
@@ -1503,12 +1503,12 @@ void DecodeProc2(FILE* fileM_,
 			read=fread(&command,1,1,fileM);
 			if (read>0)
 			{
-#define GENERIC(x) fprintf(fsend,"%s\r\n",x)
+#define GENERIC(x) fprintf(fsend,"%s\n",x)
 				arg1=arg2=arg3=arg4=arg5=arg6=arg7=0;
 				switch (command)
 				{
 				default:
-					fprintf(fsend,"#raw 0x%X\r\n",command);
+					fprintf(fsend,"#raw 0x%X\n",command);
 					break;
 				}
 			}
@@ -1534,19 +1534,19 @@ void DecodeProc2(FILE* fileM_,
 				case CMD_GIVEMONEY:
 					fread(&arg1,1,4,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"givemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"givemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_REAPPEARAT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"reappearat 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"reappearat 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_MOVESPRITE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"movesprite 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"movesprite 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_APPLYMOVEMENTFINISHAT:
 					fread(&arg1,1,2,fileM);
@@ -1576,30 +1576,30 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf2,"@move%u",movenum);
 								Define2(arg2|0x08000000,buf2);
 							}
-							fprintf(fsend,"applymovementfinishat %s %s 0x%X 0x%X ' %s\r\n",buf,WhatIs2(arg2|0x08000000),arg3,arg4,trans);
+							fprintf(fsend,"applymovementfinishat %s %s 0x%X 0x%X ' %s\n",buf,WhatIs2(arg2|0x08000000),arg3,arg4,trans);
 						}
 						else
-							fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' %s\r\n",buf,arg2,arg3,arg4,trans);
+							fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' %s\n",buf,arg2,arg3,arg4,trans);
 						DoMove(arg2);
 					}
 					else
 					{
-						fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' Not in ROM\r\n",buf,arg2,arg3,arg4);
+						fprintf(fsend,"applymovementfinishat %s 0x%X 0x%X 0x%X ' Not in ROM\n",buf,arg2,arg3,arg4);
 					}
 					break;
 				case CMD_DISAPPEARAT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"disappearat 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"disappearat 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_CHECKFURNITURE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkfurniture 0x%X\r\n",arg1);
+					fprintf(fsend,"checkfurniture 0x%X\n",arg1);
 					break;
 				case CMD_TAKEFURNITURE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"takefurniture 0x%X\r\n",arg1);
+					fprintf(fsend,"takefurniture 0x%X\n",arg1);
 					break;
 				case CMD_CHECKITEMINPC:
 					fread(&arg1,1,2,fileM);
@@ -1608,7 +1608,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"checkiteminpc %s %u\r\n",buf,arg2);
+					fprintf(fsend,"checkiteminpc %s %u\n",buf,arg2);
 					break;
 				case CMD_GIVEITEMTOPC:
 					fread(&arg1,1,2,fileM);
@@ -1617,11 +1617,11 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"giveitemtopc %s %u\r\n",buf,arg2);
+					fprintf(fsend,"giveitemtopc %s %u\n",buf,arg2);
 					break;
 				case CMD_ADDFURNITURE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"addfurniture 0x%X\r\n",arg1);
+					fprintf(fsend,"addfurniture 0x%X\n",arg1);
 					break;
 				case CMD_CHECKITEMTYPE:
 					fread(&arg1,1,2,fileM);
@@ -1629,38 +1629,38 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"checkitemtype %s\r\n",buf);
+					fprintf(fsend,"checkitemtype %s\n",buf);
 					break;
 				case CMD_CHECKIFROOMFORFURNITURE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkifroomforfurniture 0x%X\r\n",arg1);
+					fprintf(fsend,"checkifroomforfurniture 0x%X\n",arg1);
 					break;
 				case CMD_PLAYSONG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"playsong 0x%X\r\n",arg1);
+					fprintf(fsend,"playsong 0x%X\n",arg1);
 					break;
 				case CMD_FARREAPPEAR:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"farreappear 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"farreappear 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_FARDISAPPEAR:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"fardisappear 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"fardisappear 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_STOREPARTYPOKEMON:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"storepartypokemon 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"storepartypokemon 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETPOKEMONPP:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"setpokemonpp 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"setpokemonpp 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_MULTICHOICE3:
 					fread(&arg1,1,1,fileM);
@@ -1668,20 +1668,20 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
 					fread(&arg5,1,1,fileM);
-					fprintf(fsend,"multichoice3 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+					fprintf(fsend,"multichoice3 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					break;
 				case CMD_SHOWYESNO:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"showyesno 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"showyesno 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETTRAINERFLAG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"settrainerflag 0x%X\r\n",arg1);
+					fprintf(fsend,"settrainerflag 0x%X\n",arg1);
 					break;
 				case CMD_STOREFIRSTPOKEMON:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"storefirstpokemon 0x%X\r\n",arg1);
+					fprintf(fsend,"storefirstpokemon 0x%X\n",arg1);
 					break;
 				case CMD_POKEMART2:
 					fread(&arg1,1,4,fileM);
@@ -1693,25 +1693,25 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"@mart%u",martnum);
 							Define2(arg1|0x08000000,buf);
 						}
-						fprintf(fsend,"pokemart2 %s\r\n",WhatIs2(arg1|0x08000000));
+						fprintf(fsend,"pokemart2 %s\n",WhatIs2(arg1|0x08000000));
 						DoMart(arg1);
 					}
 					else
 					{
 						if((arg1&0xF8000000)==0x08000000)
 						{
-							fprintf(fsend,"pokemart2 0x%X\r\n",arg1);
+							fprintf(fsend,"pokemart2 0x%X\n",arg1);
 							DoMart(arg1);
 						}
 						else
-							fprintf(fsend,"pokemart2 0x%X 'Not in ROM area\r\n",arg1);
+							fprintf(fsend,"pokemart2 0x%X 'Not in ROM area\n",arg1);
 					}
 					break;
 				case CMD_8A:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"CMD_8A 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"CMD_8A 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_FADESCREENDELAY:
 					fread(&arg1,1,1,fileM);
@@ -1733,12 +1733,12 @@ void DecodeProc2(FILE* fileM_,
 					default:
 						sprintf(buf,"0x%X",arg1);
 					}
-					fprintf(fsend,"fadescreendelay %s 0x%X\r\n",buf,arg2);
+					fprintf(fsend,"fadescreendelay %s 0x%X\n",buf,arg2);
 					break;
 				case CMD_SETCATCHLOCATION:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"setcatchlocation 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setcatchlocation 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_STOREITEMS:
 					fread(&arg1,1,1,fileM);
@@ -1748,7 +1748,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg2);
 					else
 						strcpy(buf,GetItemName(arg2));
-					fprintf(fsend,"storeitems 0x%X %s %u\r\n",arg1,buf,arg3);
+					fprintf(fsend,"storeitems 0x%X %s %u\n",arg1,buf,arg3);
 					break;
 				case CMD_WARPTELEPORT2:
 					fread(&arg1,1,1,fileM);
@@ -1758,10 +1758,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warpteleport2 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warpteleport2 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warpteleport2 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warpteleport2 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 					break;
@@ -1773,10 +1773,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warpmuted 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warpmuted 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warpmuted 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warpmuted 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_WARPWALKING:
@@ -1787,16 +1787,16 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warpwalking 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warpwalking 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warpwalking 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warpwalking 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_FALLDOWNHOLE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"falldownhole 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"falldownhole 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_WARPTELEPORT:
 					fread(&arg1,1,1,fileM);
@@ -1806,10 +1806,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warpteleport 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warpteleport 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warpteleport 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warpteleport 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_WARP3:
@@ -1820,10 +1820,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warp3 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warp3 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warp3 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warp3 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_WARPELEVATOR:
@@ -1834,10 +1834,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warpelevator 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warpelevator 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warpelevator 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warpelevator 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_WARP4:
@@ -1848,10 +1848,10 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warp4 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warp4 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warp4 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warp4 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_WARP5:
@@ -1862,20 +1862,20 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warp5 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warp5 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					} else
 					{
-						fprintf(fsend,"warp5 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warp5 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_GETPLAYERXY:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"getplayerxy 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"getplayerxy 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_FADESONG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"fadesong 0x%X\r\n",arg1);
+					fprintf(fsend,"fadesong 0x%X\n",arg1);
 					break;
 				case CMD_EXECUTERAM:
 					GENERIC("executeram");
@@ -1906,13 +1906,13 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_TAKEFROMCOINCASE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"takefromcoincase 0x%X\r\n",arg1);
+					fprintf(fsend,"takefromcoincase 0x%X\n",arg1);
 					break;
 				case CMD_MSGBOX2:
 					fread(&arg2,1,4,fileM);
 					if ((arg2&0xF8000000)!=0x08000000)
 					{
-						fprintf(fsend,"msgbox2 0x%X\r\n",arg2);
+						fprintf(fsend,"msgbox2 0x%X\n",arg2);
 					}
 					else
 					{
@@ -1929,15 +1929,15 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@text%u",textnum);
 								Define2(arg2|0x08000000,buf);
 							}
-							fprintf(fsend,"msgbox2 %s ' %s\r\n",WhatIs2(arg2|0x08000000),trans);
+							fprintf(fsend,"msgbox2 %s ' %s\n",WhatIs2(arg2|0x08000000),trans);
 						}
 						else
-							fprintf(fsend,"msgbox2 0x%X ' %s\r\n",arg2,trans);
+							fprintf(fsend,"msgbox2 0x%X ' %s\n",arg2,trans);
 						DoText(arg2);
 					}
 					if ((arg2&0xF8000000)!=0x08000000)
 					{
-						fprintf(fsend,"          'Pointer not in ROM area\r\n");
+						fprintf(fsend,"          'Pointer not in ROM area\n");
 					}
 					break;
 				case CMD_B2:
@@ -1949,7 +1949,7 @@ void DecodeProc2(FILE* fileM_,
 				case CMD_2C:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"CMD_2C 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"CMD_2C 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_RESETVARS:
 					GENERIC("resetvars");
@@ -1959,23 +1959,23 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,2,fileM);
 					fread(&arg4,1,2,fileM);
-					fprintf(fsend,"CMD_B1 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"CMD_B1 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CMD_SETDOOROPENEDSTATIC:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"setdooropenedstatic 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setdooropenedstatic 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETDOORCLOSEDSTATIC:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"setdoorclosedstatic 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setdoorclosedstatic 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_RESETSPRITELEVEL:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"resetspritelevel 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"resetspritelevel 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_CREATETEMPSPRITE:
 					fread(&arg1,1,1,fileM);
@@ -1984,34 +1984,34 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg4,1,2,fileM);
 					fread(&arg5,1,1,fileM);
 					fread(&arg6,1,1,fileM);
-					fprintf(fsend,"createtempsprite 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6);
+					fprintf(fsend,"createtempsprite 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5,arg6);
 					break;
 				case CMD_A6:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"CMD_A6 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_A6 0x%X\n",arg1);
 					break;
 				case CMD_TEMPSPRITEFACE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"tempspriteface 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"tempspriteface 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETOBEDIENCE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setobedience 0x%X\r\n",arg1);
+					fprintf(fsend,"setobedience 0x%X\n",arg1);
 					break;
 				case CMD_CHECKOBEDIENCE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkobedience 0x%X\r\n",arg1);
+					fprintf(fsend,"checkobedience 0x%X\n",arg1);
 					break;
 				case CMD_COMPAREHIDDENVAR:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"comparehiddenvar 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparehiddenvar 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_STOREBOXNAME:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"storeboxname 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"storeboxname 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_WARP6:
 					fread(&arg1,1,1,fileM);
@@ -2019,7 +2019,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,2,fileM);
 					fread(&arg5,1,2,fileM);
-					fprintf(fsend,"warp6 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+					fprintf(fsend,"warp6 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					break;
 				case CMD_MSGBOXSIGN:
 					GENERIC("msgboxsign");
@@ -2029,7 +2029,7 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_SETHEALINGPLACE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"sethealingplace 0x%X\r\n",arg1);
+					fprintf(fsend,"sethealingplace 0x%X\n",arg1);
 					break;
 				case CMD_SPRITEFACE:
 					fread(&arg1,1,2,fileM);
@@ -2049,30 +2049,30 @@ void DecodeProc2(FILE* fileM_,
 						case 4:strcpy(buf2,"RIGHT");break;
 						default:sprintf(buf2,"0x%X",arg2);
 					}
-					fprintf(fsend,"spriteface %s %s\r\n",buf,buf2);
+					fprintf(fsend,"spriteface %s %s\n",buf,buf2);
 					break;
 				case CMD_RANDOM:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"random 0x%X\r\n",arg1);
+					fprintf(fsend,"random 0x%X\n",arg1);
 					break;
 				case CMD_MOVEOFFSCREEN:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"moveoffscreen 0x%X\r\n",arg1);
+					fprintf(fsend,"moveoffscreen 0x%X\n",arg1);
 					break;
 				case CMD_CHECKTRAINERFLAG:
 					fread(&arg1,1,2,fileM);
 					comparetype=1;
-					fprintf(fsend,"checktrainerflag 0x%X\r\n",arg1);
+					fprintf(fsend,"checktrainerflag 0x%X\n",arg1);
 					break;
 				case CMD_SETDOOROPENED:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"setdooropened 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setdooropened 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETDOORCLOSED:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"setdoorclosed 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setdoorclosed 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_DOORCHANGE:
 					GENERIC("doorchange");
@@ -2119,20 +2119,20 @@ void DecodeProc2(FILE* fileM_,
 							strcpy(buf,"Unknown Compare/IF condition");
 							sprintf(buf2,"0x%X",arg1);
 						}
-					fprintf(fsend,"if %s callstd 0x%X ' %s\r\n",buf2,arg2,buf);
+					fprintf(fsend,"if %s callstd 0x%X ' %s\n",buf2,arg2,buf);
 					break;
 				case CMD_SHOWPOKEPIC:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"showpokepic 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"showpokepic 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_HIDEPOKEPIC:
-					fprintf(fsend,"hidepokepic\r\n");
+					fprintf(fsend,"hidepokepic\n");
 					break;
 				case CMD_SETMAPFOOTER:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setmapfooter 0x%X\r\n",arg1);
+					fprintf(fsend,"setmapfooter 0x%X\n",arg1);
 					break;
 				case CMD_JUMPSTDIF:
 					fread(&arg1,1,1,fileM);
@@ -2176,25 +2176,25 @@ void DecodeProc2(FILE* fileM_,
 							strcpy(buf,"Unknown Compare/IF condition");
 							sprintf(buf2,"0x%X",arg1);
 						}
-					fprintf(fsend,"if %s jumpstd 0x%X ' %s\r\n",buf2,arg2,buf);
+					fprintf(fsend,"if %s jumpstd 0x%X ' %s\n",buf2,arg2,buf);
 					break;
 				case CMD_SETWORLDMAPFLAG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setworldmapflag 0x%X\r\n",arg1);
+					fprintf(fsend,"setworldmapflag 0x%X\n",arg1);
 					break;
 				case CMD_LIGHTROOM:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"lightroom 0x%X\r\n",arg1);
+					fprintf(fsend,"lightroom 0x%X\n",arg1);
 					break;
 				case CMD_DARKENROOM:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"darkenroom 0x%X\r\n",arg1);
+					fprintf(fsend,"darkenroom 0x%X\n",arg1);
 					break;
 				case CMD_MOVESPRITE2:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"movesprite2 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"movesprite2 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_ADDITEM:
 					fread(&arg1,1,2,fileM);
@@ -2203,27 +2203,27 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"additem %s %u\r\n",buf,arg2);
+					fprintf(fsend,"additem %s %u\n",buf,arg2);
 					break;
 				case CMD_SPRITEBEHAVE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"spritebehave 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"spritebehave 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_UPDATECOINS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"updatecoins 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"updatecoins 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETBYTE2:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"setbyte2 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setbyte2 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETFARBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,4,fileM);
-					fprintf(fsend,"setfarbyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setfarbyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_TEXTCOLOR:
 					fread(&arg1,1,1,fileM);
@@ -2234,13 +2234,13 @@ void DecodeProc2(FILE* fileM_,
 						case 3:strcpy(buf,"GRAY");break;
 						default:sprintf(buf,"0x%X",arg1);
 					}
-					fprintf(fsend,"textcolor %s\r\n",buf);
+					fprintf(fsend,"textcolor %s\n",buf);
 					break;
 				case CMD_FAKEJUMPSTD:
 					if (mode==FIRE_RED)
 					{
 						fread(&arg1,1,1,fileM);
-						fprintf(fsend,"fakejumpstd 0x%X\r\n",arg1);
+						fprintf(fsend,"fakejumpstd 0x%X\n",arg1);
 					}
 					else
 					{
@@ -2253,18 +2253,18 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@mart%u",martnum);
 								Define2(arg1|0x08000000,buf);
 							}
-							fprintf(fsend,"pokemart3 %s\r\n",WhatIs2(arg1|0x08000000));
+							fprintf(fsend,"pokemart3 %s\n",WhatIs2(arg1|0x08000000));
 							DoMart(arg1);
 						}
 						else
 						{
 							if((arg1&0xF8000000)==0x08000000)
 							{
-								fprintf(fsend,"pokemart3 0x%X\r\n",arg1);
+								fprintf(fsend,"pokemart3 0x%X\n",arg1);
 								DoMart(arg1);
 							}
 							else
-								fprintf(fsend,"pokemart3 0x%X 'Not in ROM area\r\n",arg1);
+								fprintf(fsend,"pokemart3 0x%X 'Not in ROM area\n",arg1);
 						}
 					}
 					break;
@@ -2292,7 +2292,7 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg2==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"comparevars %s %s\r\n",buf,buf2);
+					fprintf(fsend,"comparevars %s %s\n",buf,buf2);
 					break;
 				case CMD_COMPAREVARS2:
 					fread(&arg1,1,2,fileM);
@@ -2318,7 +2318,7 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg2==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"comparevars2 %s %s\r\n",buf,buf2);
+					fprintf(fsend,"comparevars2 %s %s\n",buf,buf2);
 					break;
 				case CMD_SUBTRACTVAR:
 					fread(&arg1,1,2,fileM);
@@ -2333,15 +2333,15 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg1==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"subtractvar %s 0x%X\r\n",buf,arg2);
+					fprintf(fsend,"subtractvar %s 0x%X\n",buf,arg2);
 					break;
 				case CMD_CLEARTRAINERFLAG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"cleartrainerflag 0x%X\r\n",arg1);
+					fprintf(fsend,"cleartrainerflag 0x%X\n",arg1);
 					break;
 				case CMD_FE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"CMD_FE 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_FE 0x%X\n",arg1);
 					break;
 				case CMD_ADDVAR:
 					fread(&arg1,1,2,fileM);
@@ -2366,11 +2366,11 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg2==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"addvar %s %s\r\n",buf,buf2);
+					fprintf(fsend,"addvar %s %s\n",buf,buf2);
 					break;
 				case CMD_96:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"CMD_96 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_96 0x%X\n",arg1);
 					break;
 				case CMD_COINCASETOVAR:
 					fread(&arg1,1,2,fileM);
@@ -2384,56 +2384,56 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg1==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"coincasetovar %s\r\n",buf);
+					fprintf(fsend,"coincasetovar %s\n",buf);
 					break;
 				case CMD_GIVETOCOINCASE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"givetocoincase %d ' Bear in mind, it's not in hex\r\n",arg1);
+					fprintf(fsend,"givetocoincase %d ' Bear in mind, it's not in hex\n",arg1);
 					break;
 				case CMD_CHECKMONEY:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"checkmoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"checkmoney 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_PAYMONEY:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,2,fileM);
-					fprintf(fsend,"paymoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"paymoney 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_UPDATEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"updatemoney 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"updatemoney 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CMD_HIDEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"hidemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"hidemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_HIDECOINS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"hidecoins 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"hidecoins 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SHOWCOINS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"showcoins 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"showcoins 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_MULTICHOICE2:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,2,fileM);
-					fprintf(fsend,"multichoice2 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"multichoice2 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CMD_SHOWMONEY:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"showmoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"showmoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_DISAPPEAR:
 					fread(&arg1,1,2,fileM);
@@ -2441,41 +2441,41 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,"LASTTALKED");
 					else
 						sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"disappear %s\r\n",buf);
+					fprintf(fsend,"disappear %s\n",buf);
 					break;
 				case CMD_REAPPEAR:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"reappear 0x%X\r\n",arg1);
+					fprintf(fsend,"reappear 0x%X\n",arg1);
 					break;
 				case CMD_GIVEEGG:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"giveegg 0x%X\r\n",arg1);
+					fprintf(fsend,"giveegg 0x%X\n",arg1);
 					break;
 				case CMD_STOREFURNITURE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"storefurniture 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"storefurniture 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_STOREATTACK:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"storeattack 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"storeattack 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_STORECOMP:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"storecomp 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"storecomp 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SLOTMACHINE:
 					if (mode==FIRE_RED)
 					{
 						fread(&arg1,1,1,fileM);
-						fprintf(fsend,"fakecallstd 0x%X\r\n",arg1);
+						fprintf(fsend,"fakecallstd 0x%X\n",arg1);
 					}
 					else if (mode==RUBY)
 					{
 						fread(&arg1,1,2,fileM);
-						fprintf(fsend,"slotmachine 0x%X\r\n",arg1);
+						fprintf(fsend,"slotmachine 0x%X\n",arg1);
 					}
 					break;
 				case CMD_STOREITEM:
@@ -2485,34 +2485,34 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg2);
 					else
 						strcpy(buf,GetItemName(arg2));
-					fprintf(fsend,"storeitem 0x%X %s\r\n",arg1,buf);
+					fprintf(fsend,"storeitem 0x%X %s\n",arg1,buf);
 					break;
 				case CMD_DOANIMATION:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"doanimation 0x%X\r\n",arg1);
+					fprintf(fsend,"doanimation 0x%X\n",arg1);
 					break;
 				case CMD_CHECKANIMATION:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkanimation 0x%X\r\n",arg1);
+					fprintf(fsend,"checkanimation 0x%X\n",arg1);
 					break;
 				case CMD_SETANIMATION:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"setanimation 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"setanimation 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_HIDEBOX:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
-					fprintf(fsend,"hidebox 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"hidebox 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CMD_STORETEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,4,fileM);
 					if ((arg2&0xF8000000)!=0x08000000)
 					{
-						fprintf(fsend,"storetext 0x%X 0x%X 'Text not in ROM area\r\n",arg1,arg2);
+						fprintf(fsend,"storetext 0x%X 0x%X 'Text not in ROM area\n",arg1,arg2);
 					}
 					else
 					{
@@ -2529,18 +2529,18 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@text%u",textnum);
 								Define2(arg2|0x08000000,buf);
 							}
-							fprintf(fsend,"storetext 0x%X %s ' %s\r\n",arg1,WhatIs2(arg2|0x08000000),trans);
+							fprintf(fsend,"storetext 0x%X %s ' %s\n",arg1,WhatIs2(arg2|0x08000000),trans);
 						}
 						else
 						{
-							fprintf(fsend,"storetext 0x%X 0x%X ' %s\r\n",arg1,arg2,trans);
+							fprintf(fsend,"storetext 0x%X 0x%X ' %s\n",arg1,arg2,trans);
 						}
 						DoText(arg2);
 					}
 					break;
 				case CMD_SOUND:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"sound 0x%X\r\n",arg1);
+					fprintf(fsend,"sound 0x%X\n",arg1);
 					break;
 				case CMD_STOREVAR:
 					fread(&arg1,1,1,fileM);
@@ -2555,7 +2555,7 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg2==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"storevar 0x%X %s\r\n",arg1,buf);
+					fprintf(fsend,"storevar 0x%X %s\n",arg1,buf);
 					break;
 				case CMD_DOWEATHER:
 					GENERIC("doweather");
@@ -2564,11 +2564,11 @@ void DecodeProc2(FILE* fileM_,
 					arg2=1;
 					if (mode==FIRE_RED) {
 						fread(&arg1,1,2,fileM);
-						fprintf(fsend,"setweather 0x%X\r\n", arg1);
+						fprintf(fsend,"setweather 0x%X\n", arg1);
 					} else {
 						fread(&arg1,1,1,fileM);
 						fread(&arg2,1,1,fileM);
-						fprintf(fsend,"setweather 0x%X 0x%X\r\n", arg1, arg2);
+						fprintf(fsend,"setweather 0x%X 0x%X\n", arg1, arg2);
 					}
 					break;
 				case CMD_BATTLE:
@@ -2584,14 +2584,14 @@ void DecodeProc2(FILE* fileM_,
 					else
 						sprintf(buf2,"0x%X",arg3);
 					//poke lvl item
-					fprintf(fsend,"battle %s %u %s\r\n",buf,arg2,buf2);
+					fprintf(fsend,"battle %s %u %s\n",buf,arg2,buf2);
 					break;
 				case CMD_SETMAPTILE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,2,fileM);
 					fread(&arg3,1,2,fileM);
 					fread(&arg4,1,2,fileM);
-					fprintf(fsend,"setmaptile 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"setmaptile 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CMD_END:
 					still_going=0;
@@ -2601,7 +2601,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg1,1,4,fileM);
 					if((arg1&0xF8000000)!=0x08000000)
 					{
-						fprintf(fsend,"pokemart 0x%X 'Not in ROM area\r\n",arg1);
+						fprintf(fsend,"pokemart 0x%X 'Not in ROM area\n",arg1);
 						break;
 					}
 					if(dyndec)
@@ -2612,10 +2612,10 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"@mart%u",martnum);
 							Define2(arg1|0x08000000,buf);
 						}
-						fprintf(fsend,"pokemart %s\r\n",WhatIs2(arg1|0x08000000));
+						fprintf(fsend,"pokemart %s\n",WhatIs2(arg1|0x08000000));
 					}
 					else
-						fprintf(fsend,"pokemart 0x%X\r\n",arg1);
+						fprintf(fsend,"pokemart 0x%X\n",arg1);
 					DoMart(arg1);
 					break;
 				case CMD_SHOWMSG:
@@ -2628,7 +2628,7 @@ void DecodeProc2(FILE* fileM_,
 				case CMD_WRITEBYTETOOFFSET:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,4,fileM);
-					fprintf(fsend,"writebytetooffset 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"writebytetooffset 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_CHECKFLAG:
 					fread(&arg1,1,2,fileM);
@@ -2637,7 +2637,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,GetFlagName(arg1));
 					else
 						sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"checkflag %s\r\n",buf);
+					fprintf(fsend,"checkflag %s\n",buf);
 					break;
 				case CMD_SPECIAL2:
 					fread(&arg1,1,2,fileM);
@@ -2655,7 +2655,7 @@ void DecodeProc2(FILE* fileM_,
 					}
 					lastdata=arg2;
 					lastdata2=arg1;
-					fprintf(fsend,"special2 %s %s\r\n",buf,buf2);
+					fprintf(fsend,"special2 %s %s\n",buf,buf2);
 					break;
 				case CMD_SETFLAG:
 					fread(&arg1,1,2,fileM);
@@ -2663,7 +2663,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,GetFlagName(arg1));
 					else
 						sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"setflag %s\r\n",buf);
+					fprintf(fsend,"setflag %s\n",buf);
 					break;
 				case CMD_LOCK:
 					GENERIC("lock");
@@ -2673,7 +2673,7 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_C3:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"CMD_C3 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_C3 0x%X\n",arg1);
 					break;
 				case CMD_JUMPIF:
 					fread(&arg1,1,1,fileM);
@@ -2727,14 +2727,14 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf3,"@code%u",codenum);
 								Define2(arg2|0x08000000,buf3);
 							}
-							fprintf(fsend,"if %s jump %s ' %s\r\n",buf2,WhatIs2(arg2|0x08000000),buf);
+							fprintf(fsend,"if %s jump %s ' %s\n",buf2,WhatIs2(arg2|0x08000000),buf);
 						}
 						else
-							fprintf(fsend,"if %s jump 0x%X ' %s\r\n",buf2,arg2,buf);
+							fprintf(fsend,"if %s jump 0x%X ' %s\n",buf2,arg2,buf);
 						Do(arg2);
 					}
 					else
-						fprintf(fsend,"if %s jump 0x%X ' %s\r\n          'Jump not in ROM area\r\n",buf2,arg2,buf);
+						fprintf(fsend,"if %s jump 0x%X ' %s\n          'Jump not in ROM area\n",buf2,arg2,buf);
 					break;
 				case CMD_WARP:
 					fread(&arg1,1,1,fileM);
@@ -2744,44 +2744,44 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg4,1,2,fileM);
 						fread(&arg5,1,2,fileM);
-						fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+						fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					}
 					else
 					{
-						fprintf(fsend,"warp 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+						fprintf(fsend,"warp 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					}
 					break;
 				case CMD_FB:
 					fread(&arg1,1,4,fileM);
-					fprintf(fsend,"CMD_FB 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_FB 0x%X\n",arg1);
 					break;
 				case CMD_COPYSCRIPTBANKS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"copyscriptbanks 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copyscriptbanks 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_COMPAREVARTOFARBYTE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,4,fileM);
 					comparetype=0;
-					fprintf(fsend,"comparevartofarbyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparevartofarbyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_COMPAREFARBYTETOVAR:
 					fread(&arg1,1,4,fileM);
 					fread(&arg2,1,2,fileM);
 					comparetype=0;
-					fprintf(fsend,"comparefarbytetovar 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparefarbytetovar 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_COMPAREFARBYTETOBYTE:
 					fread(&arg1,1,4,fileM);
 					fread(&arg2,1,1,fileM);
 					comparetype=0;
-					fprintf(fsend,"comparefarbytetobyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparefarbytetobyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_COPYBYTE:
 					fread(&arg1,1,4,fileM);
 					fread(&arg2,1,4,fileM);
-					fprintf(fsend,"copybyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copybyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_SETVAR:
 					fread(&arg1,1,2,fileM);
@@ -2796,13 +2796,13 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg1==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"setvar %s 0x%X\r\n",buf,arg2);
+					fprintf(fsend,"setvar %s 0x%X\n",buf,arg2);
 					break;
 				case CMD_MESSAGE:
 					fread(&arg1,1,4,fileM);
 					if ((arg1&0xF8000000)!=0x08000000)
 					{
-						fprintf(fsend,"message 0x%X 'Text not in ROM area\r\n",arg1);
+						fprintf(fsend,"message 0x%X 'Text not in ROM area\n",arg1);
 					}
 					else
 					{
@@ -2819,10 +2819,10 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@text%u",textnum);
 								Define2(arg1|0x08000000,buf);
 							}
-							fprintf(fsend,"message %s ' %s\r\n",WhatIs2(arg1|0x08000000),trans);
+							fprintf(fsend,"message %s ' %s\n",WhatIs2(arg1|0x08000000),trans);
 						}
 						else
-							fprintf(fsend,"message 0x%X ' %s\r\n",arg1,trans);
+							fprintf(fsend,"message 0x%X ' %s\n",arg1,trans);
 						DoText(arg1);
 					}
 					break;
@@ -2878,14 +2878,14 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf3,"@code%u",codenum);
 								Define2(arg2|0x08000000,buf3);
 							}
-							fprintf(fsend,"if %s call %s ' %s\r\n",buf2,WhatIs2(arg2|0x08000000),buf);
+							fprintf(fsend,"if %s call %s ' %s\n",buf2,WhatIs2(arg2|0x08000000),buf);
 						}
 						else
-							fprintf(fsend,"if %s call 0x%X ' %s\r\n",buf2,arg2,buf);
+							fprintf(fsend,"if %s call 0x%X ' %s\n",buf2,arg2,buf);
 						Do(arg2);
 					}
 					else
-						fprintf(fsend,"if %s call 0x%X ' %s\r\n          'Call not in ROM area\r\n",buf2,arg2,buf);
+						fprintf(fsend,"if %s call 0x%X ' %s\n          'Call not in ROM area\n",buf2,arg2,buf);
 					break;
 				case CMD_CHECKGENDER:
 					GENERIC("checkgender");
@@ -2933,7 +2933,7 @@ void DecodeProc2(FILE* fileM_,
 							}
 						}
 					}
-					fprintf(fsend,"compare %s %s\r\n",buf,buf2);
+					fprintf(fsend,"compare %s %s\n",buf,buf2);
 					break;
 				case CMD_APPLYMOVEMENT:
 					fread(&arg1,1,2,fileM);
@@ -2961,28 +2961,28 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf2,"@move%u",movenum);
 								Define2(arg2|0x08000000,buf2);
 							}
-							fprintf(fsend,"applymovement %s %s ' %s\r\n",buf,WhatIs2(arg2|0x08000000),trans);
+							fprintf(fsend,"applymovement %s %s ' %s\n",buf,WhatIs2(arg2|0x08000000),trans);
 						}
 						else
-							fprintf(fsend,"applymovement %s 0x%X ' %s\r\n",buf,arg2,trans);
+							fprintf(fsend,"applymovement %s 0x%X ' %s\n",buf,arg2,trans);
 						DoMove(arg2);
 					}
 					else
 					{
-						fprintf(fsend,"applymovement %s 0x%X ' Not in ROM area\r\n",buf,arg2);
+						fprintf(fsend,"applymovement %s 0x%X ' Not in ROM area\n",buf,arg2);
 					}
 					break;
 				case CMD_RELEASE:
 					GENERIC("release");
-					if(lastcmd==CMD_CALLSTD&&lastdata==4)fprintf(fsend,"     ' Release commands close any open messages\r\n");
+					if(lastcmd==CMD_CALLSTD&&lastdata==4)fprintf(fsend,"     ' Release commands close any open messages\n");
 					break;
 				case CMD_PAUSE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"pause 0x%X\r\n",arg1);
+					fprintf(fsend,"pause 0x%X\n",arg1);
 					break;
 				case CMD_PAUSEEVENT:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"pauseevent 0x%X\r\n",arg1);
+					fprintf(fsend,"pauseevent 0x%X\n",arg1);
 					break;
 				case CMD_CALL:
 					fread(&arg1,1,4,fileM);
@@ -2996,14 +2996,14 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@code%u",codenum);
 								Define2(arg1|0x08000000,buf);
 							}
-							fprintf(fsend,"call %s\r\n",WhatIs2(arg1|0x08000000));
+							fprintf(fsend,"call %s\n",WhatIs2(arg1|0x08000000));
 						}
 						else
-							fprintf(fsend,"call 0x%X\r\n",arg1);
+							fprintf(fsend,"call 0x%X\n",arg1);
 						Do(arg1);
 					}
 					else
-						fprintf(fsend,"call 0x%X\r\n          'Call not in ROM area\r\n",arg1);
+						fprintf(fsend,"call 0x%X\n          'Call not in ROM area\n",arg1);
 					break;
 				case CMD_CALLSTD:
 					fread(&arg1,1,1,fileM);
@@ -3050,7 +3050,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,"");
 						sprintf(buf2,"0x%X",arg1);
 					}
-					fprintf(fsend,"callstd %s ' %s\r\n",buf2,buf);
+					fprintf(fsend,"callstd %s ' %s\n",buf2,buf);
 					break;
 				case CMD_MSGBOX:
 					fread(&arg1,1,1,fileM);
@@ -3059,7 +3059,7 @@ void DecodeProc2(FILE* fileM_,
 					{
 						if ((arg2&0xF8000000)!=0x08000000)
 						{
-							fprintf(fsend,"msgbox 0x%X\r\n       ' Not in ROM area\r\n",arg2);
+							fprintf(fsend,"msgbox 0x%X\n       ' Not in ROM area\n",arg2);
 						}
 						else
 						{
@@ -3076,19 +3076,19 @@ void DecodeProc2(FILE* fileM_,
 									sprintf(buf,"@text%u",textnum);
 									Define2(arg2|0x08000000,buf);
 								}
-								fprintf(fsend,"msgbox %s ' %s\r\n",WhatIs2(arg2|0x08000000),trans);
+								fprintf(fsend,"msgbox %s ' %s\n",WhatIs2(arg2|0x08000000),trans);
 							}
 							else
-								fprintf(fsend,"msgbox 0x%X ' %s\r\n",arg2,trans);
+								fprintf(fsend,"msgbox 0x%X ' %s\n",arg2,trans);
 							DoText(arg2);
 						}
 					}
 					else
 					{
-						fprintf(fsend,"loadpointer 0x%X 0x%X\r\n",arg1,arg2);
+						fprintf(fsend,"loadpointer 0x%X 0x%X\n",arg1,arg2);
 						if ((arg2&0xF8000000)!=0x08000000)
 						{
-							fprintf(fsend,"          'Pointer not in ROM area\r\n");
+							fprintf(fsend,"          'Pointer not in ROM area\n");
 						}
 					}
 					break;
@@ -3099,7 +3099,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg2);
 					else
 						strcpy(buf,GetPokeName(arg2));
-					fprintf(fsend,"storepokemon 0x%X %s\r\n",arg1,buf);
+					fprintf(fsend,"storepokemon 0x%X %s\n",arg1,buf);
 					break;
 				case CMD_SPECIAL:
 					fread(&arg1,1,2,fileM);
@@ -3131,7 +3131,7 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"0x%X",arg1);
 					}
 					lastdata=arg1;
-					fprintf(fsend,"special %s\r\n",buf);
+					fprintf(fsend,"special %s\n",buf);
 					break;
 				case CMD_FADESCREEN:
 					fread(&arg1,1,1,fileM);
@@ -3152,37 +3152,37 @@ void DecodeProc2(FILE* fileM_,
 					default:
 						sprintf(buf,"0x%X",arg1);
 					}
-					fprintf(fsend,"fadescreen %s\r\n",buf);
+					fprintf(fsend,"fadescreen %s\n",buf);
 					break;
 				case CMD_FANFARE:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"fanfare 0x%X\r\n",arg1);
+					fprintf(fsend,"fanfare 0x%X\n",arg1);
 					break;
 				case CMD_WAITFANFARE:
 					GENERIC("waitfanfare");
 					break;
 				case CMD_BRAILLE:
 					fread(&arg1,1,4,fileM);
-					fprintf(fsend,"braille 0x%X\r\n",arg1);
+					fprintf(fsend,"braille 0x%X\n",arg1);
 					if ((arg1&0xF8000000)==0x08000000)
 					{
 						transbrl(arg1,filename,fsend);
 					}
 					else
 					{
-						fprintf(fsend,"          'Braille not in ROM area\r\n");
+						fprintf(fsend,"          'Braille not in ROM area\n");
 					}
 					break;
 				case CMD_D3:
 					fread(&arg1,1,4,fileM);
-					fprintf(fsend,"CMD_D3 0x%X\r\n",arg1);
+					fprintf(fsend,"CMD_D3 0x%X\n",arg1);
 					if ((arg1&0xF8000000)==0x08000000)
 					{
 						transbrl(arg1,filename,fsend);
 					}
 					else
 					{
-						fprintf(fsend,"          'Braille not in ROM area\r\n");
+						fprintf(fsend,"          'Braille not in ROM area\n");
 					}
 					break;
 				case CMD_WAITBUTTON:
@@ -3190,20 +3190,20 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_RELEASEALL:
 					GENERIC("releaseall");
-					if(lastcmd==CMD_CALLSTD&&lastdata==4)fprintf(fsend,"     ' Release commands close any open messages\r\n");
+					if(lastcmd==CMD_CALLSTD&&lastdata==4)fprintf(fsend,"     ' Release commands close any open messages\n");
 					break;
 				case CMD_LOCKALL:
 					GENERIC("lockall");
 					break;
 				case CMD_PICTURE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"picture 0x%X\r\n",arg1);
+					fprintf(fsend,"picture 0x%X\n",arg1);
 					break;
 				case CMD_NOP0:
-					fprintf(fsend,"nop0 ' #raw 0x0\r\n");
+					fprintf(fsend,"nop0 ' #raw 0x0\n");
 					break;
 				case CMD_NOP1:
-					fprintf(fsend,"nop1 ' #raw 0x1\r\n");
+					fprintf(fsend,"nop1 ' #raw 0x1\n");
 					break;
 				case CMD_JUMP:
 					fread(&arg1,1,4,fileM);
@@ -3217,19 +3217,19 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@code%u",codenum);
 								Define2(arg1|0x08000000,buf);
 							}
-							fprintf(fsend,"jump %s\r\n",WhatIs2(arg1|0x08000000));
+							fprintf(fsend,"jump %s\n",WhatIs2(arg1|0x08000000));
 						}
 						else
-							fprintf(fsend,"jump 0x%X\r\n",arg1);
+							fprintf(fsend,"jump 0x%X\n",arg1);
 						Do(arg1);
 					}
 					else
-						fprintf(fsend,"jump 0x%X\r\n          'Jump not in ROM area\r\n",arg1);
+						fprintf(fsend,"jump 0x%X\n          'Jump not in ROM area\n",arg1);
 					still_going=0;
 					break;
 				case CMD_JUMPSTD:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"jumpstd 0x%X\r\n",arg1);
+					fprintf(fsend,"jumpstd 0x%X\n",arg1);
 					still_going=0;
 					break;
 				case CMD_KILLSCRIPT:
@@ -3237,7 +3237,7 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CMD_SETBYTE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"setbyte 0x%X\r\n",arg1);
+					fprintf(fsend,"setbyte 0x%X\n",arg1);
 					break;
 				case CMD_COPYVARIFNOTZERO:
 					fread(&arg1,1,2,fileM);
@@ -3257,7 +3257,7 @@ void DecodeProc2(FILE* fileM_,
 						if(GetItemName(arg2))
 							strcpy(buf2,GetItemName(arg2));
 					}
-					fprintf(fsend,"copyvarifnotzero %s %s\r\n",buf,buf2);
+					fprintf(fsend,"copyvarifnotzero %s %s\n",buf,buf2);
 					break;
 				case CMD_COPYVAR:
 					fread(&arg1,1,2,fileM);
@@ -3282,18 +3282,18 @@ void DecodeProc2(FILE* fileM_,
 					else if (arg2==0x800F) {
 						strcpy(buf,"LASTTALKED");
 					}
-					fprintf(fsend,"copyvar %s %s\r\n",buf,buf2);
+					fprintf(fsend,"copyvar %s %s\n",buf,buf2);
 					break;
 				case CMD_COMPAREVARTOBYTE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					comparetype=0;
-					fprintf(fsend,"comparevartobyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparevartobyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_LOADBYTEFROMPOINTER:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,4,fileM);
-					fprintf(fsend,"loadbytefrompointer 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadbytefrompointer 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_REMOVEITEM:
 					fread(&arg1,1,2,fileM);
@@ -3302,7 +3302,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"removeitem %s %u\r\n",buf,arg2);
+					fprintf(fsend,"removeitem %s %u\n",buf,arg2);
 					break;
 				case CMD_WAITSPECIAL:
 					GENERIC("waitspecial");
@@ -3316,7 +3316,7 @@ void DecodeProc2(FILE* fileM_,
 					if(GetPokeName(arg1))
 						strcpy(buf,GetPokeName(arg1));
 					else sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"cry %s 0x%X\r\n",buf,arg2);
+					fprintf(fsend,"cry %s 0x%X\n",buf,arg2);
 					break;
 				case CMD_CRY:
 					if (mode!=FIRE_RED)
@@ -3329,7 +3329,7 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"0x%X",arg2);
 						else
 							strcpy(buf, pokeName);
-						fprintf(fsend,"cry 0x%X %s 0x%X\r\n",arg1, buf, arg3);
+						fprintf(fsend,"cry 0x%X %s 0x%X\n",arg1, buf, arg3);
 					}
 					else
 						GENERIC("checksound");
@@ -3339,31 +3339,31 @@ void DecodeProc2(FILE* fileM_,
 					if (mode==FIRE_RED)
 					{
 						fread(&arg2,1,1,fileM);
-						fprintf(fsend,"playsound 0x%X 0x%X\r\n",arg1,arg2);
+						fprintf(fsend,"playsound 0x%X 0x%X\n",arg1,arg2);
 					}
 					else
 					{
-						fprintf(fsend,"playsound 0x%X\r\n",arg1);
+						fprintf(fsend,"playsound 0x%X\n",arg1);
 					}
 					break;
 				case CMD_FADEDEFAULT:
 					if (mode==RUBY)
 					{
 						fread(&arg1,1,2,fileM);
-						fprintf(fsend,"fadesound 0x%X\r\n",arg1);
+						fprintf(fsend,"fadesound 0x%X\n",arg1);
 					}
 					else if (mode==FIRE_RED)
 					{
-						fprintf(fsend,"fadedefault\r\n");
+						fprintf(fsend,"fadedefault\n");
 					}
 					break;
 				case CMD_FADEOUT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"fadeout 0x%X\r\n",arg1);
+					fprintf(fsend,"fadeout 0x%X\n",arg1);
 					break;
 				case CMD_FADEIN:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"fadein 0x%X\r\n",arg1);
+					fprintf(fsend,"fadein 0x%X\n",arg1);
 					break;
 				case CMD_COUNTPOKEMON:
 					GENERIC("countpokemon");
@@ -3375,7 +3375,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"checkitem %s %u\r\n",buf,arg2);
+					fprintf(fsend,"checkitem %s %u\n",buf,arg2);
 					break;
 				case CMD_CHECKITEMSPACEINBAG:
 					fread(&arg1,1,2,fileM);
@@ -3384,7 +3384,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"checkitemspaceinbag %s %u\r\n",buf,arg2);
+					fprintf(fsend,"checkitemspaceinbag %s %u\n",buf,arg2);
 					break;
 				case CMD_CHECKATTACK:
 					fread(&arg1,1,2,fileM);
@@ -3392,7 +3392,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,GetAttackName(arg1));
 					else
 						sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"checkattack %s\r\n",buf);
+					fprintf(fsend,"checkattack %s\n",buf);
 					break;
 				case CMD_TRAINERBATTLE:
 					fread(&arg1,1,1,fileM);
@@ -3453,7 +3453,7 @@ void DecodeProc2(FILE* fileM_,
 						{
 							sprintf(buf3,"0x%X 0x%X 0x%X",arg4,arg5,arg6);
 						}
-						fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\r\n",arg1,arg2,arg3,buf3);
+						fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\n",arg1,arg2,arg3,buf3);
 						if ((arg6&0xF8000000)==0x08000000)
 						{
 							Do(arg6);
@@ -3469,10 +3469,10 @@ void DecodeProc2(FILE* fileM_,
 								sprintf(buf,"@text%u",textnum);
 								Define2(arg4|0x08000000,buf);
 							}
-							fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\r\n",arg1,arg2,arg3,WhatIs2(arg4|0x08000000));
+							fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\n",arg1,arg2,arg3,WhatIs2(arg4|0x08000000));
 						}
 						else
-							fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+							fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					}
 					else
 					{
@@ -3508,7 +3508,7 @@ void DecodeProc2(FILE* fileM_,
 						}
 						else
 							sprintf(buf3,"0x%X 0x%X",arg4,arg5);
-						fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\r\n",arg1,arg2,arg3,buf3);
+						fprintf(fsend,"trainerbattle 0x%X 0x%X 0x%X %s\n",arg1,arg2,arg3,buf3);
 					}
 					if ((arg4&0xF8000000)==0x08000000)
 					{
@@ -3524,7 +3524,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
-					fprintf(fsend,"multichoice 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"multichoice 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CMD_ADDPOKEMON:
 					fread(&arg1,1,2,fileM);
@@ -3541,7 +3541,7 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf2,"0x%X",arg3);
 					else
 						strcpy(buf2,GetItemName(arg3));
-					fprintf(fsend,"addpokemon %s %u %s 0x%X 0x%X 0x%X\r\n",buf,arg2,buf2,arg4,arg5,arg6);
+					fprintf(fsend,"addpokemon %s %u %s 0x%X 0x%X 0x%X\n",buf,arg2,buf2,arg4,arg5,arg6);
 					break;
 				case CMD_CALLASM:
 					fread(&arg1,1,4,fileM);
@@ -3553,10 +3553,10 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"@thumb%u",thumbnum);
 							Define2(arg1|0x08000000,buf);
 						}
-						fprintf(fsend,"callasm %s\r\n",WhatIs2(arg1|0x08000000));
+						fprintf(fsend,"callasm %s\n",WhatIs2(arg1|0x08000000));
 					}
 					else
-						fprintf(fsend,"callasm 0x%X\r\n",arg1);
+						fprintf(fsend,"callasm 0x%X\n",arg1);
 					if ((arg1&1)&&((arg1&0xF8000000)==0x08000000))
 						DoThumb(arg1&0xFFFFFFFE);
 					break;
@@ -3570,10 +3570,10 @@ void DecodeProc2(FILE* fileM_,
 							sprintf(buf,"@thumb%u",thumbnum);
 							Define2(arg1|0x08000000,buf);
 						}
-						fprintf(fsend,"callasm2 %s\r\n",WhatIs2(arg1|0x08000000));
+						fprintf(fsend,"callasm2 %s\n",WhatIs2(arg1|0x08000000));
 					}
 					else
-						fprintf(fsend,"callasm2 0x%X\r\n",arg1);
+						fprintf(fsend,"callasm2 0x%X\n",arg1);
 					if ((arg1&1)&&((arg1&0xF8000000)==0x08000000))
 						DoThumb(arg1&0xFFFFFFFE);
 					break;
@@ -3583,25 +3583,25 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf,GetFlagName(arg1));
 					else
 						sprintf(buf,"0x%X",arg1);
-					fprintf(fsend,"clearflag %s\r\n",buf);
+					fprintf(fsend,"clearflag %s\n",buf);
 					break;
 				case CMD_COMPAREFARBYTETOFARBYTE:
 					fread(&arg1,1,4,fileM);
 					fread(&arg2,1,4,fileM);
 					comparetype=0;
-					fprintf(fsend,"comparefarbytetofarbyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"comparefarbytetofarbyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CMD_CLOSEMSG:
 					GENERIC("closemsg");
 					break;
 				default:
-					fprintf(fsend,"#raw 0x%X\r\n",command);
+					fprintf(fsend,"#raw 0x%X\n",command);
 					if (command==0xFF)
 					{
 						failsafe++;
 						if (failsafe>=100)
 						{
-							fprintf(fsend,"'Decompiler stopped due to failsafe mechanism (too many #RAW 0xFF commands)\r\n");
+							fprintf(fsend,"'Decompiler stopped due to failsafe mechanism (too many #RAW 0xFF commands)\n");
 							still_going=0;
 						}
 					}
@@ -3622,7 +3622,7 @@ void DecodeProc2(FILE* fileM_,
 			read=(signed int)fread(&command,1,1,fileM);
 			if (read>0)
 			{
-#define GENERIC(x) fprintf(fsend,"%s\r\n",x)
+#define GENERIC(x) fprintf(fsend,"%s\n",x)
 				arg1=arg2=arg3=arg4=arg5=arg6=arg7=0;
 				switch (command)
 				{
@@ -3641,13 +3641,13 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_2CALL:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2call 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2call 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case GLD_3CALL:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3call 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3call 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case GLD_2PTCALL:
@@ -3660,28 +3660,28 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					DoDword(arg2);
 					Do(PointerToOffset(arg4));
 					break;
 				case GLD_2JUMP:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2jump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2jump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
 				case GLD_PRIORITYJUMP:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"priorityjump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"priorityjump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
 				case GLD_3JUMP:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3jump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3jump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
@@ -3695,7 +3695,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
 					DoDword(arg2);
 					Do(PointerToOffset(arg4));
@@ -3710,7 +3710,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"ptpriorityjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"ptpriorityjump 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
 					Do(arg4);
 					break;
@@ -3718,58 +3718,58 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if == 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if == 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case GLD_NEQBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if != 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if != 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case GLD_EQZERO:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"if false 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"if false 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case GLD_NEQZERO:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"if true 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"if true 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case GLD_LTBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if < 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if < 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case GLD_GTBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if > 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if > 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case GLD_JUMPSTD:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"jumpstd 0x%X\r\n",arg1);
+					fprintf(fsend,"jumpstd 0x%X\n",arg1);
 					still_going=0;
 					break;
 				case GLD_CALLSTD:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"callstd 0x%X\r\n",arg1);
+					fprintf(fsend,"callstd 0x%X\n",arg1);
 					break;
 				case GLD_3CALLASM:
 					fread(&arg1,1,3,fileM);
-					fprintf(fsend,"3callasm 0x%X\r\n",arg1);
+					fprintf(fsend,"3callasm 0x%X\n",arg1);
 					break;
 				case GLD_SPECIAL:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"special 0x%X\r\n",arg1);
+					fprintf(fsend,"special 0x%X\n",arg1);
 					break;
 				case GLD_2PTCALLASM:
 					fread(&arg1,1,2,fileM);
@@ -3781,23 +3781,23 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					DoDword(arg2);
 					break;
 				case GLD_CHECKMAPTRIGGERS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"checkmaptriggers 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"checkmaptriggers 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_DOMAPTRIGGER:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"domaptrigger 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"domaptrigger 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_DOTRIGGER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"dotrigger 0x%X\r\n",arg1);
+					fprintf(fsend,"dotrigger 0x%X\n",arg1);
 					break;
 				case GLD_CHECKTRIGGERS:
 					GENERIC("checktriggers");
@@ -3859,87 +3859,87 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_PASSTOENGINE:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"passtoengine 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"passtoengine 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_CHECKBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"checkbit1 0x%X\n",arg1);
 					break;
 				case GLD_SETBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"setbit1 0x%X\n",arg1);
 					break;
 				case GLD_SETBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"setbit2 0x%X\n",arg1);
 					break;
 				case GLD_CHECKBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"checkbit2 0x%X\n",arg1);
 					break;
 				case GLD_CLEARBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"clearbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"clearbit2 0x%X\n",arg1);
 					break;
 				case GLD_CLEARBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"clearbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"clearbit1 0x%X\n",arg1);
 					break;
 				case GLD_2WRITETEXT:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2writetext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=0xFFFFFFFF)
 						DoText(arg2);
 					break;
 				case GLD_3WRITETEXT:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3writetext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=0xFFFFFFFF)
 						DoText(arg2);
 					break;
 				case GLD_REPEATTEXT:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"repeattext 0x%X\r\n",arg1);
+					fprintf(fsend,"repeattext 0x%X\n",arg1);
 					break;
 				case GLD_POKEPIC:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"pokepic 0x%X\r\n",arg1);
+					fprintf(fsend,"pokepic 0x%X\n",arg1);
 					break;
 				case GLD_DESCRIBEDECORATION:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"describedecoration 0x%X\r\n",arg1);
+					fprintf(fsend,"describedecoration 0x%X\n",arg1);
 					break;
 				case GLD_FRUITTREE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"fruittree 0x%X\r\n",arg1);
+					fprintf(fsend,"fruittree 0x%X\n",arg1);
 					break;
 				case GLD_SPECIALPHONECALL:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"specialphonecall 0x%X\r\n",arg1);
+					fprintf(fsend,"specialphonecall 0x%X\n",arg1);
 					break;
 				case GLD_FACEPERSON:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"faceperson 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"faceperson 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_VARIABLESPRITE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"variablesprite 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"variablesprite 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_APPLYMOVEMENT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"applymovement 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"applymovement 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					if (arg3!=-1)DoMove(arg3);
 					break;
 				case GLD_APPLYMOVEOTHER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"applymoveother 0x%X ' 0x%X Applies movement to last talked\r\n",arg1,arg2);
+					fprintf(fsend,"applymoveother 0x%X ' 0x%X Applies movement to last talked\n",arg1,arg2);
 					if (arg2!=-1)DoMove(arg2);
 					break;
 				case GLD_VERBOSEGIVEITEM:
@@ -3949,25 +3949,25 @@ void DecodeProc2(FILE* fileM_,
 						sprintf(buf,"0x%X",arg1);
 					else
 						strcpy(buf,GetItemName(arg1));
-					fprintf(fsend,"verbosegiveitem %s %u\r\n",buf,arg2);
+					fprintf(fsend,"verbosegiveitem %s %u\n",buf,arg2);
 					break;
 				case GLD_LOADWILDDATA:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadwilddata 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadwilddata 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_LOADTRAINER:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadtrainer 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadtrainer 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_CATCHTUTORIAL:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"catchtutorial 0x%X\r\n",arg1);
+					fprintf(fsend,"catchtutorial 0x%X\n",arg1);
 					break;
 				case GLD_TRAINERTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"trainertext 0x%X\r\n",arg1);
+					fprintf(fsend,"trainertext 0x%X\n",arg1);
 					break;
 				case GLD_TRAINERSTATUS:
 					fread(&arg1,1,1,fileM);
@@ -3983,7 +3983,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf2," ' Check if Trainer is Activated");
 						break;
 					}
-					fprintf(fsend,"trainerstatus 0x%X%s\r\n",arg1,buf2);
+					fprintf(fsend,"trainerstatus 0x%X%s\n",arg1,buf2);
 					break;
 				case GLD_CLOSETEXT:
 					GENERIC("closetext");
@@ -3994,12 +3994,12 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_POKEMART:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"pokemart 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"pokemart 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_ELEVATOR:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"elevator 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"elevator 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_YESORNO:
 					GENERIC("yesorno");
@@ -4051,11 +4051,11 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case GLD_DEACTIVATEFACING:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"deactivatefacing 0x%X\r\n",arg1);
+					fprintf(fsend,"deactivatefacing 0x%X\n",arg1);
 					break;
 				case GLD_NEWLOADMAP:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"newloadmap 0x%X\r\n",arg1);
+					fprintf(fsend,"newloadmap 0x%X\n",arg1);
 					break;
 				case GLD_WARPCHECK:
 					GENERIC("warpcheck");
@@ -4063,122 +4063,122 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_GIVEITEM:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"giveitem 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"giveitem 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_REFRESHSCREEN:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"refreshscreen 0x%X\r\n",arg1);
+					fprintf(fsend,"refreshscreen 0x%X\n",arg1);
 					break;
 				case GLD_C1CELOADBYTE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"C1CEloadbyte 0x%X ' Apparently useless.\r\n",arg1);
+					fprintf(fsend,"C1CEloadbyte 0x%X ' Apparently useless.\n",arg1);
 					break;
 				case GLD_SETLASTTALKED:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"setlasttalked 0x%X\r\n",arg1);
+					fprintf(fsend,"setlasttalked 0x%X\n",arg1);
 					break;
 				case GLD_EARTHQUAKE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"earthquake 0x%X\r\n",arg1);
+					fprintf(fsend,"earthquake 0x%X\n",arg1);
 					break;
 				case GLD_LOADVAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"loadvar 0x%X\r\n",arg1);
+					fprintf(fsend,"loadvar 0x%X\n",arg1);
 					break;
 				case GLD_ADDVAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"addvar 0x%X\r\n",arg1);
+					fprintf(fsend,"addvar 0x%X\n",arg1);
 					break;
 				case GLD_RANDOM:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"random 0x%X\r\n",arg1);
+					fprintf(fsend,"random 0x%X\n",arg1);
 					break;
 				case GLD_COPYBYTETOVAR:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"copybytetovar 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copybytetovar 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_COPYVARTOBYTE:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"copyvartobyte 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copyvartobyte 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_CHANGEBLOCK:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"changeblock 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"changeblock 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_SHOWEMOTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"showemote 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"showemote 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_FOLLOW:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"follow 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"follow 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_FOLLOWNOTEXACT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"follownotexact 0x%X 0x%X ' Follows, but without mindlessly copying movements.\r\n",arg1,arg2);
+					fprintf(fsend,"follownotexact 0x%X 0x%X ' Follows, but without mindlessly copying movements.\n",arg1,arg2);
 					break;
 				case GLD_SWAPMAPS:
 					fread(&arg1,1,3,fileM);
-					fprintf(fsend,"swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffset(arg1));
+					fprintf(fsend,"swapmaps 0x%X ' 0x%X\n",arg1,PointerToOffset(arg1));
 					break;
 				case GLD_SPRITEFACE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"spriteface 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"spriteface 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_MOVEPERSON:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"moveperson 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"moveperson 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_WRITEPERSONLOC:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"writepersonloc 0x%X\r\n",arg1);
+					fprintf(fsend,"writepersonloc 0x%X\n",arg1);
 					break;
 				case GLD_LOADEMOTE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"loademote 0x%X\r\n",arg1);
+					fprintf(fsend,"loademote 0x%X\n",arg1);
 					break;
 				case GLD_STOPFOLLOW:
 					GENERIC("stopfollow");
 					break;
 				case GLD_PLAYSOUND:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"playsound 0x%X\r\n",arg1);
+					fprintf(fsend,"playsound 0x%X\n",arg1);
 					break;
 				case GLD_PLAYMUSIC:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"playmusic 0x%X\r\n",arg1);
+					fprintf(fsend,"playmusic 0x%X\n",arg1);
 					break;
 				case GLD_CRY:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"cry 0x%X\r\n",arg1);
+					fprintf(fsend,"cry 0x%X\n",arg1);
 					break;
 				case GLD_PAUSE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"pause 0x%X\r\n",arg1);
+					fprintf(fsend,"pause 0x%X\n",arg1);
 					break;
 				case GLD_WARPMOD:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"warpmod 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"warpmod 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_WARP:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
-					fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case GLD_WARPFACING:
 					fread(&arg1,1,1,fileM);
@@ -4186,55 +4186,55 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
 					fread(&arg5,1,1,fileM);
-					fprintf(fsend,"warpfacing 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+					fprintf(fsend,"warpfacing 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					break;
 				case GLD_BLACKOUTMOD:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"blackoutmod 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"blackoutmod 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_LOCATIONTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"locationtotext 0x%X\r\n",arg1);
+					fprintf(fsend,"locationtotext 0x%X\n",arg1);
 					break;
 				case GLD_DISPLAYLOCATION:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"displaylocation 0x%X\r\n",arg1);
+					fprintf(fsend,"displaylocation 0x%X\n",arg1);
 					break;
 				case GLD_MONEYTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"moneytotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"moneytotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_COINSTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"coinstotext 0x%X\r\n",arg1);
+					fprintf(fsend,"coinstotext 0x%X\n",arg1);
 					break;
 				case GLD_VARTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"vartotext 0x%X\r\n",arg1);
+					fprintf(fsend,"vartotext 0x%X\n",arg1);
 					break;
 				case GLD_POKETOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"poketotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"poketotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_ITEMTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"itemtotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"itemtotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_TRAINERTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"trainertotext 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"trainertotext 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case GLD_STRINGTOTEXT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"stringtotext 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"stringtotext 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					if (arg3!=-1)
 					{
 						DoText(arg3);
@@ -4245,7 +4245,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					arg4=PointerToOffset((arg1<<8)|arg2);
-					fprintf(fsend,"storetext 0x%X 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"storetext 0x%X 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3,arg4);
 					if (arg4!=-1)
 					{
 						DoText(arg4);
@@ -4254,21 +4254,21 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_MUSICFADEOUT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"musicfadeout 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"musicfadeout 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_WRITECMDQUEUE:
 					fread(&arg1,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"writecmdqueue 0x%X ' 0x%X\r\n",arg1,arg3);
+					fprintf(fsend,"writecmdqueue 0x%X ' 0x%X\n",arg1,arg3);
 					break;
 				case GLD_DELCMDQUEUE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"delcmdqueue 0x%X\r\n",arg1);
+					fprintf(fsend,"delcmdqueue 0x%X\n",arg1);
 					break;
 				case GLD_JUMPTEXTFACEPLAYER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"jumptextfaceplayer 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"jumptextfaceplayer 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=-1)
 						DoText(arg2);
 					still_going=0;
@@ -4276,7 +4276,7 @@ void DecodeProc2(FILE* fileM_,
 				case GLD_JUMPTEXT:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"jumptext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"jumptext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=-1)
 						DoText(arg2);
 					still_going=0;
@@ -4286,7 +4286,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
 					arg4=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"winlosstext 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"winlosstext 0x%X 0x%X ' 0x%X,0x%X\n",arg1,arg2,arg3,arg4);
 					if (arg3!=-1)
 						DoText(arg3);
 					if (arg4!=-1)
@@ -4294,103 +4294,103 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case GLD_APPEAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"appear 0x%X\r\n",arg1);
+					fprintf(fsend,"appear 0x%X\n",arg1);
 					break;
 				case GLD_DISAPPEAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"disappear 0x%X\r\n",arg1);
+					fprintf(fsend,"disappear 0x%X\n",arg1);
 					break;
 				case GLD_ASKFORPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"askforphonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"askforphonenumber 0x%X\n",arg1);
 					break;
 				case GLD_PHONECALL:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"phonecall 0x%X\r\n",arg1);
+					fprintf(fsend,"phonecall 0x%X\n",arg1);
 					break;
 				case GLD_TRADE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"trade 0x%X\r\n",arg1);
+					fprintf(fsend,"trade 0x%X\n",arg1);
 					break;
 				case GLD_TAKEITEM:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"takeitem 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takeitem 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_GIVEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"givemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"givemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_TAKEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"takemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_CHECKMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"checkmoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"checkmoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_GIVECOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"givecoins 0x%X\r\n",arg1);
+					fprintf(fsend,"givecoins 0x%X\n",arg1);
 					break;
 				case GLD_TAKECOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"takecoins 0x%X\r\n",arg1);
+					fprintf(fsend,"takecoins 0x%X\n",arg1);
 					break;
 				case GLD_CHECKCOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkcoins 0x%X\r\n",arg1);
+					fprintf(fsend,"checkcoins 0x%X\n",arg1);
 					break;
 				case GLD_GIVEPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"givephonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"givephonenumber 0x%X\n",arg1);
 					break;
 				case GLD_TAKEPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"takephonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"takephonenumber 0x%X\n",arg1);
 					break;
 				case GLD_CHECKPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkphonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"checkphonenumber 0x%X\n",arg1);
 					break;
 				case GLD_CHECKITEM:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkitem 0x%X\r\n",arg1);
+					fprintf(fsend,"checkitem 0x%X\n",arg1);
 					break;
 				case GLD_CHECKTIME:
 					fread(&arg1,1,1,fileM);
 					arg2=rand()%10;
 					if (arg2==0)
-						fprintf(fsend,"checktime 0x%X ' Look, an acronym of CheckItem!\r\n",arg1); //Easter Egg
+						fprintf(fsend,"checktime 0x%X ' Look, an acronym of CheckItem!\n",arg1); //Easter Egg
 					else
-						fprintf(fsend,"checktime 0x%X\r\n",arg1);
+						fprintf(fsend,"checktime 0x%X\n",arg1);
 					break;
 				case GLD_CHECKPOKE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkpoke 0x%X\r\n",arg1);
+					fprintf(fsend,"checkpoke 0x%X\n",arg1);
 					break;
 				case GLD_GIVEEGG:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"giveegg 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"giveegg 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_GIVEPOKEITEM:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"givepokeitem 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"givepokeitem 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_TAKEIFLETTER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"takeifletter 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takeifletter 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_XYCOMPARE:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"xycompare 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"xycompare 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_GIVEPOKE:
 					fread(&arg1,1,1,fileM);
@@ -4402,39 +4402,39 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg5,1,2,fileM);
 						fread(&arg6,1,2,fileM);
 						arg7=(OffsetToPointer(FileZoomPos)&0xFF);
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\n",arg1,arg2,arg3,arg4,arg5,arg6,
 										PointerToOffset(arg7|(arg5<<8)),
 										PointerToOffset(arg7|(arg6<<8)));
 					}
 					else
 					{
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					}
 					break;
 				case GLD_LOADMENUDATA:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"loadmenudata 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadmenudata 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case GLD_LOADPOKEDATA:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadpokedata 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadpokedata 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_CHECKCODE:
 					fread(&arg1,1,1,fileM);
 					//fread(&arg2,1,1,fileM);
-					//fprintf(fsend,"checkcode 0x%X 0x%X\r\n",arg1,arg2);
-					fprintf(fsend,"checkcode 0x%X\r\n",arg1);
+					//fprintf(fsend,"checkcode 0x%X 0x%X\n",arg1,arg2);
+					fprintf(fsend,"checkcode 0x%X\n",arg1);
 					break;
 				case GLD_WRITEBYTE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"writebyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"writebyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case GLD_WRITEVARCODE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"writevarcode 0x%X\r\n",arg1);
+					fprintf(fsend,"writevarcode 0x%X\n",arg1);
 					break;
 				case GLD_WRITECODE:
 					fread(&arg1,1,1,fileM);
@@ -4469,15 +4469,15 @@ void DecodeProc2(FILE* fileM_,
 							strcpy(buf2," ' Tree pokemon fight");
 							break;
 						}
-						fprintf(fsend,"writecode 0x3 0x%X%s\r\n",arg2,buf2);
+						fprintf(fsend,"writecode 0x3 0x%X%s\n",arg2,buf2);
 					}
 					else
 					{
-						fprintf(fsend,"writecode 0x%X 0x%X\r\n",arg1,arg2);
+						fprintf(fsend,"writecode 0x%X 0x%X\n",arg1,arg2);
 					}
 					break;
 				default:
-					fprintf(fsend,"#raw 0x%X\r\n",command);
+					fprintf(fsend,"#raw 0x%X\n",command);
 					break;
 				}
 			}
@@ -4495,7 +4495,7 @@ void DecodeProc2(FILE* fileM_,
 			read=(signed int)fread(&command,1,1,fileM);
 			if (read>0)
 			{
-#define GENERIC(x) fprintf(fsend,"%s\r\n",x)
+#define GENERIC(x) fprintf(fsend,"%s\n",x)
 				arg1=arg2=arg3=arg4=arg5=arg6=arg7=0;
 				switch (command)
 				{
@@ -4514,13 +4514,13 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_2CALL:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2call 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2call 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case CRY_3CALL:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3call 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3call 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case CRY_2PTCALL:
@@ -4533,28 +4533,28 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptcall 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					DoDword(arg2);
 					Do(PointerToOffset(arg4));
 					break;
 				case CRY_2JUMP:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2jump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2jump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
 				case CRY_PRIORITYJUMP:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"priorityjump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"priorityjump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
 				case CRY_3JUMP:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3jump 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3jump 0x%X ' 0x%X\n",arg1,arg2);
 					still_going=0;
 					Do(arg2);
 					break;
@@ -4568,7 +4568,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptjump 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
 					DoDword(arg2);
 					Do(PointerToOffset(arg4));
@@ -4583,7 +4583,7 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"ptpriorityjump 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"ptpriorityjump 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					still_going=0;
 					Do(arg4);
 					break;
@@ -4591,58 +4591,58 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if == 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if == 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case CRY_NEQBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if != 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if != 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case CRY_EQZERO:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"if false 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"if false 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case CRY_NEQZERO:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"if true 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"if true 0x%X ' 0x%X\n",arg1,arg2);
 					Do(arg2);
 					break;
 				case CRY_LTBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if < 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if < 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case CRY_GTBYTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"if > 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"if > 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					Do(arg3);
 					break;
 				case CRY_JUMPSTD:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"jumpstd 0x%X\r\n",arg1);
+					fprintf(fsend,"jumpstd 0x%X\n",arg1);
 					still_going=0;
 					break;
 				case CRY_CALLSTD:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"callstd 0x%X\r\n",arg1);
+					fprintf(fsend,"callstd 0x%X\n",arg1);
 					break;
 				case CRY_3CALLASM:
 					fread(&arg1,1,3,fileM);
-					fprintf(fsend,"3callasm 0x%X\r\n",arg1);
+					fprintf(fsend,"3callasm 0x%X\n",arg1);
 					break;
 				case CRY_SPECIAL:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"special 0x%X\r\n",arg1);
+					fprintf(fsend,"special 0x%X\n",arg1);
 					break;
 				case CRY_2PTCALLASM:
 					fread(&arg1,1,2,fileM);
@@ -4654,23 +4654,23 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg4,1,3,fileM);
 						fseek(fileM,arg3,SEEK_SET);
 					}
-					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\r\n",arg1,arg2,arg4,PointerToOffset(arg4));
+					fprintf(fsend,"2ptcallasm 0x%X ' 0x%X->0x%X = 0x%X\n",arg1,arg2,arg4,PointerToOffset(arg4));
 					DoDword(arg2);
 					break;
 				case CRY_CHECKMAPTRIGGERS:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"checkmaptriggers 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"checkmaptriggers 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_DOMAPTRIGGER:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"domaptrigger 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"domaptrigger 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_DOTRIGGER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"dotrigger 0x%X\r\n",arg1);
+					fprintf(fsend,"dotrigger 0x%X\n",arg1);
 					break;
 				case CRY_CHECKTRIGGERS:
 					GENERIC("checktriggers");
@@ -4732,111 +4732,111 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_PASSTOENGINE:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"passtoengine 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"passtoengine 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_CHECKBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"checkbit1 0x%X\n",arg1);
 					break;
 				case CRY_SETBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"setbit1 0x%X\n",arg1);
 					break;
 				case CRY_SETBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"setbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"setbit2 0x%X\n",arg1);
 					break;
 				case CRY_CHECKBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"checkbit2 0x%X\n",arg1);
 					break;
 				case CRY_CLEARBIT2:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"clearbit2 0x%X\r\n",arg1);
+					fprintf(fsend,"clearbit2 0x%X\n",arg1);
 					break;
 				case CRY_CLEARBIT1:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"clearbit1 0x%X\r\n",arg1);
+					fprintf(fsend,"clearbit1 0x%X\n",arg1);
 					break;
 				case CRY_2WRITETEXT:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"2writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"2writetext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=0xFFFFFFFF)
 						DoText(arg2);
 					break;
 				case CRY_3WRITETEXT:
 					fread(&arg1,1,3,fileM);
 					arg2=PointerToOffset(arg1);
-					fprintf(fsend,"3writetext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"3writetext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=0xFFFFFFFF)
 						DoText(arg2);
 					break;
 				case CRY_REPEATTEXT:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"repeattext 0x%X\r\n",arg1);
+					fprintf(fsend,"repeattext 0x%X\n",arg1);
 					break;
 				case CRY_POKEPIC:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"pokepic 0x%X\r\n",arg1);
+					fprintf(fsend,"pokepic 0x%X\n",arg1);
 					break;
 				case CRY_DESCRIBEDECORATION:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"describedecoration 0x%X\r\n",arg1);
+					fprintf(fsend,"describedecoration 0x%X\n",arg1);
 					break;
 				case CRY_FRUITTREE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"fruittree 0x%X\r\n",arg1);
+					fprintf(fsend,"fruittree 0x%X\n",arg1);
 					break;
 				case CRY_SPECIALPHONECALL:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"specialphonecall 0x%X\r\n",arg1);
+					fprintf(fsend,"specialphonecall 0x%X\n",arg1);
 					break;
 				case CRY_FACEPERSON:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"faceperson 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"faceperson 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_VARIABLESPRITE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"variablesprite 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"variablesprite 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_APPLYMOVEMENT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"applymovement 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"applymovement 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					if (arg3!=-1)DoMove(arg3);
 					break;
 				case CRY_APPLYMOVEOTHER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"applymoveother 0x%X ' 0x%X Applies movement to last talked\r\n",arg1,arg2);
+					fprintf(fsend,"applymoveother 0x%X ' 0x%X Applies movement to last talked\n",arg1,arg2);
 					if (arg2!=-1)DoMove(arg2);
 					break;
 				case CRY_VERBOSEGIVEITEM:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"verbosegiveitem 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"verbosegiveitem 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_LOADWILDDATA:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadwilddata 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadwilddata 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_LOADTRAINER:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadtrainer 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadtrainer 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_CATCHTUTORIAL:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"catchtutorial 0x%X\r\n",arg1);
+					fprintf(fsend,"catchtutorial 0x%X\n",arg1);
 					break;
 				case CRY_TRAINERTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"trainertext 0x%X\r\n",arg1);
+					fprintf(fsend,"trainertext 0x%X\n",arg1);
 					break;
 				case CRY_TRAINERSTATUS:
 					fread(&arg1,1,1,fileM);
@@ -4852,7 +4852,7 @@ void DecodeProc2(FILE* fileM_,
 						strcpy(buf2," ' Check if Trainer is Activated");
 						break;
 					}
-					fprintf(fsend,"trainerstatus 0x%X%s\r\n",arg1,buf2);
+					fprintf(fsend,"trainerstatus 0x%X%s\n",arg1,buf2);
 					break;
 				case CRY_CLOSETEXT:
 					GENERIC("closetext");
@@ -4863,12 +4863,12 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_POKEMART:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,2,fileM);
-					fprintf(fsend,"pokemart 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"pokemart 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_ELEVATOR:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"elevator 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"elevator 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_YESORNO:
 					GENERIC("yesorno");
@@ -4920,11 +4920,11 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CRY_DEACTIVATEFACING:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"deactivatefacing 0x%X\r\n",arg1);
+					fprintf(fsend,"deactivatefacing 0x%X\n",arg1);
 					break;
 				case CRY_NEWLOADMAP:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"newloadmap 0x%X\r\n",arg1);
+					fprintf(fsend,"newloadmap 0x%X\n",arg1);
 					break;
 				case CRY_WARPCHECK:
 					GENERIC("warpcheck");
@@ -4932,122 +4932,122 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_GIVEITEM:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"giveitem 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"giveitem 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_REFRESHSCREEN:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"refreshscreen 0x%X\r\n",arg1);
+					fprintf(fsend,"refreshscreen 0x%X\n",arg1);
 					break;
 				case CRY_C1CELOADBYTE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"C1CEloadbyte 0x%X ' Apparently useless.\r\n",arg1);
+					fprintf(fsend,"C1CEloadbyte 0x%X ' Apparently useless.\n",arg1);
 					break;
 				case CRY_SETLASTTALKED:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"setlasttalked 0x%X\r\n",arg1);
+					fprintf(fsend,"setlasttalked 0x%X\n",arg1);
 					break;
 				case CRY_EARTHQUAKE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"earthquake 0x%X\r\n",arg1);
+					fprintf(fsend,"earthquake 0x%X\n",arg1);
 					break;
 				case CRY_LOADVAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"loadvar 0x%X\r\n",arg1);
+					fprintf(fsend,"loadvar 0x%X\n",arg1);
 					break;
 				case CRY_ADDVAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"addvar 0x%X\r\n",arg1);
+					fprintf(fsend,"addvar 0x%X\n",arg1);
 					break;
 				case CRY_RANDOM:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"random 0x%X\r\n",arg1);
+					fprintf(fsend,"random 0x%X\n",arg1);
 					break;
 				case CRY_COPYBYTETOVAR:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"copybytetovar 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copybytetovar 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_COPYVARTOBYTE:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"copyvartobyte 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"copyvartobyte 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_CHANGEBLOCK:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"changeblock 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"changeblock 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_SHOWEMOTE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"showemote 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"showemote 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_FOLLOW:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"follow 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"follow 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_FOLLOWNOTEXACT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"follownotexact 0x%X 0x%X ' Follows, but without mindlessly copying movements.\r\n",arg1,arg2);
+					fprintf(fsend,"follownotexact 0x%X 0x%X ' Follows, but without mindlessly copying movements.\n",arg1,arg2);
 					break;
 				case CRY_SWAPMAPS:
 					fread(&arg1,1,3,fileM);
-					fprintf(fsend,"swapmaps 0x%X ' 0x%X\r\n",arg1,PointerToOffset(arg1));
+					fprintf(fsend,"swapmaps 0x%X ' 0x%X\n",arg1,PointerToOffset(arg1));
 					break;
 				case CRY_SPRITEFACE:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"spriteface 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"spriteface 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_MOVEPERSON:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"moveperson 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"moveperson 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_WRITEPERSONLOC:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"writepersonloc 0x%X\r\n",arg1);
+					fprintf(fsend,"writepersonloc 0x%X\n",arg1);
 					break;
 				case CRY_LOADEMOTE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"loademote 0x%X\r\n",arg1);
+					fprintf(fsend,"loademote 0x%X\n",arg1);
 					break;
 				case CRY_STOPFOLLOW:
 					GENERIC("stopfollow");
 					break;
 				case CRY_PLAYSOUND:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"playsound 0x%X\r\n",arg1);
+					fprintf(fsend,"playsound 0x%X\n",arg1);
 					break;
 				case CRY_PLAYMUSIC:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"playmusic 0x%X\r\n",arg1);
+					fprintf(fsend,"playmusic 0x%X\n",arg1);
 					break;
 				case CRY_CRY:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"cry 0x%X\r\n",arg1);
+					fprintf(fsend,"cry 0x%X\n",arg1);
 					break;
 				case CRY_PAUSE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"pause 0x%X\r\n",arg1);
+					fprintf(fsend,"pause 0x%X\n",arg1);
 					break;
 				case CRY_WARPMOD:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"warpmod 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"warpmod 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_WARP:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
-					fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"warp 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					break;
 				case CRY_WARPFACING:
 					fread(&arg1,1,1,fileM);
@@ -5055,55 +5055,55 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg3,1,1,fileM);
 					fread(&arg4,1,1,fileM);
 					fread(&arg5,1,1,fileM);
-					fprintf(fsend,"warpfacing 0x%X 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4,arg5);
+					fprintf(fsend,"warpfacing 0x%X 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4,arg5);
 					break;
 				case CRY_BLACKOUTMOD:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"blackoutmod 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"blackoutmod 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_LOCATIONTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"locationtotext 0x%X\r\n",arg1);
+					fprintf(fsend,"locationtotext 0x%X\n",arg1);
 					break;
 				case CRY_DISPLAYLOCATION:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"displaylocation 0x%X\r\n",arg1);
+					fprintf(fsend,"displaylocation 0x%X\n",arg1);
 					break;
 				case CRY_MONEYTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"moneytotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"moneytotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_COINSTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"coinstotext 0x%X\r\n",arg1);
+					fprintf(fsend,"coinstotext 0x%X\n",arg1);
 					break;
 				case CRY_VARTOTEXT:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"vartotext 0x%X\r\n",arg1);
+					fprintf(fsend,"vartotext 0x%X\n",arg1);
 					break;
 				case CRY_POKETOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"poketotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"poketotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_ITEMTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"itemtotext 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"itemtotext 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_TRAINERTOTEXT:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
-					fprintf(fsend,"trainertotext 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"trainertotext 0x%X 0x%X 0x%X\n",arg1,arg2,arg3);
 					break;
 				case CRY_STRINGTOTEXT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"stringtotext 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3);
+					fprintf(fsend,"stringtotext 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3);
 					if (arg3!=-1)
 					{
 						DoText(arg3);
@@ -5114,7 +5114,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,1,fileM);
 					fread(&arg3,1,1,fileM);
 					arg4=PointerToOffset((arg1<<8)|arg2);
-					fprintf(fsend,"storetext 0x%X 0x%X 0x%X ' 0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"storetext 0x%X 0x%X 0x%X ' 0x%X\n",arg1,arg2,arg3,arg4);
 					if (arg4!=-1)
 					{
 						DoText(arg4);
@@ -5123,21 +5123,21 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_MUSICFADEOUT:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"musicfadeout 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"musicfadeout 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_WRITECMDQUEUE:
 					fread(&arg1,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"writecmdqueue 0x%X ' 0x%X\r\n",arg1,arg3);
+					fprintf(fsend,"writecmdqueue 0x%X ' 0x%X\n",arg1,arg3);
 					break;
 				case CRY_DELCMDQUEUE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"delcmdqueue 0x%X\r\n",arg1);
+					fprintf(fsend,"delcmdqueue 0x%X\n",arg1);
 					break;
 				case CRY_JUMPTEXTFACEPLAYER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"jumptextfaceplayer 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"jumptextfaceplayer 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=-1)
 						DoText(arg2);
 					still_going=0;
@@ -5145,7 +5145,7 @@ void DecodeProc2(FILE* fileM_,
 				case CRY_JUMPTEXT:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"jumptext 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"jumptext 0x%X ' 0x%X\n",arg1,arg2);
 					if (arg2!=-1)
 						DoText(arg2);
 					still_going=0;
@@ -5155,7 +5155,7 @@ void DecodeProc2(FILE* fileM_,
 					fread(&arg2,1,2,fileM);
 					arg3=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
 					arg4=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"winlosstext 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4);
+					fprintf(fsend,"winlosstext 0x%X 0x%X ' 0x%X,0x%X\n",arg1,arg2,arg3,arg4);
 					if (arg3!=-1)
 						DoText(arg3);
 					if (arg4!=-1)
@@ -5163,103 +5163,103 @@ void DecodeProc2(FILE* fileM_,
 					break;
 				case CRY_APPEAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"appear 0x%X\r\n",arg1);
+					fprintf(fsend,"appear 0x%X\n",arg1);
 					break;
 				case CRY_DISAPPEAR:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"disappear 0x%X\r\n",arg1);
+					fprintf(fsend,"disappear 0x%X\n",arg1);
 					break;
 				case CRY_ASKFORPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"askforphonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"askforphonenumber 0x%X\n",arg1);
 					break;
 				case CRY_PHONECALL:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"phonecall 0x%X\r\n",arg1);
+					fprintf(fsend,"phonecall 0x%X\n",arg1);
 					break;
 				case CRY_TRADE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"trade 0x%X\r\n",arg1);
+					fprintf(fsend,"trade 0x%X\n",arg1);
 					break;
 				case CRY_TAKEITEM:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"takeitem 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takeitem 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_GIVEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"givemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"givemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_TAKEMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"takemoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takemoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_CHECKMONEY:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,3,fileM);
-					fprintf(fsend,"checkmoney 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"checkmoney 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_GIVECOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"givecoins 0x%X\r\n",arg1);
+					fprintf(fsend,"givecoins 0x%X\n",arg1);
 					break;
 				case CRY_TAKECOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"takecoins 0x%X\r\n",arg1);
+					fprintf(fsend,"takecoins 0x%X\n",arg1);
 					break;
 				case CRY_CHECKCOINS:
 					fread(&arg1,1,2,fileM);
-					fprintf(fsend,"checkcoins 0x%X\r\n",arg1);
+					fprintf(fsend,"checkcoins 0x%X\n",arg1);
 					break;
 				case CRY_GIVEPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"givephonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"givephonenumber 0x%X\n",arg1);
 					break;
 				case CRY_TAKEPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"takephonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"takephonenumber 0x%X\n",arg1);
 					break;
 				case CRY_CHECKPHONENUMBER:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkphonenumber 0x%X\r\n",arg1);
+					fprintf(fsend,"checkphonenumber 0x%X\n",arg1);
 					break;
 				case CRY_CHECKITEM:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkitem 0x%X\r\n",arg1);
+					fprintf(fsend,"checkitem 0x%X\n",arg1);
 					break;
 				case CRY_CHECKTIME:
 					fread(&arg1,1,1,fileM);
 					arg2=rand()%10;
 					if (arg2==0)
-						fprintf(fsend,"checktime 0x%X ' Look, an acronym of CheckItem!\r\n",arg1); //Easter Egg
+						fprintf(fsend,"checktime 0x%X ' Look, an acronym of CheckItem!\n",arg1); //Easter Egg
 					else
-						fprintf(fsend,"checktime 0x%X\r\n",arg1);
+						fprintf(fsend,"checktime 0x%X\n",arg1);
 					break;
 				case CRY_CHECKPOKE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"checkpoke 0x%X\r\n",arg1);
+					fprintf(fsend,"checkpoke 0x%X\n",arg1);
 					break;
 				case CRY_GIVEEGG:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"giveegg 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"giveegg 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_GIVEPOKEITEM:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"givepokeitem 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"givepokeitem 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_TAKEIFLETTER:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"takeifletter 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"takeifletter 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_XYCOMPARE:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg2<<8));
-					fprintf(fsend,"xycompare 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"xycompare 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_GIVEPOKE:
 					fread(&arg1,1,1,fileM);
@@ -5271,39 +5271,39 @@ void DecodeProc2(FILE* fileM_,
 						fread(&arg5,1,2,fileM);
 						fread(&arg6,1,2,fileM);
 						arg7=(OffsetToPointer(FileZoomPos)&0xFF);
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\r\n",arg1,arg2,arg3,arg4,arg5,arg6,
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X ' 0x%X,0x%X\n",arg1,arg2,arg3,arg4,arg5,arg6,
 										PointerToOffset(arg7|(arg5<<8)),
 										PointerToOffset(arg7|(arg6<<8)));
 					}
 					else
 					{
-						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X\r\n",arg1,arg2,arg3,arg4);
+						fprintf(fsend,"givepoke 0x%X 0x%X 0x%X 0x%X\n",arg1,arg2,arg3,arg4);
 					}
 					break;
 				case CRY_LOADMENUDATA:
 					fread(&arg1,1,2,fileM);
 					arg2=PointerToOffset((OffsetToPointer(FileZoomPos)&0xFF)|(arg1<<8));
-					fprintf(fsend,"loadmenudata 0x%X ' 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadmenudata 0x%X ' 0x%X\n",arg1,arg2);
 					break;
 				case CRY_LOADPOKEDATA:
 					fread(&arg1,1,1,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"loadpokedata 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"loadpokedata 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_CHECKCODE:
 					fread(&arg1,1,1,fileM);
 					//fread(&arg2,1,1,fileM);
-					//fprintf(fsend,"checkcode 0x%X 0x%X\r\n",arg1,arg2);
-					fprintf(fsend,"checkcode 0x%X\r\n",arg1);
+					//fprintf(fsend,"checkcode 0x%X 0x%X\n",arg1,arg2);
+					fprintf(fsend,"checkcode 0x%X\n",arg1);
 					break;
 				case CRY_WRITEBYTE:
 					fread(&arg1,1,2,fileM);
 					fread(&arg2,1,1,fileM);
-					fprintf(fsend,"writebyte 0x%X 0x%X\r\n",arg1,arg2);
+					fprintf(fsend,"writebyte 0x%X 0x%X\n",arg1,arg2);
 					break;
 				case CRY_WRITEVARCODE:
 					fread(&arg1,1,1,fileM);
-					fprintf(fsend,"writevarcode 0x%X\r\n",arg1);
+					fprintf(fsend,"writevarcode 0x%X\n",arg1);
 					break;
 				case CRY_WRITECODE:
 					fread(&arg1,1,1,fileM);
@@ -5338,15 +5338,15 @@ void DecodeProc2(FILE* fileM_,
 							strcpy(buf2," ' Tree pokemon fight");
 							break;
 						}
-						fprintf(fsend,"writecode 0x3 0x%X%s\r\n",arg2,buf2);
+						fprintf(fsend,"writecode 0x3 0x%X%s\n",arg2,buf2);
 					}
 					else
 					{
-						fprintf(fsend,"writecode 0x%X 0x%X\r\n",arg1,arg2);
+						fprintf(fsend,"writecode 0x%X 0x%X\n",arg1,arg2);
 					}
 					break;
 				default:
-					fprintf(fsend,"#raw 0x%X\r\n",command);
+					fprintf(fsend,"#raw 0x%X\n",command);
 					break;
 				}
 			}
@@ -5357,7 +5357,7 @@ void DecodeProc2(FILE* fileM_,
 			}
 		}
 	}
-	fprintf(fsend,"\r\n");
+	fprintf(fsend,"\n");
 }
 
 static void decompile_single_text(FILE *fsend, const char *fname, uint32_t seek) {
@@ -5365,7 +5365,7 @@ static void decompile_single_text(FILE *fsend, const char *fname, uint32_t seek)
 	char orgbuf[32];
 	char prefix[4];
 	const char* orgname = orgbuf;
-	fprintf(fsend,"\r\n");
+	fprintf(fsend,"\n");
 	if (mode == GOLD) {
 		prefix[0] = '\0';  // Unprefixed; gsc text is a full scripting language
 	} else {
@@ -5382,10 +5382,10 @@ static void decompile_single_text(FILE *fsend, const char *fname, uint32_t seek)
 		}
 		orgname = WhatIs2(offset|0x08000000);
 	}
-	fprintf(fsend,"#org %s\r\n",orgname);
+	fprintf(fsend,"#org %s\n",orgname);
 
 	while (offset) {
-		fprintf(fsend, "%s%s\r\n", prefix, transtxt(offset, fname, WORD_WRAP_LEN, &offset));
+		fprintf(fsend, "%s%s\n", prefix, transtxt(offset, fname, WORD_WRAP_LEN, &offset));
 	}
 }
 
@@ -5408,28 +5408,28 @@ void DecodeProcLevel(FILE*fileM,
 	register char*m;
 	char buf[1024];
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
@@ -5438,17 +5438,17 @@ void DecodeProcLevel(FILE*fileM,
 	{
 		codenum=1;
 		Define2(FileZoomPos|0x08000000,"@start");
-		fprintf(fsend,"#org @start\r\n'-----------------------------------\r\n");
+		fprintf(fsend,"#org @start\n'-----------------------------------\n");
 	}
 	else
-		fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n",FileZoomPos&0x07FFFFFF);
+		fprintf(fsend,"#org 0x%X\n'-----------------------------------\n",FileZoomPos&0x07FFFFFF);
 	while (arg2)
 	{
 		fread(&arg2,1,1,fileM);
 		if (arg2)
 		{
 			fread(&arg3,1,4,fileM);
-			fprintf(fsend,"#raw 0x%02X\r\n#dword 0x%X\r\n",arg2,arg3);
+			fprintf(fsend,"#raw 0x%02X\n#dword 0x%X\n",arg2,arg3);
 			if (arg2&1)//hack? I don't know. Only time will tell.
 			{
 				Do(arg3);
@@ -5460,10 +5460,10 @@ void DecodeProcLevel(FILE*fileM,
 		}
 		else
 		{
-			fprintf(fsend,"#raw 0x00\r\n");
+			fprintf(fsend,"#raw 0x00\n");
 		}
 	}
-	fprintf(fsend,"\r\n");
+	fprintf(fsend,"\n");
 	while (!AllDoneLevel())
 	{
 		arg1=DoneLevel(FindNotDoneLevel());
@@ -5476,24 +5476,24 @@ void DecodeProcLevel(FILE*fileM,
 				sprintf(buf,"@level%u",levelnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n'-----------------------------------\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n'-----------------------------------\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n'-----------------------------------\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n'-----------------------------------\n",arg1);
 		arg2=arg3=0;
 		fread(&arg2,1,2,fileM);
 		fread(&arg3,1,2,fileM);
-		fprintf(fsend,"#word 0x%X\r\n#word 0x%X\r\n",arg2,arg3);
+		fprintf(fsend,"#word 0x%X\n#word 0x%X\n",arg2,arg3);
 		fread(&arg2,1,4,fileM);
 		fread(&arg3,1,2,fileM);
-		fprintf(fsend,"#dword 0x%X\r\n#word 0x%X\r\n\r\n",arg2,arg3);
+		fprintf(fsend,"#dword 0x%X\n#word 0x%X\n\n",arg2,arg3);
 		Do(arg2);
 	}
 	while (!AllDone())
 	{
 		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
-#define nl() fprintf(fsend,"\r\n")
+#define nl() fprintf(fsend,"\n")
 	decompile_all_text(fsend, fname);
 	while (!AllDoneMove())
 	{
@@ -5507,10 +5507,10 @@ void DecodeProcLevel(FILE*fileM,
 				sprintf(buf,"@move%u",movenum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\nM %s\r\n",WhatIs2(arg1|0x08000000),transmove(arg1&0x07ffffff,fname));
+			fprintf(fsend,"#org %s\nM %s\n",WhatIs2(arg1|0x08000000),transmove(arg1&0x07ffffff,fname));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\nM %s\r\n",arg1,transmove(arg1&0x07ffffff,fname));
+			fprintf(fsend,"#org 0x%X\nM %s\n",arg1,transmove(arg1&0x07ffffff,fname));
 	}
 	while (!AllDoneMart())
 	{
@@ -5525,26 +5525,26 @@ void DecodeProcLevel(FILE*fileM,
 				sprintf(buf,"@mart%u",martnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n",arg1);
 		arg2=1;
 		while (arg2!=0)
 		{
 			fread(&arg2,1,2,fileM);
 			if (arg2==0)
-				fprintf(fsend,"endmart\r\n");
+				fprintf(fsend,"endmart\n");
 			else
 			{
 				m=GetItemName(arg2);
 				if (!m)
-					fprintf(fsend,"item 0x%X\r\n",arg2);
+					fprintf(fsend,"item 0x%X\n",arg2);
 				else
-					fprintf(fsend,"item %s\r\n",m);
+					fprintf(fsend,"item %s\n",m);
 			}
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 	}
 	while (!AllDoneThumb())
 	{
@@ -5558,10 +5558,10 @@ void DecodeProcLevel(FILE*fileM,
 				sprintf(buf,"@thumb%u",thumbnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n#thumb\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n#thumb\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n#thumb\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		arg2=1;
 		arg3=0;
@@ -5570,12 +5570,12 @@ void DecodeProcLevel(FILE*fileM,
 		{
 			fread(&arg3,1,2,fileM);
 			if(arg3==0||arg3==0xFF){failsafe++;
-			if(failsafe>=100){fprintf(fsend,"'Failsafe\r\n");break;}}else failsafe=0;
+			if(failsafe>=100){fprintf(fsend,"'Failsafe\n");break;}}else failsafe=0;
 			arg2=dec_thumb(arg3,arg1);
-			fprintf(fsend,"%s\r\n",asm_buf);
+			fprintf(fsend,"%s\n",asm_buf);
 			arg1+=2;
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 	}
 	while (!AllDoneDword())
 	{
@@ -5589,21 +5589,21 @@ void DecodeProcLevel(FILE*fileM,
 				sprintf(buf,"@dword%u",dwordnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		if(mode!=GOLD&&mode!=CRYSTAL)
 		{
 		  fread(&arg2,1,4,fileM);
-		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		  fprintf(fsend,"#dword 0x%X\n",arg2);
 		}
 		else
 		{
 		  arg2=0;
 		  fread(&arg2,1,3,fileM);
-		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\n",arg2,PointerToOffset(arg2));
 		}
 	}
 }
@@ -5619,38 +5619,38 @@ void DecodeProc(FILE*fileM,
 	register char*m;
 	char buf[1024];
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	if(dyndec)
-		fprintf(fsend,"#org 0x%X\r\njump @start ' This redirects the script to your dynamic-offset version. Remove this line if you don't want this.\r\n\r\n",FileZoomPos);
+		fprintf(fsend,"#org 0x%X\njump @start ' This redirects the script to your dynamic-offset version. Remove this line if you don't want this.\n\n",FileZoomPos);
 	DecodeProc2(fileM,narc,FileZoomPos,fname,fsend);
 	while (!AllDone())
 	{
 		DecodeProc2(fileM,0,Done(FindNotDone()),fname,fsend);
 	}
-#define nl() fprintf(fsend,"\r\n")
+#define nl() fprintf(fsend,"\n")
 	decompile_all_text(fsend, fname);
 	while (!AllDoneMove())
 	{
@@ -5664,10 +5664,10 @@ void DecodeProc(FILE*fileM,
 				sprintf(buf,"@move%u",movenum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\nM %s\r\n",WhatIs2(arg1|0x08000000),transmove(arg1&0x07ffffff,fname));
+			fprintf(fsend,"#org %s\nM %s\n",WhatIs2(arg1|0x08000000),transmove(arg1&0x07ffffff,fname));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\nM %s\r\n",arg1,transmove(arg1&0x07ffffff,fname));
+			fprintf(fsend,"#org 0x%X\nM %s\n",arg1,transmove(arg1&0x07ffffff,fname));
 	}
 	while (!AllDoneMart())
 	{
@@ -5682,26 +5682,26 @@ void DecodeProc(FILE*fileM,
 				sprintf(buf,"@mart%u",martnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n",arg1);
 		arg2=1;
 		while (arg2!=0)
 		{
 			fread(&arg2,1,2,fileM);
 			if (arg2==0)
-				fprintf(fsend,"endmart\r\n");
+				fprintf(fsend,"endmart\n");
 			else
 			{
 				m=GetItemName(arg2);
 				if (!m)
-					fprintf(fsend,"item 0x%X\r\n",arg2);
+					fprintf(fsend,"item 0x%X\n",arg2);
 				else
-					fprintf(fsend,"item %s\r\n",m);
+					fprintf(fsend,"item %s\n",m);
 			}
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 	}
 	while (!AllDoneThumb())
 	{
@@ -5715,10 +5715,10 @@ void DecodeProc(FILE*fileM,
 				sprintf(buf,"@thumb%u",thumbnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n#thumb\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n#thumb\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n#thumb\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		arg2=1;
 		arg3=0;
@@ -5727,12 +5727,12 @@ void DecodeProc(FILE*fileM,
 		{
 			fread(&arg3,1,2,fileM);
 			if(arg3==0||arg3==0xFF){failsafe++;
-			if(failsafe>=100){fprintf(fsend,"'Failsafe\r\n");break;}}else failsafe=0;
+			if(failsafe>=100){fprintf(fsend,"'Failsafe\n");break;}}else failsafe=0;
 			arg2=dec_thumb(arg3,arg1);
-			fprintf(fsend,"%s\r\n",asm_buf);
+			fprintf(fsend,"%s\n",asm_buf);
 			arg1+=2;
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 	}
 	while (!AllDoneDword())
 	{
@@ -5746,21 +5746,21 @@ void DecodeProc(FILE*fileM,
 				sprintf(buf,"@dword%u",dwordnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		if(mode!=GOLD&&mode!=CRYSTAL)
 		{
 		  fread(&arg2,1,4,fileM);
-		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		  fprintf(fsend,"#dword 0x%X\n",arg2);
 		}
 		else
 		{
 		  arg2=0;
 		  fread(&arg2,1,3,fileM);
-		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\n",arg2,PointerToOffset(arg2));
 		}
 	}
 }
@@ -5774,28 +5774,28 @@ void DecodeProcASM(FILE*fileM,
 	unsigned int arg2,arg3;
 	char buf[1024];
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	if (FileZoomPos&1)DoThumb(FileZoomPos&0xFFFFFFFE);
@@ -5814,10 +5814,10 @@ void DecodeProcASM(FILE*fileM,
 				sprintf(buf,"@thumb%u",thumbnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n#thumb\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n#thumb\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n#thumb\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n#thumb\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		arg2=1;
 		arg3=0;
@@ -5826,12 +5826,12 @@ void DecodeProcASM(FILE*fileM,
 		{
 			fread(&arg3,1,2,fileM);
 			if(arg3==0||arg3==0xFF){failsafe++;
-			if(failsafe>=100){fprintf(fsend,"'Failsafe\r\n");break;}}else failsafe=0;
+			if(failsafe>=100){fprintf(fsend,"'Failsafe\n");break;}}else failsafe=0;
 			arg2=dec_thumb(arg3,arg1);
-			fprintf(fsend,"%s\r\n",asm_buf);
+			fprintf(fsend,"%s\n",asm_buf);
 			arg1+=2;
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 	}
 	while (!AllDoneDword())
 	{
@@ -5845,21 +5845,21 @@ void DecodeProcASM(FILE*fileM,
 				sprintf(buf,"@dword%u",dwordnum);
 				Define2(arg1|0x08000000,buf);
 			}
-			fprintf(fsend,"#org %s\r\n",WhatIs2(arg1|0x08000000));
+			fprintf(fsend,"#org %s\n",WhatIs2(arg1|0x08000000));
 		}
 		else
-			fprintf(fsend,"#org 0x%X\r\n",arg1);
+			fprintf(fsend,"#org 0x%X\n",arg1);
 		fseek(fileM,arg1&0x07FFFFFF,SEEK_SET);
 		if(mode!=GOLD&&mode!=CRYSTAL)
 		{
 		  fread(&arg2,1,4,fileM);
-		  fprintf(fsend,"#dword 0x%X\r\n",arg2);
+		  fprintf(fsend,"#dword 0x%X\n",arg2);
 		}
 		else
 		{
 		  arg2=0;
 		  fread(&arg2,1,3,fileM);
-		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\r\n",arg2,PointerToOffset(arg2));
+		  fprintf(fsend,"#3ptr 0x%X ' -> 0x%X\n",arg2,PointerToOffset(arg2));
 		}
 	}
 }
@@ -5870,28 +5870,28 @@ void DecodeProcText(FILE*fileM,
                     FILE*fsend)
 {
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	decompile_single_text(fsend, fname, FileZoomPos);
@@ -5904,28 +5904,28 @@ void DecodeProcPointer(FILE*fileM,
 {
 	unsigned int arg2;
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
@@ -5933,14 +5933,14 @@ void DecodeProcPointer(FILE*fileM,
 	{
 	  fread(&arg2,1,4,fileM);
 	  if(arg2&0x08000000)
-  		fprintf(fsend,"#org 0x%X\r\n#ptr 0x%X\r\n",FileZoomPos,arg2);
+  		fprintf(fsend,"#org 0x%X\n#ptr 0x%X\n",FileZoomPos,arg2);
   	else
-		  fprintf(fsend,"#org 0x%X\r\n#dword 0x%X\r\n",FileZoomPos,arg2);
+		  fprintf(fsend,"#org 0x%X\n#dword 0x%X\n",FileZoomPos,arg2);
 	}
 	else
 	{
 	  fread(&arg2,1,3,fileM);
-	  fprintf(fsend,"#org 0x%X\r\n#3ptr 0x%X ' 0x%X\r\n",FileZoomPos,arg2,PointerToOffset(arg2));
+	  fprintf(fsend,"#org 0x%X\n#3ptr 0x%X ' 0x%X\n",FileZoomPos,arg2,PointerToOffset(arg2));
 	}
 }
 
@@ -5950,34 +5950,34 @@ void DecodeProcMoves(FILE*fileM,
                      FILE*fsend)
 {
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	if(dyndec)
-		fprintf(fsend,"#org @moves\r\nM %s\r\n",transmove(FileZoomPos&0x07ffffff,fname));
+		fprintf(fsend,"#org @moves\nM %s\n",transmove(FileZoomPos&0x07ffffff,fname));
 	else
-		fprintf(fsend,"#org 0x%X\r\nM %s\r\n",FileZoomPos,transmove(FileZoomPos&0x07ffffff,fname));
+		fprintf(fsend,"#org 0x%X\nM %s\n",FileZoomPos,transmove(FileZoomPos&0x07ffffff,fname));
 }
 
 void DecodeProcMart(FILE*fileM,
@@ -5988,51 +5988,51 @@ void DecodeProcMart(FILE*fileM,
 	register char*m;
 	int arg2;
 	initDoneProcs();
-	if(dyndec)fprintf(fsend,"#dynamic 0x%X\r\n",dynplace);
+	if(dyndec)fprintf(fsend,"#dynamic 0x%X\n",dynplace);
 	if (VersionOverride)
 	{
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
 	if(dyndec)
-		fprintf(fsend,"#org @mart\r\n");
+		fprintf(fsend,"#org @mart\n");
 	else
-		fprintf(fsend,"#org 0x%X\r\n",FileZoomPos);
+		fprintf(fsend,"#org 0x%X\n",FileZoomPos);
 	arg2=1;
 	while (arg2!=0)
 	{
 		fread(&arg2,1,2,fileM);
 		if (arg2==0)
-			fprintf(fsend,"endmart\r\n");
+			fprintf(fsend,"endmart\n");
 		else
 		{
 			m=GetItemName(arg2);
 			if (!m)
-				fprintf(fsend,"item 0x%X\r\n",arg2);
+				fprintf(fsend,"item 0x%X\n",arg2);
 			else
-				fprintf(fsend,"item %s\r\n",m);
+				fprintf(fsend,"item %s\n",m);
 		}
 	}
-	fprintf(fsend,"\r\n");
+	fprintf(fsend,"\n");
 }
 
 void DecodeProcAttacks(FILE*fileM,
@@ -6048,41 +6048,41 @@ void DecodeProcAttacks(FILE*fileM,
 		switch (mode)
 		{
 		case RUBY:
-			fprintf(fsend,"#rse\r\n\r\n");
+			fprintf(fsend,"#rse\n\n");
 			break;
 		case FIRE_RED:
-			fprintf(fsend,"#frlg\r\n\r\n");
+			fprintf(fsend,"#frlg\n\n");
 			break;
 		case DIAMOND:
-			fprintf(fsend,"#dp\r\n\r\n");
+			fprintf(fsend,"#dp\n\n");
 			break;
 		case CRYSTAL:
-			fprintf(fsend,"#c\r\n\r\n");
+			fprintf(fsend,"#c\n\n");
 			break;
 		case GOLD:
-			fprintf(fsend,"#gs\r\n\r\n");
+			fprintf(fsend,"#gs\n\n");
 			break;
 		default:
-			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\r\n\r\n",mode);
+			fprintf(fsend,"#frlg 'Unknown mode override ID 0x%X\n\n",mode);
 		}
 	}
 	fseek(fileM,FileZoomPos&0x07FFFFFF,SEEK_SET);
 	if(dyndec)
-		fprintf(fsend,"#org @attacks\r\n");
+		fprintf(fsend,"#org @attacks\n");
 	else
-		fprintf(fsend,"#org 0x%X\r\n",FileZoomPos);
+		fprintf(fsend,"#org 0x%X\n",FileZoomPos);
 	while (1)
 	{
 		fread(&arg2,1,2,fileM);
 		m=GetAttackName(arg2);
 		if (!m)
 		{
-			fprintf(fsend,"item 0x%X\r\n",arg2);
+			fprintf(fsend,"item 0x%X\n",arg2);
 			break;
 		}
 		else
-			fprintf(fsend,"item %s\r\n",m);
+			fprintf(fsend,"item %s\n",m);
 	}
-	fprintf(fsend,"\r\n");
+	fprintf(fsend,"\n");
 }
 

@@ -386,7 +386,7 @@ char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_ou
 							readagain=0;
 							fread(&p,1,1,fileC);
 							if (p==0) {
-								strcat(trans,"\\e\r\n");
+								strcat(trans,"\\e\n");
 								still_going=0;
 								break;
 							}
@@ -398,13 +398,13 @@ char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_ou
 							strcat(trans,buf);
 						}
 					}
-					strcat(trans,"\r\n");
+					strcat(trans,"\n");
 				}
 				else if (code==1)
 				{
 					pt=0;
 					fread(&pt,1,2,fileC);
-					sprintf(buf,"text-ram 0x%X\r\n",pt);
+					sprintf(buf,"text-ram 0x%X\n",pt);
 					strcat(trans,buf);
 				}
 				else if (code==2)
@@ -446,13 +446,13 @@ char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_ou
 					}
 					strcat(trans,"text-hex ");
 					strcat(trans,buf);
-					strcat(trans,"\r\n");
+					strcat(trans,"\n");
 				}
 				else if (code==3)
 				{
 					pt=0;
 					fread(&pt,1,2,fileC);
-					sprintf(buf,"text-reloc 0x%X\r\n",pt);
+					sprintf(buf,"text-reloc 0x%X\n",pt);
 					strcat(trans,buf);
 				}
 				else if (code==4)
@@ -461,24 +461,24 @@ char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_ou
 					fread(&pt,1,2,fileC);
 					fread(&arg1,1,1,fileC);
 					fread(&arg2,1,1,fileC);
-					sprintf(buf,"text-box 0x%X 0x%X 0x%X\r\n",pt,arg1,arg2);
+					sprintf(buf,"text-box 0x%X 0x%X 0x%X\n",pt,arg1,arg2);
 					strcat(trans,buf);
 				}
 				else if (code==5)
 				{
-					strcat(trans,"text-newline\r\n");
+					strcat(trans,"text-newline\n");
 				}
 				else if (code==6)
 				{
-					strcat(trans,"text-waitbutton\r\n");
+					strcat(trans,"text-waitbutton\n");
 				}
 				else if (code==7)
 				{
-					strcat(trans,"text-newlinewitharrow\r\n");
+					strcat(trans,"text-newlinewitharrow\n");
 				}
 				else if (code==8)
 				{
-					strcat(trans,"text-switchtoasm\r\n");
+					strcat(trans,"text-switchtoasm\n");
 					still_going=0;
 				}
 				else if (code==9)
@@ -486,80 +486,80 @@ char*transtxt(int howfar, const char*file, size_t word_wrap, uint32_t *resume_ou
 					pt=arg1=0;
 					fread(&pt,1,2,fileC);
 					fread(&arg1,1,1,fileC);
-					sprintf(buf,"text-number 0x%X 0x%X 0x%X\r\n",pt,(arg1&0xF0)>>8,arg1&0xF);
+					sprintf(buf,"text-number 0x%X 0x%X 0x%X\n",pt,(arg1&0xF0)>>8,arg1&0xF);
 					strcat(trans,buf);
 				}
 				else if (code==10)
 				{
-					strcat(trans,"text-interpretdata\r\n");
+					strcat(trans,"text-interpretdata\n");
 				}
 				else if (code==11)
 				{
-					strcat(trans,"text-playsound0\r\n");
+					strcat(trans,"text-playsound0\n");
 				}
 				else if (code==12)
 				{
 					pt=0;
 					fread(&pt,1,1,fileC);
-					sprintf(buf,"text-interpretxdata 0x%X\r\n",pt);
+					sprintf(buf,"text-interpretxdata 0x%X\n",pt);
 					strcat(trans,buf);
 				}
 				else if (code==13)
 				{
-					strcat(trans,"text-waitbutton2\r\n");
+					strcat(trans,"text-waitbutton2\n");
 				}
 				else if (code==14)
 				{
-					strcat(trans,"text-playsound9\r\n");
+					strcat(trans,"text-playsound9\n");
 				}
 				else if (code==15)
 				{
-					strcat(trans,"text-playsound1\r\n");
+					strcat(trans,"text-playsound1\n");
 				}
 				else if (code==16)
 				{
-					strcat(trans,"text-playsound2\r\n");
+					strcat(trans,"text-playsound2\n");
 				}
 				else if (code==17)
 				{
-					strcat(trans,"text-playsounda\r\n");
+					strcat(trans,"text-playsounda\n");
 				}
 				else if (code==18)
 				{
-					strcat(trans,"text-playsoundd\r\n");
+					strcat(trans,"text-playsoundd\n");
 				}
 				else if (code==19)
 				{
-					strcat(trans,"text-playsoundc\r\n");
+					strcat(trans,"text-playsoundc\n");
 				}
 				else if (code==20)
 				{
 					pt=0;
 					fread(&pt,1,1,fileC);
-					sprintf(buf,"text-buffer 0x%X\r\n",pt);
+					sprintf(buf,"text-buffer 0x%X\n",pt);
 					strcat(trans,buf);
 				}
 				else if (code==21)
 				{
-					strcat(trans,"text-day\r\n");
+					strcat(trans,"text-day\n");
 				}
 				else if (code==22)
 				{
 					pt=arg1=0;
 					fread(&pt,1,2,fileC);
 					fread(&arg1,1,1,fileC);
-					sprintf(buf,"text-newtxt 0x%X ' 0x%X\r\n",arg1|(pt<<8),PointerToOffset(arg1|(pt<<8)));
+					sprintf(buf,"text-newtxt 0x%X ' 0x%X\n",arg1|(pt<<8),PointerToOffset(arg1|(pt<<8)));
 					strcat(trans,buf);
 					if (PointerToOffset(arg1|(pt<<8))!=0xFFFFFFFF)
 					{
-						sprintf(buf,"\r\n#org 0x%X\r\n",PointerToOffset(arg1|(pt<<8)));
+						sprintf(buf,"\n#org 0x%X\n",PointerToOffset(arg1|(pt<<8)));
 						strcat(trans,buf);
 						fseek(fileC,PointerToOffset(arg1|(pt<<8)),SEEK_SET);
 					}
 				}
 				else
 				{
-					sprintf(buf,"#raw 0x%X\r\n",code);
+					sprintf(buf,"#raw 0x%X\n",code);
 					strcat(trans,buf);
 				}
 			}
@@ -611,7 +611,7 @@ char*transbrl(int howfar,const char*file,FILE*fsend)
 			if (p&2) fprintf(fsend,".");
 			else fprintf(fsend," ");
 		}
-		fprintf(fsend,"\r\n        '");
+		fprintf(fsend,"\n        '");
 		fseek(fileC,(howfar&0xffffff),SEEK_SET);
 		still_going=1;
 		while (still_going)
@@ -629,7 +629,7 @@ char*transbrl(int howfar,const char*file,FILE*fsend)
 			if (p&2) fprintf(fsend,".");
 			else fprintf(fsend," ");
 		}
-		fprintf(fsend,"\r\n        '");
+		fprintf(fsend,"\n        '");
 		fseek(fileC,(howfar&0xffffff),SEEK_SET);
 		still_going=1;
 		while (still_going)
@@ -647,7 +647,7 @@ char*transbrl(int howfar,const char*file,FILE*fsend)
 			if (p&2) fprintf(fsend,".");
 			else fprintf(fsend," ");
 		}
-		fprintf(fsend,"\r\n");
+		fprintf(fsend,"\n");
 		fclose(fileC);
 	}
 	else
@@ -764,7 +764,7 @@ char* transbackstr(char*scrfn, unsigned int pos, codeblock*c)
 #ifndef DLL
 	unsigned int read;
 	FILE*scrfile;
-	scrfile=fopen(scrfn,"rb");
+	scrfile=fopen(scrfn,"rt");
 
 	if (pos!=0xFFFFFFFF)fseek(scrfile,pos,SEEK_SET);
 	else {
@@ -1199,7 +1199,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 			uint32_t j;
 			const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
 			if (hex_end != &cmdbuf[cmdbuf_size]) {
-				sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
+				sprintf(xbuf,"Invalid raw command '%s'.\n",cmdbuf);
 				log_txt(xbuf,strlen(xbuf));
 				len--;
 			} else {
@@ -1208,7 +1208,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 		}
 		else {
 			len--;
-			sprintf(xbuf,"Unknown %s move command \"%s\"\r\n", get_romtype_name(), cmdbuf);
+			sprintf(xbuf,"Unknown %s move command \"%s\"\n", get_romtype_name(), cmdbuf);
 			log_txt(xbuf,strlen(xbuf));
 		}
 		len++;

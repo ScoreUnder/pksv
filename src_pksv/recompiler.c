@@ -65,7 +65,7 @@ void end_command(const char *in, pos_int *ppos)
     // Make sure the line has ended
     if (in[pos] != '\0' && in[pos] != '\n') {
       // TODO: make this an error
-      log_txt("Extra characters on line. Ignoring.\r\n",37);
+      log_txt("Extra characters on line. Ignoring.\n", 37-1);
       while (in[pos] != '\0' && in[pos] != '\n') {
         pos++;
       }
@@ -143,7 +143,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>15)
       {
-        log_txt("Bad arguments to THUMB LSL\r\n",28);
+        log_txt("Bad arguments to THUMB LSL\n", 28-1);
         return;
       }
       i = skip_whitespace(Script, i);
@@ -166,7 +166,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>15)
       {
-        log_txt("Bad arguments to THUMB LSR\r\n",28);
+        log_txt("Bad arguments to THUMB LSR\n", 28-1);
         return;
       }
       i = skip_whitespace(Script, i);
@@ -189,7 +189,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>15)
       {
-        log_txt("Bad arguments to THUMB ASR\r\n",28);
+        log_txt("Bad arguments to THUMB ASR\n", 28-1);
         return;
       }
       i = skip_whitespace(Script, i);
@@ -214,7 +214,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         i++;
         if (chr!='p')
         {
-          log_txt("Bad arguments to THUMB ADD\r\n",28);
+          log_txt("Bad arguments to THUMB ADD\n", 28-1);
           return;
         }
         i++;
@@ -238,7 +238,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg2=REG();
           if ((unsigned)(arg1|arg2)>15)
           {
-            log_txt("Bad arguments to THUMB ADD\r\n",28);
+            log_txt("Bad arguments to THUMB ADD\n", 28-1);
             return;
           }
           i = skip_whitespace(Script, i);
@@ -247,7 +247,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
             arg3=REG();
             if ((unsigned)arg3>15)
             {
-              log_txt("Bad arguments to THUMB ADD\r\n",28);
+              log_txt("Bad arguments to THUMB ADD\n", 28-1);
               return;
             }
             rom(arg1|(arg2<<3)|(arg3<<6)|0x1800,2);
@@ -270,7 +270,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           i++;
           if (chr!='p')
           {
-            log_txt("Bad arguments to THUMB ADD\r\n",28);
+            log_txt("Bad arguments to THUMB ADD\n", 28-1);
             return;
           }
           i++;
@@ -286,7 +286,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           i++;
           if (chr!='c')
           {
-            log_txt("Bad arguments to THUMB ADD\r\n",28);
+            log_txt("Bad arguments to THUMB ADD\n", 28-1);
             return;
           }
           i++;
@@ -314,7 +314,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         i++;
         if (chr!='p')
         {
-          log_txt("Bad arguments to THUMB SUB\r\n",28);
+          log_txt("Bad arguments to THUMB SUB\n", 28-1);
           return;
         }
         i++;
@@ -338,7 +338,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg2=REG();
           if ((unsigned)(arg1|arg2)>15)
           {
-            log_txt("Bad arguments to THUMB SUB\r\n",28);
+            log_txt("Bad arguments to THUMB SUB\n", 28-1);
             return;
           }
           i = skip_whitespace(Script, i);
@@ -347,7 +347,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
             arg3=REG();
             if ((unsigned)arg3>15)
             {
-              log_txt("Bad arguments to THUMB SUB\r\n",28);
+              log_txt("Bad arguments to THUMB SUB\n", 28-1);
               return;
             }
             rom(arg1|(arg2<<3)|(arg3<<6)|0x1A00,2);
@@ -374,7 +374,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg1=REG();
       if ((unsigned)arg1>15)
       {
-        log_txt("Bad arguments to THUMB MOV\r\n",28);
+        log_txt("Bad arguments to THUMB MOV\n", 28-1);
         return;
       }
       i = skip_whitespace_and_comma(Script, i);
@@ -383,7 +383,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=REG();
         if ((unsigned)arg2>15)
         {
-          log_txt("Bad arguments to THUMB MOV\r\n",28);
+          log_txt("Bad arguments to THUMB MOV\n", 28-1);
           return;
         }
         rom(0x4600|(arg1&0x7)|((arg1&0x8)<<4)|(arg2<<3),2);
@@ -402,7 +402,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg1=REG();
       if ((unsigned)arg1>15)
       {
-        log_txt("Bad arguments to THUMB CMP\r\n",28);
+        log_txt("Bad arguments to THUMB CMP\n", 28-1);
         return;
       }
       i = skip_whitespace_and_comma(Script, i);
@@ -411,7 +411,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=REG();
         if ((unsigned)arg2>15)
         {
-          log_txt("Bad arguments to THUMB CMP\r\n",28);
+          log_txt("Bad arguments to THUMB CMP\n", 28-1);
           return;
         }
         rom(0x4500|(arg1&0x7)|((arg1&0x8)<<4)|(arg2<<3),2);
@@ -431,7 +431,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB AND\r\n",28);
+        log_txt("Bad arguments to THUMB AND\n", 28-1);
         return;
       }
       rom(0x4000|arg1|(arg2<<3),2);
@@ -444,7 +444,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB EOR\r\n",28);
+        log_txt("Bad arguments to THUMB EOR\n", 28-1);
         return;
       }
       rom(0x4040|arg1|(arg2<<3),2);
@@ -457,7 +457,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB ADC\r\n",28);
+        log_txt("Bad arguments to THUMB ADC\n", 28-1);
         return;
       }
       rom(0x4140|arg1|(arg2<<3),2);
@@ -470,7 +470,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB SBC\r\n",28);
+        log_txt("Bad arguments to THUMB SBC\n", 28-1);
         return;
       }
       rom(0x4180|arg1|(arg2<<3),2);
@@ -483,7 +483,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB ROR\r\n",28);
+        log_txt("Bad arguments to THUMB ROR\n", 28-1);
         return;
       }
       rom(0x41C0|arg1|(arg2<<3),2);
@@ -496,7 +496,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB TST\r\n",28);
+        log_txt("Bad arguments to THUMB TST\n", 28-1);
         return;
       }
       rom(0x4200|arg1|(arg2<<3),2);
@@ -509,7 +509,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB NEG\r\n",28);
+        log_txt("Bad arguments to THUMB NEG\n", 28-1);
         return;
       }
       rom(0x4240|arg1|(arg2<<3),2);
@@ -522,7 +522,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB CMN\r\n",28);
+        log_txt("Bad arguments to THUMB CMN\n", 28-1);
         return;
       }
       rom(0x42C0|arg1|(arg2<<3),2);
@@ -535,7 +535,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB ORR\r\n",28);
+        log_txt("Bad arguments to THUMB ORR\n", 28-1);
         return;
       }
       rom(0x4300|arg1|(arg2<<3),2);
@@ -548,7 +548,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB MUL\r\n",28);
+        log_txt("Bad arguments to THUMB MUL\n", 28-1);
         return;
       }
       rom(0x4340|arg1|(arg2<<3),2);
@@ -561,7 +561,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB BIC\r\n",28);
+        log_txt("Bad arguments to THUMB BIC\n", 28-1);
         return;
       }
       rom(0x4380|arg1|(arg2<<3),2);
@@ -574,7 +574,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg2|arg1)>7)
       {
-        log_txt("Bad arguments to THUMB MVN\r\n",28);
+        log_txt("Bad arguments to THUMB MVN\n", 28-1);
         return;
       }
       rom(0x43C0|arg1|(arg2<<3),2);
@@ -591,7 +591,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg1=REG();
       if ((unsigned)arg1>15)
       {
-        log_txt("Bad arguments to THUMB BLX\r\n",28);
+        log_txt("Bad arguments to THUMB BLX\n", 28-1);
         return;
       }
       rom(0x4780|(arg1<<3),2);
@@ -603,7 +603,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg1=REG();
       if ((unsigned)arg1>15)
       {
-        log_txt("Bad arguments to THUMB BX\r\n",27);
+        log_txt("Bad arguments to THUMB BX\n", 27-1);
         return;
       }
       rom(0x4700|(arg1<<3),2);
@@ -617,7 +617,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>7)
       {
-        log_txt("Bad arguments to THUMB STRH\r\n",29);
+        log_txt("Bad arguments to THUMB STRH\n", 29-1);
         return;
       }
       if (chr=='r')
@@ -625,7 +625,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=REG();
         if ((unsigned)arg3>7)
         {
-          log_txt("Bad arguments to THUMB STRH\r\n",29);
+          log_txt("Bad arguments to THUMB STRH\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x5200,2);
@@ -636,7 +636,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=HEX();
         if ((unsigned)arg3>0x1F)
         {
-          log_txt("Bad arguments to THUMB STRH\r\n",29);
+          log_txt("Bad arguments to THUMB STRH\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x8000,2);
@@ -653,7 +653,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg3=REG();
       if ((unsigned)(arg1|arg2|arg3)>7)
       {
-        log_txt("Bad arguments to THUMB LDSB\r\n",29);
+        log_txt("Bad arguments to THUMB LDSB\n", 29-1);
         return;
       }
       rom(arg1|(arg2<<3)|(arg3<<6)|0x5600,2);
@@ -668,7 +668,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>7)
       {
-        log_txt("Bad arguments to THUMB LDRH\r\n",29);
+        log_txt("Bad arguments to THUMB LDRH\n", 29-1);
         return;
       }
       if (chr=='r')
@@ -676,7 +676,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=REG();
         if ((unsigned)arg3>7)
         {
-          log_txt("Bad arguments to THUMB LDRH\r\n",29);
+          log_txt("Bad arguments to THUMB LDRH\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x5A00,2);
@@ -687,7 +687,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=HEX();
         if ((unsigned)arg3>0x1F)
         {
-          log_txt("Bad arguments to THUMB LDRH\r\n",29);
+          log_txt("Bad arguments to THUMB LDRH\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x8800,2);
@@ -704,7 +704,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg3=REG();
       if ((unsigned)(arg1|arg2|arg3)>7)
       {
-        log_txt("Bad arguments to THUMB LDSH\r\n",29);
+        log_txt("Bad arguments to THUMB LDSH\n", 29-1);
         return;
       }
       rom(arg1|(arg2<<3)|(arg3<<6)|0x5E00,2);
@@ -718,7 +718,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg1=REG();
       if ((unsigned)arg1>7)
       {
-        log_txt("Bad arguments to THUMB STR\r\n",28);
+        log_txt("Bad arguments to THUMB STR\n", 28-1);
         return;
       }
       while (chr==','||chr==' '||chr=='[')i++;
@@ -727,7 +727,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=REG();
         if ((unsigned)arg2>7)
         {
-          log_txt("Bad arguments to THUMB STR\r\n",28);
+          log_txt("Bad arguments to THUMB STR\n", 28-1);
           return;
         }
         if (chr=='r')
@@ -735,7 +735,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg3=REG();
           if ((unsigned)arg3>7)
           {
-            log_txt("Bad arguments to THUMB STR\r\n",28);
+            log_txt("Bad arguments to THUMB STR\n", 28-1);
             return;
           }
           rom(arg1|(arg2<3)|(arg3<6)|0x5000,2);
@@ -746,7 +746,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg3=HEX();
           if ((unsigned)arg3>0x1F)
           {
-            log_txt("Bad arguments to THUMB STR\r\n",28);
+            log_txt("Bad arguments to THUMB STR\n", 28-1);
             return;
           }
           rom(arg1|(arg2<<3)|(arg3<<6)|0x6000,2);
@@ -757,13 +757,13 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       {//R,[SP,X]
         if (chr!='s')
         {
-          log_txt("Bad arguments to THUMB STR\r\n",28);
+          log_txt("Bad arguments to THUMB STR\n", 28-1);
           return;
         }
         i++;
         if (chr!='p')
         {
-          log_txt("Bad arguments to THUMB STR\r\n",28);
+          log_txt("Bad arguments to THUMB STR\n", 28-1);
           return;
         }
         i++;
@@ -771,7 +771,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=HEX();
         if ((arg2&3)||(unsigned)arg2>1020)
         {
-          log_txt("Bad arguments to THUMB STR\r\n",28);
+          log_txt("Bad arguments to THUMB STR\n", 28-1);
           return;
         }
         arg2/=4;
@@ -793,7 +793,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg3=REG();
           if ((unsigned)(arg1|arg2|arg3)>7)
           {
-            log_txt("Bad arguments to THUMB LDR\r\n",28);
+            log_txt("Bad arguments to THUMB LDR\n", 28-1);
             return;
           }
           rom(arg1|(arg2<<3)|(arg3<<6)|0x5800,2);
@@ -804,7 +804,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
           arg3=HEX();
           if ((unsigned)(arg1|arg2)>7||(unsigned)arg3>0x1F)
           {
-            log_txt("Bad arguments to THUMB LDR\r\n",28);
+            log_txt("Bad arguments to THUMB LDR\n", 28-1);
             return;
           }
           rom(arg1|(arg2<<3)|(arg3<<6)|0x6800,2);
@@ -816,7 +816,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         i++;
         if (chr!='p')
         {
-          log_txt("Bad arguments to THUMB LDR\r\n",28);
+          log_txt("Bad arguments to THUMB LDR\n", 28-1);
           return;
         }
         i++;
@@ -824,7 +824,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=HEX();
         if (arg2>1020||(arg2&3))
         {
-          log_txt("Bad arguments to THUMB LDR\r\n",28);
+          log_txt("Bad arguments to THUMB LDR\n", 28-1);
           return;
         }
         rom(arg2|(arg1<<8)|0x9800,2);
@@ -834,13 +834,13 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       {//R, [PC,X]
         if (chr!='p')
         {
-          log_txt("Bad arguments to THUMB LDR\r\n",28);
+          log_txt("Bad arguments to THUMB LDR\n", 28-1);
           return;
         }
         i++;
         if (chr!='c')
         {
-          log_txt("Bad arguments to THUMB LDR\r\n",28);
+          log_txt("Bad arguments to THUMB LDR\n", 28-1);
           return;
         }
         i++;
@@ -848,7 +848,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg2=HEX();
         if (arg2>1020||(arg2&3))
         {
-          log_txt("Bad arguments to THUMB LDR\r\n",28);
+          log_txt("Bad arguments to THUMB LDR\n", 28-1);
           return;
         }
         rom((arg2>>2)|(arg1<<8)|0x4800,2);
@@ -863,7 +863,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>7)
       {
-        log_txt("Bad arguments to THUMB STRB\r\n",29);
+        log_txt("Bad arguments to THUMB STRB\n", 29-1);
         return;
       }
       if (chr=='r')
@@ -871,7 +871,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=REG();
         if ((unsigned)arg3>7)
         {
-          log_txt("Bad arguments to THUMB STRB\r\n",29);
+          log_txt("Bad arguments to THUMB STRB\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x5400,2);
@@ -882,7 +882,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=HEX();
         if ((unsigned)arg3>0x1F)
         {
-          log_txt("Bad arguments to THUMB STRB\r\n",29);
+          log_txt("Bad arguments to THUMB STRB\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x7000,2);
@@ -897,7 +897,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
       arg2=REG();
       if ((unsigned)(arg1|arg2)>7)
       {
-        log_txt("Bad arguments to THUMB LDRB\r\n",29);
+        log_txt("Bad arguments to THUMB LDRB\n", 29-1);
         return;
       }
       if (chr=='r')
@@ -905,7 +905,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=REG();
         if ((unsigned)arg3>7)
         {
-          log_txt("Bad arguments to THUMB LDRB\r\n",29);
+          log_txt("Bad arguments to THUMB LDRB\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x5C00,2);
@@ -916,7 +916,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c)
         arg3=HEX();
         if ((unsigned)arg3>0x1F)
         {
-          log_txt("Bad arguments to THUMB LDRB\r\n",29);
+          log_txt("Bad arguments to THUMB LDRB\n", 29-1);
           return;
         }
         rom(arg1|(arg2<<3)|(arg3<<6)|0x7800,2);
@@ -1372,7 +1372,7 @@ struct bsearch_root* DoDefines()
     f = fopen("defines.dat", "rb");
   }
   if (!f) {
-    log_txt("Cannot open defines.dat!\r\n",26);
+    log_txt("Cannot open defines.dat!\n", 26-1);
     return defines;
   }
   bool ok = true;
@@ -1407,11 +1407,11 @@ struct bsearch_root* DoDefines()
     char *s;
     if (feof(f))
     {
-      s = "defines.dat is truncated and not fully valid\r\n";
+      s = "defines.dat is truncated and not fully valid\n";
     }
     else if (ferror(f))
     {
-      s = "Error reading defines.dat\r\n";
+      s = "Error reading defines.dat\n";
     }
     log_txt(s, strlen(s));
     bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
@@ -1456,9 +1456,9 @@ void RecodeProc(char*script,char*romfn)
   struct bsearch_root *defines = DoDefines();
 #ifndef DLL
   strcat(GlobBuf,"pokeinc.txt");
-  IncFile=fopen(GlobBuf,"rb");
+  IncFile=fopen(GlobBuf,"rt");
 #else
-  IncFile=fopen("pokeinc.txt","rb");
+  IncFile=fopen("pokeinc.txt","rt");
 #endif
 
   if (RomFile==NULL)
@@ -1473,7 +1473,7 @@ void RecodeProc(char*script,char*romfn)
     return;
   }
 #ifndef DLL
-  CurrFile=fopen(script,"rb");
+  CurrFile=fopen(script,"rt");
   if (CurrFile!=NULL)
   {
     fseek(CurrFile,0,SEEK_END);
@@ -1527,7 +1527,7 @@ void RecodeProc(char*script,char*romfn)
 #endif
 
 #ifndef DLL
-    LogFile=fopen("PokeScrE.log","wb");
+    LogFile=fopen("PokeScrE.log","wt");
     if (LogFile==NULL)
     {
       printf("Failed to open a logfile\n");
@@ -1540,9 +1540,9 @@ void RecodeProc(char*script,char*romfn)
       bsearch_destroy_root(defines);
       return;
     }
-    fprintf(LogFile,"Opened file.\r\n");
+    fprintf(LogFile,"Opened file.\n");
 #else
-    log_txt("Initialized.\r\n",14);
+    log_txt("Initialized.\n", 14-1);
 #endif
 
     i=0;
@@ -1576,11 +1576,11 @@ void RecodeProc(char*script,char*romfn)
           buf[j]=0;
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
-            vlog_txt("#DEFINE\r\n");
+            vlog_txt("#DEFINE\n");
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             j=0;
@@ -1591,12 +1591,12 @@ void RecodeProc(char*script,char*romfn)
               j++;
             }
             buf[j]=0; //Append null
-            sprintf(buf2,"   -> %s\r\n",buf);
+            sprintf(buf2,"   -> %s\n",buf);
             vlog_txt(buf2);
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             k=GetNum("#DEFINE");
@@ -1608,7 +1608,7 @@ void RecodeProc(char*script,char*romfn)
           }
           aa("#narc")
           {
-            vlog_txt("#NARC\r\n");
+            vlog_txt("#NARC\n");
             arg1=GetNum("#NARC");
             if (!gffs) {
               return;
@@ -1656,13 +1656,13 @@ void RecodeProc(char*script,char*romfn)
               }
               else
               {
-                log_txt("Incomplete NARC.\r\n",18);
+                log_txt("Incomplete NARC.\n", 18-1);
                 return;
               }
             }
             else
             {
-              log_txt("Incomplete NARC.\r\n",18);
+              log_txt("Incomplete NARC.\n", 18-1);
               return;
             }
             ec();
@@ -1715,7 +1715,7 @@ dp:
           }
           aa("#raw")
           {
-            vlog_txt("#RAW\r\n");
+            vlog_txt("#RAW\n");
             arg1=1;
             while(arg1)
             {
@@ -1731,7 +1731,7 @@ dp:
           }
           aa("#ptr")
           {
-            vlog_txt("#PTR\r\n");
+            vlog_txt("#PTR\n");
             k=GetNum("#PTR");
             if (!gffs) {
               return;
@@ -1742,7 +1742,7 @@ dp:
           }
           aa("wildbattle")
           {
-            vlog_txt("WILDBATTLE\r\n");
+            vlog_txt("WILDBATTLE\n");
             arg1=GetNum("WILDBATTLE");
             if (!gffs) {
               return;
@@ -1798,30 +1798,30 @@ dp:
           }
           aa("m")
           {
-            vlog_txt("Movement data...\r\n");
+            vlog_txt("Movement data...\n");
             add_data(c,trans,transbackmove(Script,&i));
             ec();
           }
           aa("=")
           {
-            vlog_txt("[STRING]\r\n");
+            vlog_txt("[STRING]\n");
             if (chr==' ') {
               i++;
             }
             else {
-              log_txt("Should have a space after the =\r\n",33);
+              log_txt("Should have a space after the =\n", 33-1);
             }
             temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
-            sprintf(buf2,"   -> %s\r\n",(char*)temp_ptr);
+            sprintf(buf2,"   -> %s\n",(char*)temp_ptr);
             free(temp_ptr);
             vlog_txt(buf2);
           }
           aa(".")
           {
-            vlog_txt("[BINARY]\r\n   ->");
+            vlog_txt("[BINARY]\n   ->");
             i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
@@ -1832,7 +1832,7 @@ dp:
               else if(chr>='A'&&chr<='F')j=10+(chr-'A');
               if (((char*)("0123456789abcdef"))[j]==0)
               {
-                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                sprintf(buf2,"Failed to understand hex character '%c'\n",chr);
                 log_txt(buf2,strlen(buf2));
                 return;
               }
@@ -1852,11 +1852,11 @@ dp:
               }
               i++;
             }
-            vlog_txt("\r\n");
+            vlog_txt("\n");
           }
           else
           {
-            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            sprintf(buf2,"Warning: Unknown command \"%s\"\n",buf);
             log_txt(buf2,strlen(buf2));
             while (chr!='\n'&&chr!=0)
             {
@@ -1896,11 +1896,11 @@ dp:
           buf[j]=0;
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
-            vlog_txt("#DEFINE\r\n");
+            vlog_txt("#DEFINE\n");
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             j=0;
@@ -1911,12 +1911,12 @@ dp:
               j++;
             }
             buf[j]=0; //Append null
-            sprintf(buf2,"   -> %s\r\n",buf);
+            sprintf(buf2,"   -> %s\n",buf);
             vlog_txt(buf2);
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             k=GetNum("#DEFINE");
@@ -1928,7 +1928,7 @@ dp:
           }
           aa("#dyn")
           {
-            vlog_txt("#DYN\r\n");
+            vlog_txt("#DYN\n");
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
@@ -1937,7 +1937,7 @@ dp:
           }
           aa("#dyn2")
           {
-            vlog_txt("#DYN2\r\n");
+            vlog_txt("#DYN2\n");
             start=GetNum("#DYN2");
             if (!gffs)return;
             dyntype=1;
@@ -1945,7 +1945,7 @@ dp:
           }
           aa("#dynamic")
           {
-            vlog_txt("#DYNAMIC\r\n");
+            vlog_txt("#DYNAMIC\n");
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
@@ -1955,14 +1955,14 @@ dp:
           aa("#org")
           {
             eorg=0;
-            vlog_txt("#ORG\r\n");
+            vlog_txt("#ORG\n");
             i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
               if(start==0)
               {
-                log_txt("Need #dyn with dynamic offsets\r\n",32);
+                log_txt("Need #dyn with dynamic offsets\n", 32-1);
                 return;
               }
               dynu=1;
@@ -1974,7 +1974,7 @@ dp:
                 j++;
               }
               buf[j]=0;
-              sprintf(buf2,"   -> %s\r\n",buf);
+              sprintf(buf2,"   -> %s\n",buf);
               vlog_txt(buf2);
             }
             else
@@ -1997,7 +1997,7 @@ dp:
           aa("#eorg")
           {
             eorg=1;
-            vlog_txt("#EORG\r\n");
+            vlog_txt("#EORG\n");
             i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
@@ -2010,7 +2010,7 @@ dp:
                 j++;
               }
               buf[j]=0;
-              sprintf(buf2,"   -> %s\r\n",buf);
+              sprintf(buf2,"   -> %s\n",buf);
               vlog_txt(buf2);
             }
             else
@@ -2081,7 +2081,7 @@ cry:
           }
           aa("#raw")
           {
-            vlog_txt("#RAW\r\n");
+            vlog_txt("#RAW\n");
             arg1=1;
             while(arg1)
             {
@@ -2325,7 +2325,7 @@ cry:
           }
           aa("2call")
           {
-            vlog_txt("2CALL\r\n");
+            vlog_txt("2CALL\n");
             arg1=GetNum("2CALL");
             if (!gffs) {
               return;
@@ -2336,7 +2336,7 @@ cry:
           }
           aa("3call")
           {
-            vlog_txt("3CALL\r\n");
+            vlog_txt("3CALL\n");
             arg1=GetNum("3CALL");
             if (!gffs) {
               return;
@@ -2347,7 +2347,7 @@ cry:
           }
           aa("2ptcall")
           {
-            vlog_txt("2PTCALL\r\n");
+            vlog_txt("2PTCALL\n");
             arg1=GetNum("2PTCALL");
             if (!gffs) {
               return;
@@ -2358,7 +2358,7 @@ cry:
           }
           aa("2jump")
           {
-            vlog_txt("2JUMP\r\n");
+            vlog_txt("2JUMP\n");
             arg1=GetNum("2JUMP");
             if (!gffs) {
               return;
@@ -2369,7 +2369,7 @@ cry:
           }
           aa("3jump")
           {
-            vlog_txt("3JUMP\r\n");
+            vlog_txt("3JUMP\n");
             arg1=GetNum("3JUMP");
             if (!gffs) {
               return;
@@ -2380,7 +2380,7 @@ cry:
           }
           aa("2ptjump")
           {
-            vlog_txt("2PTJUMP\r\n");
+            vlog_txt("2PTJUMP\n");
             arg1=GetNum("2PTJUMP");
             if (!gffs) {
               return;
@@ -2391,7 +2391,7 @@ cry:
           }
           aa("text-ram")
           {
-            vlog_txt("TEXT-RAM\r\n");
+            vlog_txt("TEXT-RAM\n");
             arg1=GetNum("TEXT-RAM");
             if (!gffs) {
               return;
@@ -2402,7 +2402,7 @@ cry:
           }
           aa("text-reloc")
           {
-            vlog_txt("TEXT-RELOC\r\n");
+            vlog_txt("TEXT-RELOC\n");
             arg1=GetNum("TEXT-RELOC");
             if (!gffs) {
               return;
@@ -2413,7 +2413,7 @@ cry:
           }
           aa("text-box")
           {
-            vlog_txt("TEXT-BOX\r\n");
+            vlog_txt("TEXT-BOX\n");
             arg1=GetNum("TEXT-BOX");
             if (!gffs) {
               return;
@@ -2434,7 +2434,7 @@ cry:
           }
           aa("text-interpretxdata")
           {
-            vlog_txt("TEXT-INTERPRETXDATA\r\n");
+            vlog_txt("TEXT-INTERPRETXDATA\n");
             arg1=GetNum("TEXT-INTERPRETXDATA");
             if (!gffs) {
               return;
@@ -2445,7 +2445,7 @@ cry:
           }
           aa("text-buffer")
           {
-            vlog_txt("TEXT-BUFFER\r\n");
+            vlog_txt("TEXT-BUFFER\n");
             arg1=GetNum("TEXT-BUFFER");
             if (!gffs) {
               return;
@@ -2456,7 +2456,7 @@ cry:
           }
           aa("text-newtxt")
           {
-            vlog_txt("TEXT-NEWTXT\r\n");
+            vlog_txt("TEXT-NEWTXT\n");
             arg1=GetNum("TEXT-NEWTXT");
             if (!gffs) {
               return;
@@ -2468,7 +2468,7 @@ cry:
           }
           aa("text-number")
           {
-            vlog_txt("TEXT-NUMBER\r\n");
+            vlog_txt("TEXT-NUMBER\n");
             arg1=GetNum("TEXT-NUMBER");
             if (!gffs) {
               return;
@@ -2488,7 +2488,7 @@ cry:
           }
           aa("text-hex")
           {
-            vlog_txt("TEXT-HEX\r\n");
+            vlog_txt("TEXT-HEX\n");
             arg1=GetNum("TEXT-HEX");
             if (!gffs) {
               return;
@@ -2533,7 +2533,7 @@ cry:
             }
             else
             {
-              log_txt("Incorrect arguments to text-hex\r\n",33);
+              log_txt("Incorrect arguments to text-hex\n", 33-1);
               return;
             }
             BASIC(2);
@@ -2543,11 +2543,11 @@ cry:
           }
           aa("if")
           {
-            vlog_txt("IF\r\n");
+            vlog_txt("IF\n");
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Incorrect arguments to IF.\r\n",28);
+              log_txt("Incorrect arguments to IF.\n", 28-1);
             }
             j=0;
             while (chr!='\n'&&chr!=' '&&chr!=0&&chr!='\'')
@@ -2586,7 +2586,7 @@ cry:
             }
             else
             {
-              log_txt("Incorrect arguments to IF\r\n",29);
+              log_txt("Incorrect arguments to IF\n", 29-1);
               return;
             }
             if (arg1!=-1)
@@ -2607,7 +2607,7 @@ cry:
           }
           aa("jumpstd")
           {
-            vlog_txt("JUMPSTD\r\n");
+            vlog_txt("JUMPSTD\n");
             arg1=GetNum("JUMPSTD");
             if (!gffs) {
               return;
@@ -2618,7 +2618,7 @@ cry:
           }
           aa("callstd")
           {
-            vlog_txt("CALLSTD\r\n");
+            vlog_txt("CALLSTD\n");
             arg1=GetNum("CALLSTD");
             if (!gffs) {
               return;
@@ -2629,7 +2629,7 @@ cry:
           }
           aa("3callasm")
           {
-            vlog_txt("3CALLASM\r\n");
+            vlog_txt("3CALLASM\n");
             arg1=GetNum("3CALLASM");
             if (!gffs) {
               return;
@@ -2640,7 +2640,7 @@ cry:
           }
           aa("special")
           {
-            vlog_txt("SPECIAL\r\n");
+            vlog_txt("SPECIAL\n");
             arg1=GetNum("SPECIAL");
             if (!gffs) {
               return;
@@ -2651,7 +2651,7 @@ cry:
           }
           aa("2ptcallasm")
           {
-            vlog_txt("2PTCALLASM\r\n");
+            vlog_txt("2PTCALLASM\n");
             arg1=GetNum("2PTCALLASM");
             if (!gffs) {
               return;
@@ -2662,7 +2662,7 @@ cry:
           }
           aa("checkmaptriggers")
           {
-            vlog_txt("CHECKMAPTRIGGERS\r\n");
+            vlog_txt("CHECKMAPTRIGGERS\n");
             arg1=GetNum("CHECKMAPTRIGGERS");
             if (!gffs) {
               return;
@@ -2678,7 +2678,7 @@ cry:
           }
           aa("domaptrigger")
           {
-            vlog_txt("DOMAPTRIGGER\r\n");
+            vlog_txt("DOMAPTRIGGER\n");
             arg1=GetNum("DOMAPTRIGGER");
             if (!gffs) {
               return;
@@ -2699,7 +2699,7 @@ cry:
           }
           aa("dotrigger")
           {
-            vlog_txt("DOTRIGGER\r\n");
+            vlog_txt("DOTRIGGER\n");
             arg1=GetNum("DOTRIGGER");
             if (!gffs) {
               return;
@@ -2710,7 +2710,7 @@ cry:
           }
           aa("loadvar")
           {
-            vlog_txt("LOADVAR\r\n");
+            vlog_txt("LOADVAR\n");
             arg1=GetNum("LOADVAR");
             if (!gffs) {
               return;
@@ -2721,7 +2721,7 @@ cry:
           }
           aa("addvar")
           {
-            vlog_txt("ADDVAR\r\n");
+            vlog_txt("ADDVAR\n");
             arg1=GetNum("ADDVAR");
             if (!gffs) {
               return;
@@ -2732,7 +2732,7 @@ cry:
           }
           aa("random")
           {
-            vlog_txt("RANDOM\r\n");
+            vlog_txt("RANDOM\n");
             arg1=GetNum("RANDOM");
             if (!gffs) {
               return;
@@ -2743,7 +2743,7 @@ cry:
           }
           aa("copybytetovar")
           {
-            vlog_txt("COPYBYTETOVAR\r\n");
+            vlog_txt("COPYBYTETOVAR\n");
             arg1=GetNum("COPYBYTETOVAR");
             if (!gffs) {
               return;
@@ -2754,7 +2754,7 @@ cry:
           }
           aa("copyvartobyte")
           {
-            vlog_txt("COPYVARTOBYTE\r\n");
+            vlog_txt("COPYVARTOBYTE\n");
             arg1=GetNum("COPYVARTOBYTE");
             if (!gffs) {
               return;
@@ -2765,7 +2765,7 @@ cry:
           }
           aa("checkcode")
           {
-            vlog_txt("CHECKCODE\r\n");
+            vlog_txt("CHECKCODE\n");
             arg1=GetNum("CHECKCODE");
             if (!gffs) {
               return;
@@ -2776,7 +2776,7 @@ cry:
           }
           aa("writevarcode")
           {
-            vlog_txt("WRITEVARCODE\r\n");
+            vlog_txt("WRITEVARCODE\n");
             arg1=GetNum("WRITEVARCODE");
             if (!gffs) {
               return;
@@ -2787,7 +2787,7 @@ cry:
           }
           aa("writecode")
           {
-            vlog_txt("WRITECODE\r\n");
+            vlog_txt("WRITECODE\n");
             arg1=GetNum("WRITECODE");
             if (!gffs) {
               return;
@@ -2803,7 +2803,7 @@ cry:
           }
           aa("giveitem")
           {
-            vlog_txt("GIVEITEM\r\n");
+            vlog_txt("GIVEITEM\n");
             arg1=GetNum("GIVEITEM");
             if (!gffs) {
               return;
@@ -2819,7 +2819,7 @@ cry:
           }
           aa("takeitem")
           {
-            vlog_txt("TAKEITEM\r\n");
+            vlog_txt("TAKEITEM\n");
             arg1=GetNum("TAKEITEM");
             if (!gffs) {
               return;
@@ -2835,7 +2835,7 @@ cry:
           }
           aa("givemoney")
           {
-            vlog_txt("GIVEMONEY\r\n");
+            vlog_txt("GIVEMONEY\n");
             arg1=GetNum("GIVEMONEY");
             if (!gffs) {
               return;
@@ -2851,7 +2851,7 @@ cry:
           }
           aa("takemoney")
           {
-            vlog_txt("TAKEMONEY\r\n");
+            vlog_txt("TAKEMONEY\n");
             arg1=GetNum("TAKEMONEY");
             if (!gffs) {
               return;
@@ -2867,7 +2867,7 @@ cry:
           }
           aa("checkmoney")
           {
-            vlog_txt("CHECKMONEY\r\n");
+            vlog_txt("CHECKMONEY\n");
             arg1=GetNum("CHECKMONEY");
             if (!gffs) {
               return;
@@ -2883,7 +2883,7 @@ cry:
           }
           aa("checkitem")
           {
-            vlog_txt("CHECKITEM\r\n");
+            vlog_txt("CHECKITEM\n");
             arg1=GetNum("CHECKITEM");
             if (!gffs) {
               return;
@@ -2894,7 +2894,7 @@ cry:
           }
           aa("givephonenumber")
           {
-            vlog_txt("GIVEPHONENUMBER\r\n");
+            vlog_txt("GIVEPHONENUMBER\n");
             arg1=GetNum("GIVEPHONENUMBER");
             if (!gffs) {
               return;
@@ -2905,7 +2905,7 @@ cry:
           }
           aa("takephonenumber")
           {
-            vlog_txt("TAKEPHONENUMBER\r\n");
+            vlog_txt("TAKEPHONENUMBER\n");
             arg1=GetNum("TAKEPHONENUMBER");
             if (!gffs) {
               return;
@@ -2916,7 +2916,7 @@ cry:
           }
           aa("checkphonenumber")
           {
-            vlog_txt("CHECKPHONENUMBER\r\n");
+            vlog_txt("CHECKPHONENUMBER\n");
             arg1=GetNum("CHECKPHONENUMBER");
             if (!gffs) {
               return;
@@ -2927,7 +2927,7 @@ cry:
           }
           aa("checktime")
           {
-            vlog_txt("CHECKTIME\r\n");
+            vlog_txt("CHECKTIME\n");
             arg1=GetNum("CHECKTIME");
             if (!gffs) {
               return;
@@ -2938,7 +2938,7 @@ cry:
           }
           aa("checkpoke")
           {
-            vlog_txt("CHECKPOKE\r\n");
+            vlog_txt("CHECKPOKE\n");
             arg1=GetNum("CHECKPOKE");
             if (!gffs) {
               return;
@@ -2949,7 +2949,7 @@ cry:
           }
           aa("givepoke")
           {
-            vlog_txt("GIVEPOKE\r\n");
+            vlog_txt("GIVEPOKE\n");
             arg1=GetNum("GIVEPOKE");
             if (!gffs) {
               return;
@@ -2991,7 +2991,7 @@ cry:
           }
           aa("giveegg")
           {
-            vlog_txt("GIVEEGG\r\n");
+            vlog_txt("GIVEEGG\n");
             arg1=GetNum("GIVEEGG");
             if (!gffs) {
               return;
@@ -3007,7 +3007,7 @@ cry:
           }
           aa("givepokeitem")
           {
-            vlog_txt("GIVEPOKEITEM\r\n");
+            vlog_txt("GIVEPOKEITEM\n");
             arg1=GetNum("GIVEPOKEITEM");
             if (!gffs) {
               return;
@@ -3018,7 +3018,7 @@ cry:
           }
           aa("takeifletter")
           {
-            vlog_txt("TAKEIFLETTER\r\n");
+            vlog_txt("TAKEIFLETTER\n");
             arg1=GetNum("TAKEIFLETTER");
             if (!gffs) {
               return;
@@ -3029,7 +3029,7 @@ cry:
           }
           aa("checkbit1")
           {
-            vlog_txt("CHECKBIT1\r\n");
+            vlog_txt("CHECKBIT1\n");
             arg1=GetNum("CHECKBIT1");
             if (!gffs) {
               return;
@@ -3040,7 +3040,7 @@ cry:
           }
           aa("clearbit1")
           {
-            vlog_txt("CLEARBIT1\r\n");
+            vlog_txt("CLEARBIT1\n");
             arg1=GetNum("CLEARBIT1");
             if (!gffs) {
               return;
@@ -3051,7 +3051,7 @@ cry:
           }
           aa("setbit1")
           {
-            vlog_txt("SETBIT1\r\n");
+            vlog_txt("SETBIT1\n");
             arg1=GetNum("SETBIT1");
             if (!gffs) {
               return;
@@ -3062,7 +3062,7 @@ cry:
           }
           aa("checkbit2")
           {
-            vlog_txt("CHECKBIT2\r\n");
+            vlog_txt("CHECKBIT2\n");
             arg1=GetNum("CHECKBIT2");
             if (!gffs) {
               return;
@@ -3073,7 +3073,7 @@ cry:
           }
           aa("clearbit2")
           {
-            vlog_txt("CLEARBIT2\r\n");
+            vlog_txt("CLEARBIT2\n");
             arg1=GetNum("CLEARBIT2");
             if (!gffs) {
               return;
@@ -3084,7 +3084,7 @@ cry:
           }
           aa("setbit2")
           {
-            vlog_txt("SETBIT2\r\n");
+            vlog_txt("SETBIT2\n");
             arg1=GetNum("SETBIT2");
             if (!gffs) {
               return;
@@ -3095,7 +3095,7 @@ cry:
           }
           aa("givecoins")
           {
-            vlog_txt("GIVECOINS\r\n");
+            vlog_txt("GIVECOINS\n");
             arg1=GetNum("GIVECOINS");
             if (!gffs) {
               return;
@@ -3106,7 +3106,7 @@ cry:
           }
           aa("takecoins")
           {
-            vlog_txt("TAKECOINS\r\n");
+            vlog_txt("TAKECOINS\n");
             arg1=GetNum("TAKECOINS");
             if (!gffs) {
               return;
@@ -3117,7 +3117,7 @@ cry:
           }
           aa("checkcoins")
           {
-            vlog_txt("CHECKCOINS\r\n");
+            vlog_txt("CHECKCOINS\n");
             arg1=GetNum("CHECKCOINS");
             if (!gffs) {
               return;
@@ -3128,7 +3128,7 @@ cry:
           }
           aa("xycompare")
           {
-            vlog_txt("XYCOMPARE\r\n");
+            vlog_txt("XYCOMPARE\n");
             arg1=GetNum("XYCOMPARE");
             if (!gffs) {
               return;
@@ -3139,7 +3139,7 @@ cry:
           }
           aa("warpmod")
           {
-            vlog_txt("WARPMOD\r\n");
+            vlog_txt("WARPMOD\n");
             arg1=GetNum("WARPMOD");
             if (!gffs) {
               return;
@@ -3160,7 +3160,7 @@ cry:
           }
           aa("warp")
           {
-            vlog_txt("WARP\r\n");
+            vlog_txt("WARP\n");
             arg1=GetNum("WARP");
             if (!gffs) {
               return;
@@ -3186,7 +3186,7 @@ cry:
           }
           aa("warpfacing")
           {
-            vlog_txt("WARPFACING\r\n");
+            vlog_txt("WARPFACING\n");
             arg1=GetNum("WARPFACING");
             if (!gffs) {
               return;
@@ -3217,7 +3217,7 @@ cry:
           }
           aa("blackoutmod")
           {
-            vlog_txt("BLACKOUTMOD\r\n");
+            vlog_txt("BLACKOUTMOD\n");
             arg1=GetNum("BLACKOUTMOD");
             if (!gffs) {
               return;
@@ -3233,7 +3233,7 @@ cry:
           }
           aa("moneytotext")
           {
-            vlog_txt("MONEYTOTEXT\r\n");
+            vlog_txt("MONEYTOTEXT\n");
             arg1=GetNum("MONEYTOTEXT");
             if (!gffs) {
               return;
@@ -3249,7 +3249,7 @@ cry:
           }
           aa("coinstotext")
           {
-            vlog_txt("COINSTOTEXT\r\n");
+            vlog_txt("COINSTOTEXT\n");
             arg1=GetNum("COINSTOTEXT");
             if (!gffs) {
               return;
@@ -3260,7 +3260,7 @@ cry:
           }
           aa("vartotext")
           {
-            vlog_txt("VARTOTEXT\r\n");
+            vlog_txt("VARTOTEXT\n");
             arg1=GetNum("VARTOTEXT");
             if (!gffs) {
               return;
@@ -3271,7 +3271,7 @@ cry:
           }
           aa("poketotext")
           {
-            vlog_txt("POKETOTEXT\r\n");
+            vlog_txt("POKETOTEXT\n");
             arg1=GetNum("POKETOTEXT");
             if (!gffs) {
               return;
@@ -3287,7 +3287,7 @@ cry:
           }
           aa("itemtotext")
           {
-            vlog_txt("ITEMTOTEXT\r\n");
+            vlog_txt("ITEMTOTEXT\n");
             arg1=GetNum("ITEMTOTEXT");
             if (!gffs) {
               return;
@@ -3303,7 +3303,7 @@ cry:
           }
           aa("locationtotext")
           {
-            vlog_txt("LOCATIONTOTEXT\r\n");
+            vlog_txt("LOCATIONTOTEXT\n");
             arg1=GetNum("LOCATIONTOTEXT");
             if (!gffs) {
               return;
@@ -3314,7 +3314,7 @@ cry:
           }
           aa("trainertotext")
           {
-            vlog_txt("TRAINERTOTEXT\r\n");
+            vlog_txt("TRAINERTOTEXT\n");
             arg1=GetNum("TRAINERTOTEXT");
             if (!gffs) {
               return;
@@ -3335,7 +3335,7 @@ cry:
           }
           aa("stringtotext")
           {
-            vlog_txt("STRINGTOTEXT\r\n");
+            vlog_txt("STRINGTOTEXT\n");
             arg1=GetNum("STRINGTOTEXT");
             if (!gffs) {
               return;
@@ -3351,7 +3351,7 @@ cry:
           }
           aa("refreshscreen")
           {
-            vlog_txt("REFRESHSCREEN\r\n");
+            vlog_txt("REFRESHSCREEN\n");
             arg1=GetNum("REFRESHSCREEN");
             if (!gffs) {
               return;
@@ -3362,7 +3362,7 @@ cry:
           }
           aa("c1celoadbyte")
           {
-            vlog_txt("C1CELOADBYTE\r\n");
+            vlog_txt("C1CELOADBYTE\n");
             arg1=GetNum("C1CELOADBYTE");
             if (!gffs) {
               return;
@@ -3373,7 +3373,7 @@ cry:
           }
           aa("3writetext")
           {
-            vlog_txt("3WRITETEXT\r\n");
+            vlog_txt("3WRITETEXT\n");
             arg1=GetNum("3WRITETEXT");
             if (!gffs) {
               return;
@@ -3384,7 +3384,7 @@ cry:
           }
           aa("2writetext")
           {
-            vlog_txt("2WRITETEXT\r\n");
+            vlog_txt("2WRITETEXT\n");
             arg1=GetNum("2WRITETEXT");
             if (!gffs) {
               return;
@@ -3395,7 +3395,7 @@ cry:
           }
           aa("repeattext")
           {
-            vlog_txt("REPEATTEXT\r\n");
+            vlog_txt("REPEATTEXT\n");
             arg1=GetNum("REPEATTEXT");
             if (!gffs) {
               return;
@@ -3406,7 +3406,7 @@ cry:
           }
           aa("loadmenudata")
           {
-            vlog_txt("LOADMENUDATA\r\n");
+            vlog_txt("LOADMENUDATA\n");
             arg1=GetNum("LOADMENUDATA");
             if (!gffs) {
               return;
@@ -3417,7 +3417,7 @@ cry:
           }
           aa("jumptextfaceplayer")
           {
-            vlog_txt("JUMPTEXTFACEPLAYER\r\n");
+            vlog_txt("JUMPTEXTFACEPLAYER\n");
             arg1=GetNum("JUMPTEXTFACEPLAYER");
             if (!gffs) {
               return;
@@ -3428,7 +3428,7 @@ cry:
           }
           aa("jumptext")
           {
-            vlog_txt("JUMPTEXT\r\n");
+            vlog_txt("JUMPTEXT\n");
             arg1=GetNum("JUMPTEXT");
             if (!gffs) {
               return;
@@ -3439,7 +3439,7 @@ cry:
           }
           aa("pokepic")
           {
-            vlog_txt("POKEPIC\r\n");
+            vlog_txt("POKEPIC\n");
             arg1=GetNum("POKEPIC");
             if (!gffs) {
               return;
@@ -3450,7 +3450,7 @@ cry:
           }
           aa("loadpokedata")
           {
-            vlog_txt("LOADPOKEDATA\r\n");
+            vlog_txt("LOADPOKEDATA\n");
             arg1=GetNum("LOADPOKEDATA");
             if (!gffs) {
               return;
@@ -3466,7 +3466,7 @@ cry:
           }
           aa("loadtrainer")
           {
-            vlog_txt("LOADTRAINER\r\n");
+            vlog_txt("LOADTRAINER\n");
             arg1=GetNum("LOADTRAINER");
             if (!gffs) {
               return;
@@ -3482,7 +3482,7 @@ cry:
           }
           aa("catchtutorial")
           {
-            vlog_txt("CATCHTUTORIAL\r\n");
+            vlog_txt("CATCHTUTORIAL\n");
             arg1=GetNum("CATCHTUTORIAL");
             if (!gffs) {
               return;
@@ -3493,7 +3493,7 @@ cry:
           }
           aa("trainertext")
           {
-            vlog_txt("TRAINERTEXT\r\n");
+            vlog_txt("TRAINERTEXT\n");
             arg1=GetNum("TRAINERTEXT");
             if (!gffs) {
               return;
@@ -3504,7 +3504,7 @@ cry:
           }
           aa("trainerstatus")
           {
-            vlog_txt("TRAINERSTATUS\r\n");
+            vlog_txt("TRAINERSTATUS\n");
             arg1=GetNum("TRAINERSTATUS");
             if (!gffs) {
               return;
@@ -3515,7 +3515,7 @@ cry:
           }
           aa("winlosstext")
           {
-            vlog_txt("WINLOSSTEXT\r\n");
+            vlog_txt("WINLOSSTEXT\n");
             arg1=GetNum("WINLOSSTEXT");
             if (!gffs) {
               return;
@@ -3531,7 +3531,7 @@ cry:
           }
           aa("setlasttalked")
           {
-            vlog_txt("SETLASTTALKED\r\n");
+            vlog_txt("SETLASTTALKED\n");
             arg1=GetNum("SETLASTTALKED");
             if (!gffs) {
               return;
@@ -3542,7 +3542,7 @@ cry:
           }
           aa("applymovement")
           {
-            vlog_txt("APPLYMOVEMENT\r\n");
+            vlog_txt("APPLYMOVEMENT\n");
             arg1=GetNum("APPLYMOVEMENT");
             if (!gffs) {
               return;
@@ -3558,7 +3558,7 @@ cry:
           }
           aa("applymoveother")
           {
-            vlog_txt("APPLYMOVEOTHER\r\n");
+            vlog_txt("APPLYMOVEOTHER\n");
             arg1=GetNum("APPLYMOVEOTHER");
             if (!gffs) {
               return;
@@ -3569,7 +3569,7 @@ cry:
           }
           aa("faceperson")
           {
-            vlog_txt("FACEPERSON\r\n");
+            vlog_txt("FACEPERSON\n");
             arg1=GetNum("FACEPERSON");
             if (!gffs) {
               return;
@@ -3585,7 +3585,7 @@ cry:
           }
           aa("variablesprite")
           {
-            vlog_txt("VARIABLESPRITE\r\n");
+            vlog_txt("VARIABLESPRITE\n");
             arg1=GetNum("VARIABLESPRITE");
             if (!gffs) {
               return;
@@ -3601,7 +3601,7 @@ cry:
           }
           aa("disappear")
           {
-            vlog_txt("DISAPPEAR\r\n");
+            vlog_txt("DISAPPEAR\n");
             arg1=GetNum("DISAPPEAR");
             if (!gffs) {
               return;
@@ -3612,7 +3612,7 @@ cry:
           }
           aa("appear")
           {
-            vlog_txt("APPEAR\r\n");
+            vlog_txt("APPEAR\n");
             arg1=GetNum("APPEAR");
             if (!gffs) {
               return;
@@ -3623,7 +3623,7 @@ cry:
           }
           aa("follow")
           {
-            vlog_txt("FOLLOW\r\n");
+            vlog_txt("FOLLOW\n");
             arg1=GetNum("FOLLOW");
             if (!gffs) {
               return;
@@ -3639,7 +3639,7 @@ cry:
           }
           aa("moveperson")
           {
-            vlog_txt("MOVEPERSON\r\n");
+            vlog_txt("MOVEPERSON\n");
             arg1=GetNum("MOVEPERSON");
             if (!gffs) {
               return;
@@ -3660,7 +3660,7 @@ cry:
           }
           aa("writepersonloc")
           {
-            vlog_txt("WRITEPERSONLOC\r\n");
+            vlog_txt("WRITEPERSONLOC\n");
             arg1=GetNum("WRITEPERSONLOC");
             if (!gffs) {
               return;
@@ -3671,7 +3671,7 @@ cry:
           }
           aa("loademote")
           {
-            vlog_txt("LOADEMOTE\r\n");
+            vlog_txt("LOADEMOTE\n");
             arg1=GetNum("LOADEMOTE");
             if (!gffs) {
               return;
@@ -3682,7 +3682,7 @@ cry:
           }
           aa("showemote")
           {
-            vlog_txt("SHOWEMOTE\r\n");
+            vlog_txt("SHOWEMOTE\n");
             arg1=GetNum("SHOWEMOTE");
             if (!gffs) {
               return;
@@ -3703,7 +3703,7 @@ cry:
           }
           aa("spriteface")
           {
-            vlog_txt("SPRITEFACE\r\n");
+            vlog_txt("SPRITEFACE\n");
             arg1=GetNum("SPRITEFACE");
             if (!gffs) {
               return;
@@ -3719,7 +3719,7 @@ cry:
           }
           aa("follownotexact")
           {
-            vlog_txt("FOLLOWNOTEXACT\r\n");
+            vlog_txt("FOLLOWNOTEXACT\n");
             arg1=GetNum("FOLLOWNOTEXACT");
             if (!gffs) {
               return;
@@ -3735,7 +3735,7 @@ cry:
           }
           aa("earthquake")
           {
-            vlog_txt("EARTHQUAKE\r\n");
+            vlog_txt("EARTHQUAKE\n");
             arg1=GetNum("EARTHQUAKE");
             if (!gffs) {
               return;
@@ -3746,7 +3746,7 @@ cry:
           }
           aa("swapmaps")
           {
-            vlog_txt("SWAPMAPS\r\n");
+            vlog_txt("SWAPMAPS\n");
             arg1=GetNum("SWAPMAPS");
             if (!gffs) {
               return;
@@ -3757,7 +3757,7 @@ cry:
           }
           aa("changeblock")
           {
-            vlog_txt("CHANGEBLOCK\r\n");
+            vlog_txt("CHANGEBLOCK\n");
             arg1=GetNum("CHANGEBLOCK");
             if (!gffs) {
               return;
@@ -3778,7 +3778,7 @@ cry:
           }
           aa("writecmdqueue")
           {
-            vlog_txt("WRITECMDQUEUE\r\n");
+            vlog_txt("WRITECMDQUEUE\n");
             arg1=GetNum("WRITECMDQUEUE");
             if (!gffs) {
               return;
@@ -3789,7 +3789,7 @@ cry:
           }
           aa("delcmdqueue")
           {
-            vlog_txt("DELCMDQUEUE\r\n");
+            vlog_txt("DELCMDQUEUE\n");
             arg1=GetNum("DELCMDQUEUE");
             if (!gffs) {
               return;
@@ -3800,7 +3800,7 @@ cry:
           }
           aa("playmusic")
           {
-            vlog_txt("PLAYMUSIC\r\n");
+            vlog_txt("PLAYMUSIC\n");
             arg1=GetNum("PLAYMUSIC");
             if (!gffs) {
               return;
@@ -3811,7 +3811,7 @@ cry:
           }
           aa("musicfadeout")
           {
-            vlog_txt("MUSICFADEOUT\r\n");
+            vlog_txt("MUSICFADEOUT\n");
             arg1=GetNum("MUSICFADEOUT");
             if (!gffs) {
               return;
@@ -3827,7 +3827,7 @@ cry:
           }
           aa("cry")
           {
-            vlog_txt("CRY\r\n");
+            vlog_txt("CRY\n");
             arg1=GetNum("CRY");
             if (!gffs) {
               return;
@@ -3838,7 +3838,7 @@ cry:
           }
           aa("playsound")
           {
-            vlog_txt("PLAYSOUND\r\n");
+            vlog_txt("PLAYSOUND\n");
             arg1=GetNum("PLAYSOUND");
             if (!gffs) {
               return;
@@ -3849,7 +3849,7 @@ cry:
           }
           aa("passtoengine")
           {
-            vlog_txt("PASSTOENGINE\r\n");
+            vlog_txt("PASSTOENGINE\n");
             arg1=GetNum("PASSTOENGINE");
             if (!gffs) {
               return;
@@ -3860,7 +3860,7 @@ cry:
           }
           aa("newloadmap")
           {
-            vlog_txt("NEWLOADMAP\r\n");
+            vlog_txt("NEWLOADMAP\n");
             arg1=GetNum("NEWLOADMAP");
             if (!gffs) {
               return;
@@ -3871,7 +3871,7 @@ cry:
           }
           aa("pause")
           {
-            vlog_txt("PAUSE\r\n");
+            vlog_txt("PAUSE\n");
             arg1=GetNum("PAUSE");
             if (!gffs) {
               return;
@@ -3882,7 +3882,7 @@ cry:
           }
           aa("deactivatefacing")
           {
-            vlog_txt("DEACTIVATEFACING\r\n");
+            vlog_txt("DEACTIVATEFACING\n");
             arg1=GetNum("DEACTIVATEFACING");
             if (!gffs) {
               return;
@@ -3893,7 +3893,7 @@ cry:
           }
           aa("priorityjump")
           {
-            vlog_txt("PRIORITYJUMP\r\n");
+            vlog_txt("PRIORITYJUMP\n");
             arg1=GetNum("PRIORITYJUMP");
             if (!gffs) {
               return;
@@ -3904,7 +3904,7 @@ cry:
           }
           aa("ptpriorityjump")
           {
-            vlog_txt("PTPRIORITYJUMP\r\n");
+            vlog_txt("PTPRIORITYJUMP\n");
             arg1=GetNum("PTPRIORITYJUMP");
             if (!gffs) {
               return;
@@ -3915,7 +3915,7 @@ cry:
           }
           aa("pokemart")
           {
-            vlog_txt("POKEMART\r\n");
+            vlog_txt("POKEMART\n");
             arg1=GetNum("POKEMART");
             if (!gffs) {
               return;
@@ -3931,7 +3931,7 @@ cry:
           }
           aa("elevator")
           {
-            vlog_txt("ELEVATOR\r\n");
+            vlog_txt("ELEVATOR\n");
             arg1=GetNum("ELEVATOR");
             if (!gffs) {
               return;
@@ -3942,7 +3942,7 @@ cry:
           }
           aa("trade")
           {
-            vlog_txt("TRADE\r\n");
+            vlog_txt("TRADE\n");
             arg1=GetNum("TRADE");
             if (!gffs) {
               return;
@@ -3953,7 +3953,7 @@ cry:
           }
           aa("askforphonenumber")
           {
-            vlog_txt("ASKFORPHONENUMBER\r\n");
+            vlog_txt("ASKFORPHONENUMBER\n");
             arg1=GetNum("ASKFORPHONENUMBER");
             if (!gffs) {
               return;
@@ -3964,7 +3964,7 @@ cry:
           }
           aa("phonecall")
           {
-            vlog_txt("PHONECALL\r\n");
+            vlog_txt("PHONECALL\n");
             arg1=GetNum("PHONECALL");
             if (!gffs) {
               return;
@@ -3975,7 +3975,7 @@ cry:
           }
           aa("describedecoration")
           {
-            vlog_txt("DESCRIBEDECORATION\r\n");
+            vlog_txt("DESCRIBEDECORATION\n");
             arg1=GetNum("DESCRIBEDECORATION");
             if (!gffs) {
               return;
@@ -3986,7 +3986,7 @@ cry:
           }
           aa("fruittree")
           {
-            vlog_txt("FRUITTREE\r\n");
+            vlog_txt("FRUITTREE\n");
             arg1=GetNum("FRUITTREE");
             if (!gffs) {
               return;
@@ -3997,7 +3997,7 @@ cry:
           }
           aa("specialphonecall")
           {
-            vlog_txt("SPECIALPHONECALL\r\n");
+            vlog_txt("SPECIALPHONECALL\n");
             arg1=GetNum("SPECIALPHONECALL");
             if (!gffs) {
               return;
@@ -4008,7 +4008,7 @@ cry:
           }
           aa("verbosegiveitem")
           {
-            vlog_txt("VERBOSEGIVEITEM\r\n");
+            vlog_txt("VERBOSEGIVEITEM\n");
             arg1=GetNum("VERBOSEGIVEITEM");
             if (!gffs) {
               return;
@@ -4024,7 +4024,7 @@ cry:
           }
           aa("loadwilddata")
           {
-            vlog_txt("LOADWILDDATA\r\n");
+            vlog_txt("LOADWILDDATA\n");
             arg1=GetNum("LOADWILDDATA");
             if (!gffs) {
               return;
@@ -4040,7 +4040,7 @@ cry:
           }
           aa("storetext")
           {
-            vlog_txt("STORETEXT\r\n");
+            vlog_txt("STORETEXT\n");
             arg1=GetNum("STORETEXT");
             if (!gffs) {
               return;
@@ -4061,7 +4061,7 @@ cry:
           }
           aa("displaylocation")
           {
-            vlog_txt("DISPLAYLOCATION\r\n");
+            vlog_txt("DISPLAYLOCATION\n");
             arg1=GetNum("DISPLAYLOCATION");
             if (!gffs) {
               return;
@@ -4072,7 +4072,7 @@ cry:
           }
           aa("writebyte")
           {
-            vlog_txt("WRITEBYTE\r\n");
+            vlog_txt("WRITEBYTE\n");
             arg1=GetNum("WRITEBYTE");
             if (!gffs) {
               return;
@@ -4095,30 +4095,30 @@ cry:
           }
           aa("m")
           {
-            vlog_txt("Movement data...\r\n");
+            vlog_txt("Movement data...\n");
             add_data(c,trans,transbackmove(Script,&i));
             ec();
           }
           aa("=")
           {
-            vlog_txt("[STRING]\r\n");
+            vlog_txt("[STRING]\n");
             if (chr==' ') {
               i++;
             }
             else {
-              log_txt("Should have a space after the =\r\n",33);
+              log_txt("Should have a space after the =\n", 33-1);
             }
             temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
-            sprintf(buf2,"   -> %s\r\n",(char*)temp_ptr);
+            sprintf(buf2,"   -> %s\n",(char*)temp_ptr);
             free(temp_ptr);
             vlog_txt(buf2);
           }
           aa(".")
           {
-            vlog_txt("[BINARY]\r\n   ->");
+            vlog_txt("[BINARY]\n   ->");
             i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
@@ -4136,7 +4136,7 @@ cry:
               }
               if (((char*)("0123456789abcdef"))[j]==0)
               {
-                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                sprintf(buf2,"Failed to understand hex character '%c'\n",chr);
                 log_txt(buf2,strlen(buf2));
                 return;
               }
@@ -4156,11 +4156,11 @@ cry:
               }
               i++;
             }
-            vlog_txt("\r\n");
+            vlog_txt("\n");
           }
           else
           {
-            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            sprintf(buf2,"Warning: Unknown command \"%s\"\n",buf);
             log_txt(buf2,strlen(buf2));
             while (chr!='\n'&&chr!=0)
             {
@@ -4200,11 +4200,11 @@ cry:
           buf[j]=0;
           if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
           {
-            vlog_txt("#DEFINE\r\n");
+            vlog_txt("#DEFINE\n");
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             j=0;
@@ -4215,12 +4215,12 @@ cry:
               j++;
             }
             buf[j]=0; //Append null
-            sprintf(buf2,"   -> %s\r\n",buf);
+            sprintf(buf2,"   -> %s\n",buf);
             vlog_txt(buf2);
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Premature end to #DEFINE!\r\n",27);
+              log_txt("Premature end to #DEFINE!\n", 27-1);
               return;
             }
             k=GetNum("#DEFINE");
@@ -4232,7 +4232,7 @@ cry:
           }
           aa("#dyn")
           {
-            vlog_txt("#DYN\r\n");
+            vlog_txt("#DYN\n");
             start=GetNum("#DYN");
             if (!gffs)return;
             dyntype=0;
@@ -4241,7 +4241,7 @@ cry:
           }
           aa("#dyn2")
           {
-            vlog_txt("#DYN2\r\n");
+            vlog_txt("#DYN2\n");
             start=GetNum("#DYN2");
             if (!gffs)return;
             dyntype=1;
@@ -4249,7 +4249,7 @@ cry:
           }
           aa("#dynamic")
           {
-            vlog_txt("#DYNAMIC\r\n");
+            vlog_txt("#DYNAMIC\n");
             start=GetNum("#DYNAMIC");
             if (!gffs)return;
             dyntype=0;
@@ -4259,14 +4259,14 @@ cry:
           aa("#org")
           {
             eorg=0;
-            vlog_txt("#ORG\r\n");
+            vlog_txt("#ORG\n");
             i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
             {
               if(start==0)
               {
-                log_txt("Need #dyn with dynamic offsets\r\n",32);
+                log_txt("Need #dyn with dynamic offsets\n", 32-1);
                 return;
               }
               dynu=1;
@@ -4278,7 +4278,7 @@ cry:
                 j++;
               }
               buf[j]=0;
-              sprintf(buf2,"   -> %s\r\n",buf);
+              sprintf(buf2,"   -> %s\n",buf);
               vlog_txt(buf2);
             }
             else
@@ -4301,7 +4301,7 @@ cry:
           aa("#eorg")
           {
             eorg=1;
-            vlog_txt("#EORG\r\n");
+            vlog_txt("#EORG\n");
             i = skip_whitespace(Script, i);
             buf[0]=0;
             if (chr=='@')
@@ -4314,7 +4314,7 @@ cry:
                 j++;
               }
               buf[j]=0;
-              sprintf(buf2,"   -> %s\r\n",buf);
+              sprintf(buf2,"   -> %s\n",buf);
               vlog_txt(buf2);
             }
             else
@@ -4382,7 +4382,7 @@ gsc:
           }
           aa("#raw")
           {
-            vlog_txt("#RAW\r\n");
+            vlog_txt("#RAW\n");
             arg1=1;
             while(arg1)
             {
@@ -4398,7 +4398,7 @@ gsc:
           }
           else if(!strcmp(buf,"#2ptr")||!strcmp(buf,"#word"))
           {
-            vlog_txt("#2PTR\r\n");
+            vlog_txt("#2PTR\n");
             arg1=1;
             while(arg1)
             {
@@ -4414,7 +4414,7 @@ gsc:
           }
           aa("#3ptr")
           {
-            vlog_txt("#3PTR\r\n");
+            vlog_txt("#3PTR\n");
             arg1=1;
             while(arg1)
             {
@@ -4430,7 +4430,7 @@ gsc:
           }
           aa("#dword")
           {
-            vlog_txt("#DWORD\r\n");
+            vlog_txt("#DWORD\n");
             arg1=1;
             while(arg1)
             {
@@ -4674,7 +4674,7 @@ gsc:
           }
           aa("2call")
           {
-            vlog_txt("2CALL\r\n");
+            vlog_txt("2CALL\n");
             BASIC(GLD_2CALL);
             arg1=GetNum("2CALL");
             if (!gffs) {
@@ -4685,7 +4685,7 @@ gsc:
           }
           aa("3call")
           {
-            vlog_txt("3CALL\r\n");
+            vlog_txt("3CALL\n");
             BASIC(GLD_3CALL);
             arg1=GetNum("3CALL");
             if (!gffs) {
@@ -4696,7 +4696,7 @@ gsc:
           }
           aa("2ptcall")
           {
-            vlog_txt("2PTCALL\r\n");
+            vlog_txt("2PTCALL\n");
             BASIC(GLD_2PTCALL);
             arg1=GetNum("2PTCALL");
             if (!gffs) {
@@ -4707,7 +4707,7 @@ gsc:
           }
           aa("2jump")
           {
-            vlog_txt("2JUMP\r\n");
+            vlog_txt("2JUMP\n");
             BASIC(GLD_2JUMP);
             arg1=GetNum("2JUMP");
             if (!gffs) {
@@ -4718,7 +4718,7 @@ gsc:
           }
           aa("3jump")
           {
-            vlog_txt("3JUMP\r\n");
+            vlog_txt("3JUMP\n");
             BASIC(GLD_3JUMP);
             arg1=GetNum("3JUMP");
             if (!gffs) {
@@ -4729,7 +4729,7 @@ gsc:
           }
           aa("2ptjump")
           {
-            vlog_txt("2PTJUMP\r\n");
+            vlog_txt("2PTJUMP\n");
             BASIC(GLD_2PTJUMP);
             arg1=GetNum("2PTJUMP");
             if (!gffs) {
@@ -4740,7 +4740,7 @@ gsc:
           }
           aa("text-ram")
           {
-            vlog_txt("TEXT-RAM\r\n");
+            vlog_txt("TEXT-RAM\n");
             BASIC(1);
             arg1=GetNum("TEXT-RAM");
             if (!gffs) {
@@ -4751,7 +4751,7 @@ gsc:
           }
           aa("text-reloc")
           {
-            vlog_txt("TEXT-RELOC\r\n");
+            vlog_txt("TEXT-RELOC\n");
             BASIC(3);
             arg1=GetNum("TEXT-RELOC");
             if (!gffs) {
@@ -4762,7 +4762,7 @@ gsc:
           }
           aa("text-box")
           {
-            vlog_txt("TEXT-BOX\r\n");
+            vlog_txt("TEXT-BOX\n");
             BASIC(4);
             arg1=GetNum("TEXT-BOX");
             if (!gffs) {
@@ -4783,7 +4783,7 @@ gsc:
           }
           aa("text-interpretxdata")
           {
-            vlog_txt("TEXT-INTERPRETXDATA\r\n");
+            vlog_txt("TEXT-INTERPRETXDATA\n");
             BASIC(12);
             arg1=GetNum("TEXT-INTERPRETXDATA");
             if (!gffs) {
@@ -4794,7 +4794,7 @@ gsc:
           }
           aa("text-buffer")
           {
-            vlog_txt("TEXT-BUFFER\r\n");
+            vlog_txt("TEXT-BUFFER\n");
             BASIC(20);
             arg1=GetNum("TEXT-BUFFER");
             if (!gffs) {
@@ -4805,7 +4805,7 @@ gsc:
           }
           aa("text-newtxt")
           {
-            vlog_txt("TEXT-NEWTXT\r\n");
+            vlog_txt("TEXT-NEWTXT\n");
             BASIC(22);
             arg1=GetNum("TEXT-NEWTXT");
             if (!gffs) {
@@ -4817,7 +4817,7 @@ gsc:
           }
           aa("text-number")
           {
-            vlog_txt("TEXT-NUMBER\r\n");
+            vlog_txt("TEXT-NUMBER\n");
             BASIC(9);
             arg1=GetNum("TEXT-NUMBER");
             if (!gffs) {
@@ -4837,7 +4837,7 @@ gsc:
           }
           aa("text-hex")
           {
-            vlog_txt("TEXT-HEX\r\n");
+            vlog_txt("TEXT-HEX\n");
             BASIC(2);
             arg1=GetNum("TEXT-HEX");
             if (!gffs) {
@@ -4884,7 +4884,7 @@ gsc:
             }
             else
             {
-              log_txt("Incorrect arguments to text-hex\r\n",33);
+              log_txt("Incorrect arguments to text-hex\n", 33-1);
               return;
             }
             rom(arg2,1);
@@ -4892,11 +4892,11 @@ gsc:
           }
           aa("if")
           {
-            vlog_txt("IF\r\n");
+            vlog_txt("IF\n");
             i = skip_whitespace(Script, i);
             if (chr=='\n'||chr==0||chr=='\'')
             {
-              log_txt("Incorrect arguments to IF.\r\n",28);
+              log_txt("Incorrect arguments to IF.\n", 28-1);
             }
             j=0;
             while (chr!='\n'&&chr!=' '&&chr!=0&&chr!='\'')
@@ -4935,7 +4935,7 @@ gsc:
             }
             else
             {
-              log_txt("Incorrect arguments to IF\r\n",29);
+              log_txt("Incorrect arguments to IF\n", 29-1);
               return;
             }
             if (arg1!=-1)
@@ -4956,7 +4956,7 @@ gsc:
           }
           aa("jumpstd")
           {
-            vlog_txt("JUMPSTD\r\n");
+            vlog_txt("JUMPSTD\n");
             BASIC(GLD_JUMPSTD);
             arg1=GetNum("JUMPSTD");
             if (!gffs) {
@@ -4967,7 +4967,7 @@ gsc:
           }
           aa("callstd")
           {
-            vlog_txt("CALLSTD\r\n");
+            vlog_txt("CALLSTD\n");
             BASIC(GLD_CALLSTD);
             arg1=GetNum("CALLSTD");
             if (!gffs) {
@@ -4978,7 +4978,7 @@ gsc:
           }
           aa("3callasm")
           {
-            vlog_txt("3CALLASM\r\n");
+            vlog_txt("3CALLASM\n");
             BASIC(GLD_3CALLASM);
             arg1=GetNum("3CALLASM");
             if (!gffs) {
@@ -4989,7 +4989,7 @@ gsc:
           }
           aa("special")
           {
-            vlog_txt("SPECIAL\r\n");
+            vlog_txt("SPECIAL\n");
             BASIC(GLD_SPECIAL);
             arg1=GetNum("SPECIAL");
             if (!gffs) {
@@ -5000,7 +5000,7 @@ gsc:
           }
           aa("2ptcallasm")
           {
-            vlog_txt("2PTCALLASM\r\n");
+            vlog_txt("2PTCALLASM\n");
             BASIC(GLD_2PTCALLASM);
             arg1=GetNum("2PTCALLASM");
             if (!gffs) {
@@ -5011,7 +5011,7 @@ gsc:
           }
           aa("checkmaptriggers")
           {
-            vlog_txt("CHECKMAPTRIGGERS\r\n");
+            vlog_txt("CHECKMAPTRIGGERS\n");
             BASIC(GLD_CHECKMAPTRIGGERS);
             arg1=GetNum("CHECKMAPTRIGGERS");
             if (!gffs) {
@@ -5027,7 +5027,7 @@ gsc:
           }
           aa("domaptrigger")
           {
-            vlog_txt("DOMAPTRIGGER\r\n");
+            vlog_txt("DOMAPTRIGGER\n");
             BASIC(GLD_DOMAPTRIGGER);
             arg1=GetNum("DOMAPTRIGGER");
             if (!gffs) {
@@ -5048,7 +5048,7 @@ gsc:
           }
           aa("dotrigger")
           {
-            vlog_txt("DOTRIGGER\r\n");
+            vlog_txt("DOTRIGGER\n");
             BASIC(GLD_DOTRIGGER);
             arg1=GetNum("DOTRIGGER");
             if (!gffs) {
@@ -5059,7 +5059,7 @@ gsc:
           }
           aa("loadvar")
           {
-            vlog_txt("LOADVAR\r\n");
+            vlog_txt("LOADVAR\n");
             BASIC(GLD_LOADVAR);
             arg1=GetNum("LOADVAR");
             if (!gffs) {
@@ -5070,7 +5070,7 @@ gsc:
           }
           aa("addvar")
           {
-            vlog_txt("ADDVAR\r\n");
+            vlog_txt("ADDVAR\n");
             BASIC(GLD_ADDVAR);
             arg1=GetNum("ADDVAR");
             if (!gffs) {
@@ -5081,7 +5081,7 @@ gsc:
           }
           aa("random")
           {
-            vlog_txt("RANDOM\r\n");
+            vlog_txt("RANDOM\n");
             BASIC(GLD_RANDOM);
             arg1=GetNum("RANDOM");
             if (!gffs) {
@@ -5092,7 +5092,7 @@ gsc:
           }
           aa("copybytetovar")
           {
-            vlog_txt("COPYBYTETOVAR\r\n");
+            vlog_txt("COPYBYTETOVAR\n");
             BASIC(GLD_COPYBYTETOVAR);
             arg1=GetNum("COPYBYTETOVAR");
             if (!gffs) {
@@ -5103,7 +5103,7 @@ gsc:
           }
           aa("copyvartobyte")
           {
-            vlog_txt("COPYVARTOBYTE\r\n");
+            vlog_txt("COPYVARTOBYTE\n");
             BASIC(GLD_COPYVARTOBYTE);
             arg1=GetNum("COPYVARTOBYTE");
             if (!gffs) {
@@ -5114,7 +5114,7 @@ gsc:
           }
           aa("checkcode")
           {
-            vlog_txt("CHECKCODE\r\n");
+            vlog_txt("CHECKCODE\n");
             BASIC(GLD_CHECKCODE);
             arg1=GetNum("CHECKCODE");
             if (!gffs) {
@@ -5125,7 +5125,7 @@ gsc:
           }
           aa("writevarcode")
           {
-            vlog_txt("WRITEVARCODE\r\n");
+            vlog_txt("WRITEVARCODE\n");
             BASIC(GLD_WRITEVARCODE);
             arg1=GetNum("WRITEVARCODE");
             if (!gffs) {
@@ -5136,7 +5136,7 @@ gsc:
           }
           aa("writecode")
           {
-            vlog_txt("WRITECODE\r\n");
+            vlog_txt("WRITECODE\n");
             BASIC(GLD_WRITECODE);
             arg1=GetNum("WRITECODE");
             if (!gffs) {
@@ -5152,7 +5152,7 @@ gsc:
           }
           aa("giveitem")
           {
-            vlog_txt("GIVEITEM\r\n");
+            vlog_txt("GIVEITEM\n");
             BASIC(GLD_GIVEITEM);
             arg1=GetNum("GIVEITEM");
             if (!gffs) {
@@ -5168,7 +5168,7 @@ gsc:
           }
           aa("takeitem")
           {
-            vlog_txt("TAKEITEM\r\n");
+            vlog_txt("TAKEITEM\n");
             BASIC(GLD_TAKEITEM);
             arg1=GetNum("TAKEITEM");
             if (!gffs) {
@@ -5184,7 +5184,7 @@ gsc:
           }
           aa("givemoney")
           {
-            vlog_txt("GIVEMONEY\r\n");
+            vlog_txt("GIVEMONEY\n");
             BASIC(GLD_GIVEMONEY);
             arg1=GetNum("GIVEMONEY");
             if (!gffs) {
@@ -5200,7 +5200,7 @@ gsc:
           }
           aa("takemoney")
           {
-            vlog_txt("TAKEMONEY\r\n");
+            vlog_txt("TAKEMONEY\n");
             BASIC(GLD_TAKEMONEY);
             arg1=GetNum("TAKEMONEY");
             if (!gffs) {
@@ -5216,7 +5216,7 @@ gsc:
           }
           aa("checkmoney")
           {
-            vlog_txt("CHECKMONEY\r\n");
+            vlog_txt("CHECKMONEY\n");
             BASIC(GLD_CHECKMONEY);
             arg1=GetNum("CHECKMONEY");
             if (!gffs) {
@@ -5232,7 +5232,7 @@ gsc:
           }
           aa("checkitem")
           {
-            vlog_txt("CHECKITEM\r\n");
+            vlog_txt("CHECKITEM\n");
             BASIC(GLD_CHECKITEM);
             arg1=GetNum("CHECKITEM");
             if (!gffs) {
@@ -5243,7 +5243,7 @@ gsc:
           }
           aa("givephonenumber")
           {
-            vlog_txt("GIVEPHONENUMBER\r\n");
+            vlog_txt("GIVEPHONENUMBER\n");
             BASIC(GLD_GIVEPHONENUMBER);
             arg1=GetNum("GIVEPHONENUMBER");
             if (!gffs) {
@@ -5254,7 +5254,7 @@ gsc:
           }
           aa("takephonenumber")
           {
-            vlog_txt("TAKEPHONENUMBER\r\n");
+            vlog_txt("TAKEPHONENUMBER\n");
             BASIC(GLD_TAKEPHONENUMBER);
             arg1=GetNum("TAKEPHONENUMBER");
             if (!gffs) {
@@ -5265,7 +5265,7 @@ gsc:
           }
           aa("checkphonenumber")
           {
-            vlog_txt("CHECKPHONENUMBER\r\n");
+            vlog_txt("CHECKPHONENUMBER\n");
             BASIC(GLD_CHECKPHONENUMBER);
             arg1=GetNum("CHECKPHONENUMBER");
             if (!gffs) {
@@ -5276,7 +5276,7 @@ gsc:
           }
           aa("checktime")
           {
-            vlog_txt("CHECKTIME\r\n");
+            vlog_txt("CHECKTIME\n");
             BASIC(GLD_CHECKTIME);
             arg1=GetNum("CHECKTIME");
             if (!gffs) {
@@ -5287,7 +5287,7 @@ gsc:
           }
           aa("checkpoke")
           {
-            vlog_txt("CHECKPOKE\r\n");
+            vlog_txt("CHECKPOKE\n");
             BASIC(GLD_CHECKPOKE);
             arg1=GetNum("CHECKPOKE");
             if (!gffs) {
@@ -5298,7 +5298,7 @@ gsc:
           }
           aa("givepoke")
           {
-            vlog_txt("GIVEPOKE\r\n");
+            vlog_txt("GIVEPOKE\n");
             BASIC(GLD_GIVEPOKE);
             arg1=GetNum("GIVEPOKE");
             if (!gffs) {
@@ -5340,7 +5340,7 @@ gsc:
           }
           aa("giveegg")
           {
-            vlog_txt("GIVEEGG\r\n");
+            vlog_txt("GIVEEGG\n");
             BASIC(GLD_GIVEEGG);
             arg1=GetNum("GIVEEGG");
             if (!gffs) {
@@ -5356,7 +5356,7 @@ gsc:
           }
           aa("givepokeitem")
           {
-            vlog_txt("GIVEPOKEITEM\r\n");
+            vlog_txt("GIVEPOKEITEM\n");
             BASIC(GLD_GIVEPOKEITEM);
             arg1=GetNum("GIVEPOKEITEM");
             if (!gffs) {
@@ -5367,7 +5367,7 @@ gsc:
           }
           aa("takeifletter")
           {
-            vlog_txt("TAKEIFLETTER\r\n");
+            vlog_txt("TAKEIFLETTER\n");
             BASIC(GLD_TAKEIFLETTER);
             arg1=GetNum("TAKEIFLETTER");
             if (!gffs) {
@@ -5378,7 +5378,7 @@ gsc:
           }
           aa("checkbit1")
           {
-            vlog_txt("CHECKBIT1\r\n");
+            vlog_txt("CHECKBIT1\n");
             BASIC(GLD_CHECKBIT1);
             arg1=GetNum("CHECKBIT1");
             if (!gffs) {
@@ -5389,7 +5389,7 @@ gsc:
           }
           aa("clearbit1")
           {
-            vlog_txt("CLEARBIT1\r\n");
+            vlog_txt("CLEARBIT1\n");
             BASIC(GLD_CLEARBIT1);
             arg1=GetNum("CLEARBIT1");
             if (!gffs) {
@@ -5400,7 +5400,7 @@ gsc:
           }
           aa("setbit1")
           {
-            vlog_txt("SETBIT1\r\n");
+            vlog_txt("SETBIT1\n");
             BASIC(GLD_SETBIT1);
             arg1=GetNum("SETBIT1");
             if (!gffs) {
@@ -5411,7 +5411,7 @@ gsc:
           }
           aa("checkbit2")
           {
-            vlog_txt("CHECKBIT2\r\n");
+            vlog_txt("CHECKBIT2\n");
             BASIC(GLD_CHECKBIT2);
             arg1=GetNum("CHECKBIT2");
             if (!gffs) {
@@ -5422,7 +5422,7 @@ gsc:
           }
           aa("clearbit2")
           {
-            vlog_txt("CLEARBIT2\r\n");
+            vlog_txt("CLEARBIT2\n");
             BASIC(GLD_CLEARBIT2);
             arg1=GetNum("CLEARBIT2");
             if (!gffs) {
@@ -5433,7 +5433,7 @@ gsc:
           }
           aa("setbit2")
           {
-            vlog_txt("SETBIT2\r\n");
+            vlog_txt("SETBIT2\n");
             BASIC(GLD_SETBIT2);
             arg1=GetNum("SETBIT2");
             if (!gffs) {
@@ -5444,7 +5444,7 @@ gsc:
           }
           aa("givecoins")
           {
-            vlog_txt("GIVECOINS\r\n");
+            vlog_txt("GIVECOINS\n");
             BASIC(GLD_GIVECOINS);
             arg1=GetNum("GIVECOINS");
             if (!gffs) {
@@ -5455,7 +5455,7 @@ gsc:
           }
           aa("takecoins")
           {
-            vlog_txt("TAKECOINS\r\n");
+            vlog_txt("TAKECOINS\n");
             BASIC(GLD_TAKECOINS);
             arg1=GetNum("TAKECOINS");
             if (!gffs) {
@@ -5466,7 +5466,7 @@ gsc:
           }
           aa("checkcoins")
           {
-            vlog_txt("CHECKCOINS\r\n");
+            vlog_txt("CHECKCOINS\n");
             BASIC(GLD_CHECKCOINS);
             arg1=GetNum("CHECKCOINS");
             if (!gffs) {
@@ -5477,7 +5477,7 @@ gsc:
           }
           aa("xycompare")
           {
-            vlog_txt("XYCOMPARE\r\n");
+            vlog_txt("XYCOMPARE\n");
             BASIC(GLD_XYCOMPARE);
             arg1=GetNum("XYCOMPARE");
             if (!gffs) {
@@ -5488,7 +5488,7 @@ gsc:
           }
           aa("warpmod")
           {
-            vlog_txt("WARPMOD\r\n");
+            vlog_txt("WARPMOD\n");
             BASIC(GLD_WARPMOD);
             arg1=GetNum("WARPMOD");
             if (!gffs) {
@@ -5509,7 +5509,7 @@ gsc:
           }
           aa("warp")
           {
-            vlog_txt("WARP\r\n");
+            vlog_txt("WARP\n");
             BASIC(GLD_WARP);
             arg1=GetNum("WARP");
             if (!gffs) {
@@ -5535,7 +5535,7 @@ gsc:
           }
           aa("warpfacing")
           {
-            vlog_txt("WARPFACING\r\n");
+            vlog_txt("WARPFACING\n");
             BASIC(GLD_WARPFACING);
             arg1=GetNum("WARPFACING");
             if (!gffs) {
@@ -5566,7 +5566,7 @@ gsc:
           }
           aa("blackoutmod")
           {
-            vlog_txt("BLACKOUTMOD\r\n");
+            vlog_txt("BLACKOUTMOD\n");
             BASIC(GLD_BLACKOUTMOD);
             arg1=GetNum("BLACKOUTMOD");
             if (!gffs) {
@@ -5582,7 +5582,7 @@ gsc:
           }
           aa("moneytotext")
           {
-            vlog_txt("MONEYTOTEXT\r\n");
+            vlog_txt("MONEYTOTEXT\n");
             BASIC(GLD_MONEYTOTEXT);
             arg1=GetNum("MONEYTOTEXT");
             if (!gffs) {
@@ -5598,7 +5598,7 @@ gsc:
           }
           aa("coinstotext")
           {
-            vlog_txt("COINSTOTEXT\r\n");
+            vlog_txt("COINSTOTEXT\n");
             BASIC(GLD_COINSTOTEXT);
             arg1=GetNum("COINSTOTEXT");
             if (!gffs) {
@@ -5609,7 +5609,7 @@ gsc:
           }
           aa("vartotext")
           {
-            vlog_txt("VARTOTEXT\r\n");
+            vlog_txt("VARTOTEXT\n");
             BASIC(GLD_VARTOTEXT);
             arg1=GetNum("VARTOTEXT");
             if (!gffs) {
@@ -5620,7 +5620,7 @@ gsc:
           }
           aa("poketotext")
           {
-            vlog_txt("POKETOTEXT\r\n");
+            vlog_txt("POKETOTEXT\n");
             BASIC(GLD_POKETOTEXT);
             arg1=GetNum("POKETOTEXT");
             if (!gffs) {
@@ -5636,7 +5636,7 @@ gsc:
           }
           aa("itemtotext")
           {
-            vlog_txt("ITEMTOTEXT\r\n");
+            vlog_txt("ITEMTOTEXT\n");
             BASIC(GLD_ITEMTOTEXT);
             arg1=GetNum("ITEMTOTEXT");
             if (!gffs) {
@@ -5652,7 +5652,7 @@ gsc:
           }
           aa("locationtotext")
           {
-            vlog_txt("LOCATIONTOTEXT\r\n");
+            vlog_txt("LOCATIONTOTEXT\n");
             BASIC(GLD_LOCATIONTOTEXT);
             arg1=GetNum("LOCATIONTOTEXT");
             if (!gffs) {
@@ -5663,7 +5663,7 @@ gsc:
           }
           aa("trainertotext")
           {
-            vlog_txt("TRAINERTOTEXT\r\n");
+            vlog_txt("TRAINERTOTEXT\n");
             BASIC(GLD_TRAINERTOTEXT);
             arg1=GetNum("TRAINERTOTEXT");
             if (!gffs) {
@@ -5684,7 +5684,7 @@ gsc:
           }
           aa("stringtotext")
           {
-            vlog_txt("STRINGTOTEXT\r\n");
+            vlog_txt("STRINGTOTEXT\n");
             BASIC(GLD_STRINGTOTEXT);
             arg1=GetNum("STRINGTOTEXT");
             if (!gffs) {
@@ -5700,7 +5700,7 @@ gsc:
           }
           aa("refreshscreen")
           {
-            vlog_txt("REFRESHSCREEN\r\n");
+            vlog_txt("REFRESHSCREEN\n");
             BASIC(GLD_REFRESHSCREEN);
             arg1=GetNum("REFRESHSCREEN");
             if (!gffs) {
@@ -5711,7 +5711,7 @@ gsc:
           }
           aa("c1celoadbyte")
           {
-            vlog_txt("C1CELOADBYTE\r\n");
+            vlog_txt("C1CELOADBYTE\n");
             BASIC(GLD_C1CELOADBYTE);
             arg1=GetNum("C1CELOADBYTE");
             if (!gffs) {
@@ -5722,7 +5722,7 @@ gsc:
           }
           aa("3writetext")
           {
-            vlog_txt("3WRITETEXT\r\n");
+            vlog_txt("3WRITETEXT\n");
             BASIC(GLD_3WRITETEXT);
             arg1=GetNum("3WRITETEXT");
             if (!gffs) {
@@ -5733,7 +5733,7 @@ gsc:
           }
           aa("2writetext")
           {
-            vlog_txt("2WRITETEXT\r\n");
+            vlog_txt("2WRITETEXT\n");
             BASIC(GLD_2WRITETEXT);
             arg1=GetNum("2WRITETEXT");
             if (!gffs) {
@@ -5744,7 +5744,7 @@ gsc:
           }
           aa("repeattext")
           {
-            vlog_txt("REPEATTEXT\r\n");
+            vlog_txt("REPEATTEXT\n");
             BASIC(GLD_REPEATTEXT);
             arg1=GetNum("REPEATTEXT");
             if (!gffs) {
@@ -5755,7 +5755,7 @@ gsc:
           }
           aa("loadmenudata")
           {
-            vlog_txt("LOADMENUDATA\r\n");
+            vlog_txt("LOADMENUDATA\n");
             BASIC(GLD_LOADMENUDATA);
             arg1=GetNum("LOADMENUDATA");
             if (!gffs) {
@@ -5766,7 +5766,7 @@ gsc:
           }
           aa("jumptextfaceplayer")
           {
-            vlog_txt("JUMPTEXTFACEPLAYER\r\n");
+            vlog_txt("JUMPTEXTFACEPLAYER\n");
             BASIC(GLD_JUMPTEXTFACEPLAYER);
             arg1=GetNum("JUMPTEXTFACEPLAYER");
             if (!gffs) {
@@ -5777,7 +5777,7 @@ gsc:
           }
           aa("jumptext")
           {
-            vlog_txt("JUMPTEXT\r\n");
+            vlog_txt("JUMPTEXT\n");
             BASIC(GLD_JUMPTEXT);
             arg1=GetNum("JUMPTEXT");
             if (!gffs) {
@@ -5788,7 +5788,7 @@ gsc:
           }
           aa("pokepic")
           {
-            vlog_txt("POKEPIC\r\n");
+            vlog_txt("POKEPIC\n");
             BASIC(GLD_POKEPIC);
             arg1=GetNum("POKEPIC");
             if (!gffs) {
@@ -5799,7 +5799,7 @@ gsc:
           }
           aa("loadpokedata")
           {
-            vlog_txt("LOADPOKEDATA\r\n");
+            vlog_txt("LOADPOKEDATA\n");
             BASIC(GLD_LOADPOKEDATA);
             arg1=GetNum("LOADPOKEDATA");
             if (!gffs) {
@@ -5815,7 +5815,7 @@ gsc:
           }
           aa("loadtrainer")
           {
-            vlog_txt("LOADTRAINER\r\n");
+            vlog_txt("LOADTRAINER\n");
             BASIC(GLD_LOADTRAINER);
             arg1=GetNum("LOADTRAINER");
             if (!gffs) {
@@ -5831,7 +5831,7 @@ gsc:
           }
           aa("catchtutorial")
           {
-            vlog_txt("CATCHTUTORIAL\r\n");
+            vlog_txt("CATCHTUTORIAL\n");
             BASIC(GLD_CATCHTUTORIAL);
             arg1=GetNum("CATCHTUTORIAL");
             if (!gffs) {
@@ -5842,7 +5842,7 @@ gsc:
           }
           aa("trainertext")
           {
-            vlog_txt("TRAINERTEXT\r\n");
+            vlog_txt("TRAINERTEXT\n");
             BASIC(GLD_TRAINERTEXT);
             arg1=GetNum("TRAINERTEXT");
             if (!gffs) {
@@ -5853,7 +5853,7 @@ gsc:
           }
           aa("trainerstatus")
           {
-            vlog_txt("TRAINERSTATUS\r\n");
+            vlog_txt("TRAINERSTATUS\n");
             BASIC(GLD_TRAINERSTATUS);
             arg1=GetNum("TRAINERSTATUS");
             if (!gffs) {
@@ -5864,7 +5864,7 @@ gsc:
           }
           aa("winlosstext")
           {
-            vlog_txt("WINLOSSTEXT\r\n");
+            vlog_txt("WINLOSSTEXT\n");
             BASIC(GLD_WINLOSSTEXT);
             arg1=GetNum("WINLOSSTEXT");
             if (!gffs) {
@@ -5880,7 +5880,7 @@ gsc:
           }
           aa("setlasttalked")
           {
-            vlog_txt("SETLASTTALKED\r\n");
+            vlog_txt("SETLASTTALKED\n");
             BASIC(GLD_SETLASTTALKED);
             arg1=GetNum("SETLASTTALKED");
             if (!gffs) {
@@ -5891,7 +5891,7 @@ gsc:
           }
           aa("applymovement")
           {
-            vlog_txt("APPLYMOVEMENT\r\n");
+            vlog_txt("APPLYMOVEMENT\n");
             BASIC(GLD_APPLYMOVEMENT);
             arg1=GetNum("APPLYMOVEMENT");
             if (!gffs) {
@@ -5907,7 +5907,7 @@ gsc:
           }
           aa("applymoveother")
           {
-            vlog_txt("APPLYMOVEOTHER\r\n");
+            vlog_txt("APPLYMOVEOTHER\n");
             BASIC(GLD_APPLYMOVEOTHER);
             arg1=GetNum("APPLYMOVEOTHER");
             if (!gffs) {
@@ -5918,7 +5918,7 @@ gsc:
           }
           aa("faceperson")
           {
-            vlog_txt("FACEPERSON\r\n");
+            vlog_txt("FACEPERSON\n");
             BASIC(GLD_FACEPERSON);
             arg1=GetNum("FACEPERSON");
             if (!gffs) {
@@ -5934,7 +5934,7 @@ gsc:
           }
           aa("variablesprite")
           {
-            vlog_txt("VARIABLESPRITE\r\n");
+            vlog_txt("VARIABLESPRITE\n");
             BASIC(GLD_VARIABLESPRITE);
             arg1=GetNum("VARIABLESPRITE");
             if (!gffs) {
@@ -5950,7 +5950,7 @@ gsc:
           }
           aa("disappear")
           {
-            vlog_txt("DISAPPEAR\r\n");
+            vlog_txt("DISAPPEAR\n");
             BASIC(GLD_DISAPPEAR);
             arg1=GetNum("DISAPPEAR");
             if (!gffs) {
@@ -5961,7 +5961,7 @@ gsc:
           }
           aa("appear")
           {
-            vlog_txt("APPEAR\r\n");
+            vlog_txt("APPEAR\n");
             BASIC(GLD_APPEAR);
             arg1=GetNum("APPEAR");
             if (!gffs) {
@@ -5972,7 +5972,7 @@ gsc:
           }
           aa("follow")
           {
-            vlog_txt("FOLLOW\r\n");
+            vlog_txt("FOLLOW\n");
             BASIC(GLD_FOLLOW);
             arg1=GetNum("FOLLOW");
             if (!gffs) {
@@ -5988,7 +5988,7 @@ gsc:
           }
           aa("moveperson")
           {
-            vlog_txt("MOVEPERSON\r\n");
+            vlog_txt("MOVEPERSON\n");
             BASIC(GLD_MOVEPERSON);
             arg1=GetNum("MOVEPERSON");
             if (!gffs) {
@@ -6009,7 +6009,7 @@ gsc:
           }
           aa("writepersonloc")
           {
-            vlog_txt("WRITEPERSONLOC\r\n");
+            vlog_txt("WRITEPERSONLOC\n");
             BASIC(GLD_WRITEPERSONLOC);
             arg1=GetNum("WRITEPERSONLOC");
             if (!gffs) {
@@ -6020,7 +6020,7 @@ gsc:
           }
           aa("loademote")
           {
-            vlog_txt("LOADEMOTE\r\n");
+            vlog_txt("LOADEMOTE\n");
             BASIC(GLD_LOADEMOTE);
             arg1=GetNum("LOADEMOTE");
             if (!gffs) {
@@ -6031,7 +6031,7 @@ gsc:
           }
           aa("showemote")
           {
-            vlog_txt("SHOWEMOTE\r\n");
+            vlog_txt("SHOWEMOTE\n");
             BASIC(GLD_SHOWEMOTE);
             arg1=GetNum("SHOWEMOTE");
             if (!gffs) {
@@ -6052,7 +6052,7 @@ gsc:
           }
           aa("spriteface")
           {
-            vlog_txt("SPRITEFACE\r\n");
+            vlog_txt("SPRITEFACE\n");
             BASIC(GLD_SPRITEFACE);
             arg1=GetNum("SPRITEFACE");
             if (!gffs) {
@@ -6068,7 +6068,7 @@ gsc:
           }
           aa("follownotexact")
           {
-            vlog_txt("FOLLOWNOTEXACT\r\n");
+            vlog_txt("FOLLOWNOTEXACT\n");
             BASIC(GLD_FOLLOWNOTEXACT);
             arg1=GetNum("FOLLOWNOTEXACT");
             if (!gffs) {
@@ -6084,7 +6084,7 @@ gsc:
           }
           aa("earthquake")
           {
-            vlog_txt("EARTHQUAKE\r\n");
+            vlog_txt("EARTHQUAKE\n");
             BASIC(GLD_EARTHQUAKE);
             arg1=GetNum("EARTHQUAKE");
             if (!gffs) {
@@ -6095,7 +6095,7 @@ gsc:
           }
           aa("swapmaps")
           {
-            vlog_txt("SWAPMAPS\r\n");
+            vlog_txt("SWAPMAPS\n");
             BASIC(GLD_SWAPMAPS);
             arg1=GetNum("SWAPMAPS");
             if (!gffs) {
@@ -6106,7 +6106,7 @@ gsc:
           }
           aa("changeblock")
           {
-            vlog_txt("CHANGEBLOCK\r\n");
+            vlog_txt("CHANGEBLOCK\n");
             BASIC(GLD_CHANGEBLOCK);
             arg1=GetNum("CHANGEBLOCK");
             if (!gffs) {
@@ -6127,7 +6127,7 @@ gsc:
           }
           aa("writecmdqueue")
           {
-            vlog_txt("WRITECMDQUEUE\r\n");
+            vlog_txt("WRITECMDQUEUE\n");
             BASIC(GLD_WRITECMDQUEUE);
             arg1=GetNum("WRITECMDQUEUE");
             if (!gffs) {
@@ -6138,7 +6138,7 @@ gsc:
           }
           aa("delcmdqueue")
           {
-            vlog_txt("DELCMDQUEUE\r\n");
+            vlog_txt("DELCMDQUEUE\n");
             BASIC(GLD_DELCMDQUEUE);
             arg1=GetNum("DELCMDQUEUE");
             if (!gffs) {
@@ -6149,7 +6149,7 @@ gsc:
           }
           aa("playmusic")
           {
-            vlog_txt("PLAYMUSIC\r\n");
+            vlog_txt("PLAYMUSIC\n");
             BASIC(GLD_PLAYMUSIC);
             arg1=GetNum("PLAYMUSIC");
             if (!gffs) {
@@ -6160,7 +6160,7 @@ gsc:
           }
           aa("musicfadeout")
           {
-            vlog_txt("MUSICFADEOUT\r\n");
+            vlog_txt("MUSICFADEOUT\n");
             BASIC(GLD_MUSICFADEOUT);
             arg1=GetNum("MUSICFADEOUT");
             if (!gffs) {
@@ -6176,7 +6176,7 @@ gsc:
           }
           aa("cry")
           {
-            vlog_txt("CRY\r\n");
+            vlog_txt("CRY\n");
             BASIC(GLD_CRY);
             arg1=GetNum("CRY");
             if (!gffs) {
@@ -6187,7 +6187,7 @@ gsc:
           }
           aa("playsound")
           {
-            vlog_txt("PLAYSOUND\r\n");
+            vlog_txt("PLAYSOUND\n");
             BASIC(GLD_PLAYSOUND);
             arg1=GetNum("PLAYSOUND");
             if (!gffs) {
@@ -6198,7 +6198,7 @@ gsc:
           }
           aa("passtoengine")
           {
-            vlog_txt("PASSTOENGINE\r\n");
+            vlog_txt("PASSTOENGINE\n");
             BASIC(GLD_PASSTOENGINE);
             arg1=GetNum("PASSTOENGINE");
             if (!gffs) {
@@ -6209,7 +6209,7 @@ gsc:
           }
           aa("newloadmap")
           {
-            vlog_txt("NEWLOADMAP\r\n");
+            vlog_txt("NEWLOADMAP\n");
             BASIC(GLD_NEWLOADMAP);
             arg1=GetNum("NEWLOADMAP");
             if (!gffs) {
@@ -6220,7 +6220,7 @@ gsc:
           }
           aa("pause")
           {
-            vlog_txt("PAUSE\r\n");
+            vlog_txt("PAUSE\n");
             BASIC(GLD_PAUSE);
             arg1=GetNum("PAUSE");
             if (!gffs) {
@@ -6231,7 +6231,7 @@ gsc:
           }
           aa("deactivatefacing")
           {
-            vlog_txt("DEACTIVATEFACING\r\n");
+            vlog_txt("DEACTIVATEFACING\n");
             BASIC(GLD_DEACTIVATEFACING);
             arg1=GetNum("DEACTIVATEFACING");
             if (!gffs) {
@@ -6242,7 +6242,7 @@ gsc:
           }
           aa("priorityjump")
           {
-            vlog_txt("PRIORITYJUMP\r\n");
+            vlog_txt("PRIORITYJUMP\n");
             BASIC(GLD_PRIORITYJUMP);
             arg1=GetNum("PRIORITYJUMP");
             if (!gffs) {
@@ -6253,7 +6253,7 @@ gsc:
           }
           aa("ptpriorityjump")
           {
-            vlog_txt("PTPRIORITYJUMP\r\n");
+            vlog_txt("PTPRIORITYJUMP\n");
             BASIC(GLD_PTPRIORITYJUMP);
             arg1=GetNum("PTPRIORITYJUMP");
             if (!gffs) {
@@ -6264,7 +6264,7 @@ gsc:
           }
           aa("pokemart")
           {
-            vlog_txt("POKEMART\r\n");
+            vlog_txt("POKEMART\n");
             BASIC(GLD_POKEMART);
             arg1=GetNum("POKEMART");
             if (!gffs) {
@@ -6280,7 +6280,7 @@ gsc:
           }
           aa("elevator")
           {
-            vlog_txt("ELEVATOR\r\n");
+            vlog_txt("ELEVATOR\n");
             BASIC(GLD_ELEVATOR);
             arg1=GetNum("ELEVATOR");
             if (!gffs) {
@@ -6291,7 +6291,7 @@ gsc:
           }
           aa("trade")
           {
-            vlog_txt("TRADE\r\n");
+            vlog_txt("TRADE\n");
             BASIC(GLD_TRADE);
             arg1=GetNum("TRADE");
             if (!gffs) {
@@ -6302,7 +6302,7 @@ gsc:
           }
           aa("askforphonenumber")
           {
-            vlog_txt("ASKFORPHONENUMBER\r\n");
+            vlog_txt("ASKFORPHONENUMBER\n");
             BASIC(GLD_ASKFORPHONENUMBER);
             arg1=GetNum("ASKFORPHONENUMBER");
             if (!gffs) {
@@ -6313,7 +6313,7 @@ gsc:
           }
           aa("phonecall")
           {
-            vlog_txt("PHONECALL\r\n");
+            vlog_txt("PHONECALL\n");
             BASIC(GLD_PHONECALL);
             arg1=GetNum("PHONECALL");
             if (!gffs) {
@@ -6324,7 +6324,7 @@ gsc:
           }
           aa("describedecoration")
           {
-            vlog_txt("DESCRIBEDECORATION\r\n");
+            vlog_txt("DESCRIBEDECORATION\n");
             BASIC(GLD_DESCRIBEDECORATION);
             arg1=GetNum("DESCRIBEDECORATION");
             if (!gffs) {
@@ -6335,7 +6335,7 @@ gsc:
           }
           aa("fruittree")
           {
-            vlog_txt("FRUITTREE\r\n");
+            vlog_txt("FRUITTREE\n");
             BASIC(GLD_FRUITTREE);
             arg1=GetNum("FRUITTREE");
             if (!gffs) {
@@ -6346,7 +6346,7 @@ gsc:
           }
           aa("specialphonecall")
           {
-            vlog_txt("SPECIALPHONECALL\r\n");
+            vlog_txt("SPECIALPHONECALL\n");
             BASIC(GLD_SPECIALPHONECALL);
             arg1=GetNum("SPECIALPHONECALL");
             if (!gffs) {
@@ -6357,7 +6357,7 @@ gsc:
           }
           aa("verbosegiveitem")
           {
-            vlog_txt("VERBOSEGIVEITEM\r\n");
+            vlog_txt("VERBOSEGIVEITEM\n");
             BASIC(GLD_VERBOSEGIVEITEM);
             arg1=GetNum("VERBOSEGIVEITEM");
             if (!gffs) {
@@ -6373,7 +6373,7 @@ gsc:
           }
           aa("loadwilddata")
           {
-            vlog_txt("LOADWILDDATA\r\n");
+            vlog_txt("LOADWILDDATA\n");
             BASIC(GLD_LOADWILDDATA);
             arg1=GetNum("LOADWILDDATA");
             if (!gffs) {
@@ -6389,7 +6389,7 @@ gsc:
           }
           aa("storetext")
           {
-            vlog_txt("STORETEXT\r\n");
+            vlog_txt("STORETEXT\n");
             BASIC(GLD_STORETEXT);
             arg1=GetNum("STORETEXT");
             if (!gffs) {
@@ -6410,7 +6410,7 @@ gsc:
           }
           aa("displaylocation")
           {
-            vlog_txt("DISPLAYLOCATION\r\n");
+            vlog_txt("DISPLAYLOCATION\n");
             BASIC(GLD_DISPLAYLOCATION);
             arg1=GetNum("DISPLAYLOCATION");
             if (!gffs) {
@@ -6421,7 +6421,7 @@ gsc:
           }
           aa("writebyte")
           {
-            vlog_txt("WRITEBYTE\r\n");
+            vlog_txt("WRITEBYTE\n");
             BASIC(GLD_WRITEBYTE);
             arg1=GetNum("WRITEBYTE");
             if (!gffs) {
@@ -6445,30 +6445,30 @@ gsc:
           }
           aa("m")
           {
-            vlog_txt("Movement data...\r\n");
+            vlog_txt("Movement data...\n");
             add_data(c,trans,transbackmove(Script,&i));
             ec();
           }
           aa("=")
           {
-            vlog_txt("[STRING]\r\n");
+            vlog_txt("[STRING]\n");
             if (chr==' ') {
               i++;
             }
             else {
-              log_txt("Should have a space after the =\r\n",33);
+              log_txt("Should have a space after the =\n", 33-1);
             }
             temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
-            sprintf(buf2,"   -> %s\r\n",(char*)temp_ptr);
+            sprintf(buf2,"   -> %s\n",(char*)temp_ptr);
             free(temp_ptr);
             vlog_txt(buf2);
           }
           aa(".")
           {
-            vlog_txt("[BINARY]\r\n   ->");
+            vlog_txt("[BINARY]\n   ->");
             i = skip_whitespace(Script, i);
             k=0;
             while (chr!='\n'&&chr!=0)
@@ -6486,7 +6486,7 @@ gsc:
               }
               if (((char*)("0123456789abcdef"))[j]==0)
               {
-                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                sprintf(buf2,"Failed to understand hex character '%c'\n",chr);
                 log_txt(buf2,strlen(buf2));
                 return;
               }
@@ -6506,11 +6506,11 @@ gsc:
               }
               i++;
             }
-            vlog_txt("\r\n");
+            vlog_txt("\n");
           }
           else
           {
-            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            sprintf(buf2,"Warning: Unknown command \"%s\"\n",buf);
             log_txt(buf2,strlen(buf2));
             while (chr!='\n'&&chr!=0)
             {
@@ -6561,11 +6561,11 @@ rse:
 					case '#':
             if (!strcmp(buf,"#define")||!strcmp(buf,"#d"))
             {
-              vlog_txt("#DEFINE\r\n");
+              vlog_txt("#DEFINE\n");
               i = skip_whitespace(Script, i);
               if (chr=='\n'||chr==0||chr=='\'')
               {
-                log_txt("Premature end to #DEFINE!\r\n",27);
+                log_txt("Premature end to #DEFINE!\n", 27-1);
                 return;
               }
               j=0;
@@ -6576,12 +6576,12 @@ rse:
                 j++;
               }
               buf[j]=0; //Append null
-              sprintf(buf2,"   -> %s\r\n",buf);
+              sprintf(buf2,"   -> %s\n",buf);
               vlog_txt(buf2);
               i = skip_whitespace(Script, i);
               if (chr=='\n'||chr==0||chr=='\'')
               {
-                log_txt("Premature end to #DEFINE!\r\n",27);
+                log_txt("Premature end to #DEFINE!\n", 27-1);
                 return;
               }
               k=GetNum("#DEFINE");
@@ -6591,7 +6591,7 @@ rse:
             }
             aa("#dyn")
             {
-              vlog_txt("#DYN\r\n");
+              vlog_txt("#DYN\n");
               start=GetNum("#DYN");
               if (!gffs)return;
               dyntype=0;
@@ -6599,14 +6599,14 @@ rse:
             }
             aa("#dyn2")
             {
-              vlog_txt("#DYN2\r\n");
+              vlog_txt("#DYN2\n");
               start=GetNum("#DYN2");
               if (!gffs)return;
               dyntype=1;
             }
             aa("#dynamic")
             {
-              vlog_txt("#DYNAMIC\r\n");
+              vlog_txt("#DYNAMIC\n");
               start=GetNum("#DYNAMIC");
               if (!gffs)return;
               dyntype=0;
@@ -6615,14 +6615,14 @@ rse:
             aa("#org")
             {
               eorg=0;
-              vlog_txt("#ORG\r\n");
+              vlog_txt("#ORG\n");
               i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
               {
                 if(start==0)
                 {
-                  log_txt("Need #dyn with dynamic offsets\r\n",32);
+                  log_txt("Need #dyn with dynamic offsets\n", 32-1);
                   return;
                 }
                 dynu=1;
@@ -6634,7 +6634,7 @@ rse:
                   j++;
                 }
                 buf[j]=0;
-                sprintf(buf2,"   -> %s\r\n",buf);
+                sprintf(buf2,"   -> %s\n",buf);
                 vlog_txt(buf2);
               }
               else
@@ -6656,14 +6656,14 @@ rse:
             aa("#orgal")
             {
               eorg=0;
-              vlog_txt("#ORGAL\r\n");
+              vlog_txt("#ORGAL\n");
               i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
               {
                 if(start==0)
                 {
-                  log_txt("Need #dyn with dynamic offsets\r\n",32);
+                  log_txt("Need #dyn with dynamic offsets\n", 32-1);
                   return;
                 }
                 dynu=1;
@@ -6675,7 +6675,7 @@ rse:
                   j++;
                 }
                 buf[j]=0;
-                sprintf(buf2,"   -> %s\r\n",buf);
+                sprintf(buf2,"   -> %s\n",buf);
                 vlog_txt(buf2);
               }
               else
@@ -6700,7 +6700,7 @@ rse:
             aa("#eorg")
             {
               eorg=1;
-              vlog_txt("#EORG\r\n");
+              vlog_txt("#EORG\n");
               i = skip_whitespace(Script, i);
               buf[0]=0;
               if (chr=='@')
@@ -6713,7 +6713,7 @@ rse:
                   j++;
                 }
                 buf[j]=0;
-                sprintf(buf2,"   -> %s\r\n",buf);
+                sprintf(buf2,"   -> %s\n",buf);
                 vlog_txt(buf2);
               }
               else
@@ -6775,7 +6775,7 @@ rse:
             }
 						aa("#raw")
 						{
-							vlog_txt("#RAW\r\n");
+							vlog_txt("#RAW\n");
 							arg1=1;
 							while(arg1)
 							{
@@ -6791,7 +6791,7 @@ rse:
 						}
             aa("#ptr")
             {
-              vlog_txt("#PTR\r\n");
+              vlog_txt("#PTR\n");
               k=GetNum("#PTR");
               if (!gffs) {
                 return;
@@ -6801,7 +6801,7 @@ rse:
             }
             aa("#dword")
             {
-              vlog_txt("#DWORD\r\n");
+              vlog_txt("#DWORD\n");
               k=GetNum("#DWORD");
               if (!gffs) {
                 return;
@@ -6810,7 +6810,7 @@ rse:
             }
             aa("#word")
             {
-              vlog_txt("#WORD\r\n");
+              vlog_txt("#WORD\n");
               k=GetNum("#WORD");
               if (!gffs) {
                 return;
@@ -6822,7 +6822,7 @@ rse:
           case 'a':
             if (!strcmp(buf,"applymovement"))
             {
-              vlog_txt("APPLYMOVEMENT\r\n");
+              vlog_txt("APPLYMOVEMENT\n");
               BASIC(CMD_APPLYMOVEMENT);
               arg1=GetNum("APPLYMOVEMENT");
               if (!gffs) {
@@ -6836,14 +6836,14 @@ rse:
               if ((arg2&0xff000000)==0)
               {
                 arg2|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                 vlog_txt(buf3);
               }
               rom(arg2,4);
             }
             aa("applymovementfinishat")
             {
-              vlog_txt("APPLYMOVEMENTFINISHAT\r\n");
+              vlog_txt("APPLYMOVEMENTFINISHAT\n");
               BASIC(CMD_APPLYMOVEMENTFINISHAT);
               arg1=GetNum("APPLYMOVEMENTFINISHAT");
               if (!gffs) {
@@ -6857,7 +6857,7 @@ rse:
               if ((arg2&0xff000000)==0)
               {
                 arg2|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                 vlog_txt(buf3);
               }
               rom(arg2,4);
@@ -6874,7 +6874,7 @@ rse:
             }
             aa("addfurniture")
             {
-              vlog_txt("ADDFURNITURE\r\n");
+              vlog_txt("ADDFURNITURE\n");
               arg1=GetNum("ADDFURNITURE");
               if (!gffs) {
                 return;
@@ -6884,7 +6884,7 @@ rse:
             }
             aa("addpokemon")
             {
-              vlog_txt("ADDPOKEMON\r\n");
+              vlog_txt("ADDPOKEMON\n");
               BASIC(CMD_ADDPOKEMON);
               arg1=GetNum("ADDPOKEMON");
               if (!gffs) {
@@ -6919,7 +6919,7 @@ rse:
             }
             aa("addvar")
             {
-              vlog_txt("ADDVAR\r\n");
+              vlog_txt("ADDVAR\n");
               arg1=GetNum("ADDVAR");
               if (!gffs) {
                 return;
@@ -6934,7 +6934,7 @@ rse:
             }
             aa("additem")
             {
-              vlog_txt("ADDITEM\r\n");
+              vlog_txt("ADDITEM\n");
               arg1=GetNum("ADDITEM");
               if (!gffs) {
                 return;
@@ -6952,7 +6952,7 @@ rse:
           case 'b':
             if (!strcmp(buf,"boxset"))
             {
-              vlog_txt("BOXSET\r\n");
+              vlog_txt("BOXSET\n");
               arg1=GetNum("BOXSET");
               if (!gffs) {
                 return;
@@ -6962,7 +6962,7 @@ rse:
             }
             aa("braille")
             {
-              vlog_txt("BRAILLE\r\n");
+              vlog_txt("BRAILLE\n");
               BASIC(CMD_BRAILLE);
               arg1=GetNum("BRAILLE");
               if (!gffs) {
@@ -6971,14 +6971,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("battle")
             {
-              vlog_txt("BATTLE\r\n");
+              vlog_txt("BATTLE\n");
               arg1=GetNum("BATTLE");
               if (!gffs) {
                 return;
@@ -7025,7 +7025,7 @@ rse:
             }
             aa("cmd_8a")
             {
-              vlog_txt("CMD_8A\r\n");
+              vlog_txt("CMD_8A\n");
               arg1=GetNum("CMD_8A");
               if (!gffs) {
                 return;
@@ -7045,7 +7045,7 @@ rse:
             }
             aa("comparehiddenvar")
             {
-              vlog_txt("COMPAREHIDDENVAR\r\n");
+              vlog_txt("COMPAREHIDDENVAR\n");
               arg1=GetNum("COMPAREHIDDENVAR");
               if (!gffs) {
                 return;
@@ -7060,7 +7060,7 @@ rse:
             }
             aa("checkobedience")
             {
-              vlog_txt("CHECKOBEDIENCE\r\n");
+              vlog_txt("CHECKOBEDIENCE\n");
               arg1=GetNum("CHECKOBEDIENCE");
               if (!gffs) {
                 return;
@@ -7070,7 +7070,7 @@ rse:
             }
             aa("checkanimation")
             {
-              vlog_txt("CHECKANIMATION\r\n");
+              vlog_txt("CHECKANIMATION\n");
               arg1=GetNum("CHECKANIMATION");
               if (!gffs) {
                 return;
@@ -7081,7 +7081,7 @@ rse:
             aa("call")
             {
               BASIC(CMD_CALL);
-              vlog_txt("CALL\r\n");
+              vlog_txt("CALL\n");
               arg1=GetNum("CALL");
               if (!gffs) {
                 return;
@@ -7089,14 +7089,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("callstd")
             {
-              vlog_txt("CALLSTD\r\n");
+              vlog_txt("CALLSTD\n");
               arg1=GetNum("CALLSTD");
               if (!gffs) {
                 return;
@@ -7106,7 +7106,7 @@ rse:
             }
             aa("compare")
             {
-              vlog_txt("COMPARE\r\n");
+              vlog_txt("COMPARE\n");
               arg1=GetNum("COMPARE");
               if (!gffs) {
                 return;
@@ -7121,7 +7121,7 @@ rse:
             }
             aa("copyvar")
             {
-              vlog_txt("COPYVAR\r\n");
+              vlog_txt("COPYVAR\n");
               arg1=GetNum("COPYVAR");
               if (!gffs) {
                 return;
@@ -7136,7 +7136,7 @@ rse:
             }
             aa("copyvarifnotzero")
             {
-              vlog_txt("COPYVARIFNOTZERO\r\n");
+              vlog_txt("COPYVARIFNOTZERO\n");
               arg1=GetNum("COPYVARIFNOTZERO");
               if (!gffs) {
                 return;
@@ -7151,7 +7151,7 @@ rse:
             }
             aa("copyscriptbanks")
             {
-              vlog_txt("COPYSCRIPTBANKS\r\n");
+              vlog_txt("COPYSCRIPTBANKS\n");
               arg1=GetNum("COPYSCRIPTBANKS");
               if (!gffs) {
                 return;
@@ -7166,7 +7166,7 @@ rse:
             }
             aa("copybyte")
             {
-              vlog_txt("COPYBYTE\r\n");
+              vlog_txt("COPYBYTE\n");
               BASIC(CMD_COPYBYTE);
               arg1=GetNum("COPYBYTE");
               if (!gffs) {
@@ -7181,7 +7181,7 @@ rse:
             }
             aa("comparevartobyte")
             {
-              vlog_txt("COMPAREVARTOBYTE\r\n");
+              vlog_txt("COMPAREVARTOBYTE\n");
               arg1=GetNum("COMPAREVARTOBYTE");
               if (!gffs) {
                 return;
@@ -7196,7 +7196,7 @@ rse:
             }
             aa("comparevartofarbyte")
             {
-              vlog_txt("COMPAREVARTOFARBYTE\r\n");
+              vlog_txt("COMPAREVARTOFARBYTE\n");
               BASIC(CMD_COMPAREVARTOFARBYTE);
               arg1=GetNum("COMPAREVARTOFARBYTE");
               if (!gffs) {
@@ -7211,7 +7211,7 @@ rse:
             }
             aa("comparefarbytetovar")
             {
-              vlog_txt("COMPAREFARBYTETOVAR\r\n");
+              vlog_txt("COMPAREFARBYTETOVAR\n");
               BASIC(CMD_COMPAREFARBYTETOVAR);
               arg1=GetNum("COMPAREFARBYTETOVAR");
               if (!gffs) {
@@ -7226,7 +7226,7 @@ rse:
             }
             aa("comparefarbytetobyte")
             {
-              vlog_txt("COMPAREFARBYTETOBYTE\r\n");
+              vlog_txt("COMPAREFARBYTETOBYTE\n");
               BASIC(CMD_COMPAREFARBYTETOBYTE);
               arg1=GetNum("COMPAREFARBYTETOBYTE");
               if (!gffs) {
@@ -7241,7 +7241,7 @@ rse:
             }
             aa("comparefarbytetofarbyte")
             {
-              vlog_txt("COMPAREFARBYTETOFARBYTE\r\n");
+              vlog_txt("COMPAREFARBYTETOFARBYTE\n");
               BASIC(CMD_COMPAREFARBYTETOFARBYTE);
               arg1=GetNum("COMPAREFARBYTETOFARBYTE");
               if (!gffs) {
@@ -7256,7 +7256,7 @@ rse:
             }
             aa("callasm")
             {
-              vlog_txt("CALLASM\r\n");
+              vlog_txt("CALLASM\n");
               BASIC(CMD_CALLASM);
               arg1=GetNum("CALLASM");
               if (!gffs) {
@@ -7265,14 +7265,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("callasm2")
             {
-              vlog_txt("CALLASM2\r\n");
+              vlog_txt("CALLASM2\n");
               BASIC(CMD_CALLASM2);
               arg1=GetNum("CALLASM2");
               if (!gffs) {
@@ -7281,14 +7281,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("clearflag")
             {
-              vlog_txt("CLEARFLAG\r\n");
+              vlog_txt("CLEARFLAG\n");
               arg1=GetNum("CLEARFLAG");
               if (!gffs) {
                 return;
@@ -7298,7 +7298,7 @@ rse:
             }
             aa("checkflag")
             {
-              vlog_txt("CHECKFLAG\r\n");
+              vlog_txt("CHECKFLAG\n");
               arg1=GetNum("CHECKFLAG");
               if (!gffs) {
                 return;
@@ -7308,7 +7308,7 @@ rse:
             }
             aa("cry")
             {
-              vlog_txt("CRY\r\n");
+              vlog_txt("CRY\n");
               arg1=GetNum("CRY");
               if (!gffs) {
                 return;
@@ -7337,12 +7337,12 @@ rse:
             }
             aa("checksound")
             {
-              vlog_txt("CHECKSOUND\r\n");
+              vlog_txt("CHECKSOUND\n");
               BASIC(CMD_CRY);
             }
             aa("cmd_c3")
             {
-              vlog_txt("CMD_C3\r\n");
+              vlog_txt("CMD_C3\n");
               arg1=GetNum("CMD_C3");
               if (!gffs) {
                 return;
@@ -7352,7 +7352,7 @@ rse:
             }
             aa("checkitem")
             {
-              vlog_txt("CHECKITEM\r\n");
+              vlog_txt("CHECKITEM\n");
               arg1=GetNum("CHECKITEM");
               if (!gffs) {
                 return;
@@ -7367,7 +7367,7 @@ rse:
             }
             aa("checkitemspaceinbag")
             {
-              vlog_txt("CHECKITEMSPACEINBAG\r\n");
+              vlog_txt("CHECKITEMSPACEINBAG\n");
               arg1=GetNum("CHECKITEMSPACEINBAG");
               if (!gffs) {
                 return;
@@ -7382,7 +7382,7 @@ rse:
             }
             aa("cmd_2c")
             {
-              vlog_txt("CMD_2C\r\n");
+              vlog_txt("CMD_2C\n");
               arg1=GetNum("CMD_2C");
               if (!gffs) {
                 return;
@@ -7397,7 +7397,7 @@ rse:
             }
             aa("checkattack")
             {
-              vlog_txt("CHECKATTACK\r\n");
+              vlog_txt("CHECKATTACK\n");
               arg1=GetNum("CHECKATTACK");
               if (!gffs) {
                 return;
@@ -7407,7 +7407,7 @@ rse:
             }
             aa("checkfurniture")
             {
-              vlog_txt("CHECKFURNITURE\r\n");
+              vlog_txt("CHECKFURNITURE\n");
               BASIC(CMD_CHECKFURNITURE);
               arg1=GetNum("CHECKFURNITURE");
               if (!gffs) {
@@ -7417,7 +7417,7 @@ rse:
             }
             aa("checkifroomforfurniture")
             {
-              vlog_txt("CHECKIFROOMFORFURNITURE\r\n");
+              vlog_txt("CHECKIFROOMFORFURNITURE\n");
               BASIC(CMD_CHECKIFROOMFORFURNITURE);
               arg1=GetNum("CHECKIFROOMFORFURNITURE");
               if (!gffs) {
@@ -7427,7 +7427,7 @@ rse:
             }
             aa("checkitemtype")
             {
-              vlog_txt("CHECKITEMTYPE\r\n");
+              vlog_txt("CHECKITEMTYPE\n");
               arg1=GetNum("CHECKITEMTYPE");
               if (!gffs) {
                 return;
@@ -7437,7 +7437,7 @@ rse:
             }
             aa("checkiteminpc")
             {
-              vlog_txt("CHECKITEMINPC\r\n");
+              vlog_txt("CHECKITEMINPC\n");
               arg1=GetNum("CHECKITEMINPC");
               if (!gffs) {
                 return;
@@ -7452,7 +7452,7 @@ rse:
             }
             aa("createtempsprite")
             {
-              vlog_txt("CREATETEMPSPRITE\r\n");
+              vlog_txt("CREATETEMPSPRITE\n");
               arg1=GetNum("CREATETEMPSPRITE");
               if (!gffs) {
                 return;
@@ -7487,7 +7487,7 @@ rse:
             }
             aa("cmd_a6")
             {
-              vlog_txt("CMD_A6\r\n");
+              vlog_txt("CMD_A6\n");
               arg1=GetNum("CMD_A6");
               if (!gffs) {
                 return;
@@ -7497,7 +7497,7 @@ rse:
             }
             aa("cmd_b1")
             {
-              vlog_txt("CMD_B1\r\n");
+              vlog_txt("CMD_B1\n");
               arg1=GetNum("CMD_B1");
               if (!gffs) {
                 return;
@@ -7522,7 +7522,7 @@ rse:
             }
             aa("cmd_d3")
             {
-              vlog_txt("CMD_D3\r\n");
+              vlog_txt("CMD_D3\n");
               BASIC(CMD_D3);
               arg1=GetNum("CMD_D3");
               if (!gffs) {
@@ -7531,14 +7531,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("cmd_fb")
             {
-              vlog_txt("CMD_FB\r\n");
+              vlog_txt("CMD_FB\n");
               BASIC(CMD_FB);
               arg1=GetNum("CMD_FB");
               if (!gffs) {
@@ -7547,14 +7547,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("checkattack")
             {
-              vlog_txt("CHECKATTACK\r\n");
+              vlog_txt("CHECKATTACK\n");
               arg1=GetNum("CHECKATTACK");
               if (!gffs) {
                 return;
@@ -7569,7 +7569,7 @@ rse:
             }
             aa("coincasetovar")
             {
-              vlog_txt("CoinCaseToVar\r\n");
+              vlog_txt("CoinCaseToVar\n");
               arg1=GetNum("COINCASETOVAR");
               if (!gffs) {
                 return;
@@ -7579,7 +7579,7 @@ rse:
             }
             aa("callstdif")
             {
-              vlog_txt("callstdif\r\n");
+              vlog_txt("callstdif\n");
               arg1=GetNum("callstdif");
               if (!gffs) {
                 return;
@@ -7594,7 +7594,7 @@ rse:
             }
             aa("checkmoney")
             {
-              vlog_txt("CHECKMONEY\r\n");
+              vlog_txt("CHECKMONEY\n");
               arg1=GetNum("CHECKMONEY");
               if (!gffs) {
                 return;
@@ -7609,7 +7609,7 @@ rse:
             }
             aa("cmd_96")
             {
-              vlog_txt("CMD_96\r\n");
+              vlog_txt("CMD_96\n");
               arg1=GetNum("CMD_96");
               if (!gffs) {
                 return;
@@ -7619,7 +7619,7 @@ rse:
             }
             aa("cmd_fe")
             {
-              vlog_txt("CMD_FE\r\n");
+              vlog_txt("CMD_FE\n");
               arg1=GetNum("CMD_FE");
               if (!gffs) {
                 return;
@@ -7629,7 +7629,7 @@ rse:
             }
             aa("cleartrainerflag")
             {
-              vlog_txt("CLEARTRAINERFLAG\r\n");
+              vlog_txt("CLEARTRAINERFLAG\n");
               arg1=GetNum("CLEARTRAINERFLAG");
               if (!gffs) {
                 return;
@@ -7639,7 +7639,7 @@ rse:
             }
             aa("comparevars")
             {
-              vlog_txt("COMPAREVARS\r\n");
+              vlog_txt("COMPAREVARS\n");
               arg1=GetNum("COMPAREVARS");
               if (!gffs) {
                 return;
@@ -7654,7 +7654,7 @@ rse:
             }
             aa("comparevars2")
             {
-              vlog_txt("COMPAREVARS2\r\n");
+              vlog_txt("COMPAREVARS2\n");
               arg1=GetNum("COMPAREVARS2");
               if (!gffs) {
                 return;
@@ -7669,7 +7669,7 @@ rse:
             }
             aa("checktrainerflag")
             {
-              vlog_txt("CHECKTRAINERFLAG\r\n");
+              vlog_txt("CHECKTRAINERFLAG\n");
               arg1=GetNum("CHECKTRAINERFLAG");
               if (!gffs) {
                 return;
@@ -7690,7 +7690,7 @@ rse:
             }
             aa("doanimation")
             {
-              vlog_txt("DOANIMATION\r\n");
+              vlog_txt("DOANIMATION\n");
               arg1=GetNum("DOANIMATION");
               if (!gffs) {
                 return;
@@ -7700,7 +7700,7 @@ rse:
             }
             aa("disappear")
             {
-              vlog_txt("DISAPPEAR\r\n");
+              vlog_txt("DISAPPEAR\n");
               arg1=GetNum("DISAPPEAR");
               if (!gffs) {
                 return;
@@ -7710,7 +7710,7 @@ rse:
             }
             aa("darkenroom")
             {
-              vlog_txt("DARKENROOM\r\n");
+              vlog_txt("DARKENROOM\n");
               arg1=GetNum("DARKENROOM");
               if (!gffs) {
                 return;
@@ -7720,7 +7720,7 @@ rse:
             }
             aa("disappearat")
             {
-              vlog_txt("DISAPPEARAT\r\n");
+              vlog_txt("DISAPPEARAT\n");
               arg1=GetNum("DISAPPEARAT");
               if (!gffs) {
                 return;
@@ -7759,7 +7759,7 @@ rse:
             }
             aa("endmart")
             {
-              vlog_txt("ENDMART\r\n");
+              vlog_txt("ENDMART\n");
               rom(0,2);
             }else goto unk_cmd_fr;
             ec();
@@ -7775,7 +7775,7 @@ rse:
             }
             aa("fadeout")
             {
-							vlog_txt("FADEOUT\r\n");
+							vlog_txt("FADEOUT\n");
 							arg1=GetNum("FADEOUT");
 							if(!gffs)return;
               BASIC(CMD_FADEOUT);
@@ -7783,7 +7783,7 @@ rse:
             }
             aa("fadein")
             {
-							vlog_txt("FADEIN\r\n");
+							vlog_txt("FADEIN\n");
 							arg1=GetNum("FADEIN");
 							if(!gffs)return;
               BASIC(CMD_FADEIN);
@@ -7795,7 +7795,7 @@ rse:
             }
             aa("falldownhole")
             {
-              vlog_txt("FALLDOWNHOLE\r\n");
+              vlog_txt("FALLDOWNHOLE\n");
               arg1=GetNum("FALLDOWNHOLE");
               if (!gffs) {
                 return;
@@ -7810,7 +7810,7 @@ rse:
             }
             aa("fadescreen")
             {
-              vlog_txt("FADESCREEN\r\n");
+              vlog_txt("FADESCREEN\n");
               arg1=GetNum("FADESCREEN");
               if (!gffs) {
                 return;
@@ -7820,7 +7820,7 @@ rse:
             }
             aa("fadescreendelay")
             {
-              vlog_txt("FADESCREENDELAY\r\n");
+              vlog_txt("FADESCREENDELAY\n");
               arg1=GetNum("FADESCREENDELAY");
               if (!gffs) {
                 return;
@@ -7835,7 +7835,7 @@ rse:
             }
             aa("fanfare")
             {
-              vlog_txt("FANFARE\r\n");
+              vlog_txt("FANFARE\n");
               arg1=GetNum("FANFARE");
               if (!gffs) {
                 return;
@@ -7845,7 +7845,7 @@ rse:
             }
             aa("fadesound")
             {
-              vlog_txt("FADESOUND\r\n");
+              vlog_txt("FADESOUND\n");
               arg1=GetNum("FADESOUND");
               if (!gffs) {
                 return;
@@ -7855,7 +7855,7 @@ rse:
             }
             aa("fadesong")
             {
-              vlog_txt("FADESONG\r\n");
+              vlog_txt("FADESONG\n");
               arg1=GetNum("FADESONG");
               if (!gffs) {
                 return;
@@ -7865,7 +7865,7 @@ rse:
             }
             aa("fadedefault")
             {
-              vlog_txt("FADEDEFAULT\r\n");
+              vlog_txt("FADEDEFAULT\n");
               arg1=GetNum("FADEDEFAULT");
               if (!gffs) {
                 return;
@@ -7874,7 +7874,7 @@ rse:
             }
             aa("fakejumpstd")
             {
-              vlog_txt("FAKEJUMPSTD\r\n");
+              vlog_txt("FAKEJUMPSTD\n");
               arg1=GetNum("FAKEJUMPSTD");
               if (!gffs) {
                 return;
@@ -7884,7 +7884,7 @@ rse:
             }
             aa("fakecallstd")
             {
-              vlog_txt("FAKECALLSTD\r\n");
+              vlog_txt("FAKECALLSTD\n");
               arg1=GetNum("FAKECALLSTD");
               if (!gffs) {
                 return;
@@ -7894,7 +7894,7 @@ rse:
             }
             aa("farreappear")
             {
-              vlog_txt("FARREAPPEAR\r\n");
+              vlog_txt("FARREAPPEAR\n");
               arg1=GetNum("FARREAPPEAR");
               if (!gffs) {
                 return;
@@ -7914,7 +7914,7 @@ rse:
             }
             aa("fardisappear")
             {
-              vlog_txt("FARDISAPPEAR\r\n");
+              vlog_txt("FARDISAPPEAR\n");
               arg1=GetNum("FARDISAPPEAR");
               if (!gffs) {
                 return;
@@ -7937,7 +7937,7 @@ rse:
           case 'g':
             if (!strcmp(buf,"getplayerxy"))
             {
-              vlog_txt("GETPLAYERXY\r\n");
+              vlog_txt("GETPLAYERXY\n");
               arg1=GetNum("GETPLAYERXY");
               if (!gffs) {
                 return;
@@ -7953,7 +7953,7 @@ rse:
             aa("goto")goto JUMP;
             aa("giveitemtopc")
             {
-              vlog_txt("GIVEITEMTOPC\r\n");
+              vlog_txt("GIVEITEMTOPC\n");
               arg1=GetNum("GIVEITEMTOPC");
               if (!gffs) {
                 return;
@@ -7968,7 +7968,7 @@ rse:
             }
             aa("giveegg")
             {
-              vlog_txt("GIVEEGG\r\n");
+              vlog_txt("GIVEEGG\n");
               arg1=GetNum("GIVEEGG");
               if (!gffs) {
                 return;
@@ -7978,7 +7978,7 @@ rse:
             }
             aa("givetocoincase")
             {
-              vlog_txt("GIVETOCOINCASE\r\n");
+              vlog_txt("GIVETOCOINCASE\n");
               arg1=GetNum("GIVETOCOINCASE");
               if (!gffs) {
                 return;
@@ -7988,7 +7988,7 @@ rse:
             }
             aa("givemoney")
             {
-              vlog_txt("GIVEMONEY\r\n");
+              vlog_txt("GIVEMONEY\n");
               BASIC(CMD_GIVEMONEY);
               arg1=GetNum("GIVEMONEY");
               if (!gffs) {
@@ -8010,7 +8010,7 @@ rse:
             }
             aa("hidebox")
             {
-              vlog_txt("HIDEBOX\r\n");
+              vlog_txt("HIDEBOX\n");
               arg1=GetNum("HIDEBOX");
               if (!gffs) {
                 return;
@@ -8035,7 +8035,7 @@ rse:
             }
             aa("hidecoins")
             {
-              vlog_txt("HIDECOINS\r\n");
+              vlog_txt("HIDECOINS\n");
               arg1=GetNum("HIDECOINS");
               if (!gffs) {
                 return;
@@ -8050,7 +8050,7 @@ rse:
             }
             aa("hidemoney")
             {
-              vlog_txt("HIDEMONEY\r\n");
+              vlog_txt("HIDEMONEY\n");
               arg1=GetNum("HIDEMONEY");
               if (!gffs) {
                 return;
@@ -8068,7 +8068,7 @@ rse:
           case 'i':
             if (!strcmp(buf,"if"))
             {
-              vlog_txt("IF\r\n");
+              vlog_txt("IF\n");
               arg1=GetNum("IF");
               if (!gffs) {
                 return;
@@ -8086,7 +8086,7 @@ rse:
               { JUMP:
                 BASIC(CMD_JUMPIF);
                 BASIC(arg1);
-                vlog_txt("   -> JUMP\r\n");
+                vlog_txt("   -> JUMP\n");
                 arg2=GetNum("IF (JUMP)");
                 if (!gffs) {
                   return;
@@ -8094,7 +8094,7 @@ rse:
                 if ((arg2&0xff000000)==0)
                 {
                   arg2|=0x08000000;
-                  sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                  sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                   vlog_txt(buf3);
                 }
                 rom(arg2,4);
@@ -8103,7 +8103,7 @@ rse:
               {
                 BASIC(CMD_CALLIF);
                 BASIC(arg1);
-                vlog_txt("   -> CALL\r\n");
+                vlog_txt("   -> CALL\n");
                 arg2=GetNum("IF (CALL)");
                 if (!gffs) {
                   return;
@@ -8111,7 +8111,7 @@ rse:
                 if ((arg2&0xff000000)==0)
                 {
                   arg2|=0x08000000;
-                  sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                  sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                   vlog_txt(buf3);
                 }
                 rom(arg2,4);
@@ -8120,7 +8120,7 @@ rse:
               {
                 BASIC(CMD_CALLSTDIF);
                 BASIC(arg1);
-                vlog_txt("   -> CALLSTD\r\n");
+                vlog_txt("   -> CALLSTD\n");
                 arg2=GetNum("IF (CALLSTD)");
                 if (!gffs) {
                   return;
@@ -8131,7 +8131,7 @@ rse:
               {
                 BASIC(CMD_JUMPSTDIF);
                 BASIC(arg1);
-                vlog_txt("   -> JUMPSTD\r\n");
+                vlog_txt("   -> JUMPSTD\n");
                 arg2=GetNum("IF (JUMPSTD)");
                 if (!gffs) {
                   return;
@@ -8140,14 +8140,14 @@ rse:
               }
               else
               {
-								sprintf(buf2,"IF (%s) was not correctly used. Use with jump/goto, call, callstd and jumpstd.\r\n",buf);
+								sprintf(buf2,"IF (%s) was not correctly used. Use with jump/goto, call, callstd and jumpstd.\n",buf);
                 log_txt(buf2,strlen(buf2));
                 return;
               }
             }
             aa("item")
             {
-              vlog_txt("ITEM\r\n");
+              vlog_txt("ITEM\n");
               arg1=GetNum("ITEM");
               if (!gffs) {
                 return;
@@ -8164,7 +8164,7 @@ rse:
             aa("jump")
             {
               BASIC(CMD_JUMP);
-              vlog_txt("JUMP\r\n");
+              vlog_txt("JUMP\n");
               arg1=GetNum("JUMP");
               if (!gffs) {
                 return;
@@ -8172,14 +8172,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("jumpstd")
             {
-              vlog_txt("JUMPSTD\r\n");
+              vlog_txt("JUMPSTD\n");
               arg1=GetNum("JUMPSTD");
               if (!gffs) {
                 return;
@@ -8189,7 +8189,7 @@ rse:
             }
             aa("jumpstdif")
             {
-              vlog_txt("jumpstdif\r\n");
+              vlog_txt("jumpstdif\n");
               arg1=GetNum("jumpstdif");
               if (!gffs) {
                 return;
@@ -8231,7 +8231,7 @@ rse:
             aa("loadpointer")
             {
               BASIC(CMD_MSGBOX);
-              vlog_txt("LOADPOINTER\r\n");
+              vlog_txt("LOADPOINTER\n");
               arg1=GetNum("LOADPOINTER");
               if (!gffs) {
                 return;
@@ -8244,14 +8244,14 @@ rse:
               if ((arg2&0xff000000)==0)
               {
                 arg2|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                 vlog_txt(buf3);
               }
               rom(arg2,4);
             }
             aa("loadbytefrompointer")
             {
-              vlog_txt("LOADBYTEFROMPOINTER\r\n");
+              vlog_txt("LOADBYTEFROMPOINTER\n");
               arg1=GetNum("LOADBYTEFROMPOINTER");
               if (!gffs) {
                 return;
@@ -8266,7 +8266,7 @@ rse:
             }
             aa("lightroom")
             {
-              vlog_txt("LIGHTROOM\r\n");
+              vlog_txt("LIGHTROOM\n");
               arg1=GetNum("LIGHTROOM");
               if (!gffs) {
                 return;
@@ -8289,7 +8289,7 @@ rse:
             {
               BASIC(CMD_MSGBOX);
               BASIC(0);
-              vlog_txt("MSGBOX\r\n");
+              vlog_txt("MSGBOX\n");
               arg1=GetNum("MSGBOX");
               if (!gffs) {
                 return;
@@ -8297,7 +8297,7 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
@@ -8306,7 +8306,7 @@ rse:
             {
               BASIC(CMD_MSGBOX2);
               BASIC(0);
-              vlog_txt("MSGBOX2\r\n");
+              vlog_txt("MSGBOX2\n");
               arg1=GetNum("MSGBOX2");
               if (!gffs) {
                 return;
@@ -8314,19 +8314,19 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("martend")
             {
-              vlog_txt("MARTEND\r\n");
+              vlog_txt("MARTEND\n");
               rom(0,2);
             }
             aa("message")
             {
-              vlog_txt("MESSAGE\r\n");
+              vlog_txt("MESSAGE\n");
               BASIC(CMD_MESSAGE);
               arg1=GetNum("MESSAGE");
               if (!gffs) {
@@ -8335,14 +8335,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("multichoice")
             {
-              vlog_txt("MULTICHOICE\r\n");
+              vlog_txt("MULTICHOICE\n");
               arg1=GetNum("MULTICHOICE");
               if (!gffs) {
                 return;
@@ -8367,7 +8367,7 @@ rse:
             }
             aa("multichoice2")
             {
-              vlog_txt("MULTICHOICE2\r\n");
+              vlog_txt("MULTICHOICE2\n");
               arg1=GetNum("MULTICHOICE2");
               if (!gffs) {
                 return;
@@ -8392,7 +8392,7 @@ rse:
             }
             aa("multichoice3")
             {
-              vlog_txt("MULTICHOICE3\r\n");
+              vlog_txt("MULTICHOICE3\n");
               arg1=GetNum("MULTICHOICE3");
               if (!gffs) {
                 return;
@@ -8422,7 +8422,7 @@ rse:
             }
             aa("movesprite2")
             {
-              vlog_txt("movesprite2\r\n");
+              vlog_txt("movesprite2\n");
               arg1=GetNum("movesprite2");
               if (!gffs) {
                 return;
@@ -8442,7 +8442,7 @@ rse:
             }
             aa("movesprite")
             {
-              vlog_txt("MOVESPRITE\r\n");
+              vlog_txt("MOVESPRITE\n");
               arg1=GetNum("MOVESPRITE");
               if (!gffs) {
                 return;
@@ -8462,7 +8462,7 @@ rse:
             }
             aa("moveoffscreen")
             {
-              vlog_txt("MOVEOFFSCREEN\r\n");
+              vlog_txt("MOVEOFFSCREEN\n");
               arg1=GetNum("MOVEOFFSCREEN");
               if (!gffs) {
                 return;
@@ -8472,7 +8472,7 @@ rse:
             }
             aa("m")
             {
-              vlog_txt("Movement data...\r\n");
+              vlog_txt("Movement data...\n");
               add_data(c,trans,transbackmove(Script,&i));
             }else goto unk_cmd_fr;
             ec();
@@ -8499,7 +8499,7 @@ rse:
           case 'p':
             if (!strcmp(buf,"pause"))
             {
-              vlog_txt("PAUSE\r\n");
+              vlog_txt("PAUSE\n");
               arg1=GetNum("PAUSE");
               if (!gffs) {
                 return;
@@ -8509,7 +8509,7 @@ rse:
             }
             aa("playsound")
             {
-              vlog_txt("PLAYSOUND\r\n");
+              vlog_txt("PLAYSOUND\n");
               arg1=GetNum("PLAYSOUND");
               if (!gffs) {
                 return;
@@ -8530,7 +8530,7 @@ rse:
             }
             aa("playsong")
             {
-              vlog_txt("PLAYSONG\r\n");
+              vlog_txt("PLAYSONG\n");
               arg1=GetNum("PLAYSONG");
               if (!gffs) {
                 return;
@@ -8541,7 +8541,7 @@ rse:
             aa("pauseevent")
             {
               BASIC(CMD_PAUSEEVENT);
-              vlog_txt("PAUSEEVENT\r\n");
+              vlog_txt("PAUSEEVENT\n");
               arg1=GetNum("PAUSEEVENT");
               if (!gffs) {
                 return;
@@ -8550,7 +8550,7 @@ rse:
             }
             aa("picture")
             {
-              vlog_txt("PICTURE\r\n");
+              vlog_txt("PICTURE\n");
               arg1=GetNum("PICTURE");
               if (!gffs) {
                 return;    //GFFS stands for Get-For-Function success. GetNum sets this to 0 on failure.
@@ -8560,7 +8560,7 @@ rse:
             }
             aa("pokemart")
             {
-              vlog_txt("POKEMART\r\n");
+              vlog_txt("POKEMART\n");
               BASIC(CMD_POKEMART);
               arg1=GetNum("POKEMART");
               if (!gffs) {
@@ -8569,14 +8569,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("pokemart2")
             {
-              vlog_txt("POKEMART2\r\n");
+              vlog_txt("POKEMART2\n");
               BASIC(CMD_POKEMART2);
               arg1=GetNum("POKEMART2");
               if (!gffs) {
@@ -8585,14 +8585,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("pokemart3")
             {
-              vlog_txt("POKEMART3\r\n");
+              vlog_txt("POKEMART3\n");
               BASIC(CMD_POKEMART3);
               arg1=GetNum("POKEMART3");
               if (!gffs) {
@@ -8601,14 +8601,14 @@ rse:
               if ((arg1&0xff000000)==0)
               {
                 arg1|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg1);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg1);
                 vlog_txt(buf3);
               }
               rom(arg1,4);
             }
             aa("paymoney")
             {
-              vlog_txt("PAYMONEY\r\n");
+              vlog_txt("PAYMONEY\n");
               arg1=GetNum("PAYMONEY");
               if (!gffs) {
                 return;
@@ -8646,7 +8646,7 @@ rse:
             }
             aa("random")
             {
-              vlog_txt("RANDOM\r\n");
+              vlog_txt("RANDOM\n");
               arg1=GetNum("RANDOM");
               if (!gffs) {
                 return;
@@ -8656,7 +8656,7 @@ rse:
             }
             aa("removeitem")
             {
-              vlog_txt("REMOVEITEM\r\n");
+              vlog_txt("REMOVEITEM\n");
               arg1=GetNum("REMOVEITEM");
               if (!gffs) {
                 return;
@@ -8671,7 +8671,7 @@ rse:
             }
             aa("resetspritelevel")
             {
-              vlog_txt("RESETSPRITELEVEL\r\n");
+              vlog_txt("RESETSPRITELEVEL\n");
               arg1=GetNum("RESETSPRITELEVEL");
               if (!gffs) {
                 return;
@@ -8691,7 +8691,7 @@ rse:
             }
             aa("reappear")
             {
-              vlog_txt("REAPPEAR\r\n");
+              vlog_txt("REAPPEAR\n");
               arg1=GetNum("REAPPEAR");
               if (!gffs) {
                 return;
@@ -8701,7 +8701,7 @@ rse:
             }
             aa("reappearat")
             {
-              vlog_txt("REAPPEARAT\r\n");
+              vlog_txt("REAPPEARAT\n");
               arg1=GetNum("REAPPEARAT");
               if (!gffs) {
                 return;
@@ -8733,7 +8733,7 @@ rse:
             }
             aa("showpokepic")
             {
-              vlog_txt("SHOWPOKEPIC\r\n");
+              vlog_txt("SHOWPOKEPIC\n");
               arg1=GetNum("SHOWPOKEPIC");
               if (!gffs) {
                 return;
@@ -8753,7 +8753,7 @@ rse:
             }
             aa("storeitems")
             {
-              vlog_txt("STOREITEMS\r\n");
+              vlog_txt("STOREITEMS\n");
               arg1=GetNum("STOREITEMS");
               if (!gffs) {
                 return;
@@ -8773,7 +8773,7 @@ rse:
             }
             aa("setpokemonpp")
             {
-              vlog_txt("SETPOKEMONPP\r\n");
+              vlog_txt("SETPOKEMONPP\n");
               arg1=GetNum("SETPOKEMONPP");
               if (!gffs) {
                 return;
@@ -8793,7 +8793,7 @@ rse:
             }
             aa("storepartypokemon")
             {
-              vlog_txt("STOREPARTYPOKEMON\r\n");
+              vlog_txt("STOREPARTYPOKEMON\n");
               arg1=GetNum("STOREPARTYPOKEMON");
               if (!gffs) {
                 return;
@@ -8808,7 +8808,7 @@ rse:
             }
             aa("storefirstpokemon")
             {
-              vlog_txt("STOREFIRSTPOKEMON\r\n");
+              vlog_txt("STOREFIRSTPOKEMON\n");
               arg1=GetNum("STOREFIRSTPOKEMON");
               if (!gffs) {
                 return;
@@ -8818,7 +8818,7 @@ rse:
             }
             aa("setcatchlocation")
             {
-              vlog_txt("SETCATCHLOCATION\r\n");
+              vlog_txt("SETCATCHLOCATION\n");
               arg1=GetNum("SETCATCHLOCATION");
               if (!gffs) {
                 return;
@@ -8833,7 +8833,7 @@ rse:
             }
             aa("setdoorclosed")
             {
-              vlog_txt("SETDOORCLOSED\r\n");
+              vlog_txt("SETDOORCLOSED\n");
               arg1=GetNum("SETDOORCLOSED");
               if (!gffs) {
                 return;
@@ -8848,7 +8848,7 @@ rse:
             }
             aa("setdoorclosedstatic")
             {
-              vlog_txt("SETDOORCLOSEDSTATIC\r\n");
+              vlog_txt("SETDOORCLOSEDSTATIC\n");
               arg1=GetNum("SETDOORCLOSEDSTATIC");
               if (!gffs) {
                 return;
@@ -8863,7 +8863,7 @@ rse:
             }
             aa("setdooropened")
             {
-              vlog_txt("SETDOOROPENED\r\n");
+              vlog_txt("SETDOOROPENED\n");
               arg1=GetNum("SETDOOROPENED");
               if (!gffs) {
                 return;
@@ -8878,7 +8878,7 @@ rse:
             }
             aa("setdooropenedstatic")
             {
-              vlog_txt("SETDOOROPENEDSTATIC\r\n");
+              vlog_txt("SETDOOROPENEDSTATIC\n");
               arg1=GetNum("SETDOOROPENEDSTATIC");
               if (!gffs) {
                 return;
@@ -8893,7 +8893,7 @@ rse:
             }
             aa("setanimation")
             {
-              vlog_txt("SETANIMATION\r\n");
+              vlog_txt("SETANIMATION\n");
               arg1=GetNum("SETANIMATION");
               if (!gffs) {
                 return;
@@ -8908,7 +8908,7 @@ rse:
             }
             aa("setobedience")
             {
-              vlog_txt("SETOBEDIENCE\r\n");
+              vlog_txt("SETOBEDIENCE\n");
               arg1=GetNum("SETOBEDIENCE");
               if (!gffs) {
                 return;
@@ -8918,7 +8918,7 @@ rse:
             }
             aa("setbyte")
             {
-              vlog_txt("SETBYTE\r\n");
+              vlog_txt("SETBYTE\n");
               arg1=GetNum("SETBYTE");
               if (!gffs) {
                 return;
@@ -8928,7 +8928,7 @@ rse:
             }
             aa("spriteface")
             {
-              vlog_txt("SPRITEFACE\r\n");
+              vlog_txt("SPRITEFACE\n");
               arg1=GetNum("SPRITEFACE");
               if (!gffs) {
                 return;
@@ -8943,7 +8943,7 @@ rse:
             }
             aa("sethealingplace")
             {
-              vlog_txt("SETHEALINGPLACE\r\n");
+              vlog_txt("SETHEALINGPLACE\n");
               arg1=GetNum("SETHEALINGPLACE");
               if (!gffs) {
                 return;
@@ -8953,7 +8953,7 @@ rse:
             }
             aa("special")
             {
-              vlog_txt("SPECIAL\r\n");
+              vlog_txt("SPECIAL\n");
               arg1=GetNum("SPECIAL");
               if (!gffs) {
                 return;
@@ -8963,7 +8963,7 @@ rse:
             }
             aa("setworldmapflag")
             {
-              vlog_txt("SETWORLDMAPFLAG\r\n");
+              vlog_txt("SETWORLDMAPFLAG\n");
               arg1=GetNum("setworldmapflag");
               if (!gffs) {
                 return;
@@ -8973,7 +8973,7 @@ rse:
             }
             aa("special2")
             {
-              vlog_txt("SPECIAL2\r\n");
+              vlog_txt("SPECIAL2\n");
               arg1=GetNum("SPECIAL2");
               if (!gffs) {
                 return;
@@ -8988,7 +8988,7 @@ rse:
             }
             aa("setvar")
             {
-              vlog_txt("SETVAR\r\n");
+              vlog_txt("SETVAR\n");
               arg1=GetNum("SETVAR");
               if (!gffs) {
                 return;
@@ -9003,7 +9003,7 @@ rse:
             }
             aa("setflag")
             {
-              vlog_txt("SETFLAG\r\n");
+              vlog_txt("SETFLAG\n");
               arg1=GetNum("SETFLAG");
               if (!gffs) {
                 return;
@@ -9013,7 +9013,7 @@ rse:
             }
             aa("sound")
             {
-              vlog_txt("SOUND\r\n");
+              vlog_txt("SOUND\n");
               arg1=GetNum("SOUND");
               if (!gffs) {
                 return;
@@ -9023,7 +9023,7 @@ rse:
             }
             aa("storepokemon")
             {
-              vlog_txt("STOREPOKEMON\r\n");
+              vlog_txt("STOREPOKEMON\n");
               arg1=GetNum("STOREPOKEMON");
               if (!gffs) {
                 return;
@@ -9038,7 +9038,7 @@ rse:
             }
             aa("storeboxname")
             {
-              vlog_txt("STOREBOXNAME\r\n");
+              vlog_txt("STOREBOXNAME\n");
               arg1=GetNum("STOREBOXNAME");
               if (!gffs) {
                 return;
@@ -9053,7 +9053,7 @@ rse:
             }
             aa("storevar")
             {
-              vlog_txt("STOREVAR\r\n");
+              vlog_txt("STOREVAR\n");
               arg1=GetNum("STOREVAR");
               if (!gffs) {
                 return;
@@ -9068,7 +9068,7 @@ rse:
             }
             aa("storetext")
             {
-              vlog_txt("STORETEXT\r\n");
+              vlog_txt("STORETEXT\n");
               BASIC(CMD_STORETEXT);
               arg1=GetNum("STORETEXT");
               if (!gffs) {
@@ -9082,14 +9082,14 @@ rse:
               if ((arg2&0xff000000)==0)
               {
                 arg2|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg2);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg2);
                 vlog_txt(buf3);
               }
               rom(arg2,4);
             }
             aa("setmaptile")
             {
-              vlog_txt("SETMAPTILE\r\n");
+              vlog_txt("SETMAPTILE\n");
               arg1=GetNum("SETMAPTILE");
               if (!gffs) {
                 return;
@@ -9114,7 +9114,7 @@ rse:
             }
             aa("setmapfooter")
             {
-              vlog_txt("SETMAPFOOTER\r\n");
+              vlog_txt("SETMAPFOOTER\n");
               arg1=GetNum("SETMAPFOOTER");
               if (!gffs) {
                 return;
@@ -9124,7 +9124,7 @@ rse:
             }
             aa("setweather")
             {
-              vlog_txt("SETWEATHER\r\n");
+              vlog_txt("SETWEATHER\n");
               arg1=GetNum("SETWEATHER");
               if (!gffs) {
                 return;
@@ -9143,7 +9143,7 @@ rse:
             }
             aa("storeitem")
             {
-              vlog_txt("STOREITEM\r\n");
+              vlog_txt("STOREITEM\n");
               arg1=GetNum("STOREITEM");
               if (!gffs) {
                 return;
@@ -9158,7 +9158,7 @@ rse:
             }
             aa("storeattack")
             {
-              vlog_txt("STOREATTACK\r\n");
+              vlog_txt("STOREATTACK\n");
               arg1=GetNum("STOREATTACK");
               if (!gffs) {
                 return;
@@ -9173,7 +9173,7 @@ rse:
             }
             aa("storefurniture")
             {
-              vlog_txt("STOREFURNITURE\r\n");
+              vlog_txt("STOREFURNITURE\n");
               arg1=GetNum("STOREFURNITURE");
               if (!gffs) {
                 return;
@@ -9188,7 +9188,7 @@ rse:
             }
             aa("storecomp")
             {
-              vlog_txt("STORECOMP\r\n");
+              vlog_txt("STORECOMP\n");
               arg1=GetNum("STORECOMP");
               if (!gffs) {
                 return;
@@ -9203,7 +9203,7 @@ rse:
             }
             aa("slotmachine")
             {
-              vlog_txt("SLOTMACHINE\r\n");
+              vlog_txt("SLOTMACHINE\n");
               arg1=GetNum("SLOTMACHINE");
               if (!gffs) {
                 return;
@@ -9213,7 +9213,7 @@ rse:
             }
             aa("showmoney")
             {
-              vlog_txt("SHOWMONEY\r\n");
+              vlog_txt("SHOWMONEY\n");
               arg1=GetNum("SHOWMONEY");
               if (!gffs) {
                 return;
@@ -9228,7 +9228,7 @@ rse:
             }
             aa("showyesno")
             {
-              vlog_txt("SHOWYESNO\r\n");
+              vlog_txt("SHOWYESNO\n");
               arg1=GetNum("SHOWYESNO");
               if (!gffs) {
                 return;
@@ -9243,7 +9243,7 @@ rse:
             }
             aa("settrainerflag")
             {
-              vlog_txt("SETTRAINERFLAG\r\n");
+              vlog_txt("SETTRAINERFLAG\n");
               arg1=GetNum("SETTRAINERFLAG");
               if (!gffs) {
                 return;
@@ -9253,7 +9253,7 @@ rse:
             }
             aa("showcoins")
             {
-              vlog_txt("SHOWCOINS\r\n");
+              vlog_txt("SHOWCOINS\n");
               arg1=GetNum("SHOWCOINS");
               if (!gffs) {
                 return;
@@ -9268,7 +9268,7 @@ rse:
             }
             aa("subtractvar")
             {
-              vlog_txt("SUBTRACTVAR\r\n");
+              vlog_txt("SUBTRACTVAR\n");
               arg1=GetNum("SUBTRACTVAR");
               if (!gffs) {
                 return;
@@ -9283,7 +9283,7 @@ rse:
             }
             aa("setfarbyte")
             {
-              vlog_txt("SETFARBYTE\r\n");
+              vlog_txt("SETFARBYTE\n");
               BASIC(CMD_SETFARBYTE);
               arg1=GetNum("SETFARBYTE");
               if (!gffs) {
@@ -9298,7 +9298,7 @@ rse:
             }
             aa("setbyte2")
             {
-              vlog_txt("SETBYTE2\r\n");
+              vlog_txt("SETBYTE2\n");
               arg1=GetNum("SETBYTE2");
               if (!gffs) {
                 return;
@@ -9313,7 +9313,7 @@ rse:
             }
             aa("spritebehave")
             {
-              vlog_txt("spritebehave\r\n");
+              vlog_txt("spritebehave\n");
               arg1=GetNum("spritebehave");
               if (!gffs) {
                 return;
@@ -9331,7 +9331,7 @@ rse:
           case 't':
             if (!strcmp(buf,"takefurniture"))
             {
-              vlog_txt("TAKEFURNITURE\r\n");
+              vlog_txt("TAKEFURNITURE\n");
               arg1=GetNum("TAKEFURNITURE");
               if (!gffs) {
                 return;
@@ -9341,7 +9341,7 @@ rse:
             }
             aa("tempspriteface")
             {
-              vlog_txt("TEMPSPRITEFACE\r\n");
+              vlog_txt("TEMPSPRITEFACE\n");
               arg1=GetNum("TEMPSPRITEFACE");
               if (!gffs) {
                 return;
@@ -9357,7 +9357,7 @@ rse:
             aa("trainerbattle")
             {
               BASIC(CMD_TRAINERBATTLE);
-              vlog_txt("TRAINERBATTLE\r\n");
+              vlog_txt("TRAINERBATTLE\n");
               arg1=GetNum("TRAINERBATTLE");
               if (!gffs) {
                 return;
@@ -9380,7 +9380,7 @@ rse:
               if ((arg4&0xff000000)==0)
               {
                 arg4|=0x08000000;
-                sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
+                sprintf(buf3,"   -> Converted to 0x%x\n",arg4);
                 vlog_txt(buf3);
               }
               rom(arg4,4);
@@ -9393,7 +9393,7 @@ rse:
                 if ((arg5&0xff000000)==0)
                 {
                   arg5|=0x08000000;
-                  sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
+                  sprintf(buf3,"   -> Converted to 0x%x\n",arg4);
                   vlog_txt(buf3);
                 }
                 rom(arg5,4);
@@ -9407,7 +9407,7 @@ rse:
                 if ((arg6&0xff000000)==0)
                 {
                   arg6|=0x08000000;
-                  sprintf(buf3,"   -> Converted to 0x%x\r\n",arg4);
+                  sprintf(buf3,"   -> Converted to 0x%x\n",arg4);
                   vlog_txt(buf3);
                 }
                 rom(arg6,4);
@@ -9415,7 +9415,7 @@ rse:
             }
             aa("takefromcoincase")
             {
-              vlog_txt("TAKEFROMCOINCASE\r\n");
+              vlog_txt("TAKEFROMCOINCASE\n");
               arg1=GetNum("TAKEFROMCOINCASE");
               if (!gffs) {
                 return;
@@ -9425,7 +9425,7 @@ rse:
             }
             else if (!strcmp(buf,"textcolor")||!strcmp(buf,"textcolour"))
             {
-              vlog_txt("TEXTCOLOUR\r\n");
+              vlog_txt("TEXTCOLOUR\n");
               arg1=GetNum("TEXTCOLOUR");
               if (!gffs) {
                 return;
@@ -9438,7 +9438,7 @@ rse:
           case 'u':
             if (!strcmp(buf,"updatecoins"))
             {
-              vlog_txt("UPDATECOINS\r\n");
+              vlog_txt("UPDATECOINS\n");
               arg1=GetNum("UPDATECOINS");
               if (!gffs) {
                 return;
@@ -9453,7 +9453,7 @@ rse:
             }
             aa("updatemoney")
             {
-              vlog_txt("UPDATEMONEY\r\n");
+              vlog_txt("UPDATEMONEY\n");
               arg1=GetNum("UPDATEMONEY");
               if (!gffs) {
                 return;
@@ -9488,7 +9488,7 @@ rse:
             }
             aa("warpteleport2")
             {
-              vlog_txt("WARPTELEPORT2\r\n");
+              vlog_txt("WARPTELEPORT2\n");
               arg1=GetNum("WARPTELEPORT2");
               if (!gffs) {
                 return;
@@ -9524,7 +9524,7 @@ rse:
             }
             aa("warp6")
             {
-              vlog_txt("WARP6\r\n");
+              vlog_txt("WARP6\n");
               arg1=GetNum("WARP6");
               if (!gffs) {
                 return;
@@ -9560,7 +9560,7 @@ rse:
             }
             aa("warpmuted")
             {
-              vlog_txt("WARPMUTED\r\n");
+              vlog_txt("WARPMUTED\n");
               arg1=GetNum("WARPMUTED");
               if (!gffs) {
                 return;
@@ -9596,7 +9596,7 @@ rse:
             }
             aa("warpwalking")
             {
-              vlog_txt("WARPWALKING\r\n");
+              vlog_txt("WARPWALKING\n");
               arg1=GetNum("WARPWALKING");
               if (!gffs) {
                 return;
@@ -9632,7 +9632,7 @@ rse:
             }
             aa("warpteleport")
             {
-              vlog_txt("WARPTELEPORT\r\n");
+              vlog_txt("WARPTELEPORT\n");
               arg1=GetNum("WARPTELEPORT");
               if (!gffs) {
                 return;
@@ -9668,7 +9668,7 @@ rse:
             }
             aa("warp3")
             {
-              vlog_txt("WARP3\r\n");
+              vlog_txt("WARP3\n");
               arg1=GetNum("WARP3");
               if (!gffs) {
                 return;
@@ -9704,7 +9704,7 @@ rse:
             }
             aa("warp4")
             {
-              vlog_txt("WARP4\r\n");
+              vlog_txt("WARP4\n");
               arg1=GetNum("WARP4");
               if (!gffs) {
                 return;
@@ -9740,7 +9740,7 @@ rse:
             }
             aa("warp5")
             {
-              vlog_txt("WARP5\r\n");
+              vlog_txt("WARP5\n");
               arg1=GetNum("WARP5");
               if (!gffs) {
                 return;
@@ -9776,7 +9776,7 @@ rse:
             }
             aa("warpelevator")
             {
-              vlog_txt("WARPELEVATOR\r\n");
+              vlog_txt("WARPELEVATOR\n");
               arg1=GetNum("WARPELEVATOR");
               if (!gffs) {
                 return;
@@ -9812,7 +9812,7 @@ rse:
             }
             aa("writebytetooffset")
             {
-              vlog_txt("WRITEBYTETOOFFSET\r\n");
+              vlog_txt("WRITEBYTETOOFFSET\n");
               arg1=GetNum("WRITEBYTETOOFFSET");
               if (!gffs) {
                 return;
@@ -9827,12 +9827,12 @@ rse:
             }
             aa("waitcry")
             {
-              vlog_txt("WAITCRY\r\n");
+              vlog_txt("WAITCRY\n");
               BASIC(CMD_WAITCRY);
             }
             aa("warp")
             {
-              vlog_txt("WARP\r\n");
+              vlog_txt("WARP\n");
               arg1=GetNum("WARP");
               if (!gffs) {
                 return;
@@ -9878,23 +9878,23 @@ rse:
             break;
           case '=':
             if(strcmp(buf,"="))goto unk_cmd_fr;
-            vlog_txt("[STRING]\r\n");
+            vlog_txt("[STRING]\n");
             if (chr==' ') {
               i++;
             }
             else {
-              log_txt("Should have a space after the =\r\n",33);
+              log_txt("Should have a space after the =\n", 33-1);
             }
             temp_ptr=transbackstr(script,i-fst,c);
             while (chr!='\n'&&chr!=0) {
               i++;
             }
-            sprintf(buf2,"   -> %s\r\n",(char*)temp_ptr);
+            sprintf(buf2,"   -> %s\n",(char*)temp_ptr);
             free(temp_ptr);
             vlog_txt(buf2);
             break;
           case '.':
-            vlog_txt("[BINARY]\r\n   ->");
+            vlog_txt("[BINARY]\n   ->");
             i=buf_loc+1;
             i = skip_whitespace(Script, i);
             k=0;
@@ -9910,7 +9910,7 @@ rse:
               else if(chr>='a'&&chr<='f')j=chr-('a'-0xA);
               else
               {
-                sprintf(buf2,"Failed to understand hex character '%c'\r\n",chr);
+                sprintf(buf2,"Failed to understand hex character '%c'\n",chr);
                 log_txt(buf2,strlen(buf2));
                 return;
               }
@@ -9934,11 +9934,11 @@ rse:
                 i++;
               }
             }
-            vlog_txt("\r\n");
+            vlog_txt("\n");
             break;
           default:
 unk_cmd_fr:
-            sprintf(buf2,"Warning: Unknown command \"%s\"\r\n",buf);
+            sprintf(buf2,"Warning: Unknown command \"%s\"\n",buf);
             log_txt(buf2,strlen(buf2));
             while (chr!='\n'&&chr!=0)
             {
@@ -9970,11 +9970,11 @@ unk_cmd_fr:
 #endif
   if (dynu&&start==0)
   {
-    log_txt("Error: No #dyn used with dynamic offsets!\r\n",43);
+    log_txt("Error: No #dyn used with dynamic offsets!\n", 43-1);
   }
   else
   {
-    vlog_txt("\r\n#ORG: data\r\n");
+    vlog_txt("\n#ORG: data\n");
     calc_org(c,start,romfn, defines);
     process_inserts(c,cl);
 #ifdef WIN32
@@ -9989,11 +9989,11 @@ unk_cmd_fr:
       if (c->name)
       {
         if(mode!=GOLD&&mode!=CRYSTAL)
-          sprintf(buf,"   -> %s <-> 0x%X (0x%X bytes)\r\n",c->name,c->org,c->size);
+          sprintf(buf,"   -> %s <-> 0x%X (0x%X bytes)\n",c->name,c->org,c->size);
         else
         {
           j=OffsetToPointer(c->org);
-          sprintf(buf,"   -> %s <-> 0x%X -> %02X:%04X (0x%X bytes)\r\n",c->name,c->org,j&0xFF,(j>>8)&0xFFFF,c->size);
+          sprintf(buf,"   -> %s <-> 0x%X -> %02X:%04X (0x%X bytes)\n",c->name,c->org,j&0xFF,(j>>8)&0xFFFF,c->size);
         }
         log_txt(buf,strlen(buf));
 #ifdef WIN32
@@ -10014,7 +10014,7 @@ unk_cmd_fr:
       }
       else
       {
-        sprintf(buf,"   -> 0x%X (0x%X bytes)\r\n",c->org,c->size);
+        sprintf(buf,"   -> 0x%X (0x%X bytes)\n",c->org,c->size);
         log_txt(buf,strlen(buf));
       }
       for(cl2=cl;cl2;cl2=cl2->next)
@@ -10022,11 +10022,11 @@ unk_cmd_fr:
         if(cl2->block==c)
         {
           if(mode!=GOLD&&mode!=CRYSTAL)
-            sprintf(buf,"      -> %s <-> 0x%X\r\n",cl2->name,c->org+cl2->pos);
+            sprintf(buf,"      -> %s <-> 0x%X\n",cl2->name,c->org+cl2->pos);
           else
           {
             j=OffsetToPointer(c->org+cl2->pos);
-            sprintf(buf,"      -> %s <-> 0x%X -> %02X:%04X\r\n",cl2->name,c->org+cl2->pos,j&0xFF,(j>>8)&0xFFFF);
+            sprintf(buf,"      -> %s <-> 0x%X -> %02X:%04X\n",cl2->name,c->org+cl2->pos,j&0xFF,(j>>8)&0xFFFF);
           }
           log_txt(buf,strlen(buf));
 #ifdef WIN32

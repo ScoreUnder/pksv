@@ -39,7 +39,7 @@ int main(int argc, char **argv)
     in_filename = argv[1];
   }
 
-  FILE *f = fopen(in_filename, "r");
+  FILE *f = fopen(in_filename, "rt");
   if (!f) {
     perror("opening input file");
     return 1;
