@@ -2294,8 +2294,8 @@ FILE* scrf;
 
 void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                  char* filename, FILE* fsend) {
-  unsigned int still_going, arg1, arg2, arg3, arg4, arg5, arg6, arg7, endat,
-      failsafe = 0, lastdata, lastdata2;
+  unsigned int still_going = 0, arg1 = 0, arg2 = 0, arg3 = 0, arg4 = 0, arg5 = 0, arg6 = 0, arg7 = 0, endat = 0,
+      failsafe = 0, lastdata = 0, lastdata2 = 0;
   unsigned char command, lastcmd;
   register FILE* fileM = fileM_;
   size_t read;
@@ -6542,8 +6542,7 @@ void DecodeProc(FILE* fileM, unsigned int narc, unsigned int FileZoomPos,
   }
 }
 
-void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                   FILE* fsend) {
+void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register unsigned int arg1, failsafe;
   unsigned int arg2, arg3;
   char buf[1024];
@@ -6634,7 +6633,7 @@ void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, char* fname,
   }
 }
 
-void DecodeProcText(FILE* fileM, unsigned int FileZoomPos, char* fname,
+void DecodeProcText(unsigned int FileZoomPos, char* fname,
                     FILE* fsend) {
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
@@ -6662,8 +6661,7 @@ void DecodeProcText(FILE* fileM, unsigned int FileZoomPos, char* fname,
   decompile_single_text(fsend, fname, FileZoomPos);
 }
 
-void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                       FILE* fsend) {
+void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   unsigned int arg2;
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
@@ -6702,8 +6700,7 @@ void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, char* fname,
   }
 }
 
-void DecodeProcMoves(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                     FILE* fsend) {
+void DecodeProcMoves(unsigned int FileZoomPos, char* fname, FILE* fsend) {
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
   if (VersionOverride) {
@@ -6735,8 +6732,7 @@ void DecodeProcMoves(FILE* fileM, unsigned int FileZoomPos, char* fname,
             transmove(FileZoomPos & 0x07ffffff, fname));
 }
 
-void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                    FILE* fsend) {
+void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register char* m;
   int arg2;
   initDoneProcs();
@@ -6783,8 +6779,7 @@ void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, char* fname,
   fprintf(fsend, "\n");
 }
 
-void DecodeProcAttacks(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                       FILE* fsend) {
+void DecodeProcAttacks(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register char* m;
   int arg2;
   initDoneProcs();

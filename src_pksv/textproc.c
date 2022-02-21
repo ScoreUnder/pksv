@@ -442,12 +442,9 @@ char *transtxt(int howfar, const char *file, size_t word_wrap,
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 char *transbrl(int howfar, const char *file, FILE *fsend) {
-  unsigned int pt = 0;
   unsigned char p;
-  int read;
   char still_going;
   FILE *fileC;
-  read = 0;
   fileC = fopen(file, "rb");
   if (fileC != NULL) {
     fseek(fileC, (howfar & 0xffffff), SEEK_SET);
@@ -455,7 +452,6 @@ char *transbrl(int howfar, const char *file, FILE *fsend) {
     fprintf(fsend, "        '");
     while (still_going) {
       fread(&p, 1, 1, fileC);
-      pt = 0;
       if (p == 0xff) {
         still_going = 0;
         break;
@@ -475,7 +471,6 @@ char *transbrl(int howfar, const char *file, FILE *fsend) {
     still_going = 1;
     while (still_going) {
       fread(&p, 1, 1, fileC);
-      pt = 0;
       if (p == 0xff) {
         still_going = 0;
         break;
@@ -496,7 +491,6 @@ char *transbrl(int howfar, const char *file, FILE *fsend) {
     still_going = 1;
     while (still_going) {
       fread(&p, 1, 1, fileC);
-      pt = 0;
       if (p == 0xff) {
         still_going = 0;
         break;
@@ -612,7 +606,8 @@ void err_bad_hex(const char *ptr, size_t len) {
 /////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 char *transbackstr(char *scrfn, unsigned int pos, codeblock *c) {
-  char *NewSpace, *ret;
+  unsigned char *NewSpace;
+  char *ret;
   char cch, noend = 0;
   char str[65536];
   unsigned int i = 0, j = 0, k, l;
@@ -918,7 +913,7 @@ char *transbackstr(char *scrfn, unsigned int pos, codeblock *c) {
   }
   if (eorg) memset(NewSpace, search, j);
 
-  add_data(c, NewSpace, j);
+  add_data(c, (char*)NewSpace, j);
   free(NewSpace);
   return ret;
 }

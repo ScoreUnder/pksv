@@ -197,7 +197,7 @@ __declspec(dllexport) __cdecl char* decompileASM(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcASM(romfile, loc, fname, script_file);
+  DecodeProcASM(romfile, loc, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
@@ -214,7 +214,7 @@ __declspec(dllexport) __cdecl char* decompileText(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcText(romfile, loc, fname, script_file);
+  DecodeProcText(loc, fname, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
@@ -248,7 +248,7 @@ __declspec(dllexport) __cdecl char* decompilePointer(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcPointer(romfile, loc, fname, script_file);
+  DecodeProcPointer(romfile, loc, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
@@ -265,7 +265,7 @@ __declspec(dllexport) __cdecl char* decompileMoves(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcMoves(romfile, loc, fname, script_file);
+  DecodeProcMoves(loc, fname, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
@@ -282,7 +282,7 @@ __declspec(dllexport) __cdecl char* decompileMart(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcMart(romfile, loc, fname, script_file);
+  DecodeProcMart(romfile, loc, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);
@@ -299,7 +299,7 @@ __declspec(dllexport) __cdecl char* decompileAttacks(char* fname, int loc) {
 
   START_FMEM(script_file);
 
-  DecodeProcAttacks(romfile, loc, fname, script_file);
+  DecodeProcAttacks(romfile, loc, script_file);
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
   fclose(romfile);

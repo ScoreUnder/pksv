@@ -131,7 +131,7 @@ uint32_t GetHex(const char *in, pos_int *ppos) {
 
 void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
   unsigned int i = *ppos;
-  int j;  // used in rom macro
+  // int j;  // used in rom macro
   register int arg1, arg2, arg3;
   ///////////////////ASM////////////////////
   if (thumb) {
@@ -1230,15 +1230,15 @@ void RecodeProc(char *script, char *romfn) {
 #endif
   char *Script;  // Whoops, used the same name for the filename.
   // Use caps-lock carefully.
-  char buf[1024], buf2[1024], buf3[1024];
+  char buf[1024], buf2[2048], buf3[1024];
   void *temp_ptr;
   int buf_loc;
   unsigned int start = 0, dynu = 0,
 #ifndef DLL
                fs,
 #endif
-               fst, i, j, k, l, arg1, arg2, arg3, arg4, arg5, arg6,
-               scriptlen;  //,arg7;
+               fst= 0, i = 0, j = 0, k = 0, l = 0, arg1 = 0, arg2 = 0, arg3 = 0, arg4 = 0, arg5 = 0, arg6 = 0,
+               scriptlen = 0;  //,arg7;
   codeblock *c = NULL;
   codeblock *d;
   codelabel *cl = NULL;
