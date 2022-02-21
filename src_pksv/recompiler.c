@@ -8953,9 +8953,9 @@ void RecodeProc(char *script, char *romfn) {
 
     for (size_t i = 0; i < root.size; i++) {
       uint32_t org = (uint32_t)root.pairs[i].key;
-      uint32_t size = (uint32_t)root.pairs[i].value;
-      if (size > 0) {
-        sprintf(buf2, "   %08X - %08X\n", org, org + size);
+      uint32_t end = (uint32_t)root.pairs[i].value;
+      if (end != org) {
+        sprintf(buf2, "   %08X - %08X\n", org, end);
         vlog_txt(buf2);
       }
     }
