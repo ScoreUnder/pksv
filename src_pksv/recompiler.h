@@ -10,6 +10,7 @@ extern unsigned int needdlg;
 
 extern bool testing;
 extern char *defines_dat_location;
+extern char *pokeinc_txt_location;
 void RecodeProc(char *script, char *romfn);
 
 #endif

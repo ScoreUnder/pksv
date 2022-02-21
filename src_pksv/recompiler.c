@@ -53,6 +53,7 @@
 #define BASIC(x) rom((x), 1)
 
 char *defines_dat_location = NULL;
+char *pokeinc_txt_location = NULL;
 
 int thumb = 1;
 void end_command(const char *in, pos_int *ppos) {
@@ -1223,7 +1224,7 @@ void RecodeProc(char *script, char *romfn) {
 #ifndef DLL
   FILE *CurrFile;
 #endif
-  FILE *IncFile, *RomFile;
+  FILE *IncFile = NULL, *RomFile;
 #ifdef WIN32
   char *strings;
 #endif
@@ -1249,12 +1250,13 @@ void RecodeProc(char *script, char *romfn) {
     RomFile = fopen(romfn, "r+b");
   }
   struct bsearch_root *defines = DoDefines();
-#ifndef DLL
-  strcat(GlobBuf, "pokeinc.txt");
-  IncFile = fopen(GlobBuf, "rt");
-#else
-  IncFile = fopen("pokeinc.txt", "rt");
-#endif
+
+  if (pokeinc_txt_location != NULL) {
+    IncFile = fopen(pokeinc_txt_location, "rt");
+  }
+  if (IncFile == NULL) {
+    IncFile = fopen("pokeinc.txt", "rt");
+  }
 
   if (RomFile == NULL) {
     printf("Cannot open ROM\n");

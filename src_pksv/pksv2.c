@@ -41,7 +41,6 @@ unsigned char search = 0xFF;  // Free Space character
 bool eorg = false;
 bool testing = false;
 FILE* LogFile;
-char GlobBuf[65536];
 signed int PointerToOffset(unsigned int ptr);  // prototype
 signed int OffsetToPointer(unsigned int offset);
 
@@ -64,7 +63,6 @@ int main(int argc, char** argv) {
     argv[0][0] = 0;
   }
   argv[0][i + 1] = 0;
-  strcpy(GlobBuf, argv[0]);
   // Argument Processing
   for (i = 1; i < argc; i++) {
     if (argv[i][0] != '-') {

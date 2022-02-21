@@ -10,8 +10,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-extern char GlobBuf[];
-
 extern bool VersionOverride, IsVerbose;
 extern bool dyndec;  // Decompile with dynamic names (helps newbies edit scripts
                      // without overwriting)

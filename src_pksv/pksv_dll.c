@@ -37,7 +37,6 @@ bool dyndec = false;
 int dynplace = 0;
 char mode = FIRE_RED;
 bool VersionOverride = false;
-char GlobBuf[65536];
 FILE* LogFile;
 bool IsVerbose = true;
 unsigned char search = 0xFF;  // Free Space character
@@ -48,21 +47,49 @@ signed int PointerToOffset(unsigned int ptr);  // prototype
 signed int OffsetToPointer(unsigned int offset);
 int __stdcall TxtDlg(HWND, UINT, WPARAM, LPARAM);
 HWND HW_DLG, HW_TXT;
+
+__attribute__((malloc)) char* get_module_filename(void) {
+  size_t maxlen = MAX_PATH;
+  size_t actual_len = MAX_PATH;
+  char* filename = malloc(maxlen);
+  while (true) {
+    actual_len = (size_t)GetModuleFileName(NULL, filename, maxlen);
+    if (actual_len < maxlen) {
+      break;
+    }
+    maxlen *= 2;
+    filename = realloc(filename, maxlen);
+  }
+
+  // Shrink, but add some space for our "defines.dat" concat later
+  filename = realloc(filename, actual_len + 16);
+  return filename;
+}
+
+#define DEFINITIONS_FILE "defines.dat"
+#define INCLUDES_FILE "pokeinc.txt"
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved) {
   RECT rect;
-  register char* a;
   if (fdwReason != DLL_PROCESS_ATTACH) return 1;
   if (hinstDLL) inst = hinstDLL;
 
-  GetModuleFileName(inst, GlobBuf, 65536);
-  a = strrchr(GlobBuf, '\\');
-  if (a)
-    a[1] = 0;
-  else
-    strcpy(GlobBuf, ".\\");
-  strcat(GlobBuf, "defines.dat");
   if (defines_dat_location) free(defines_dat_location);
-  defines_dat_location = strdup(GlobBuf);
+  defines_dat_location = get_module_filename();
+  char* last_slash = strrchr(defines_dat_location, '\\');
+  if (last_slash)
+    strcpy(last_slash + 1, DEFINITIONS_FILE);
+  else
+    strcpy(defines_dat_location, ".\\" DEFINITIONS_FILE);
+
+  if (pokeinc_txt_location) free(pokeinc_txt_location);
+  pokeinc_txt_location =
+      strcpy(malloc(strlen(defines_dat_location + 1 - strlen(DEFINITIONS_FILE) +
+                           strlen(INCLUDES_FILE))),
+             defines_dat_location);
+  strcpy(pokeinc_txt_location + strlen(pokeinc_txt_location) -
+             strlen(DEFINITIONS_FILE),
+         INCLUDES_FILE);
 
   HW_DLG = CreateDialog(inst, MAKEINTRESOURCE(10), NULL, (DLGPROC)&OffsetDlg);
   HW_TXT = CreateDialog(inst, MAKEINTRESOURCE(11), NULL, (DLGPROC)&TxtDlg);
