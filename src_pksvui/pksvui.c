@@ -1,19 +1,17 @@
+#include "version.h"
 #include <stdint.h>
 
-#include "version.h"
-
 #define _CRT_SECURE_NO_DEPRECATE
-#include <commctrl.h>
-#include <math.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
-#include <windows.h>
-
-#include "XPMData.h"
-#include "scilexer.h"
-#include "scintilla.h"
 #include "sqrt.h"
+#include "XPMData.h"
+#include <stdio.h>
+#include <math.h>
+#include <windows.h>
+#include <commctrl.h>
+#include "scintilla.h"
+#include "scilexer.h"
 #ifndef DOES_NOT_UPDATE
 #include <winsock.h>
 #endif

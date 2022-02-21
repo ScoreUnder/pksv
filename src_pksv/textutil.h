@@ -1,8 +1,8 @@
 #ifndef PKSV_TEXT_UTIL_H
 #define PKSV_TEXT_UTIL_H 1
 
-#include <stddef.h>
 #include <stdint.h>
+#include <stddef.h>
 
 __attribute__((nonnull, returns_nonnull)) const char *hex_to_uint32(
     const char *c, size_t maxlen, uint32_t *out);

@@ -1,8 +1,7 @@
-#include "romutil.h"
-
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 
+#include "romutil.h"
 #include "pksv.h"
 
 struct rom_mode determine_mode(FILE *romfile) {

@@ -1,9 +1,9 @@
-#include "textutil.h"
-
-#include <stddef.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "textutil.h"
 
 const char *hex_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   uint32_t result = 0;

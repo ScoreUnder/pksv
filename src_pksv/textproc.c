@@ -23,11 +23,12 @@
 #include <windows.h>
 #endif
 
-#include "codeproc.h"
-#include "pksv.h"
-#include "sublang/moves.h"
 #include "textproc.h"
+#include "codeproc.h"
 #include "textutil.h"
+#include "pksv.h"
+
+#include "sublang/moves.h"
 
 char trans[65536];
 

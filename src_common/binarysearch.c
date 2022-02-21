@@ -1,8 +1,8 @@
-#include "binarysearch.h"
-
+#include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <string.h>
+
+#include "binarysearch.h"
 
 void bsearch_init_root(struct bsearch_root *root, bsearch_compare_func *compare,
                        bsearch_copy_func *copy, bsearch_free_key_func *free_key,

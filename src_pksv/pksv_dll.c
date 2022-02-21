@@ -16,17 +16,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define _POSIX_C_SOURCE 200809L
-#include <fmem.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "codeproc.h"
-#include "decompiler.h"
-#include "pksv.h"
-#include "recompiler.h"
-#include "romutil.h"
-#include "sulib.h"
+#include <fmem.h>
+
 #include "version.h"
+#include "pksv.h"
+#include "sulib.h"
+#include "recompiler.h"
+#include "decompiler.h"
+#include "codeproc.h"
+#include "romutil.h"
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>

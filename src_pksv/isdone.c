@@ -16,9 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "isdone.h"
-
 #include <string.h>
+
+#include "isdone.h"
 
 unsigned int doprocs[1024], doneprocs[2048];
 unsigned int dotexts[1024], donetexts[2048];

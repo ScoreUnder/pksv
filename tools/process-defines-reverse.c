@@ -1,7 +1,7 @@
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 void strupper(char *s) {
   while (*s) {

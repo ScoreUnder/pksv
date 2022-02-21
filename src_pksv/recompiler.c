@@ -16,23 +16,23 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdint.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
 
 #include "binarysearch.h"
-#include "codeproc.h"
-#include "golddef.h"
-#include "pksv.h"
-#include "pokedef.h"
 #include "recompiler.h"
-#include "sulib.h"
 #include "textproc.h"
+#include "codeproc.h"
 #include "textutil.h"
+#include "pokedef.h"
+#include "golddef.h"
+#include "sulib.h"
+#include "pksv.h"
 
 #define chr Script[i]
 

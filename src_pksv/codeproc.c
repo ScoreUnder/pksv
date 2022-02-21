@@ -15,17 +15,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "codeproc.h"
-
-#include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
 
+#include "codeproc.h"
 #include "binarysearch.h"
-#include "pksv.h"
-#include "sulib.h"
-#include "textproc.h"
 #include "textutil.h"
+#include "textproc.h"
+#include "sulib.h"
+#include "pksv.h"
 
 const char ARG_END_CHARS[] = "\' ,\n";
 

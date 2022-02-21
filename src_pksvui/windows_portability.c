@@ -1,10 +1,10 @@
-#include "windows_portability.h"
-
-#include <errno.h>
-#include <fcntl.h>
-#include <io.h>
-#include <stdio.h>
 #include <windows.h>
+#include <stdio.h>
+#include <io.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#include "windows_portability.h"
 
 FILE *windows_handle_as_stdio(HANDLE handle, const char *mode) {
   if (handle == INVALID_HANDLE_VALUE) {

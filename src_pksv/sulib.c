@@ -5,10 +5,10 @@
 #include <windows.h>
 #endif
 
-#include "binarysearch.h"
-#include "codeproc.h"
-#include "pksv.h"
 #include "sulib.h"
+#include "codeproc.h"
+#include "binarysearch.h"
+#include "pksv.h"
 
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** chain) {

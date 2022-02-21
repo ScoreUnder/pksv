@@ -16,20 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
-#include "decompiler.h"
-#include "isdone.h"
 #include "pksv.h"
-#include "recompiler.h"
-#include "romutil.h"
-#include "textproc.h"
 #include "textutil.h"
 #include "version.h"
+#include "textproc.h"
+#include "isdone.h"
+#include "decompiler.h"
+#include "recompiler.h"
+#include "romutil.h"
 
 bool dyndec = false;
 int dynplace = 0;

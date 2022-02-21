@@ -1,8 +1,8 @@
 #ifndef PKSV_TEXTPROC_H
 #define PKSV_TEXTPROC_H 1
 
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
 
 #include "sulib.h"
 

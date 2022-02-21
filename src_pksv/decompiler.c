@@ -15,20 +15,20 @@
                 You should have received a copy of the GNU General Public
    License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "codeproc.h"
 #include "decompiler.h"
-#include "gba_asm.h"
+#include "codeproc.h"
+#include "textproc.h"
+#include "pokedef.h"
 #include "golddef.h"
+#include "gba_asm.h"
 #include "isdone.h"
 #include "pksv.h"
-#include "pokedef.h"
-#include "textproc.h"
 
 #define WORD_WRAP_LEN 120
 

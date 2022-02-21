@@ -1,9 +1,10 @@
-#include <binarysearch.h>
+#include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+#include <binarysearch.h>
 
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t),
                "intptr_t must be at least 32 bits");
