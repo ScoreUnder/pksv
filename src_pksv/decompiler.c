@@ -3316,7 +3316,12 @@ void DecodeProc2(FILE* fileM_,
 					{
 						fread(&arg1,1,1,fileM);
 						fread(&arg2,1,2,fileM);
-						fprintf(fsend,"cry 0x%X 0x%X\r\n",arg1,arg2);
+						char *pokeName = GetPokeName(arg2);
+						if (pokeName == NULL)
+							sprintf(buf,"0x%X",arg2);
+						else
+							strcpy(buf, pokeName);
+						fprintf(fsend,"cry 0x%X %s\r\n",arg1,buf);
 					}
 					else
 						GENERIC("checksound");
