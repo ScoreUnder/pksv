@@ -5,6 +5,7 @@
 %}
 
 %struct-type
+%define initializer-suffix ,0
 struct move_data;
 %%
 look_down, 0x00
