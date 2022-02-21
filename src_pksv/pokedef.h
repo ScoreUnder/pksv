@@ -196,7 +196,7 @@
 #define CMD_MSGBOX2 0x9B               // C,D,  ptr(4)
 #define CMD_DOANIMATION 0x9C           // C,D,  (2)
 #define CMD_SETANIMATION 0x9D          // C,D,  (1)(2)
-#define CMD_CHECKANIMATION 0x9E        // C,D,  (2)
+#define CMD_WAITANIMATION 0x9E         // C,D,  (2)
 #define CMD_SETHEALINGPLACE 0x9F       // C,D,  place(2)
 #define CMD_CHECKGENDER 0xA0           // C,D,
 #define CMD_CRYFR 0xA1                 // C,D,  (2)(1)

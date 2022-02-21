@@ -6333,13 +6333,13 @@ void RecodeProc(char *script, char *romfn) {
                   BASIC(CMD_CHECKOBEDIENCE);
                   rom(arg1, 2);
                 }
-                aa("checkanimation") {
-                  vlog_txt("CHECKANIMATION\n");
-                  arg1 = GetNum("CHECKANIMATION");
+                aa("waitanimation") {
+                  vlog_txt("WAITANIMATION\n");
+                  arg1 = GetNum("WAITANIMATION");
                   if (!gffs) {
                     return;
                   }
-                  BASIC(CMD_CHECKANIMATION);
+                  BASIC(CMD_WAITANIMATION);
                   rom(arg1, 2);
                 }
                 aa("call") {

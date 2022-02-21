@@ -3359,9 +3359,9 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             fread(&arg1, 1, 2, fileM);
             fprintf(fsend, "doanimation 0x%X\n", arg1);
             break;
-          case CMD_CHECKANIMATION:
+          case CMD_WAITANIMATION:
             fread(&arg1, 1, 2, fileM);
-            fprintf(fsend, "checkanimation 0x%X\n", arg1);
+            fprintf(fsend, "waitanimation 0x%X\n", arg1);
             break;
           case CMD_SETANIMATION:
             fread(&arg1, 1, 1, fileM);
