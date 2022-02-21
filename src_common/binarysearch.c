@@ -50,13 +50,13 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity) {
   }
 }
 
-static size_t bsearch_find(struct bsearch_kv const *kvs, size_t len,
-                           void const *key, bsearch_compare_func *compare) {
+ssize_t bsearch_find(struct bsearch_root const *restrict root, void const *key) {
+  struct bsearch_kv const *kvs = root->pairs;
   size_t left = 0;
-  size_t right = len;
+  size_t right = root->size;
   while (left < right) {
     size_t mid = (left + right) / 2;
-    int cmp = compare(kvs[mid].key, key);
+    int cmp = root->compare(kvs[mid].key, key);
     if (cmp < 0) {
       left = mid + 1;
     } else if (cmp > 0) {
@@ -65,18 +65,19 @@ static size_t bsearch_find(struct bsearch_kv const *kvs, size_t len,
       return mid;
     }
   }
-  return left;
+  return -left - 1;
 }
 
-size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value) {
+size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key, void *value) {
   size_t len = kvs->size;
-  size_t index = bsearch_find(kvs->pairs, len, key, kvs->compare);
-  if (index < len && kvs->compare(kvs->pairs[index].key, key) == 0) {
+  ssize_t index = bsearch_find(kvs, key);
+  if (index >= 0) {
     // Overwrite value of existing element
     if (kvs->free_val) kvs->free_val(kvs->pairs[index].value);
     kvs->pairs[index].value = value;
     return index;
   } else {
+    index = -index - 1;
     bsearch_ensure_capacity(kvs, len + 1);
     if (index < len) {
       memmove(&kvs->pairs[index + 1], &kvs->pairs[index],
@@ -86,15 +87,5 @@ size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value) {
     kvs->pairs[index] = (struct bsearch_kv){.key = key_copied, .value = value};
     kvs->size++;
     return index;
-  }
-}
-
-size_t bsearch_find_if_exists(struct bsearch_root *kvs, void const *key) {
-  size_t len = kvs->size;
-  size_t index = bsearch_find(kvs->pairs, len, key, kvs->compare);
-  if (index < len && kvs->compare(kvs->pairs[index].key, key) == 0) {
-    return index;
-  } else {
-    return len;
   }
 }

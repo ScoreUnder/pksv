@@ -87,8 +87,8 @@ int main(int argc, char **argv) {
       char *endptr;
       uint32_t value_parsed = strtoul(value, &endptr, base);
       if (!endptr || *endptr != '\0') {
-        size_t index = bsearch_find_if_exists(&defines, value);
-        if (index != defines.size) {
+        ssize_t index = bsearch_find(&defines, value);
+        if (index >= 0) {
           value_parsed = (uint32_t)(intptr_t)defines.pairs[index].value;
         } else {
           fprintf(stderr, "#define of %s with invalid value: %s\n", identifier,

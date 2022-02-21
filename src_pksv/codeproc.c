@@ -125,9 +125,9 @@ unsigned int FindFreeSpace(char *romname, unsigned int len,
   unsigned char cr;
   uint32_t findfrom = 0;
 
-  size_t index = bsearch_find_if_exists(
+  ssize_t index = bsearch_find(
       defines, (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom");
-  if (index != defines->size) {
+  if (index >= 0) {
     findfrom = (uint32_t)(intptr_t)defines->pairs[index].value;
   }
 
@@ -266,8 +266,8 @@ uint32_t GenForFunc(char *func, pos_int *ppos, char *Script,
     buf[j] = 0;
     *ppos = i;
 
-    size_t index = bsearch_find_if_exists(defines, buf);
-    if (index != defines->size) {
+    ssize_t index = bsearch_find(defines, buf);
+    if (index >= 0) {
       gffs = 1;
       uint32_t value = (uint32_t)(intptr_t)defines->pairs[index].value;
       if (IsVerbose) {
