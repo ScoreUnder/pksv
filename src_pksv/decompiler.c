@@ -3884,7 +3884,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                 strcpy(buf, "PLAYER found one XXXXXX!");
                 break;
               case 2:
-                strcpy(buf2, "MSG_FACEPLAYER");
+                strcpy(buf2, "MSG_NPC");
                 strcpy(buf, "Builtin lock/faceplayer");
                 break;
               case 3:
@@ -3900,8 +3900,8 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                 strcpy(buf, "Yes/No message");
                 break;
               case 6:
-                strcpy(buf2, "MSG_LOCK");
-                strcpy(buf, "Built-in lock command");
+                strcpy(buf2, "MSG_AUTOCLOSE");
+                strcpy(buf, "Closes after text ends");
                 break;
               case 9:
                 strcpy(buf2, "MSG_ITEM");
