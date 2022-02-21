@@ -2249,16 +2249,16 @@ void RecodeProc(char *script, char *romfn) {
               } else if (!strcmp(buf, "==0") || !strcmp(buf, "=0") ||
                          !strcmp(buf, "false")) {
                 BASIC(CRY_EQZERO);
-                arg1 = -1;
+                arg1 = -1U;
               } else if (!strcmp(buf, "!=0") || !strcmp(buf, "<>0") ||
                          !strcmp(buf, "true")) {
                 BASIC(CRY_NEQZERO);
-                arg1 = -1;
+                arg1 = -1U;
               } else {
                 log_txt("Incorrect arguments to IF\n", 29 - 1);
                 return;
               }
-              if (arg1 != -1) {
+              if (arg1 != -1U) {
                 arg1 = GetNum("IF");
                 if (!gffs) {
                   return;
@@ -2268,7 +2268,7 @@ void RecodeProc(char *script, char *romfn) {
               if (!gffs) {
                 return;
               }
-              if (arg1 != -1) rom(arg1, 1);
+              if (arg1 != -1U) rom(arg1, 1);
               rom(arg2, 2);
               ec();
             }
@@ -4401,13 +4401,13 @@ void RecodeProc(char *script, char *romfn) {
                 log_txt("Incorrect arguments to IF\n", 29 - 1);
                 return;
               }
-              if (arg1 != -1) {
+              if (arg1 != -1U) {
                 arg1 = GetNum("IF");
                 if (!gffs) {
                   return;
                 }
               }
-              if (arg1 != -1) rom(arg1, 1);
+              if (arg1 != -1U) rom(arg1, 1);
               arg2 = GetNum("IF");
               if (!gffs) {
                 return;
