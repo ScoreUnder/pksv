@@ -170,7 +170,6 @@ void calc_org(codeblock* c, unsigned int start, char* file,
               struct bsearch_root* defines) {
   register unsigned int a;
   register codeblock* b;
-  char buf[1024];
   a = start;
   a |= 0x08000000;
   b = rewind_codeblock(c);
