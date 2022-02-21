@@ -132,7 +132,9 @@ uint32_t GetHex(const char *in, pos_int *ppos) {
 void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
   unsigned int i = *ppos;
   // int j;  // used in rom macro
-  register int arg1, arg2, arg3;
+  //note about j: it is very clearly not used, though i've left it here (commented out)
+  // just in case there's something i've missed
+  register int arg1 = 0, arg2  = 0, arg3 = 0;
   ///////////////////ASM////////////////////
   if (thumb) {
     if (!strcmp(buf, "-lsl")) {
@@ -1208,6 +1210,8 @@ struct bsearch_root *DoDefines() {
       s = "defines.dat is truncated and not fully valid\n";
     } else if (ferror(f)) {
       s = "Error reading defines.dat\n";
+    } else {
+      s = "general unknown error\n";
     }
     log_txt(s, strlen(s));
     bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
@@ -1226,7 +1230,9 @@ void RecodeProc(char *script, char *romfn) {
 #endif
   FILE *IncFile = NULL, *RomFile;
 #ifdef WIN32
+#ifdef DLL
   char *strings;
+#endif
 #endif
   char *Script;  // Whoops, used the same name for the filename.
   // Use caps-lock carefully.
@@ -1240,7 +1246,7 @@ void RecodeProc(char *script, char *romfn) {
                fst= 0, i = 0, j = 0, k = 0, l = 0, arg1 = 0, arg2 = 0, arg3 = 0, arg4 = 0, arg5 = 0, arg6 = 0,
                scriptlen = 0;  //,arg7;
   codeblock *c = NULL;
-  codeblock *d;
+  codeblock *d = NULL;
   codelabel *cl = NULL;
   codelabel *cl2;
 
