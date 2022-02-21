@@ -1126,10 +1126,9 @@ static const char* get_romtype_name() {
 
 unsigned int transbackmove(char*script,unsigned int*ii)
 {
-	unsigned int i,len=0,k=0;
+	unsigned int i,len=0;
 	char cmdbuf[100];
 	char xbuf[100];
-	//unsigned int read;
 	i=*ii;
 	while (script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 	{
