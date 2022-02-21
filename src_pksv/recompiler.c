@@ -1320,19 +1320,7 @@ void RecodeProc(char *script, char *romfn) {
 #endif
 
 #ifndef DLL
-    LogFile = fopen("PokeScrE.log", "wt");
-    if (LogFile == NULL) {
-      printf("Failed to open a logfile\n");
-#ifdef WIN32
-      MessageBox(NULL, "Failed to open a log.", "Error", 0x10);
-#endif
-      free(Script);
-      if (CurrFile) fclose(CurrFile);
-      if (IncFile) fclose(IncFile);
-      bsearch_destroy_root(defines);
-      return;
-    }
-    fprintf(LogFile, "Opened file.\n");
+    LogFile = stderr;
 #else
   log_txt("Initialized.\n", 14 - 1);
 #endif
