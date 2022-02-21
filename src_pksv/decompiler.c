@@ -2514,9 +2514,9 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             fread(&arg1, 1, 2, fileM);
             fprintf(fsend, "checkifroomforfurniture 0x%X\n", arg1);
             break;
-          case CMD_PLAYSONG:
+          case CMD_SAVEBGM:
             fread(&arg1, 1, 2, fileM);
-            fprintf(fsend, "playsong 0x%X\n", arg1);
+            fprintf(fsend, "savebgm 0x%X\n", arg1);
             break;
           case CMD_FARREAPPEAR:
             fread(&arg1, 1, 2, fileM);

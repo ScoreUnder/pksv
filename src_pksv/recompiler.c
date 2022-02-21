@@ -7637,13 +7637,13 @@ void RecodeProc(char *script, char *romfn) {
                   rom(arg1, 2);
                   rom(arg2, 1);
                 }
-                aa("playsong") {
-                  vlog_txt("PLAYSONG\n");
-                  arg1 = GetNum("PLAYSONG");
+                aa("savebgm") {
+                  vlog_txt("SAVEBGM\n");
+                  arg1 = GetNum("SAVEBGM");
                   if (!gffs) {
                     return;
                   }
-                  BASIC(CMD_PLAYSONG);
+                  BASIC(CMD_SAVEBGM);
                   rom(arg1, 2);
                 }
                 aa("pauseevent") {

@@ -77,7 +77,7 @@
 #define CMD_FANFARE 0x31      // C,D,T snd(2)
 #define CMD_WAITFANFARE 0x32  // C,D,T
 #define CMD_PLAYSOUND 0x33    // C,D,T snd(2) save:bool(1)
-#define CMD_PLAYSONG 0x34     // C,D,T song(2)
+#define CMD_SAVEBGM 0x34      // C,D,T song(2)
 #define CMD_FADEDEFAULT 0x35  // C,D,T
 #define CMD_FADESONG 0x36     // C,D,T song(2)
 #define CMD_FADEOUT 0x37      // C,D,T speed?(1)
