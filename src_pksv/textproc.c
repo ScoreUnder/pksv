@@ -1162,8 +1162,9 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 			if (hex_end != &cmdbuf[cmdbuf_size]) {
 				sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
 				log_txt(xbuf,strlen(xbuf));
+				len--;
 			} else {
-				trans[len] = k;
+				trans[len] = j;
 			}
 		}
 		else {
