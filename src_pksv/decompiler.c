@@ -1512,7 +1512,7 @@ void DecodeProc2(FILE* fileM_,
 			}
 			else
 			{
-				puts("'--EOF--");
+				fputs("'--EOF--\n", fsend);
 				still_going=0;
 			}
 		}
@@ -3597,7 +3597,7 @@ void DecodeProc2(FILE* fileM_,
 			}
 			else
 			{
-				puts("'--EOF--");
+				fputs("'--EOF--\n", fsend);
 				still_going=0;
 			}
 		}
@@ -4470,7 +4470,7 @@ void DecodeProc2(FILE* fileM_,
 			}
 			else
 			{
-				puts("'--EOF--");
+				fputs("'--EOF--\n", fsend);
 				still_going=0;
 			}
 		}
@@ -5339,7 +5339,7 @@ void DecodeProc2(FILE* fileM_,
 			}
 			else
 			{
-				puts("'--EOF--");
+				fputs("'--EOF--\n", fsend);
 				still_going=0;
 			}
 		}
