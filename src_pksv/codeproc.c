@@ -33,8 +33,8 @@ unsigned int fail;
 int *basedef2 = NULL;
 char **defnames2 = NULL;
 
-int def_alloc2 = 0;
-int def_size2 = 0;
+size_t def_alloc2 = 0;
+size_t def_size2 = 0;
 
 int codenum = 0;
 int levelnum = 0;
@@ -93,7 +93,7 @@ void Define2(unsigned int otherthing, char *thing) {
 }
 unsigned int fail2;
 char *WhatIs2(int thing) {
-  register int i;
+  register size_t i;
   fail = 0;
   for (i = 0; i < def_size2; i++)
     if (thing == basedef2[i]) return defnames2[i];
@@ -209,7 +209,7 @@ unsigned char gffs;
 uint32_t GenForFunc(char *func, pos_int *ppos, char *Script,
                     struct bsearch_root *defines, codeblock *c) {
   uint32_t result = 0;
-  char buf[1024], log_buf[1024];
+  char buf[1024], log_buf[2048];
   gffs = 0;
   pos_int i = skip_whitespace(Script, *ppos);
 

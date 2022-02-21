@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
   char* export_name;
   FILE* romfile;
   FILE* otherfile;
-  unsigned int i;
+  unsigned i;
   int file_location = 0;
   uint32_t decompile_at;
   uint32_t narc;
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
   free(exename);
 
   // Argument Processing
-  for (i = 1; i < argc; i++) {
+  for (i = 1; i < (size_t)argc; i++) {
     if (argv[i][0] != '-') {
       if (file_location == 0) file_location = i;
       continue;
