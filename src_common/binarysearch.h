@@ -48,7 +48,6 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity);
 /** @brief Insert a key/value pair into a bsearch_root. */
 size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value);
 
-
 /** @brief Find the closest index to the given key in the bsearch_root.
  *  This will point to the smallest element that is greater than or equal to
  *  the given key.
@@ -57,5 +56,8 @@ size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value);
  *  @return the index if found, or (-index - 1) if no exact match was found.
  */
 ssize_t bsearch_find(struct bsearch_root const *restrict root, void const *key);
+
+/** @brief Delete the key/value pair at the given index. */
+void bsearch_remove(struct bsearch_root *restrict root, size_t index);
 
 #endif

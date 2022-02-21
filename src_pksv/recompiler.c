@@ -24,6 +24,7 @@
 #include <windows.h>
 #endif
 
+#include "int32_interval.h"
 #include "binarysearch.h"
 #include "recompiler.h"
 #include "textproc.h"
@@ -8940,6 +8941,27 @@ void RecodeProc(char *script, char *romfn) {
   if (dynu && start == 0) {
     log_txt("Error: No #dyn used with dynamic offsets!\n", 43 - 1);
   } else {
+    vlog_txt("\nDiscontinuous written regions:\n");
+    struct bsearch_root root;
+    int32_interval_init_bsearch_root(&root);
+
+    for (codeblock *curr = rewind_codeblock(c); curr != NULL;
+         curr = curr->next) {
+      curr->org &= 0x07FFFFFF;
+      int32_interval_add(&root, curr->org, curr->org + curr->size);
+    }
+
+    for (size_t i = 0; i < root.size; i++) {
+      uint32_t org = (uint32_t)root.pairs[i].key;
+      uint32_t size = (uint32_t)root.pairs[i].value;
+      if (size > 0) {
+        sprintf(buf2, "   %08X - %08X\n", org, org + size);
+        vlog_txt(buf2);
+      }
+    }
+
+    bsearch_deinit_root(&root);
+
     vlog_txt("\n#ORG: data\n");
     calc_org(c, start, romfn, defines);
     process_inserts(c, cl);
