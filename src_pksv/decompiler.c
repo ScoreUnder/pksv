@@ -2212,6 +2212,22 @@ const char* special_name_by_id(uint16_t id) {
   switch (id) {
     case 0:
       return "HEAL_POKEMON";
+    case 0x2b:
+      return "CHECK_BERRY_TREE";
+    case 0x2c:
+      return "CHOOSE_BERRY";
+    case 0x2d:
+      return "PLANT_BERRY";
+    case 0x2e:
+      return "PICK_BERRY";
+    case 0x2f:
+      return "REMOVE_BERRY_TREE";
+    case 0x30:
+      return "WATER_BERRY_TREE";
+    case 0x31:
+      return "PLAYER_HAS_BERRIES";
+    case 0x5e:
+      return "PLANT_WATERING_ANIMATION";
     case 0x39:
       return "WANT_REMATCH";
     case 0x84:
