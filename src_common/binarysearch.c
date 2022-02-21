@@ -92,7 +92,7 @@ size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value) {
 size_t bsearch_find_if_exists(struct bsearch_root *kvs, void const *key) {
   size_t len = kvs->size;
   size_t index = bsearch_find(kvs->pairs, len, key, kvs->compare);
-  if (index < len && strcmp(kvs->pairs[index].key, key) == 0) {
+  if (index < len && kvs->compare(kvs->pairs[index].key, key) == 0) {
     return index;
   } else {
     return len;
