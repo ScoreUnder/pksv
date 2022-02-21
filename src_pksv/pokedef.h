@@ -323,7 +323,7 @@ storetext Stores text (argument 2) into text-var (\v\hXX+2) where XX is argument
 pokemart Opens up a pokemon-mart screen.
 slotmachine Whee, fun! It's the slots!
 fadescreen Fades in or out.
-cmd_91 ¯\
+cmd_91 Â¯\
 cmd_92  |
 cmd_93  |
 cmd_94  >- I have no clue.
