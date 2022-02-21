@@ -115,7 +115,7 @@
 #define CMD_FARDISAPPEAR            0x59 //C,D,T id(2)bnk(1)map(1)
 #define CMD_FACEPLAYER              0x5A //C,D,T
 #define CMD_SPRITEFACE              0x5B //C,D,T sprite(2) face(1)
-#define CMD_TRAINERBATTLE           0x5C //C,D,T kind[0x0==normal,0x4==double](1) num(2) ???(2) start(4) defeat(4)
+#define CMD_TRAINERBATTLE           0x5C //C,D,T kind[0x0==normal,0x3==rival/elite4,0x4==double,0x5==rematch](1) num(2) ???(2) start(4) defeat(4)
 #define CMD_LASTTRAINERBATTLE       0x5D //C,D,T
 #define CMD_ENDTRAINERBATTLE        0x5E //C,D,T
 #define CMD_ENDTRAINERBATTLE2       0x5F //C,D,T
