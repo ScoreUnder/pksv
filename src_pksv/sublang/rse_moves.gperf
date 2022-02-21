@@ -1,0 +1,57 @@
+%define lookup-function-name lookup_rse_move
+%{
+#include <string.h>
+#include "moves.h"
+%}
+
+%struct-type
+struct move_data;
+%%
+look_down, 0x00
+look_up, 0x01
+look_left, 0x02
+look_right, 0x03
+walk_down_vslow, 0x04
+walk_up_vslow, 0x05
+walk_left_vslow, 0x06
+walk_right_vslow, 0x07
+walk_down_slow, 0x08
+walk_up_slow, 0x09
+walk_left_slow, 0x0a
+walk_right_slow, 0x0b
+pause0, 0x10
+pause1, 0x11
+pause2, 0x12
+pause3, 0x13
+pause4, 0x14
+walk_left, 0x15
+walk_right, 0x16
+walk_down, 0x17
+walk_up, 0x18
+onspot_down_slow, 0x21
+onspot_up_slow, 0x22
+onspot_left_slow, 0x23
+onspot_right_slow, 0x24
+onspot_down, 0x25
+onspot_up, 0x26
+onspot_left, 0x27
+onspot_right, 0x28
+walk_down_fast, 0x2d
+walk_up_fast, 0x2e
+walk_left_fast, 0x2f
+walk_right_fast, 0x30
+run_down, 0x35
+run_up, 0x36
+run_left, 0x37
+run_right, 0x38
+hide, 0x54
+show, 0x55
+alert, 0x56
+question, 0x57
+love, 0x58
+pokeball, 0x5a
+run_down_fast, 0x7e
+run_up_fast, 0x7f
+run_left_fast, 0x80
+run_right_fast, 0x81
+end, 0xfe

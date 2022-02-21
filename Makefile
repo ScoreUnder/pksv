@@ -49,7 +49,9 @@ SRC_PKSV_COMMON = \
 	src_pksv/codeproc.c src_pksv/decompiler.c src_pksv/gba_asm.c src_pksv/isdone.c \
 	src_pksv/recompiler.c src_pksv/sulib.c src_pksv/textproc.c src_common/binarysearch.c \
 	src_pksv/romutil.c src_pksv/textutil.c \
-	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c
+	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
+	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
+	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 RES_PKSV_SHLIB = src_pksv/pksv.rc
@@ -150,6 +152,12 @@ $(PKSVUI): $(OBJ_PKSVUI)
 
 src_pksv/sublang/gsc_moves_reverse.c: src_pksv/sublang/gsc_moves.gperf $(BIN_GPERF_REVERSE)
 	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < src_pksv/sublang/gsc_moves.gperf > $@ || { rm -f -- $@; false; }
+
+src_pksv/sublang/rse_moves_reverse.c: src_pksv/sublang/rse_moves.gperf $(BIN_GPERF_REVERSE)
+	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < src_pksv/sublang/rse_moves.gperf > $@ || { rm -f -- $@; false; }
+
+src_pksv/sublang/frlg_moves_reverse.c: src_pksv/sublang/frlg_moves.gperf $(BIN_GPERF_REVERSE)
+	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < src_pksv/sublang/frlg_moves.gperf > $@ || { rm -f -- $@; false; }
 
 .SUFFIXES: .sh_o .o .c .gperf .rc
 .c.sh_o:

@@ -645,7 +645,7 @@ char*transmove(int howfar,const char*file)
 				strcat(trans,"'FAILSAFE");
 				break;
 			}
-			if (mode==GOLD||mode==CRYSTAL)
+			if (mode == GOLD || mode == CRYSTAL)
 			{
 				const char *cmd = lookup_gsc_move_reverse(p);
 				if (cmd != NULL) {
@@ -669,429 +669,34 @@ char*transmove(int howfar,const char*file)
 					strcat(trans,buf);
 				}
 			}
-			else if (mode==FIRE_RED)
+			else if (mode == FIRE_RED || mode == RUBY)
 			{
-				switch (p)
-				{
-				case 254:
-					strcat(trans,"end");
-					still_going=0;
-					break;
-				case 0x1:
-					strcat(trans,"look_up");
-					break;
-				case 0x2:
-					strcat(trans,"look_left");
-					break;
-				case 0x3:
-					strcat(trans,"look_right");
-					break;
-				case 0x4:
-					strcat(trans,"look_down");
-					break;
-				case 0x8:
-					strcat(trans,"walk_down_vslow");
-					break;
-				case 0x9:
-					strcat(trans,"walk_up_vslow");
-					break;
-				case 0xA:
-					strcat(trans,"walk_left_vslow");
-					break;
-				case 0xB:
-					strcat(trans,"walk_right_vslow");
-					break;
-				case 0xC:
-					strcat(trans,"walk_down_slow");
-					break;
-				case 0xD:
-					strcat(trans,"walk_up_slow");
-					break;
-				case 0xE:
-					strcat(trans,"walk_left_slow");
-					break;
-				case 0xF:
-					strcat(trans,"walk_right_slow");
-					break;
-				case 0x10:
-					strcat(trans,"walk_down");
-					break;
-				case 0x11:
-					strcat(trans,"walk_up");
-					break;
-				case 0x12:
-					strcat(trans,"walk_left");
-					break;
-				case 0x13:
-					strcat(trans,"walk_right");
-					break;
-				case 0x14:
-					strcat(trans,"jump_down2");
-					break;
-				case 0x15:
-					strcat(trans,"jump_up2");
-					break;
-				case 0x16:
-					strcat(trans,"jump_left2");
-					break;
-				case 0x17:
-					strcat(trans,"jump_right2");
-					break;
-				case 0x18:strcat(trans,"pause_xshort");break;
-				case 0x19:strcat(trans,"pause_vshort");break;
-				case 0x1A:strcat(trans,"pause_short");break;
-				case 0x1B:strcat(trans,"pause");break;
-				case 0x1C:strcat(trans,"pause_long");break;
-				case 0x1D:
-					strcat(trans,"run_down");
-					break;
-				case 0x1E:
-					strcat(trans,"run_up");
-					break;
-				case 0x1F:
-					strcat(trans,"run_left");
-					break;
-				case 0x20:
-					strcat(trans,"run_right");
-					break;
-				case 0x21:
-					strcat(trans,"onspot_down_slow");
-					break;
-				case 0x22:
-					strcat(trans,"onspot_up_slow");
-					break;
-				case 0x23:
-					strcat(trans,"onspot_left_slow");
-					break;
-				case 0x24:
-					strcat(trans,"onspot_right_slow");
-					break;
-				case 0x25:
-					strcat(trans,"onspot_down");
-					break;
-				case 0x26:
-					strcat(trans,"onspot_up");
-					break;
-				case 0x27:
-					strcat(trans,"onspot_left");
-					break;
-				case 0x28:
-					strcat(trans,"onspot_right");
-					break;
-				case 0x29:
-					strcat(trans,"onspot_down_fast");
-					break;
-				case 0x2A:
-					strcat(trans,"onspot_up_fast");
-					break;
-				case 0x2B:
-					strcat(trans,"onspot_left_fast");
-					break;
-				case 0x2C:
-					strcat(trans,"onspot_right_fast");
-					break;
-				case 0x2D:
-					strcat(trans,"look_down_delayed");
-					break;
-				case 0x2E:
-					strcat(trans,"look_up_delayed");
-					break;
-				case 0x2F:
-					strcat(trans,"look_left_delayed");
-					break;
-				case 0x30:
-					strcat(trans,"look_right_delayed");
-					break;
-				case 0x31:
-					strcat(trans,"slide_down");
-					break;
-				case 0x32:
-					strcat(trans,"slide_up");
-					break;
-				case 0x33:
-					strcat(trans,"slide_left");
-					break;
-				case 0x34:
-					strcat(trans,"slide_right");
-					break;
-				case 0x35:strcat(trans,"run_down_vfast");break;
-				case 0x36:strcat(trans,"run_up_vfast");break;
-				case 0x37:strcat(trans,"run_left_vfast");break;
-				case 0x38:strcat(trans,"run_right_vfast");break;
-				case 0x39:strcat(trans,"slide_down_vfast");break;
-				case 0x3A:strcat(trans,"slide_up_vfast");break;
-				case 0x3B:strcat(trans,"slide_left_vfast");break;
-				case 0x3C:strcat(trans,"slide_right_vfast");break;
-				case 0x3D:
-					strcat(trans,"slide_down2");
-					break;
-				case 0x3E:
-					strcat(trans,"slide_up2");
-					break;
-				case 0x3F:
-					strcat(trans,"slide_left2");
-					break;
-				case 0x40:
-					strcat(trans,"slide_right2");
-					break;
-				case 0x41:
-					strcat(trans,"slide_down3");
-					break;
-				case 0x42:
-					strcat(trans,"slide_up3");
-					break;
-				case 0x43:
-					strcat(trans,"slide_left3");
-					break;
-				case 0x44:
-					strcat(trans,"slide_right3");
-					break;
-				case 0x45:strcat(trans,"walk_onspot");break;
-				case 0x46:
-					strcat(trans,"look_left_jump_down");
-					break;
-				case 0x47:
-					strcat(trans,"look_down_jump_up");
-					break;
-				case 0x48:
-					strcat(trans,"look_up_jump_left");
-					break;
-				case 0x49:
-					strcat(trans,"look_left_jump_right");
-					break;
-				case 0x4A:
-					strcat(trans,"faceplayer");
-					break;
-				case 0x4B:
-					strcat(trans,"face_away");
-					break;
-				case 0x4E:
-					strcat(trans,"jump_down1");
-					break;
-				case 0x4F:
-					strcat(trans,"jump_up1");
-					break;
-				case 0x50:
-					strcat(trans,"jump_left1");
-					break;
-				case 0x51:
-					strcat(trans,"jump_right1");
-					break;
-				case 0x52:
-					strcat(trans,"jump_down");
-					break;
-				case 0x53:
-					strcat(trans,"jump_up");
-					break;
-				case 0x54:
-					strcat(trans,"jump_left");
-					break;
-				case 0x55:
-					strcat(trans,"jump_right");
-					break;
-				case 0x56:
-					strcat(trans,"jump_downup");
-					break;
-				case 0x57:
-					strcat(trans,"jump_updown");
-					break;
-				case 0x58:
-					strcat(trans,"jump_leftright");
-					break;
-				case 0x59:
-					strcat(trans,"jump_rightleft");
-					break;
-				case 0x5A:
-					strcat(trans,"face_default");
-					break;
-				case 0x60:
-					strcat(trans,"hide");
-					break;
-				case 0x62:
-					strcat(trans,"say_!");
-					break;
-				case 0x63:
-					strcat(trans,"say_?");
-					break;
-				case 0x64:
-					strcat(trans,"say_x");
-					break;
-				case 0x65:
-					strcat(trans,"say_!!");
-					break;
-				case 0x66:
-					strcat(trans,"say_:)");
-					break;
-				case 0x68:
-					strcat(trans,"rock_animate");
-					break;
-				case 0x69:
-					strcat(trans,"tree_animate");
-					break;
-				default:
-					sprintf(buf,"raw_%02X",p);
-					strcat(trans,buf);
-					break;
+				const char *cmd;
+				if (mode == FIRE_RED)
+					cmd = lookup_frlg_move_reverse(p);
+				else
+					cmd = lookup_rse_move_reverse(p);
+
+				if (cmd != NULL) {
+					strcat(trans, cmd);
+				} else {
+					sprintf(buf, "raw_%02X", p);
+					strcat(trans, buf);
 				}
-				if (still_going)
-					strcat(trans," ");
+
+				if (p == 0xfe) break; // end command
+
+				strcat(trans," ");
 			}
 			else
 			{
-				switch (p)
-				{
-				case 254:
-					strcat(trans,"end");
-					still_going=0;
-					break;
-				case 0x54:
-					strcat(trans,"hide");
-					break;
-				case 0x55:
-					strcat(trans,"show");
-					break;
-				case 0x56:
-					strcat(trans,"alert");
-					break;
-				case 0x57:
-					strcat(trans,"question");
-					break;
-				case 0x58:
-					strcat(trans,"love");
-					break;
-				case 0x5A:
-					strcat(trans,"pokeball");
-					break;
-				case 0x10:
-					strcat(trans,"pause0");
-					break;
-				case 0x11:
-					strcat(trans,"pause1");
-					break;
-				case 0x12:
-					strcat(trans,"pause2");
-					break;
-				case 0x13:
-					strcat(trans,"pause3");
-					break;
-				case 0x14:
-					strcat(trans,"pause4");
-					break;
-				case 0x00:
-					strcat(trans,"look_down");
-					break;
-				case 0x01:
-					strcat(trans,"look_up");
-					break;
-				case 0x02:
-					strcat(trans,"look_left");
-					break;
-				case 0x03:
-					strcat(trans,"look_right");
-					break;
-				case 0x04:
-					strcat(trans,"walk_down_vslow");
-					break;
-				case 0x05:
-					strcat(trans,"walk_up_vslow");
-					break;
-				case 0x06:
-					strcat(trans,"walk_left_vslow");
-					break;
-				case 0x07:
-					strcat(trans,"walk_right_vslow");
-					break;
-				case 0x08:
-					strcat(trans,"walk_down_slow");
-					break;
-				case 0x09:
-					strcat(trans,"walk_up_slow");
-					break;
-				case 0x0A:
-					strcat(trans,"walk_left_slow");
-					break;
-				case 0x0B:
-					strcat(trans,"walk_right_slow");
-					break;
-				case 0x17:
-					strcat(trans,"walk_down");
-					break;
-				case 0x18:
-					strcat(trans,"walk_up");
-					break;
-				case 0x15:
-					strcat(trans,"walk_left");
-					break;
-				case 0x16:
-					strcat(trans,"walk_right");
-					break;
-				case 0x21:
-					strcat(trans,"onspot_down_slow");
-					break;
-				case 0x22:
-					strcat(trans,"onspot_up_slow");
-					break;
-				case 0x23:
-					strcat(trans,"onspot_left_slow");
-					break;
-				case 0x24:
-					strcat(trans,"onspot_right_slow");
-					break;
-				case 0x25:
-					strcat(trans,"onspot_down");
-					break;
-				case 0x26:
-					strcat(trans,"onspot_up");
-					break;
-				case 0x27:
-					strcat(trans,"onspot_left");
-					break;
-				case 0x28:
-					strcat(trans,"onspot_right");
-					break;
-				case 0x2D:
-					strcat(trans,"walk_down_fast");
-					break;
-				case 0x2E:
-					strcat(trans,"walk_up_fast");
-					break;
-				case 0x2F:
-					strcat(trans,"walk_left_fast");
-					break;
-				case 0x30:
-					strcat(trans,"walk_right_fast");
-					break;
-				case 0x35:
-					strcat(trans,"run_down");
-					break;
-				case 0x36:
-					strcat(trans,"run_up");
-					break;
-				case 0x37:
-					strcat(trans,"run_left");
-					break;
-				case 0x38:
-					strcat(trans,"run_right");
-					break;
-				case 0x7e:
-					strcat(trans,"run_down_fast");
-					break;
-				case 0x7f:
-					strcat(trans,"run_up_fast");
-					break;
-				case 0x80:
-					strcat(trans,"run_left_fast");
-					break;
-				case 0x81:
-					strcat(trans,"run_right_fast");
-					break;
-				default:
-					sprintf(buf,"raw_%02X",p);
-					strcat(trans,buf);
-					break;
-				}
-				if (still_going)
-					strcat(trans," ");
+				// Unknown version (e.g. DIAMOND for now)
+				sprintf(buf, "raw_%02X", p);
+				strcat(trans, buf);
+
+				if (p == 0xfe) break; // end command
+
+				strcat(trans," ");
 			}
 		}
 		fclose(fileC);
@@ -1508,6 +1113,17 @@ char* transbackstr(char*scrfn,unsigned int pos,codeblock*c)
 	return ret;
 }
 
+static const char* get_romtype_name() {
+	switch (mode) {
+		case GOLD: return "Gold/Silver";
+		case CRYSTAL: return "Crystal";
+		case RUBY: return "Ruby/Sapphire/Emerald";
+		case FIRE_RED: return "FireRed/LeafGreen";
+		case DIAMOND: return "Diamond/Pearl";
+		default: return "unidentified";
+	}
+}
+
 unsigned int transbackmove(char*script,unsigned int*ii)
 {
 	unsigned int i,len=0,k=0;
@@ -1518,6 +1134,7 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 	while (script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 	{
     i = skip_whitespace(script, i);
+
 		size_t cmdbuf_size = 0;
 		while (script[i]!=' '&&script[i]!='\n'&&script[i]!=0&&script[i]!='\'')
 		{
@@ -1526,443 +1143,35 @@ unsigned int transbackmove(char*script,unsigned int*ii)
 			cmdbuf_size++;
 		}
 		cmdbuf[cmdbuf_size]=0;
-#define aaa(x) else if(!strcmp(cmdbuf,x))
-#define move trans[len]=
-		if (mode==GOLD||mode==CRYSTAL)
-		{
-			const struct move_data* move_data = NULL;
-			if (eorg) {
-				move 0x00;
-			}
-			else if ((move_data = lookup_gsc_move(cmdbuf, cmdbuf_size)) != NULL) {
-				move move_data->value;
-			}
-			else if (cmdbuf[0]=='\'')
-			{
-				*ii=i;
-				return len;
-			}
-			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
-			{
-				//RAW handler.
-				uint32_t j;
-				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
-				if (hex_end != &cmdbuf[cmdbuf_size]) {
-					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
-					log_txt(xbuf,strlen(xbuf));
-				} else {
-					move k;
-				}
-			}
-			else {
-				len--;
-				sprintf(xbuf,"Unknown Gold/Silver/Crystal move command \"%s\"\r\n",cmdbuf);
-				log_txt(xbuf,strlen(xbuf));
-			}
-			len++;
 
-		}
-		else if (mode==FIRE_RED)
-		{
-			if (eorg) {
-				move 0xFF;
-			}
-			aaa("end") {
-				move 0xfe;
-			}
-			aaa("look_up") {
-				move 0x01;
-			}
-			aaa("look_left") {
-				move 0x02;
-			}
-			aaa("look_right") {
-				move 0x03;
-			}
-			aaa("look_down") {
-				move 0x04;
-			}
-			aaa("walk_down_vslow") {
-				move 0x08;
-			}
-			aaa("walk_up_vslow") {
-				move 0x09;
-			}
-			aaa("walk_left_vslow") {
-				move 0x0A;
-			}
-			aaa("walk_right_vslow") {
-				move 0x0B;
-			}
-			aaa("walk_down_slow") {
-				move 0x0C;
-			}
-			aaa("walk_up_slow") {
-				move 0x0D;
-			}
-			aaa("walk_left_slow") {
-				move 0x0E;
-			}
-			aaa("walk_right_slow") {
-				move 0x0F;
-			}
-			aaa("walk_down") {
-				move 0x10;
-			}
-			aaa("walk_up") {
-				move 0x11;
-			}
-			aaa("walk_left") {
-				move 0x12;
-			}
-			aaa("walk_right") {
-				move 0x13;
-			}
-			aaa("jump_down2") {
-				move 0x14;
-			}
-			aaa("jump_up2") {
-				move 0x15;
-			}
-			aaa("jump_left2") {
-				move 0x16;
-			}
-			aaa("jump_right2") {
-				move 0x17;
-			}
-			aaa("pause_xshort"){move 0x18;}
-			aaa("pause_vshort"){move 0x19;}
-			aaa("pause_short"){move 0x1A;}
-			aaa("pause"){move 0x1B;}
-			aaa("pause_long"){move 0x1C;}
-			aaa("run_down") {
-				move 0x1D;
-			}
-			aaa("run_up") {
-				move 0x1E;
-			}
-			aaa("run_left") {
-				move 0x1F;
-			}
-			aaa("run_right") {
-				move 0x20;
-			}
-				aaa("onspot_down_slow"){move 0x21;}
-				aaa("onspot_up_slow"){move 0x22;}
-				aaa("onspot_left_slow"){move 0x23;}
-				aaa("onspot_right_slow"){move 0x24;}
-				aaa("onspot_down"){move 0x25;}
-				aaa("onspot_up"){move 0x26;}
-				aaa("onspot_left"){move 0x27;}
-				aaa("onspot_right"){move 0x28;}
-				aaa("onspot_down_fast"){move 0x29;}
-				aaa("onspot_up_fast"){move 0x2A;}
-				aaa("onspot_left_fast"){move 0x2B;}
-				aaa("onspot_right_fast"){move 0x2C;}
-				aaa("look_down_delayed"){move 0x2D;}
-				aaa("look_up_delayed"){move 0x2E;}
-				aaa("look_left_delayed"){move 0x2F;}
-				aaa("look_right_delayed"){move 0x30;}
-				aaa("slide_down"){move 0x31;}
-				aaa("slide_up"){move 0x32;}
-				aaa("slide_left"){move 0x33;}
-				aaa("slide_right"){move 0x34;}
-				aaa("run_down_vfast"){move 0x35;}
-				aaa("run_up_vfast"){move 0x36;}
-				aaa("run_left_vfast"){move 0x37;}
-				aaa("run_right_vfast"){move 0x38;}
-				aaa("slide_down_vfast"){move 0x39;}
-				aaa("slide_up_vfast"){move 0x3A;}
-				aaa("slide_left_vfast"){move 0x3B;}
-				aaa("slide_right_vfast"){move 0x3C;}
-				aaa("slide_down2"){move 0x3D;}
-				aaa("slide_up2"){move 0x3E;}
-				aaa("slide_left2"){move 0x3F;}
-				aaa("slide_right2"){move 0x40;}
-				aaa("slide_down3"){move 0x41;}
-				aaa("slide_up3"){move 0x42;}
-				aaa("slide_left3"){move 0x43;}
-				aaa("slide_right3"){move 0x44;}
-				aaa("walk_onspot"){move 0x45;}
-			aaa("look_left_jump_down") {
-				move 0x46;
-			}
-			aaa("look_down_jump_up") {
-				move 0x47;
-			}
-			aaa("look_up_jump_left") {
-				move 0x48;
-			}
-			aaa("look_left_jump_right") {
-				move 0x49;
-			}
-			aaa("faceplayer") {
-				move 0x4A;
-			}
-			aaa("face_away") {
-				move 0x4B;
-			}
-			aaa("jump_down1") {
-				move 0x4E;
-			}
-			aaa("jump_up1") {
-				move 0x4F;
-			}
-			aaa("jump_left1") {
-				move 0x50;
-			}
-			aaa("jump_right1") {
-				move 0x51;
-			}
-			aaa("jump_down") {
-				move 0x52;
-			}
-			aaa("jump_up") {
-				move 0x53;
-			}
-			aaa("jump_left") {
-				move 0x54;
-			}
-			aaa("jump_right") {
-				move 0x55;
-			}
-			aaa("jump_downup") {
-				move 0x56;
-			}
-			aaa("jump_updown") {
-				move 0x57;
-			}
-			aaa("jump_leftright") {
-				move 0x58;
-			}
-			aaa("jump_rightleft") {
-				move 0x59;
-			}
-			aaa("face_default") {
-				move 0x5A;
-			}
-			aaa("hide") {
-				move 0x60;
-			}
-			aaa("say_!") {
-				move 0x62;
-			}
-			aaa("say_?") {
-				move 0x63;
-			}
-			aaa("say_x") {
-				move 0x64;
-			}
-			aaa("say_!!") {
-				move 0x65;
-			}
-			aaa("say_:)") {
-				move 0x66;
-			}
-			aaa("rock_animate") {
-				move 0x68;
-			}
-			aaa("tree_animate") {
-				move 0x69;
-			}
-			else if (cmdbuf[0]=='\'')
-			{
-				*ii=i;
-				return len;
-			}
-			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
-			{
-				//RAW handler.
-				uint32_t j;
-				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
-				if (hex_end != &cmdbuf[cmdbuf_size]) {
-					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
-					log_txt(xbuf,strlen(xbuf));
-				} else {
-					move k;
-				}
-			}
-			else if (*cmdbuf)
-			{
-				len--;
-				sprintf(xbuf,"Unknown FR/LG move command \"%s\"\r\n",cmdbuf);
+		const struct move_data* move_data = NULL;
+		if (eorg) {
+			trans[len] = search;
+		} else if (cmdbuf[0]=='\'') {
+			break;  // Stop processing movement at a comment
+		} else if ((mode == GOLD || mode == CRYSTAL) && (move_data = lookup_gsc_move(cmdbuf, cmdbuf_size)) != NULL) {
+			trans[len] = move_data->value;
+		} else if (mode == FIRE_RED && (move_data = lookup_frlg_move(cmdbuf, cmdbuf_size)) != NULL) {
+			trans[len] = move_data->value;
+		} else if (mode == RUBY && (move_data = lookup_rse_move(cmdbuf, cmdbuf_size)) != NULL) {
+			trans[len] = move_data->value;
+		} else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0) {
+			//RAW handler.
+			uint32_t j;
+			const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
+			if (hex_end != &cmdbuf[cmdbuf_size]) {
+				sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
 				log_txt(xbuf,strlen(xbuf));
+			} else {
+				trans[len] = k;
 			}
-			len++;
 		}
-		else
-		{
-			if (eorg) {
-				move 0xFF;
-			}
-			aaa("end") {
-				move 0xfe;
-			}
-			aaa("hide") {
-				move 0x54;
-			}
-			aaa("show") {
-				move 0x55;
-			}
-			aaa("alert") {
-				move 0x56;
-			}
-			aaa("question") {
-				move 0x57;
-			}
-			aaa("love") {
-				move 0x58;
-			}
-			aaa("pokeball") {
-				move 0x5A;
-			}
-			aaa("pause0") {
-				move 0x10;
-			}
-			aaa("pause1") {
-				move 0x11;
-			}
-			aaa("pause2") {
-				move 0x12;
-			}
-			aaa("pause3") {
-				move 0x13;
-			}
-			aaa("pause4") {
-				move 0x14;
-			}
-			aaa("look_down") {
-				move 0x00;
-			}
-			aaa("look_up") {
-				move 0x01;
-			}
-			aaa("look_left") {
-				move 0x02;
-			}
-			aaa("look_right") {
-				move 0x03;
-			}
-			aaa("walk_down_vslow") {
-				move 0x04;
-			}
-			aaa("walk_up_vslow") {
-				move 0x05;
-			}
-			aaa("walk_left_vslow") {
-				move 0x06;
-			}
-			aaa("walk_right_vslow") {
-				move 0x07;
-			}
-			aaa("walk_down_slow") {
-				move 0x08;
-			}
-			aaa("walk_up_slow") {
-				move 0x09;
-			}
-			aaa("walk_left_slow") {
-				move 0x0A;
-			}
-			aaa("walk_right_slow") {
-				move 0x0B;
-			}
-			aaa("walk_down") {
-				move 0x17;
-			}
-			aaa("walk_up") {
-				move 0x18;
-			}
-			aaa("walk_left") {
-				move 0x15;
-			}
-			aaa("walk_right") {
-				move 0x16;
-			}
-			aaa("onspot_down_slow") {
-				move 0x21;
-			}
-			aaa("onspot_up_slow") {
-				move 0x22;
-			}
-			aaa("onspot_left_slow") {
-				move 0x23;
-			}
-			aaa("onspot_right_slow") {
-				move 0x24;
-			}
-			aaa("onspot_down") {
-				move 0x25;
-			}
-			aaa("onspot_up") {
-				move 0x26;
-			}
-			aaa("onspot_left") {
-				move 0x27;
-			}
-			aaa("onspot_right") {
-				move 0x28;
-			}
-			aaa("walk_down_fast") {
-				move 0x2D;
-			}
-			aaa("walk_up_fast") {
-				move 0x2E;
-			}
-			aaa("walk_left_fast") {
-				move 0x2F;
-			}
-			aaa("walk_right_fast") {
-				move 0x30;
-			}
-			aaa("run_down") {
-				move 0x35;
-			}
-			aaa("run_up") {
-				move 0x36;
-			}
-			aaa("run_left") {
-				move 0x37;
-			}
-			aaa("run_right") {
-				move 0x38;
-			}
-			aaa("run_down_fast") {
-				move 0x7e;
-			}
-			aaa("run_up_fast") {
-				move 0x7f;
-			}
-			aaa("run_left_fast") {
-				move 0x80;
-			}
-			aaa("run_right_fast") {
-				move 0x81;
-			}
-			else if (cmdbuf[0]=='\'')
-			{
-				*ii=i;
-				return len;
-			}
-			else if ((cmdbuf_size == 6 || cmdbuf_size == 5) && memcmp(cmdbuf, "raw_", 4) == 0)
-			{
-				//RAW handler.
-				uint32_t j;
-				const char *hex_end = hex_to_uint32(&cmdbuf[4], 2, &j);
-				if (hex_end != &cmdbuf[cmdbuf_size]) {
-					sprintf(xbuf,"Invalid raw command '%s'.\r\n",cmdbuf);
-					log_txt(xbuf,strlen(xbuf));
-				} else {
-					move k;
-				}
-			}
-			else {
-				len--;
-				sprintf(xbuf,"Unknown R/S move command \"%s\"\r\n",cmdbuf);
-				log_txt(xbuf,strlen(xbuf));
-			}
-			len++;
+		else {
+			len--;
+			sprintf(xbuf,"Unknown %s move command \"%s\"\r\n", get_romtype_name(), cmdbuf);
+			log_txt(xbuf,strlen(xbuf));
 		}
+		len++;
 	}
 	*ii=i;
 	return len;

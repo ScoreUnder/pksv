@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -9,11 +10,25 @@ int main(int argc, char **argv) {
 
   char lookup_function_name[256] = {0};
   char buf[1024];
+  bool raw = false;
 
   while (fgets(buf, sizeof(buf), stdin)) {
+    if (strcmp(buf, "%}\n") == 0) {
+      raw = false;
+      continue;
+    }
+    if (raw) {
+      fputs(buf, stdout);
+      continue;
+    }
+    if (strcmp(buf, "%{\n") == 0) {
+      raw = true;
+      continue;
+    }
     if (strcmp(buf, "%%\n") == 0) {
       break;
     }
+
     char *saveptr = NULL;
     char *cmd = strtok_r(buf, " \t\n", &saveptr);
     if (cmd && strcmp(cmd, "%define") == 0) {
