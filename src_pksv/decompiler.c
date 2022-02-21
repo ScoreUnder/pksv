@@ -2207,6 +2207,62 @@ char* GetItemName(unsigned int a) {
   }
   return NULL;
 }
+
+const char* special_name_by_id(uint16_t id) {
+  switch (id) {
+    case 0:
+      return "HEAL_POKEMON";
+    case 0x39:
+      return "WANT_REMATCH";
+    case 0x84:
+      return "COUNT_POKEMON";
+    case 0x9C:
+      return "CHOOSE_POKEMON";
+    case 0x9D:
+      return "CATCH_POKEMON";
+    case 0x9E:
+      return "NAME_POKEMON";
+    case 0x137:
+      return "BATTLE_WIPE";
+    case 0x138:
+      return "BATTLE_PIXELLATE";
+    case 0x139:
+      return "BATTLE_PIXELLATE2";
+    case 0x143:
+      return "BATTLE_INTERLACE";
+    case 0x156:
+      return "BATTLE_UNCATCHABLE";
+    case 0x163:
+      return "SEEN_POKEMON";
+    case 0x16F:
+      return "FR_NATIONAL_DEX";
+    case 0x18D:
+      return "TEACH_ATTACK";
+    case 0x1F3:
+      return "EM_NATIONAL_DEX";
+    case 0x113:
+      return "CAMERA_START";
+    case 0x114:
+      return "CAMERA_END";
+    case 0x116:
+      return "EM_CAMERA_START";
+    case 0x117:
+      return "EM_CAMERA_END";
+    case 0x173:
+      return "FAME_CHECKER";
+    case 0x174:
+      return "FAME_CHECKER_NEW";
+    case 0x187:
+      return "INIT_STEPCOUNT";
+    case 0x188:
+      return "GET_STEPCOUNT";
+    case 0x197:
+      return "RESET_STEPCOUNT";
+    default:
+      return NULL;
+  }
+}
+
 unsigned int chr_count(char chrs,
                        char* string)  // cannot use chr, defined as i...
 {
@@ -3425,18 +3481,13 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
               sprintf(buf, "0x%X", arg1);
             fprintf(fsend, "checkflag %s\n", buf);
             break;
-          case CMD_SPECIAL2:
+          case CMD_SPECIAL2: {
             fread(&arg1, 1, 2, fileM);
             fread(&arg2, 1, 2, fileM);
-            switch (arg2) {
-              case 0x39:
-                strcpy(buf2, "WANT_REMATCH");
-                break;
-              case 0x84:
-                strcpy(buf2, "COUNT_POKEMON");
-                break;
-              default:
-                sprintf(buf2, "0x%X", arg2);
+            const char* special = special_name_by_id(arg2);
+            if (special == NULL) {
+              sprintf(buf2, "0x%X", arg2);
+              special = buf2;
             }
             switch (arg1) {
               case 0x800D:
@@ -3447,8 +3498,9 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             }
             lastdata = arg2;
             lastdata2 = arg1;
-            fprintf(fsend, "special2 %s %s\n", buf, buf2);
+            fprintf(fsend, "special2 %s %s\n", buf, special);
             break;
+          }
           case CMD_SETFLAG:
             fread(&arg1, 1, 2, fileM);
             if (GetFlagName(arg1))
@@ -3890,81 +3942,17 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
               strcpy(buf, GetPokeName(arg2));
             fprintf(fsend, "storepokemon 0x%X %s\n", arg1, buf);
             break;
-          case CMD_SPECIAL:
+          case CMD_SPECIAL: {
             fread(&arg1, 1, 2, fileM);
-            switch (arg1) {
-              case 0x000:
-                strcpy(buf, "HEAL_POKEMON");
-                break;
-              case 0x09C:
-                strcpy(buf, "CHOOSE_POKEMON");
-                break;
-              case 0x09D:
-                strcpy(buf, "CATCH_POKEMON");
-                break;
-              case 0x09E:
-                strcpy(buf, "NAME_POKEMON");
-                break;
-              case 0x137:
-                strcpy(buf, "BATTLE_WIPE");
-                break;
-              case 0x138:
-                strcpy(buf, "BATTLE_PIXELLATE");
-                break;
-              case 0x139:
-                strcpy(buf, "BATTLE_PIXELLATE2");
-                break;
-              case 0x143:
-                strcpy(buf, "BATTLE_INTERLACE");
-                break;
-              case 0x156:
-                strcpy(buf, "BATTLE_UNCATCHABLE");
-                break;
-              case 0x163:
-                strcpy(buf, "SEEN_POKEMON");
-                break;
-              case 0x16F:
-                strcpy(buf, "FR_NATIONAL_DEX");
-                break;
-              case 0x18D:
-                strcpy(buf, "TEACH_ATTACK");
-                break;
-              case 0x1F3:
-                strcpy(buf, "EM_NATIONAL_DEX");
-                break;
-              case 0x113:
-                strcpy(buf, "CAMERA_START");
-                break;
-              case 0x114:
-                strcpy(buf, "CAMERA_END");
-                break;
-              case 0x116:
-                strcpy(buf, "EM_CAMERA_START");
-                break;
-              case 0x117:
-                strcpy(buf, "EM_CAMERA_END");
-                break;
-              case 0x173:
-                strcpy(buf, "FAME_CHECKER");
-                break;
-              case 0x174:
-                strcpy(buf, "FAME_CHECKER_NEW");
-                break;
-              case 0x187:
-                strcpy(buf, "INIT_STEPCOUNT");
-                break;
-              case 0x188:
-                strcpy(buf, "GET_STEPCOUNT");
-                break;
-              case 0x197:
-                strcpy(buf, "RESET_STEPCOUNT");
-                break;
-              default:
-                sprintf(buf, "0x%X", arg1);
+            const char* special = special_name_by_id(arg1);
+            if (special == NULL) {
+              sprintf(buf, "0x%X", arg1);
+              special = buf;
             }
             lastdata = arg1;
-            fprintf(fsend, "special %s\n", buf);
+            fprintf(fsend, "special %s\n", special);
             break;
+          }
           case CMD_FADESCREEN:
             fread(&arg1, 1, 1, fileM);
             switch (arg1) {
