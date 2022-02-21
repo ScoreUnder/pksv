@@ -6715,13 +6715,13 @@ void RecodeProc(char *script, char *romfn) {
                   rom(arg5, 1);
                   rom(arg6, 1);
                 }
-                aa("cmd_a6") {
-                  vlog_txt("CMD_A6\n");
-                  arg1 = GetNum("CMD_A6");
+                aa("setstepcallback") {
+                  vlog_txt("SETSTEPCALLBACK\n");
+                  arg1 = GetNum("SETSTEPCALLBACK");
                   if (!gffs) {
                     return;
                   }
-                  BASIC(CMD_A6);
+                  BASIC(CMD_SETSTEPCALLBACK);
                   rom(arg1, 1);
                 }
                 aa("cmd_b1") {

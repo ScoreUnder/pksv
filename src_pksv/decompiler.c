@@ -2848,9 +2848,9 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             fprintf(fsend, "createtempsprite 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n",
                     arg1, arg2, arg3, arg4, arg5, arg6);
             break;
-          case CMD_A6:
+          case CMD_SETSTEPCALLBACK:
             fread(&arg1, 1, 1, fileM);
-            fprintf(fsend, "CMD_A6 0x%X\n", arg1);
+            fprintf(fsend, "setstepcallback 0x%X\n", arg1);
             break;
           case CMD_TEMPSPRITEFACE:
             fread(&arg1, 1, 1, fileM);
