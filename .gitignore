@@ -11,3 +11,5 @@ vgcore.*
 # /pksv
 /tools/*
 !/tools/*.c
+!/tools/language_parser
+/tools/language_parser/language-parser

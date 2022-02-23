@@ -19,6 +19,8 @@ CC = $(TOOLCHAIN_PREFIX)gcc
 WINDRES = $(TOOLCHAIN_PREFIX)windres
 GPERF = gperf
 CMAKE = cmake
+LEX = lex
+YACC = yacc
 TOOL_WRAPPER =  # Might be wine
 
 LIB_FMEM_BASE = lib/fmem
@@ -62,8 +64,14 @@ RES_PKSVUI = src_pksvui/vcpksv2.rc
 SRC_PROCESS_DEFINES = tools/process-defines.c src_common/binarysearch.c
 SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
 SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c
+SRC_LANGUAGE_PARSER = tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c
 
-GENERATED_SOURCES = pksv/sublang/gsc_moves.c pksv/sublang/gsc_moves_reverse.c
+GENERATED_SOURCES = \
+	pksv/sublang/gsc_moves.c pksv/sublang/gsc_moves_reverse.c \
+	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
+	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
+	tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c \
+	tools/language_parser/language-def-yacc.tab.h
 
 OBJ_PKSVUI_P_win = $(RES_PKSVUI:.rc=.o)
 OBJ_PKSVUI = $(SRC_PKSVUI:.c=.o) $(OBJ_PKSVUI_P_$(PLATFORM))
@@ -73,12 +81,14 @@ OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o) $(RES_PKSV_SHLIB:.rc=.o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
+OBJ_LANGUAGE_PARSER = $(SRC_LANGUAGE_PARSER:.c=.o)
 
 BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
 BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
+BIN_LANGUAGE_PARSER = tools/language_parser/language-parser$(EXE_EXT)
 
-DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
+DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d) $(OBJ_LANGUAGE_PARSER:.o=.d)
 
 PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
@@ -88,7 +98,8 @@ DIST_FILES = $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll license.t
 DIST_OUT = pksv-"$$(git describe --long --dirty --always)".zip
 DIST_OUT_WC = pksv-*.zip
 
-all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll
+all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll $(BIN_LANGUAGE_PARSER)
+compat: $(PKSV) defines.dat $(BIN_LANGUAGE_PARSER)
 
 check: $(PKSV) defines.dat
 	bunzip2 -fkq src_pksv/tests/fakerom.gba.bz2
@@ -102,10 +113,10 @@ check: $(PKSV) defines.dat
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(DIST_OUT_WC) defines.dat Scintilla.dll
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(DIST_OUT_WC) defines.dat Scintilla.dll
 
 mostlyclean: clean-fmem
-	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_LANGUAGE_PARSER) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
@@ -141,6 +152,9 @@ $(BIN_GPERF_REVERSE): $(OBJ_GPERF_REVERSE)
 $(BIN_PROCESS_DEFINES_REVERSE): $(OBJ_PROCESS_DEFINES_REVERSE)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES_REVERSE) -o $@
 
+$(BIN_LANGUAGE_PARSER): $(OBJ_LANGUAGE_PARSER)
+	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_LANGUAGE_PARSER) -o $@
+
 $(PKSV): $(OBJ_PKSV_MAIN)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(CFLAGS) $(OBJ_PKSV_MAIN) -o $@
 
@@ -159,7 +173,7 @@ src_pksv/sublang/rse_moves_reverse.c: src_pksv/sublang/rse_moves.gperf $(BIN_GPE
 src_pksv/sublang/frlg_moves_reverse.c: src_pksv/sublang/frlg_moves.gperf $(BIN_GPERF_REVERSE)
 	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < src_pksv/sublang/frlg_moves.gperf > $@ || { rm -f -- $@; false; }
 
-.SUFFIXES: .sh_o .o .c .gperf .rc
+.SUFFIXES: .sh_o .o .c .gperf .rc .y .l .c .tab.c
 .c.sh_o:
 	$(CC) $(CFLAGS) $(CFLAGS_SH) $(CPPFLAGS) -MD -MF $(@:o=d) -c $< -o $@
 
@@ -172,8 +186,19 @@ src_pksv/sublang/frlg_moves_reverse.c: src_pksv/sublang/frlg_moves.gperf $(BIN_G
 .rc.o:
 	$(WINDRES) $(CPPFLAGS) -o $@ $<
 
-.PHONY: all check clean clean-fmem dist
+.l.c:
+	$(LEX) -t $< > $@ || { rm -f -- $@; false; }
+
+.y.tab.c:
+	$(YACC) -d -b $(@D)/$(*F) $<
+
+.PHONY: all check clean clean-fmem compat dist
+
+tools/language_parser/language-def-yacc.tab.h: tools/language_parser/language-def-yacc.tab.c
+	@:
 
 src_pksv/pksv_dll.c: $(LIB_FMEM)/gen/fmem.h
+
+tools/language_parser/language-def-lex.o: tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.h
 
 -include $(DEPS)
