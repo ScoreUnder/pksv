@@ -120,6 +120,7 @@ struct language_def {
   struct rule *default_rule;
   struct rule *terminator_rule;
   char **parents;
+  char *name;
   uint8_t meta_flags;
 };
 

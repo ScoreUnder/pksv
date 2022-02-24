@@ -26,6 +26,7 @@
 
 #include "int32_interval.h"
 #include "binarysearch.h"
+#include "lang_parsers.h"
 #include "recompiler.h"
 #include "textproc.h"
 #include "codeproc.h"
@@ -1152,65 +1153,9 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
 
 #define try_asm() try_asm_x(Script, &i, buf, c)
 struct bsearch_root *DoDefines() {
-  char buf[500];
-  struct bsearch_root *defines =
-      bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
-
-#ifdef WIN32
-  OutputDebugString("Started Defines");
-#endif
-
-  FILE *f = NULL;
-  if (defines_dat_location) {
-    f = fopen(defines_dat_location, "rb");
-  }
-  if (!f) {
-    f = fopen("defines.dat", "rb");
-  }
-  if (!f) {
-    log_txt("Cannot open defines.dat!\n", 26 - 1);
-    return defines;
-  }
-  bool ok = true;
-  while (!feof(f)) {
-    uint8_t l;
-    if (fread(&l, 1, 1, f) == 0) {
-      if (!feof(f)) ok = false;
-      break;
-    }
-    if (fread(buf, 1, l, f) < l) {
-      ok = false;
-      break;
-    }
-    uint32_t value;
-    if (fread(&value, 1, 4, f) < 4) {
-      ok = false;
-      break;
-    }
-    bsearch_ensure_capacity(defines, defines->size + 1);
-    buf[l] = '\0';
-    // Note: safe to insert directly because defines.dat is already sorted
-    defines->pairs[defines->size++] = (struct bsearch_kv){
-        .key = strdup(buf),
-        .value = (void *)(intptr_t)value,
-    };
-  }
-  if (!ok) {
-    char *s;
-    if (feof(f)) {
-      s = "defines.dat is truncated and not fully valid\n";
-    } else if (ferror(f)) {
-      s = "Error reading defines.dat\n";
-    }
-    log_txt(s, strlen(s));
-    bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
-    bsearch_init_root(defines, bsearch_key_strcmp, bsearch_key_strdup, free,
-                      NULL);  // Still need a struct to return
-  }
-  fclose(f);
-#ifdef WIN32
-  OutputDebugString("Finished Defines, starting main compiler loop");
-#endif
+  struct bsearch_root *defines = load_definitions(defines_dat_location);
+  if (defines == NULL) defines = load_definitions("defines.dat");
+  if (defines == NULL) defines = bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
   return defines;
 }
 void RecodeProc(char *script, char *romfn) {

@@ -15,14 +15,14 @@ size_t fputvarint(uint32_t u32, FILE *stream) {
 }
 
 uint32_t fgetvarint(FILE *stream) {
-  uint8_t byte;
+  int byte;
   uint32_t result = 0;
   int i = 0;
   do {
     byte = fgetc(stream);
     result |= (byte & 0x7F) << i;
     i += 7;
-  } while (byte & 0x80);
+  } while (byte & 0x80 && byte != EOF);
   return result;
 }
 

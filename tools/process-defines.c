@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <binarysearch.h>
+#include "binarysearch.h"
+#include "stdio_ext.h"
 
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t),
                "intptr_t must be at least 32 bits");
@@ -108,9 +109,8 @@ int main(int argc, char **argv) {
   }
 
   for (size_t i = 0; i < defines.size; i++) {
-    fputc(strlen(defines.pairs[i].key), outfile);
-    fputs(defines.pairs[i].key, outfile);
-    fwrite(&defines.pairs[i].value, sizeof(uint32_t), 1, outfile);
+    fputstr(defines.pairs[i].key, outfile);
+    fputvarint((uint32_t)(intptr_t) defines.pairs[i].value, outfile);
   }
 
   if (fflush(outfile)) {

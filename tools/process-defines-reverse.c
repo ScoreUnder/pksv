@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
+
+#include "stdio_ext.h"
 
 void strupper(char *s) {
   while (*s) {
@@ -19,26 +22,25 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  char namebuf[256];
   bool ok = true;
   while (!feof(in)) {
-    int c = fgetc(in);
-    if (c == EOF) break;
+    char *name = fgetstr(in);
 
-    if (fread(namebuf, 1, c, in) != (size_t)c) {
-      ok = false;
-      break;
-    }
-    namebuf[c] = 0;
-    strupper(namebuf);
-
-    uint32_t value;
-    if (fread(&value, 4, 1, in) != 1) {
-      ok = false;
+    if (feof(in)) {
+      free(name);
       break;
     }
 
-    printf("#define %s 0x%08X\n", namebuf, value);
+    uint32_t value = fgetvarint(in);
+
+    if (feof(in) || ferror(in)) {
+      ok = false;
+      free(name);
+      break;
+    }
+
+    strupper(name);
+    printf("#define %s 0x%08X\n", name, value);
   }
 
   if (feof(in) && !ok) {
