@@ -8,48 +8,47 @@
 
 Flat file format:
 
-1b: metaflags
-1b: parents.length
-[ for parent * parents.length
-    1b strlen(parent)
-    <string> parent
+vi: string_table.length
+[ for string * string_table.length ]
+  vi: string.length
+  <string>
 ]
 
-1b rules.length
+1b: metaflags
+vi: parents.length
+[ for parent * parents.length
+    vi string index
+]
+
+vi rules.length
 [ for rule * rules.length
     1b rule.attributes
 
-    1b rule.bytes.length
+    vi rule.bytes.length
     <rule.bytes.length blob> rule.bytes.bytes
 
-    1b strlen(rule.command_name)
-    <string> rule.command_name
+    vi string index = rule.command_name
 
-    1b strlen(rule.oneshot_lang.name)
-    <string> rule.oneshot_lang.name
-    [ if rule.oneshot_lang.name is not empty
-        1b rule.oneshot_lang.is_prefixed
-    ]
+    vi string index = rule.oneshot_lang.name
+    1b rule.oneshot_lang.is_prefixed
 
-    1b rule.args.length
+    vi rule.args.length
     [ for arg * rule.args.length
         1b arg.size
 
-        1b arg.parsers.length
+        vi arg.parsers.length
         [ for parser * arg.parsers.length
-            1b strlen(parser.name)
-            <string> parser.name
+            vi string index = parser.name
             1b parser.is_prefixed
         ]
 
         1b arg.as_language.type
         [ if arg.as_language.type is LC_TYPE_LANG
-            1b strlen(arg.as_language.lang.name)
-            <string> arg.as_language.lang.name
+            vi string index = arg.as_language.lang.name
+            1b arg.as_language.lang.is_prefixed
         ]
         [ if arg.as_language.type is LC_TYPE_COMMAND
-            1b strlen(arg.as_language.command)
-            <string> arg.as_language.command
+            vi string index = arg.as_language.command
         ]
     ]
 ]
@@ -72,17 +71,17 @@ Flat file format:
 #define METAFLAG_LANGTYPE_TEXT 2
 
 struct bytes_list {
-  const uint8_t *bytes;
+  uint8_t *bytes;
   size_t length;
 };
 
 struct language {
-  const char *name;
+  char *name;
   bool is_prefixed;
 };
 
 struct parser_list {
-  const struct language *parsers;
+  struct language *parsers;
   size_t length;
 };
 
@@ -90,7 +89,7 @@ struct lang_or_cmd {
   int type;
   union {
     struct language lang;
-    const char *command;
+    char *command;
   };
 };
 
@@ -101,7 +100,7 @@ struct command_arg {
 };
 
 struct command_args_list {
-  const struct command_arg *args;
+  struct command_arg *args;
   size_t length;
 };
 
@@ -109,14 +108,16 @@ struct rule {
   struct bytes_list bytes;
   struct command_args_list args;
   struct language oneshot_lang;
-  const char *command_name;
+  char *command_name;
   uint8_t attributes;
 };
 
 struct language_def {
-  const struct bsearch_root *rules_by_bytes;
-  const struct bsearch_root *rules_by_command_name;
-  const char **parents;
+  struct bsearch_root *rules_by_bytes;
+  struct bsearch_root *rules_by_command_name;
+  struct rule *default_rule;
+  struct rule *terminator_rule;
+  char **parents;
   uint8_t meta_flags;
 };
 

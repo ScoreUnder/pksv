@@ -99,3 +99,12 @@ void bsearch_remove(struct bsearch_root *restrict root, size_t index) {
           (root->size - index - 1) * sizeof(struct bsearch_kv));
   root->size--;
 }
+
+// Convenience functions:
+int bsearch_key_strcmp(const void *a, const void *b) {
+  return strcmp((const char *)a, (const char *)b);
+}
+
+void *bsearch_key_strdup(const void *a) {
+  return strdup((const char *)a);
+}

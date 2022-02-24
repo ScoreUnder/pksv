@@ -1,0 +1,141 @@
+# extra features we need:
+# turn "if jump" to "if arg jump"
+# default hex parser
+# cmp_flag cmp_int
+# aliases
+# string pooling
+
+# Pseudo-commands
+[] = .text !*text
+[] = "=" !*text  # old alias for .text
+[] = m !*moves
+[] = .move !*moves
+[] = item !*items
+
+# Actual commands
+[] = "#raw"+default 1
+[0x00] = nop0
+[0x01] = nop1
+[0x02] = end+end
+[0x03] = return+end
+[0x04] = call 4:address@*
+[0x05] = jump+end 4:address@*
+[0x06] = "if jump" 1:condition:dec 4:address@*
+[0x07] = "if call" 1:condition:dec 4:address@*
+[0x08] = jumpstd 1:*callstd:dec
+[0x09] = callstd 1:*callstd:dec
+[0x0A] = "if jumpstd" 1:condition:dec 1:*callstd:dec
+[0x0B] = "if callstd" 1:condition:dec 1:*callstd:dec
+[0x0C] = jumpram+end
+[0x0D] = killscript+end
+[0x0E] = setbyte 1
+[0x0F 0x00] = msgbox 4:address@cmd=".text"
+[0x0F] = loadpointer 1 4:address
+[0x10] = setbyte2 1 1
+[0x11] = writebytetooffset 1 4:address
+[0x12] = loadbytefrompointer 1 4:address
+[0x13] = setfarbyte 1 4:address
+[0x14] = copyscriptbanks 1 1
+[0x15] = copybyte 4:address 4:address
+[0x16] = setvar 2:*var 2:*var
+[0x17] = addvar 2:*var 2:*var
+[0x18] = subtractvar 2:*var 2:*var
+[0x19] = copyvar 2:*var 2:*var
+[0x1A] = setorcopyvar 2:*var 2:*var
+[0x1A] = copyvarifnotzero 2:*var 2:*var
+[0x1B] = comparelocals+cmp_int 2:*var 2:*var
+[0x1C] = comparelocaltobyte+cmp_int 2:*var 1
+[0x1D] = comparelocaltofarbyte+cmp_int 2:*var 4:address
+[0x1E] = comparefarbytetolocal+cmp_int 4:address 2:*var
+[0x1F] = comparefarbytetobyte+cmp_int 4:address 1
+[0x20] = comparefarbytetofarbyte+cmp_int 4:address 4:address
+[0x21] = compare+cmp_int 2:*var 2
+[0x22] = comparevars+cmp_int 2:*var 2:*var
+[0x23] = callasm 4:address@gba_arm
+[0x24] = jumpasm+end 4:address@gba_arm
+[0x24] = callasm2 4:address@gba_arm
+[0x25] = special 2:*special
+[0x26] = special 2:*var 2:*special
+[0x27] = waitspecial
+[0x28] = pause 2:dec
+[0x29] = setflag 2:*flag
+[0x2A] = clearflag 2:*flag
+[0x2B] = checkflag+cmp_flag 2:*flag
+[0x2C] = initclock 2:*var 2:*var
+[0x2D] = dotimebasedevents
+[0x2E] = gettime
+[0x2F] = sound 2:*sound
+[0x30] = waitsound
+[0x31] = fanfare 2:*sound
+[0x32] = waitfanfare
+[0x33] = playsound 2:*sound 1:bool  # sound, save_as_bgm
+[0x34] = savebgm 2:*sound
+[0x35] = fadedefault
+[0x36] = fadesong 2:*sound
+[0x37] = fadeout 1:dec  # speed
+[0x38] = fadein  1:dec  # speed
+[0x39] = warp           1 1 1  # bank, map, exit
+[0x3A] = warpmuted      1 1 1  # bank, map, exit
+[0x3B] = warpwalking    1 1 1  # bank, map, exit
+[0x3C] = falldownhole   1 1    # bank, map
+[0x3D] = warpteleport   1 1 1  # bank, map, exit
+[0x3E] = setwarp        1 1 1  # bank, map, exit
+[0x3F] = setdynamicwarp 1 1 1  # bank, map, exit
+[0x40] = setdivewarp    1 1 1  # bank, map, exit
+[0x41] = setholewarp    1 1 1  # bank, map, exit
+[0x42] = getplayerxy 2:*var 2:*var
+[0x43] = countpokemon
+[0x44] = additem             2:*var:*item 2:*var:dec
+[0x45] = removeitem          2:*var:*item 2:*var:dec
+[0x46] = checkitemspace      2:*var:*item 2:*var:dec
+[0x47] = checkitem           2:*var:*item 2:*var:dec
+[0x48] = checkitemtype       2:*var:*item
+[0x49] = giveitemtopc        2:*var:*item 2:*var:dec
+[0x4A] = checkiteminpc       2:*var:*item 2:*var:dec
+[0x4B] = addfurniture        2:*var:*furniture
+[0x4C] = removefurniture     2:*var:*furniture
+[0x4D] = checkfurniturespace 2:*var:*furniture
+[0x4E] = checkfurniture      2:*var:*furniture
+[0x4F] = applymovement   2:*var:*sprite 4:address@cmd=.move
+[0x50] = applymovementat 2:*var:*sprite 4:address@cmd=.move 1 1  # sprite, script, bank, map
+[0x51] = waitmovement    2:*var:*sprite
+[0x52] = waitmovementat  2:*var:*sprite 1 1  # sprite, bank, map
+[0x53] = disappear       2:*var:*sprite
+[0x54] = disappearat     2:*var:*sprite 1 1  # sprite, bank, map
+[0x55] = reappear        2:*var:*sprite
+[0x56] = reappearat      2:*var:*sprite 1 1  # sprite, bank, map
+[0x57] = movesprite      2:*var:*sprite 2:*var 2:*var  # sprite, x, y
+[0x58] = reappearat2     2:*var:*sprite 1 1  # sprite, bank, map
+[0x59] = disappearat2    2:*var:*sprite 1 1  # sprite, bank, map
+[0x5A] = faceplayer
+[0x5B] = spriteface      2:*var:*sprite 1:*direction
+[0x5C] = trainerbattle !*trainerbattle
+[0x5D] = trainerbattlebegin
+[0x5E] = gotopostbattlescript
+[0x5F] = gotobeatenscript
+[0x60] = checktrainerflag 2:*var:*trainer
+[0x61] = cleartrainerflag 2:*var:*trainer
+[0x62] = settrainerflag   2:*var:*trainer
+[0x63] = movespriteperm 2:*var:*sprite 2:*var 2:*var  # sprite, x, y
+[0x64] = moveoffscreen  2:*var:*sprite
+[0x65] = spritebehave   2:*var:*sprite 1:*spritebehave
+[0x66] = showmsg
+[0x67] = message 4:address@cmd=.text
+[0x68] = closemsg
+[0x69] = lockall
+[0x6A] = lock
+[0x6B] = releaseall
+[0x6C] = release
+[0x6D] = waitbutton
+[0x6E] = showyesno          1 1        # x, y
+[0x6F] = multichoice        1 1 1 1    # x, y, id, ignoreButton
+[0x70] = multichoicedefault 1 1 1 1 1  # x, y, id, defaultChoice, ignoreButton
+[0x71] = multichoicegrid    1 1 1 1 1  # x, y, id, cols, ignoreButton
+[0x72] = showbox            1 1 1 1    # x, y, x2, y2
+[0x73] = hidebox            1 1 1 1    # x, y, x2, y2
+[0x74] = drawboxtext        1 1 1 1    # x, y, id, ignoreButton
+[0x75] = showpokepic 2:*var:*pokemon 1 1  # poke, x, y
+[0x76] = hidepokepic
+
+# ...
+[0x90] = givemoney 4:dec 1  # amount, ???

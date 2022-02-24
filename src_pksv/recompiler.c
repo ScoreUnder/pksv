@@ -1150,14 +1150,6 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
   *ppos = i;
 }
 
-static int bsearch_key_strcmp(const void *a, const void *b) {
-  return strcmp((const char *)a, (const char *)b);
-}
-
-static void *bsearch_key_strdup(const void *a) {
-  return strdup((const char *)a);
-}
-
 #define try_asm() try_asm_x(Script, &i, buf, c)
 struct bsearch_root *DoDefines() {
   char buf[500];

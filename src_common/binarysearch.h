@@ -61,4 +61,8 @@ ssize_t bsearch_find(struct bsearch_root const *restrict root, void const *key);
 /** @brief Delete the key/value pair at the given index. */
 void bsearch_remove(struct bsearch_root *restrict root, size_t index);
 
+// Provided for convenience
+int bsearch_key_strcmp(const void *a, const void *b);
+void *bsearch_key_strdup(const void *a);
+
 #endif

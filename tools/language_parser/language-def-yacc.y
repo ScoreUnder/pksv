@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include "language-defs-builder.h"
+#include "binarysearch.h"
+#include "stdio_ext.h"
 
 extern int yylex(void);
 extern int yylineno;
@@ -118,7 +120,7 @@ args: /*empty*/ { $$ = (struct command_args_list_builder) {NULL, 0, 0}; }
     | args arg { $$ = add_command_args_list($1, $2); }
     ;
 
-oneshot_lang: /*empty*/ { $$.name = NULL; }
+oneshot_lang: /*empty*/ { $$ = (struct language) {.name = strdup(""), .is_prefixed = false}; }
             | '!' language { $$ = $2; }
             ;
 
@@ -209,14 +211,14 @@ bool run_parser(FILE *file) {
 }
 
 bool sanity_check(struct language_def_builder *language, struct string_list_builder *parents) {
-  if (parents->length > 255) {
+  if (parents->length > UINT32_MAX) {
     fputs("Too many inherit clauses\n", stderr);
     return false;
   }
 
   for (size_t i = 0; i < parents->length; i++) {
     const char *parent = parents->items[i];
-    if (strlen(parent) > 255) {
+    if (strlen(parent) > UINT32_MAX) {
       fprintf(stderr, "Inherited language name too long: \"%s\"\n", parent);
       return false;
     }
@@ -224,23 +226,23 @@ bool sanity_check(struct language_def_builder *language, struct string_list_buil
 
   for (size_t i = 0; i < language->rules.length; i++) {
     const struct rule_builder *rule = &language->rules.rules[i];
-    if (strlen(rule->command_name) > 255) {
+    if (strlen(rule->command_name) > UINT32_MAX) {
       fprintf(stderr, "Rule name too long: \"%s\"\n", rule->command_name);
       return false;
     }
-    if (rule->bytes.length > 255) {
+    if (rule->bytes.length > UINT32_MAX) {
       fprintf(stderr, "Rule has too many bytes: \"%s\"\n", rule->command_name);
       return false;
     }
-    if (rule->oneshot_lang.name != NULL && strlen(rule->oneshot_lang.name) > 255) {
+    if (strlen(rule->oneshot_lang.name) > UINT32_MAX) {
       fprintf(stderr, "Rule oneshot language name too long: \"%s\"\n", rule->oneshot_lang.name);
       return false;
     }
-    if (rule->oneshot_lang.name != NULL && strlen(rule->oneshot_lang.name) == 0) {
+    if (strlen(rule->oneshot_lang.name) == 0 && rule->oneshot_lang.is_prefixed) {
       fprintf(stderr, "Rule oneshot language cannot be recursive (use a different language type) on \"%s\"\n", rule->command_name);
       return false;
     }
-    if (rule->args.length > 255) {
+    if (rule->args.length > UINT32_MAX) {
       fprintf(stderr, "Rule has too many args: \"%s\"\n", rule->command_name);
       return false;
     }
@@ -250,24 +252,28 @@ bool sanity_check(struct language_def_builder *language, struct string_list_buil
         fprintf(stderr, "WARNING: Rule arg consumes too many bytes: \"%s\"\n", rule->command_name);
         // return false;  // Not a strict limit on file format
       }
-      if (arg->parsers.length > 255) {
+      if (arg->size > 255) {
+        fprintf(stderr, "Rule arg consumes too many bytes: \"%s\"\n", rule->command_name);
+        return false;
+      }
+      if (arg->parsers.length > UINT32_MAX) {
         fprintf(stderr, "Rule arg has too many parsers: \"%s\" arg %d\n", rule->command_name, (int) j);
         return false;
       }
       for (size_t k = 0; k < arg->parsers.length; k++) {
         const struct language *parser = &arg->parsers.parsers[k];
-        if (strlen(parser->name) > 255) {
+        if (strlen(parser->name) > UINT32_MAX) {
           fprintf(stderr, "Rule arg parser name too long: \"%s\" arg %d parser \"%s\"\n", rule->command_name, (int) j, parser->name);
           return false;
         }
       }
       if (arg->as_language.type == LC_TYPE_LANG) {
-        if (strlen(arg->as_language.lang.name) > 255) {
+        if (strlen(arg->as_language.lang.name) > UINT32_MAX) {
           fprintf(stderr, "Rule arg as-language name too long: \"%s\" arg %d as-language \"%s\"\n", rule->command_name, (int) j, arg->as_language.lang.name);
           return false;
         }
       } else if (arg->as_language.type == LC_TYPE_COMMAND) {
-        if (strlen(arg->as_language.command) > 255) {
+        if (strlen(arg->as_language.command) > UINT32_MAX) {
           fprintf(stderr, "Rule arg as-command name too long: \"%s\" arg %d as-command \"%s\"\n", rule->command_name, (int) j, arg->as_language.command);
           return false;
         }
@@ -275,6 +281,44 @@ bool sanity_check(struct language_def_builder *language, struct string_list_buil
     }
   }
   return true;
+}
+
+struct bsearch_root *make_string_table(struct language_def_builder *language, struct string_list_builder *parents) {
+  struct bsearch_root *root = bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+
+  for (size_t i = 0; i < parents->length; i++) {
+    const char *parent = parents->items[i];
+    bsearch_upsert(root, parent, NULL);
+  }
+
+  for (size_t i = 0; i < language->rules.length; i++) {
+    const struct rule_builder *rule = &language->rules.rules[i];
+    bsearch_upsert(root, rule->command_name, NULL);
+    bsearch_upsert(root, rule->oneshot_lang.name, NULL);
+    for (size_t j = 0; j < rule->args.length; j++) {
+      const struct command_arg_builder *arg = &rule->args.args[j];
+      for (size_t k = 0; k < arg->parsers.length; k++) {
+        const struct language *parser = &arg->parsers.parsers[k];
+        bsearch_upsert(root, parser->name, NULL);
+      }
+      if (arg->as_language.type == LC_TYPE_LANG) {
+        bsearch_upsert(root, arg->as_language.lang.name, NULL);
+      } else if (arg->as_language.type == LC_TYPE_COMMAND) {
+        bsearch_upsert(root, arg->as_language.command, NULL);
+      }
+    }
+  }
+
+  return root;
+}
+
+void write_string(FILE *f, struct bsearch_root *string_table, const char *string) {
+  ssize_t index = bsearch_find(string_table, string);
+  if (index < 0) {
+    fprintf(stderr, "Internal error: string not found in string table: \"%s\"\n", string);
+    abort();
+  }
+  fputvarint(index, f);
 }
 
 int main(int argc, char **argv) {
@@ -330,78 +374,60 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  struct bsearch_root *restrict string_table = make_string_table(&language_def, &parents);
+
   FILE *out = fopen(argv[2], "wb");
   if (!out) {
     perror(argv[2]);
     return 1;
   }
 
+  fputvarint(string_table->size, out);
+  for (size_t i = 0; i < string_table->size; i++) {
+    fputstr(string_table->pairs[i].key, out);
+  }
+
   // Metas
-  fwrite(&meta_flags, 1, 1, out);
-  uint8_t parents_count = (uint8_t) parents.length;
-  fwrite(&parents_count, 1, 1, out);
+  putc(meta_flags, out);
+  fputvarint(parents.length, out);
   for (size_t i = 0; i < parents.length; i++) {
-    uint8_t parent_length = (uint8_t) strlen(parents.items[i]);
-    fwrite(&parent_length, 1, 1, out);
-    fwrite(parents.items[i], 1, parent_length, out);
+    write_string(out, string_table, parents.items[i]);
   }
 
   // Rules
-  uint8_t rule_count = (uint8_t) language_def.rules.length;
-  fwrite(&rule_count, 1, 1, out);
+  fputvarint(language_def.rules.length, out);
   for (size_t i = 0; i < language_def.rules.length; i++) {
     const struct rule_builder *rule = &language_def.rules.rules[i];
 
-    fwrite(&rule->attributes, 1, 1, out);
+    putc(rule->attributes, out);
 
-    uint8_t bytes_length = (uint8_t) rule->bytes.length;
-    fwrite(&bytes_length, 1, 1, out);
-    fwrite(rule->bytes.bytes, 1, bytes_length, out);
+    fputvarint(rule->bytes.length, out);
+    fwrite(rule->bytes.bytes, 1, rule->bytes.length, out);
 
-    uint8_t command_name_len = (uint8_t) strlen(rule->command_name);
-    fwrite(&command_name_len, 1, 1, out);
-    fwrite(rule->command_name, 1, command_name_len, out);
+    write_string(out, string_table, rule->command_name);
 
-    if (rule->oneshot_lang.name != NULL) {
-      uint8_t oneshot_lang_len = (uint8_t) strlen(rule->oneshot_lang.name);
-      fwrite(&oneshot_lang_len, 1, 1, out);
-      fwrite(rule->oneshot_lang.name, 1, oneshot_lang_len, out);
-    } else {
-      uint8_t oneshot_lang_len = 0;
-      fwrite(&oneshot_lang_len, 1, 1, out);
-    }
+    write_string(out, string_table, rule->oneshot_lang.name);
+    putc(rule->oneshot_lang.is_prefixed, out);
 
-    uint8_t args_length = (uint8_t) rule->args.length;
-    fwrite(&args_length, 1, 1, out);
+    fputvarint(rule->args.length, out);
     for (size_t j = 0; j < rule->args.length; j++) {
       const struct command_arg_builder *arg = &rule->args.args[j];
 
-      uint8_t arg_size = (uint8_t) arg->size;
-      fwrite(&arg_size, 1, 1, out);
+      putc(arg->size, out);
 
-      uint8_t parsers_length = (uint8_t) arg->parsers.length;
-      fwrite(&parsers_length, 1, 1, out);
+      fputvarint(arg->parsers.length, out);
       for (size_t k = 0; k < arg->parsers.length; k++) {
         const struct language *parser = &arg->parsers.parsers[k];
-
-        uint8_t parser_len = (uint8_t) strlen(parser->name);
-        fwrite(&parser_len, 1, 1, out);
-        fwrite(parser->name, 1, parser_len, out);
-
-        uint8_t is_prefixed = parser->is_prefixed;
-        fwrite(&is_prefixed, 1, 1, out);
+        write_string(out, string_table, parser->name);
+        putc(parser->is_prefixed, out);
       }
 
-      uint8_t as_language_type = (uint8_t) arg->as_language.type;
-      fwrite(&as_language_type, 1, 1, out);
+      putc(arg->as_language.type, out);
       if (arg->as_language.type == LC_TYPE_LANG) {
-        uint8_t as_language_len = (uint8_t) strlen(arg->as_language.lang.name);
-        fwrite(&as_language_len, 1, 1, out);
-        fwrite(arg->as_language.lang.name, 1, as_language_len, out);
+        write_string(out, string_table, arg->as_language.lang.name);
+        putc(arg->as_language.lang.is_prefixed, out);
       } else if (arg->as_language.type == LC_TYPE_COMMAND) {
-        uint8_t as_command_len = (uint8_t) strlen(arg->as_language.command);
-        fwrite(&as_command_len, 1, 1, out);
-        fwrite(arg->as_language.command, 1, as_command_len, out);
+        write_string(out, string_table, arg->as_language.command);
       }
     }
   }
