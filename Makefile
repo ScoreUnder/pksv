@@ -90,7 +90,7 @@ BIN_LANGUAGE_PARSER = tools/language_parser/language-parser$(EXE_EXT)
 
 SUBLANGS = sublang/lang_rse.dat
 
-DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d) $(OBJ_LANGUAGE_PARSER:.o=.d)
+DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PKSVUI:.o=.d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d) $(OBJ_LANGUAGE_PARSER:.o=.d)
 
 PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
