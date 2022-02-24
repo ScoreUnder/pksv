@@ -11,24 +11,20 @@
 #include "pksv.h"
 
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
-                       codelabel** chain) {
-  char* name2;
-  codelabel* ncl;
-  codelabel* d;
-  name2 = malloc(strlen(name) + 1);
-  strcpy(name2, name);
-  ncl = malloc(sizeof(codelabel));
-  d = *chain;
-  if (d)
-    while (d->next) d = d->next;
-  ncl->prev = d;
-  if (d) d->next = ncl;
-  ncl->next = NULL;
-  ncl->name = name2;
-  ncl->pos = loc;
-  ncl->block = c;
-  if (!*chain) *chain = ncl;
-  return !!ncl;
+                       codelabel** head) {
+  char *name2 = strdup(name);
+  codelabel* newlabel = malloc(sizeof(codelabel));
+  codelabel* tail = *head;
+  if (tail)
+    while (tail->next) tail = tail->next;
+  newlabel->prev = tail;
+  newlabel->next = NULL;
+  newlabel->name = name2;
+  newlabel->pos = loc;
+  newlabel->block = c;
+  if (tail) tail->next = newlabel;
+  else *head = newlabel;
+  return newlabel != NULL;
 }
 
 unsigned int init_codeblock(codeblock* c, char* name, int org) {
