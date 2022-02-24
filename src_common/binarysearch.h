@@ -2,6 +2,7 @@
 #define PKSV_BINARY_SEARCH_H 1
 
 #include <stddef.h>
+#include <unistd.h>
 
 typedef int bsearch_compare_func(const void *a, const void *b);
 typedef void *bsearch_copy_func(const void *a);
