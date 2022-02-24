@@ -113,9 +113,9 @@
 [0x5D] = trainerbattlebegin
 [0x5E] = gotopostbattlescript
 [0x5F] = gotobeatenscript
-[0x60] = checktrainerflag 2:*var:*trainer
-[0x61] = cleartrainerflag 2:*var:*trainer
-[0x62] = settrainerflag   2:*var:*trainer
+[0x60] = checktrainerflag+cmp_flag 2:*var:*trainer
+[0x61] = cleartrainerflag          2:*var:*trainer
+[0x62] = settrainerflag            2:*var:*trainer
 [0x63] = movespriteperm 2:*var:*sprite 2:*var 2:*var  # sprite, x, y
 [0x64] = moveoffscreen  2:*var:*sprite
 [0x65] = spritebehave   2:*var:*sprite 1:*spritebehave
