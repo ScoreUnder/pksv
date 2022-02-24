@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <unistd.h>
+#include <sys/types.h>
 
 #include "int32_interval.h"
 #include "binarysearch.h"
