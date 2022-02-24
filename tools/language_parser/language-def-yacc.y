@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "language-defs-builder.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
@@ -23,7 +24,7 @@ struct language_def_builder language_def;
 
 %union {
   int intval;
-  const char * strval;
+  char * strval;
   struct meta_list_builder meta_list;
   struct rule_list_builder rule_list;
   struct meta meta;

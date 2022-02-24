@@ -79,16 +79,16 @@ size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
     kvs->pairs[index].value = value;
     return index;
   } else {
-    index = -index - 1;
+    size_t pos_index = (size_t)(-index - 1);
     bsearch_ensure_capacity(kvs, len + 1);
-    if (index < len) {
-      memmove(&kvs->pairs[index + 1], &kvs->pairs[index],
-              (len - index) * sizeof(struct bsearch_kv));
+    if (pos_index < len) {
+      memmove(&kvs->pairs[pos_index + 1], &kvs->pairs[pos_index],
+              (len - pos_index) * sizeof(struct bsearch_kv));
     }
-    void const *key_copied = kvs->copy(key);
-    kvs->pairs[index] = (struct bsearch_kv){.key = key_copied, .value = value};
+    void *key_copied = kvs->copy(key);
+    kvs->pairs[pos_index] = (struct bsearch_kv){.key = key_copied, .value = value};
     kvs->size++;
-    return index;
+    return pos_index;
   }
 }
 
