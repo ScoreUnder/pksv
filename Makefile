@@ -67,7 +67,7 @@ SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c
 SRC_LANGUAGE_PARSER = tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c src_common/binarysearch.c src_common/stdio_ext.c
 
 GENERATED_SOURCES = \
-	pksv/sublang/gsc_moves.c pksv/sublang/gsc_moves_reverse.c \
+	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
 	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
 	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
 	tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c \
