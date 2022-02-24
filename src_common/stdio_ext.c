@@ -10,7 +10,7 @@ size_t fputvarint(uint32_t u32, FILE *stream) {
     bytes[i++] = (u32 & 0x7F) | 0x80;
     u32 >>= 7;
   } while (u32);
-  bytes[i-1] &= 0x7F;
+  bytes[i - 1] &= 0x7F;
   return fwrite(bytes, 1, i, stream);
 }
 
@@ -24,6 +24,33 @@ uint32_t fgetvarint(FILE *stream) {
     i += 7;
   } while (byte & 0x80);
   return result;
+}
+
+size_t fput_little_endian(uint32_t u32, size_t size, FILE *stream) {
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+  return fwrite(&u32, 1, size, stream);
+#else
+  uint8_t bytes[4];
+  for (size_t i = 0; i < size; i++) {
+    bytes[i] = u32 & 0xFF;
+    u32 >>= 8;
+  }
+  return fwrite(bytes, 1, size, stream);
+#endif
+}
+
+uint32_t fget_little_endian(size_t size, FILE *stream) {
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+  uint32_t result;
+  fread(&result, 1, size, stream);
+  return result;
+#else
+  uint32_t result = 0;
+  for (size_t i = 0; i < size; i++) {
+    result |= getc(stream) << (i * 8);
+  }
+  return result;
+#endif
 }
 
 size_t fputstr(const char *str, FILE *stream) {
