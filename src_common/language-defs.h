@@ -64,6 +64,7 @@ Flat file format:
 #define RULE_ATTR_END 1
 #define RULE_ATTR_TERMINATOR 2
 #define RULE_ATTR_NO_TERMINATE 4
+#define RULE_ATTR_DEFAULT 8
 
 #define METAFLAG_NONE 0
 #define METAFLAG_MASK_LANGTYPE 3

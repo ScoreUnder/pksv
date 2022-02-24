@@ -106,6 +106,8 @@ attributes: /*empty*/ { $$ = RULE_ATTR_NONE; }
                 $$ |= RULE_ATTR_TERMINATOR;
               } else if (strcmp($3, "no_terminate")) {
                 $$ |= RULE_ATTR_NO_TERMINATE;
+              } else if (strcmp($3, "default")) {
+                $$ |= RULE_ATTR_DEFAULT;
               } else {
                 yyerror("Unknown attribute");
               }
@@ -129,7 +131,7 @@ arg: T_integer parsers as_language {
       }
    ;
 
-parsers: ':' language { $$ = add_parser_list((struct parser_list_builder) {NULL, 0, 0}, $2); }
+parsers: /*empty*/ { $$ = (struct parser_list_builder) {NULL, 0, 0}; }
        | parsers ':' language { $$ = add_parser_list($1, $3); }
        | parsers ':' error { yyerror("Bad arg parser type"); yyerrok; }
        ;
@@ -152,6 +154,7 @@ as_language: /*empty*/ { $$.type = LC_TYPE_NONE; }
 
 language: T_identifier { $$.is_prefixed = false; $$.name = $1; }
         | '*' T_identifier { $$.is_prefixed = true; $$.name = $2; }
+        | '*' { $$.is_prefixed = true; $$.name = strdup(""); }
         ;
 
 textval: T_identifier { $$ = $1; }
@@ -231,6 +234,10 @@ bool sanity_check(struct language_def_builder *language, struct string_list_buil
     }
     if (rule->oneshot_lang.name != NULL && strlen(rule->oneshot_lang.name) > 255) {
       fprintf(stderr, "Rule oneshot language name too long: \"%s\"\n", rule->oneshot_lang.name);
+      return false;
+    }
+    if (rule->oneshot_lang.name != NULL && strlen(rule->oneshot_lang.name) == 0) {
+      fprintf(stderr, "Rule oneshot language cannot be recursive (use a different language type) on \"%s\"\n", rule->command_name);
       return false;
     }
     if (rule->args.length > 255) {
