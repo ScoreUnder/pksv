@@ -4,16 +4,6 @@
 #include "int32_interval.h"
 #include "binarysearch.h"
 
-static void *bsearch_key_nocopy(const void *a) { return (void *)a; }
-
-static int bsearch_key_int32cmp(const void *a, const void *b) {
-  _Static_assert(sizeof(int32_t) <= sizeof(void *),
-                 "pointer size is too small");
-  if ((uint32_t)a < (uint32_t)b) return -1;
-  if ((uint32_t)a > (uint32_t)b) return 1;
-  return 0;
-}
-
 void int32_interval_init_bsearch_root(struct bsearch_root *root) {
   bsearch_init_root(root, bsearch_key_int32cmp, bsearch_key_nocopy, NULL, NULL);
 }

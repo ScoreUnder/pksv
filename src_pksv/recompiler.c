@@ -1153,10 +1153,14 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
 
 #define try_asm() try_asm_x(Script, &i, buf, c)
 struct bsearch_root *DoDefines() {
-  struct bsearch_root *defines = load_definitions(defines_dat_location);
+  struct loaded_parser *defines = load_definitions(defines_dat_location);
   if (defines == NULL) defines = load_definitions("defines.dat");
-  if (defines == NULL) defines = bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
-  return defines;
+  if (defines == NULL) return bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+  bsearch_deinit_root(&defines->lookup_by_id);
+  struct bsearch_root *result = malloc(sizeof *result);
+  memcpy(result, &defines->lookup_by_name, sizeof *result);
+  free(defines);
+  return result;
 }
 void RecodeProc(char *script, char *romfn) {
 #ifndef DLL

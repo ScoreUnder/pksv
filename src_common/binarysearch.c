@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "binarysearch.h"
 
@@ -107,4 +108,14 @@ int bsearch_key_strcmp(const void *a, const void *b) {
 
 void *bsearch_key_strdup(const void *a) {
   return strdup((const char *)a);
+}
+
+void *bsearch_key_nocopy(const void *a) { return (void *)a; }
+
+int bsearch_key_int32cmp(const void *a, const void *b) {
+  _Static_assert(sizeof(int32_t) <= sizeof(void *),
+                 "pointer size is too small");
+  if ((uint32_t)a < (uint32_t)b) return -1;
+  if ((uint32_t)a > (uint32_t)b) return 1;
+  return 0;
 }

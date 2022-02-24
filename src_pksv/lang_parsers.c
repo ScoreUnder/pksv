@@ -2,23 +2,26 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "lang_parsers.h"
 #include "language-defs.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
-
-struct loaded_parser {
-  struct bsearch_root lookup_by_name;
-  struct bsearch_root lookup_by_id;
-};
 
 struct parser_cache {
   struct bsearch_root loaded_parsers;
 };
 
+void destroy_loaded_parser(struct loaded_parser *parser) {
+  bsearch_deinit_root(&parser->lookup_by_name);
+  bsearch_deinit_root(&parser->lookup_by_id);
+  free(parser);
+}
 
-struct bsearch_root *load_definitions(const char *filename) {
-  struct bsearch_root *defines =
-      bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+struct loaded_parser *load_definitions(const char *filename) {
+  struct loaded_parser *result = malloc(sizeof *result);
+  bsearch_init_root(&result->lookup_by_name, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+  // Values of lookup_by_id are not freed because they are all keys in lookup_by_name.
+  bsearch_init_root(&result->lookup_by_id, bsearch_key_int32cmp, bsearch_key_nocopy, NULL, NULL);
 
   FILE *f = fopen(filename, "rb");
   if (!f) {
@@ -38,22 +41,24 @@ struct bsearch_root *load_definitions(const char *filename) {
         fprintf(stderr, "Error while reading definitions file \"%s\"\n", filename);
       }
       goto error;
-      break;
     }
 
-    bsearch_ensure_capacity(defines, defines->size + 1);
+    struct bsearch_root *by_name = &result->lookup_by_name;
+    bsearch_ensure_capacity(by_name, by_name->size + 1);
     // Note: safe to insert directly because defines.dat is already sorted
-    defines->pairs[defines->size++] = (struct bsearch_kv){
+    by_name->pairs[by_name->size++] = (struct bsearch_kv){
         .key = str,
         .value = (void *)(intptr_t)value,
     };
+
+    bsearch_upsert(&result->lookup_by_id, value, str);
   }
   fclose(f);
-  return defines;
+  return result;
 
 error:
   if (f != NULL) fclose(f);
-  bsearch_destroy_root(defines);
+  destroy_loaded_parser(result);
   return NULL;
 }
 
@@ -85,4 +90,10 @@ bool parse_for_decomp(struct language_def *lang, const char *parser_dir,
       } while (prefix != NULL);
     }
   }
+}
+
+struct parser_cache *create_parser_cache(void) {
+  struct parser_cache *cache = malloc(sizeof *cache);
+  bsearch_init_root(&cache->loaded_parsers, bsearch_key_strcmp, bsearch_key_strdup, free, destroy_loaded_parser);
+  return cache;
 }
