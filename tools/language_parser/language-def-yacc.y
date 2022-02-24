@@ -104,14 +104,19 @@ attributes: /*empty*/ { $$ = RULE_ATTR_NONE; }
               $$ = $1;
               if (strcmp($3, "end") == 0) {
                 $$ |= RULE_ATTR_END;
-              } else if (strcmp($3, "terminator")) {
+              } else if (strcmp($3, "terminator") == 0) {
                 $$ |= RULE_ATTR_TERMINATOR;
-              } else if (strcmp($3, "no_terminate")) {
+              } else if (strcmp($3, "no_terminate") == 0) {
                 $$ |= RULE_ATTR_NO_TERMINATE;
-              } else if (strcmp($3, "default")) {
+              } else if (strcmp($3, "default") == 0) {
                 $$ |= RULE_ATTR_DEFAULT;
+              } else if (strcmp($3, "cmp_flag") == 0) {
+                $$ |= RULE_ATTR_CMP_FLAG;
+              } else if (strcmp($3, "cmp_int") == 0) {
+                $$ |= RULE_ATTR_CMP_INT;
               } else {
                 yyerror("Unknown attribute");
+                YYERROR;
               }
             }
           ;
