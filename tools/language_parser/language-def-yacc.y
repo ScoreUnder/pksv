@@ -331,10 +331,17 @@ int main(int argc, char **argv) {
 
   // Metas
   fwrite(&meta_flags, 1, 1, out);
-  uint8_t length_as_byte = (uint8_t) parents.length;
-  fwrite(&parents.length, 1, 1, out);
+  uint8_t parents_count = (uint8_t) parents.length;
+  fwrite(&parents_count, 1, 1, out);
+  for (size_t i = 0; i < parents.length; i++) {
+    uint8_t parent_length = (uint8_t) strlen(parents.items[i]);
+    fwrite(&parent_length, 1, 1, out);
+    fwrite(parents.items[i], 1, parent_length, out);
+  }
 
   // Rules
+  uint8_t rule_count = (uint8_t) language_def.rules.length;
+  fwrite(&rule_count, 1, 1, out);
   for (size_t i = 0; i < language_def.rules.length; i++) {
     const struct rule_builder *rule = &language_def.rules.rules[i];
 

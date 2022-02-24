@@ -4,6 +4,58 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/*
+
+Flat file format:
+
+1b: metaflags
+1b: parents.length
+[ for parent * parents.length
+    1b strlen(parent)
+    <string> parent
+]
+
+1b rules.length
+[ for rule * rules.length
+    1b rule.attributes
+
+    1b rule.bytes.length
+    <rule.bytes.length blob> rule.bytes.bytes
+
+    1b strlen(rule.command_name)
+    <string> rule.command_name
+
+    1b strlen(rule.oneshot_lang.name)
+    <string> rule.oneshot_lang.name
+    [ if rule.oneshot_lang.name is not empty
+        1b rule.oneshot_lang.is_prefixed
+    ]
+
+    1b rule.args.length
+    [ for arg * rule.args.length
+        1b arg.size
+
+        1b arg.parsers.length
+        [ for parser * arg.parsers.length
+            1b strlen(parser.name)
+            <string> parser.name
+            1b parser.is_prefixed
+        ]
+
+        1b arg.as_language.type
+        [ if arg.as_language.type is LC_TYPE_LANG
+            1b strlen(arg.as_language.lang.name)
+            <string> arg.as_language.lang.name
+        ]
+        [ if arg.as_language.type is LC_TYPE_COMMAND
+            1b strlen(arg.as_language.command)
+            <string> arg.as_language.command
+        ]
+    ]
+]
+
+*/
+
 #define LC_TYPE_NONE 0
 #define LC_TYPE_LANG 1
 #define LC_TYPE_COMMAND 2
