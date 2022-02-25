@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "language-defs.h"
 #include "binarysearch.h"
@@ -83,6 +84,7 @@ static struct rule * dup_language_rule(struct rule *rule) {
 }
 
 static void free_loaded_lang(struct loaded_lang *lang) {
+  free(lang->def.name);
   free(lang->def.parents);
   free(lang->def.default_rule);
   free(lang->def.terminator_rule);
@@ -140,6 +142,11 @@ static char *fgettabledstr(char **string_table, size_t string_table_size, FILE *
 
 const struct language_def *get_language(struct language_cache *cache, const char *dir, const char *name);
 
+static void read_language_name(char **string_table, size_t string_table_len, struct language *lang, FILE *file) {
+  lang->name = fgettabledstr(string_table, string_table_len, file);
+  lang->is_prefixed = getc(file);
+}
+
 static struct loaded_lang *load_language(struct language_cache *cache, const char *dir, const char *name) {
   char *filename = get_lang_filename(dir, name);
   FILE *file = fopen(filename, "rb");
@@ -149,6 +156,7 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
   }
 
   struct loaded_lang *lang = malloc(sizeof *lang);
+  lang->def.name = strdup(name);
 
   size_t string_table_len = fgetvarint(file);
   lang->string_table = malloc(sizeof *lang->string_table * (string_table_len + 1));
@@ -193,10 +201,12 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
     }
 
     if (parent->default_rule != NULL) {
+      if (lang->def.default_rule != NULL) bsearch_free_language_rule(lang->def.default_rule);
       lang->def.default_rule = dup_language_rule(parent->default_rule);
     }
 
     if (parent->terminator_rule != NULL) {
+      if (lang->def.terminator_rule != NULL) bsearch_free_language_rule(lang->def.terminator_rule);
       lang->def.terminator_rule = dup_language_rule(parent->terminator_rule);
     }
   }
@@ -208,8 +218,7 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
     rule->bytes.bytes = malloc(rule->bytes.length);
     fread(rule->bytes.bytes, 1, rule->bytes.length, file);
     rule->command_name = fgettabledstr(lang->string_table, string_table_len, file);
-    rule->oneshot_lang.name = fgettabledstr(lang->string_table, string_table_len, file);
-    rule->oneshot_lang.is_prefixed = getc(file);
+    read_language_name(lang->string_table, string_table_len, &rule->oneshot_lang, file);
 
     size_t args_len = fgetvarint(file);
     rule->args.args = malloc(sizeof *rule->args.args * args_len);
@@ -222,16 +231,13 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
       arg->parsers.parsers = malloc(sizeof *arg->parsers.parsers * parsers_len);
       arg->parsers.length = parsers_len;
       for (size_t k = 0; k < parsers_len; k++) {
-        struct language *parser = &arg->parsers.parsers[k];
-        parser->name = fgettabledstr(lang->string_table, string_table_len, file);
-        parser->is_prefixed = getc(file);
+        read_language_name(lang->string_table, string_table_len, &arg->parsers.parsers[k], file);
       }
 
       arg->as_language.type = getc(file);
       switch (arg->as_language.type) {
         case LC_TYPE_LANG:
-          arg->as_language.lang.name = fgettabledstr(lang->string_table, string_table_len, file);
-          arg->as_language.lang.is_prefixed = getc(file);
+          read_language_name(lang->string_table, string_table_len, &arg->as_language.lang, file);
           break;
         case LC_TYPE_COMMAND:
           arg->as_language.command = fgettabledstr(lang->string_table, string_table_len, file);
@@ -240,9 +246,11 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
     }
 
     if (rule->attributes & RULE_ATTR_DEFAULT) {
+      if (lang->def.default_rule != NULL) bsearch_free_language_rule(lang->def.default_rule);
       lang->def.default_rule = dup_language_rule(rule);
     }
     if (rule->attributes & RULE_ATTR_TERMINATOR) {
+      if (lang->def.terminator_rule != NULL) bsearch_free_language_rule(lang->def.terminator_rule);
       lang->def.terminator_rule = dup_language_rule(rule);
     }
 
@@ -269,4 +277,9 @@ const struct language_def *get_language(struct language_cache *cache, const char
     return &lang->def;
   }
   return &((struct loaded_lang *) cache->languages.pairs[index].value)->def;
+}
+
+void destroy_language_cache(struct language_cache *cache) {
+  bsearch_deinit_root(&cache->languages);
+  free(cache);
 }

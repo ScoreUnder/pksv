@@ -13,3 +13,5 @@ vgcore.*
 !/tools/*.c
 !/tools/language_parser
 /tools/language_parser/language-parser
+tools/language_parser/language-def-lex.c
+*.tab.[ch]
