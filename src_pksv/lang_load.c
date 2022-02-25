@@ -276,7 +276,9 @@ const struct language_def *get_language(struct language_cache *cache, const char
     bsearch_upsert(&cache->languages, name, lang);
     return &lang->def;
   }
-  return &((struct loaded_lang *) cache->languages.pairs[index].value)->def;
+  struct loaded_lang *lang = cache->languages.pairs[index].value;
+  if (lang == NULL) return NULL;
+  return &lang->def;
 }
 
 void destroy_language_cache(struct language_cache *cache) {
