@@ -54,7 +54,7 @@ SRC_PKSV_COMMON = \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
 	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
 	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
-	src_pksv/lang_parsers.c src_common/stdio_ext.c
+	src_pksv/lang_parsers.c src_common/stdio_ext.c src_pksv/lang_default_parsers.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 RES_PKSV_SHLIB = src_pksv/pksv.rc

@@ -5,6 +5,8 @@
 #include <stdbool.h>
 
 #include "binarysearch.h"
+#include "lang_decompiler.h"
+#include "language-defs.h"
 
 struct loaded_parser {
   struct bsearch_root lookup_by_name;
@@ -33,18 +35,20 @@ labels can be resolved after the fact by (de)compiler engine
 #define PARSE_RESULT_FAIL 0
 #define PARSE_RESULT_VALUE 1
 #define PARSE_RESULT_LABEL 2
+#define PARSE_RESULT_TOKEN 3
 struct parse_result {
   uint_fast8_t type;
   union {
     uint32_t value;  // if PARSE_RESULT_VALUE or formatter's PARSE_RESULT_LABEL
     char *label;     // if parser's PARSE_RESULT_LABEL
+    char *token;     // if formatter's PARSE_RESULT_TOKEN
   };
 };
 
 typedef struct parse_result builtin_parser_parse(const char *token,
                                                  size_t token_len);
-typedef struct parse_result builtin_parser_format(uint32_t value,
-                                                  bool is_dyndec);
+typedef struct parse_result builtin_parser_format(
+    uint32_t value, bool is_dyndec, struct decompiler_informative_state *state);
 
 struct builtin_parser {
   builtin_parser_parse *parse;
@@ -62,6 +66,20 @@ struct loaded_or_builtin_parser {
   };
 };
 
-struct loaded_parser *load_definitions(const char *filename);
+struct loaded_parser *load_definitions(const char *filename, bool required);
+
+struct parser_cache;
+struct parser_cache *create_parser_cache(void);
+void destroy_parser_cache(struct parser_cache *cache);
+
+struct parse_result parse_for_recomp(struct parser_cache *cache,
+                                     struct language_def *lang,
+                                     const char *parser_dir,
+                                     struct parser_list parsers, char *token,
+                                     size_t token_len);
+struct parse_result format_for_recomp(
+    struct parser_cache *cache, struct language_def *lang,
+    const char *parser_dir, struct parser_list parsers, uint32_t value,
+    bool is_dyndec, struct decompiler_informative_state *decstate);
 
 #endif

@@ -1153,8 +1153,8 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
 
 #define try_asm() try_asm_x(Script, &i, buf, c)
 struct bsearch_root *DoDefines() {
-  struct loaded_parser *defines = load_definitions(defines_dat_location);
-  if (defines == NULL) defines = load_definitions("defines.dat");
+  struct loaded_parser *defines = load_definitions(defines_dat_location, false);
+  if (defines == NULL) defines = load_definitions("defines.dat", true);
   if (defines == NULL) return bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
   bsearch_deinit_root(&defines->lookup_by_id);
   struct bsearch_root *result = malloc(sizeof *result);
