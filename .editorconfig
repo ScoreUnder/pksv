@@ -3,6 +3,6 @@ root=true
 [*]
 insert_final_newline = true
 
-[*.c]
+[*.{c,h,y,l}]
 indent_style = space
 indent_size = 2
