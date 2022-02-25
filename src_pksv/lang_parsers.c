@@ -33,6 +33,8 @@ struct loaded_parser *load_definitions(const char *filename) {
   }
 
   size_t num_defines = fgetvarint(f);
+  struct bsearch_root *by_name = &result->lookup_by_name;
+  bsearch_ensure_capacity(by_name, num_defines);
   for (size_t i = 0; i < num_defines; i++) {
     char *str = fgetstr(f);
     uint32_t value = fgetvarint(f);
@@ -41,8 +43,6 @@ struct loaded_parser *load_definitions(const char *filename) {
       goto error;
     }
 
-    struct bsearch_root *by_name = &result->lookup_by_name;
-    bsearch_ensure_capacity(by_name, by_name->size + 1);
     // Note: safe to insert directly because defines.dat is already sorted
     by_name->pairs[by_name->size++] = (struct bsearch_kv){
         .key = str,
@@ -51,6 +51,8 @@ struct loaded_parser *load_definitions(const char *filename) {
   }
 
   size_t num_reverse_defines = fgetvarint(f);
+  struct bsearch_root *by_id = &result->lookup_by_id;
+  bsearch_ensure_capacity(by_id, num_reverse_defines);
   for (size_t i = 0; i < num_reverse_defines; i++) {
     uint32_t value = fgetvarint(f);
     uint32_t str_index = fgetvarint(f);
@@ -60,8 +62,6 @@ struct loaded_parser *load_definitions(const char *filename) {
       goto error;
     }
 
-    struct bsearch_root *by_id = &result->lookup_by_id;
-    bsearch_ensure_capacity(by_id, by_id->size + 1);
     by_id->pairs[by_id->size++] = (struct bsearch_kv){
         .key = (void *)(intptr_t)value,
         .value = str,
