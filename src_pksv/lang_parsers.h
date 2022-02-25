@@ -37,12 +37,14 @@ struct parse_result {
   uint_fast8_t type;
   union {
     uint32_t value;  // if PARSE_RESULT_VALUE or formatter's PARSE_RESULT_LABEL
-    char *label;  // if parser's PARSE_RESULT_LABEL
+    char *label;     // if parser's PARSE_RESULT_LABEL
   };
 };
 
-typedef struct parse_result builtin_parser_parse(const char *token, size_t token_len);
-typedef struct parse_result builtin_parser_format(uint32_t value, bool is_dyndec);
+typedef struct parse_result builtin_parser_parse(const char *token,
+                                                 size_t token_len);
+typedef struct parse_result builtin_parser_format(uint32_t value,
+                                                  bool is_dyndec);
 
 struct builtin_parser {
   builtin_parser_parse *parse;

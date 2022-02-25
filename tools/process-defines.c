@@ -22,6 +22,7 @@ int main(int argc, char **argv) {
   (void)argv;
 
   struct bsearch_root defines;
+  struct bsearch_root defines_by_value;
 
   char *in_filename = "pokeinc_default.txt";
   if (argc >= 2) {
@@ -36,6 +37,8 @@ int main(int argc, char **argv) {
 
   bsearch_init_root(&defines, bsearch_key_strcmp, bsearch_key_strdup, free,
                     NULL);
+  bsearch_init_root(&defines_by_value, bsearch_key_int32cmp, bsearch_key_nocopy,
+                    NULL, NULL);
 
   char line[1024];
   while (fgets(line, sizeof(line), f)) {
@@ -90,7 +93,15 @@ int main(int argc, char **argv) {
         }
       }
 
-      bsearch_upsert(&defines, identifier, (void *)(intptr_t)value_parsed);
+      ssize_t idx = bsearch_find(&defines, identifier);
+      if (idx >= 0) {
+        fprintf(stderr, "Duplicate #define of %s\n", identifier);
+        return 1;
+      }
+      idx = (ssize_t)bsearch_unsafe_insert(&defines, idx, identifier,
+                                           (void *)(intptr_t)value_parsed);
+      bsearch_upsert(&defines_by_value, (void *)(intptr_t)value_parsed,
+                     defines.pairs[idx].key);
     } else if (!strcmp(p, "#quiet") || !strcmp(p, "#loud")) {
       // ignore verbosity indicator
     } else if (p[0] == '\'') {
@@ -108,9 +119,20 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  fputvarint(defines.size, outfile);
   for (size_t i = 0; i < defines.size; i++) {
     fputstr(defines.pairs[i].key, outfile);
-    fputvarint((uint32_t)(intptr_t) defines.pairs[i].value, outfile);
+    fputvarint((uint32_t)(intptr_t)defines.pairs[i].value, outfile);
+  }
+
+  // Much of this can be derived from existing data, but specifying
+  // it explicitly will make loading this file cheaper.
+  // Namely, the length and keys are both derivable trivially from
+  // the previous array.
+  fputvarint(defines_by_value.size, outfile);
+  for (size_t i = 0; i < defines_by_value.size; i++) {
+    fputvarint((uint32_t)(intptr_t)defines_by_value.pairs[i].key, outfile);
+    fputvarint((uint32_t)bsearch_find(&defines, defines_by_value.pairs[i].value), outfile);
   }
 
   if (fflush(outfile)) {

@@ -19,9 +19,12 @@ void destroy_loaded_parser(struct loaded_parser *parser) {
 
 struct loaded_parser *load_definitions(const char *filename) {
   struct loaded_parser *result = malloc(sizeof *result);
-  bsearch_init_root(&result->lookup_by_name, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
-  // Values of lookup_by_id are not freed because they are all keys in lookup_by_name.
-  bsearch_init_root(&result->lookup_by_id, bsearch_key_int32cmp, bsearch_key_nocopy, NULL, NULL);
+  bsearch_init_root(&result->lookup_by_name, bsearch_key_strcmp,
+                    bsearch_key_strdup, free, NULL);
+  // Values of lookup_by_id are not freed because they are all keys in
+  // lookup_by_name.
+  bsearch_init_root(&result->lookup_by_id, bsearch_key_int32cmp,
+                    bsearch_key_nocopy, NULL, NULL);
 
   FILE *f = fopen(filename, "rb");
   if (!f) {
@@ -29,17 +32,12 @@ struct loaded_parser *load_definitions(const char *filename) {
     goto error;
   }
 
-  while (!feof(f)) {
+  size_t num_defines = fgetvarint(f);
+  for (size_t i = 0; i < num_defines; i++) {
     char *str = fgetstr(f);
     uint32_t value = fgetvarint(f);
 
     if (feof(f) || ferror(f)) {
-      free(str);
-      if (feof(f)) {
-        fprintf(stderr, "Definitions file \"%s\" is truncated\n", filename);
-      } else if (ferror(f)) {
-        fprintf(stderr, "Error while reading definitions file \"%s\"\n", filename);
-      }
       goto error;
     }
 
@@ -50,14 +48,43 @@ struct loaded_parser *load_definitions(const char *filename) {
         .key = str,
         .value = (void *)(intptr_t)value,
     };
-
-    bsearch_upsert(&result->lookup_by_id, value, str);
   }
+
+  size_t num_reverse_defines = fgetvarint(f);
+  for (size_t i = 0; i < num_reverse_defines; i++) {
+    uint32_t value = fgetvarint(f);
+    uint32_t str_index = fgetvarint(f);
+    char *str = result->lookup_by_name.pairs[str_index].key;
+
+    if (feof(f) || ferror(f)) {
+      goto error;
+    }
+
+    struct bsearch_root *by_id = &result->lookup_by_id;
+    bsearch_ensure_capacity(by_id, by_id->size + 1);
+    by_id->pairs[by_id->size++] = (struct bsearch_kv){
+        .key = (void *)(intptr_t)value,
+        .value = str,
+    };
+  }
+
+  if (feof(f) || ferror(f)) {
+    goto error;
+  }
+
   fclose(f);
   return result;
 
 error:
-  if (f != NULL) fclose(f);
+  if (f != NULL) {
+    if (feof(f)) {
+      fprintf(stderr, "Definitions file \"%s\" is truncated\n", filename);
+    } else if (ferror(f)) {
+      fprintf(stderr, "Error while reading definitions file \"%s\"\n",
+              filename);
+    }
+    fclose(f);
+  }
   destroy_loaded_parser(result);
   return NULL;
 }
@@ -94,6 +121,7 @@ bool parse_for_decomp(struct language_def *lang, const char *parser_dir,
 
 struct parser_cache *create_parser_cache(void) {
   struct parser_cache *cache = malloc(sizeof *cache);
-  bsearch_init_root(&cache->loaded_parsers, bsearch_key_strcmp, bsearch_key_strdup, free, destroy_loaded_parser);
+  bsearch_init_root(&cache->loaded_parsers, bsearch_key_strcmp,
+                    bsearch_key_strdup, free, destroy_loaded_parser);
   return cache;
 }

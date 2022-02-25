@@ -70,9 +70,24 @@ ssize_t bsearch_find(struct bsearch_root const *restrict root,
   return -left - 1;
 }
 
+size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
+                             void const *key, void *value) {
+  size_t pos_index = (size_t)(-index - 1);
+  size_t len = root->size;
+  bsearch_ensure_capacity(root, len + 1);
+  if (pos_index < len) {
+    memmove(&root->pairs[pos_index + 1], &root->pairs[pos_index],
+            (len - pos_index) * sizeof(struct bsearch_kv));
+  }
+  void *key_copied = root->copy(key);
+  root->pairs[pos_index] =
+      (struct bsearch_kv){.key = key_copied, .value = value};
+  root->size++;
+  return pos_index;
+}
+
 size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
                       void *value) {
-  size_t len = kvs->size;
   ssize_t index = bsearch_find(kvs, key);
   if (index >= 0) {
     // Overwrite value of existing element
@@ -80,16 +95,7 @@ size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
     kvs->pairs[index].value = value;
     return index;
   } else {
-    size_t pos_index = (size_t)(-index - 1);
-    bsearch_ensure_capacity(kvs, len + 1);
-    if (pos_index < len) {
-      memmove(&kvs->pairs[pos_index + 1], &kvs->pairs[pos_index],
-              (len - pos_index) * sizeof(struct bsearch_kv));
-    }
-    void *key_copied = kvs->copy(key);
-    kvs->pairs[pos_index] = (struct bsearch_kv){.key = key_copied, .value = value};
-    kvs->size++;
-    return pos_index;
+    return bsearch_unsafe_insert(kvs, index, key, value);
   }
 }
 
@@ -106,9 +112,7 @@ int bsearch_key_strcmp(const void *a, const void *b) {
   return strcmp((const char *)a, (const char *)b);
 }
 
-void *bsearch_key_strdup(const void *a) {
-  return strdup((const char *)a);
-}
+void *bsearch_key_strdup(const void *a) { return strdup((const char *)a); }
 
 void *bsearch_key_nocopy(const void *a) { return (void *)a; }
 
