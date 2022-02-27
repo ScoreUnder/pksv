@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -147,6 +148,14 @@ static void read_language_name(char **string_table, size_t string_table_len, str
   lang->is_prefixed = getc(file);
 }
 
+void overwrite_special_rule(struct language_def *dest, struct rule *src, size_t type) {
+  assert(type < NUM_SPECIAL_RULES);
+  if (dest->special_rules[type] != NULL) {
+    bsearch_free_language_rule(dest->special_rules[type]);
+  }
+  dest->special_rules[type] = dup_language_rule(src);
+}
+
 static struct loaded_lang *load_language(struct language_cache *cache, const char *dir, const char *name) {
   char *filename = get_lang_filename(dir, name);
   FILE *file = fopen(filename, "rb");
@@ -177,8 +186,8 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
   lang->def.rules_by_bytes = bsearch_create_root(bsearch_key_cmp_bytes, bsearch_key_dup_bytes, bsearch_free_bytes, bsearch_free_language_rule);
   lang->def.rules_by_command_name = bsearch_create_root(bsearch_key_strcmp, void_identity, NULL, bsearch_free_language_rule);
 
-  lang->def.default_rule = NULL;
-  lang->def.terminator_rule = NULL;
+  // Null all elements of special rules array.
+  memset(&lang->def.special_rules, 0, sizeof lang->def.special_rules);
 
   // Insert parent rules
   for (size_t i = 0; i < parents_len; i++) {
@@ -200,14 +209,10 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
       bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, dup_language_rule(rule));
     }
 
-    if (parent->default_rule != NULL) {
-      if (lang->def.default_rule != NULL) bsearch_free_language_rule(lang->def.default_rule);
-      lang->def.default_rule = dup_language_rule(parent->default_rule);
-    }
-
-    if (parent->terminator_rule != NULL) {
-      if (lang->def.terminator_rule != NULL) bsearch_free_language_rule(lang->def.terminator_rule);
-      lang->def.terminator_rule = dup_language_rule(parent->terminator_rule);
+    for (size_t j = 0; j < NUM_SPECIAL_RULES; j++) {
+      if (parent->special_rules[j]) {
+        overwrite_special_rule(&lang->def, parent->special_rules[j], j);
+      }
     }
   }
 
@@ -246,12 +251,13 @@ static struct loaded_lang *load_language(struct language_cache *cache, const cha
     }
 
     if (rule->attributes & RULE_ATTR_DEFAULT) {
-      if (lang->def.default_rule != NULL) bsearch_free_language_rule(lang->def.default_rule);
-      lang->def.default_rule = dup_language_rule(rule);
+      overwrite_special_rule(&lang->def, rule, SPECIAL_RULE_DEFAULT);
     }
     if (rule->attributes & RULE_ATTR_TERMINATOR) {
-      if (lang->def.terminator_rule != NULL) bsearch_free_language_rule(lang->def.terminator_rule);
-      lang->def.terminator_rule = dup_language_rule(rule);
+      overwrite_special_rule(&lang->def, rule, SPECIAL_RULE_TERMINATOR);
+    }
+    if (rule->attributes & RULE_ATTR_NO_TERMINATE) {
+      overwrite_special_rule(&lang->def, rule, SPECIAL_RULE_NO_TERMINATE);
     }
 
     bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes, dup_language_rule(rule));

@@ -72,6 +72,11 @@ vi rules.length
 #define METAFLAG_LANGTYPE_LINE 1
 #define METAFLAG_LANGTYPE_TEXT 2
 
+#define SPECIAL_RULE_DEFAULT 0
+#define SPECIAL_RULE_TERMINATOR 1
+#define SPECIAL_RULE_NO_TERMINATE 2
+#define NUM_SPECIAL_RULES 3
+
 struct bytes_list {
   uint8_t *bytes;
   size_t length;
@@ -117,8 +122,7 @@ struct rule {
 struct language_def {
   struct bsearch_root *rules_by_bytes;
   struct bsearch_root *rules_by_command_name;
-  struct rule *default_rule;
-  struct rule *terminator_rule;
+  struct rule *special_rules[NUM_SPECIAL_RULES];
   char **parents;
   char *name;
   uint8_t meta_flags;
