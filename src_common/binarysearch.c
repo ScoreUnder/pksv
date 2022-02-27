@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -72,8 +73,19 @@ ssize_t bsearch_find(struct bsearch_root const *restrict root,
 
 size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
                              void const *key, void *value) {
+  assert(index < 0);
   size_t pos_index = (size_t)(-index - 1);
   size_t len = root->size;
+
+#ifndef NDEBUG
+  if (pos_index < len) {
+    assert(root->compare(root->pairs[pos_index].key, key) > 0);
+  }
+  if (pos_index > 0) {
+    assert(root->compare(root->pairs[pos_index - 1].key, key) < 0);
+  }
+#endif
+
   bsearch_ensure_capacity(root, len + 1);
   if (pos_index < len) {
     memmove(&root->pairs[pos_index + 1], &root->pairs[pos_index],
