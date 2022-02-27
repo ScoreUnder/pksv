@@ -39,7 +39,7 @@ labels can be resolved after the fact by (de)compiler engine
 struct parse_result {
   uint_fast8_t type;
   union {
-    uint32_t value;  // if PARSE_RESULT_VALUE or formatter's PARSE_RESULT_LABEL
+    uint32_t value;  // if parser's PARSE_RESULT_VALUE or formatter's PARSE_RESULT_LABEL
     char *label;     // if parser's PARSE_RESULT_LABEL
     char *token;     // if formatter's PARSE_RESULT_TOKEN
   };

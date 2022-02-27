@@ -27,8 +27,9 @@ void bsearch_destroy_loaded_or_builtin_parser(void *ptr) {
   struct loaded_or_builtin_parser *parser = ptr;
   if (parser->which == PARSER_TYPE_LOADED) {
     deinit_loaded_parser(&parser->loaded);
+    free(parser);
   }
-  free(parser);
+  // Builtin parsers are statically allocated.
 }
 
 struct loaded_parser *load_definitions(const char *filename, bool required) {
@@ -300,6 +301,11 @@ struct parser_cache *create_parser_cache(void) {
   bsearch_init_root(&cache->loaded_parsers, bsearch_key_strcmp,
                     bsearch_key_strdup, free,
                     bsearch_destroy_loaded_or_builtin_parser);
+
+  // Populate cache with builtin parsers.
+  bsearch_upsert(&cache->loaded_parsers, "dec", &builtin_parser_dec);
+  bsearch_upsert(&cache->loaded_parsers, "hex", &builtin_parser_hex);
+
   return cache;
 }
 
