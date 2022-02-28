@@ -192,16 +192,17 @@ struct parse_result execute_parser_format(
 struct take_parser_state {
   size_t parser_idx;
   size_t prefix_idx;
+  bool had_parser;
 };
 
 struct loaded_or_builtin_parser *take_parser(
     struct parser_cache *cache, const struct language_def *lang,
     const struct parser_list parsers,
     struct take_parser_state *restrict state) {
+  bool had_parser = state->had_parser;
   while (state->parser_idx < parsers.length) {
     const char *parser_name = parsers.parsers[state->parser_idx].name;
     bool is_prefixed = parsers.parsers[state->parser_idx].is_prefixed;
-    state->parser_idx++;
 
     struct loaded_or_builtin_parser *generic_parser = NULL;
 
@@ -209,8 +210,7 @@ struct loaded_or_builtin_parser *take_parser(
       size_t parser_name_len = strlen(parser_name);
       char **parents = lang->parents;
 
-      for (; state->prefix_idx == 0 || parents[state->prefix_idx - 1];
-           state->prefix_idx++) {
+      while (state->prefix_idx == 0 || parents[state->prefix_idx - 1]) {
         char *prefix;
         if (state->prefix_idx == 0) {
           prefix = lang->name;
@@ -218,6 +218,7 @@ struct loaded_or_builtin_parser *take_parser(
           prefix = parents[state->prefix_idx - 1];
         }
         size_t prefix_len = strlen(prefix);
+        state->prefix_idx++;
 
         // Concatenate language or parent name with parser name
         char *next_name = malloc(parser_name_len + prefix_len + 2);
@@ -232,13 +233,20 @@ struct loaded_or_builtin_parser *take_parser(
         // Load or use this parser
         generic_parser = get_parser(cache, next_name, false);
         free(next_name);  // note: already strdup'd
+
+        if (generic_parser != NULL) {
+          state->had_parser = true;
+          return generic_parser;
+        }
       }
       state->prefix_idx = 0;
+      state->had_parser = false;
     }
+    state->parser_idx++;
 
     if (generic_parser == NULL) {
       // Try unprefixed parser, even if prefixed was requested
-      generic_parser = get_parser(cache, parser_name, true);
+      generic_parser = get_parser(cache, parser_name, !had_parser);
     }
 
     if (generic_parser != NULL) {
@@ -261,7 +269,7 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
                                      struct parser_list parsers, char *token,
                                      size_t token_len) {
   struct parse_result result = {PARSE_RESULT_FAIL};
-  struct take_parser_state state = {0, 0};
+  struct take_parser_state state = {0, 0, false};
   struct loaded_or_builtin_parser *generic_parser;
 
   do {
@@ -279,7 +287,7 @@ struct parse_result format_for_decomp(
     const struct parser_list parsers, uint32_t value,
     struct decompiler_informative_state *decstate) {
   struct parse_result result = {PARSE_RESULT_FAIL};
-  struct take_parser_state state = {0, 0};
+  struct take_parser_state state = {0, 0, false};
   struct loaded_or_builtin_parser *generic_parser;
 
   do {

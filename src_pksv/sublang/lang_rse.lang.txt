@@ -55,7 +55,7 @@
 [0x24] = jumpasm+end 4:address@gba_arm
 [0x24] = callasm2 4:address@gba_arm
 [0x25] = special 2:*special
-[0x26] = special 2:*var 2:*special
+[0x26] = specialvar 2:*var 2:*special
 [0x27] = waitspecial
 [0x28] = pause 2:dec
 [0x29] = setflag 2:*flag

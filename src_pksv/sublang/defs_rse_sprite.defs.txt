@@ -1,0 +1,2 @@
+#d PLAYER 0xFF
+#d CAMERA 0x7F
