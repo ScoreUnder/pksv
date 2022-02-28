@@ -6714,9 +6714,6 @@ void DecodeProcMoves(FILE* fileM, unsigned int FileZoomPos, char* fname,
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
         break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
-        break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
         break;
@@ -6748,9 +6745,6 @@ void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, char* fname,
         break;
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
-        break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
         break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");

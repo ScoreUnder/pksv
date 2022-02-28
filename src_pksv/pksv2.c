@@ -23,12 +23,12 @@
 #include <string.h>
 #include <libgen.h>
 
+#include "lang_load.h"
+#include "lang_parsers.h"
+#include "lang_decompiler.h"
 #include "pksv.h"
 #include "textutil.h"
 #include "version.h"
-#include "textproc.h"
-#include "isdone.h"
-#include "decompiler.h"
 #include "recompiler.h"
 #include "romutil.h"
 
@@ -40,19 +40,35 @@ bool IsVerbose = true;
 unsigned char search = 0xFF;  // Free Space character
 bool eorg = false;
 bool testing = false;
-FILE* LogFile;
+FILE *LogFile;
 
-int main(int argc, char** argv) {
+#define MAX_POSITIONAL_ARGUMENTS 3
+
+void show_help(FILE *where) {
+  fprintf(where, "PKSV V" PKSV_VERSION
+                 " - Command line tool to compile/decompile PokeScript.\n\
+pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
+pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
+pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
+You can insert --lang LANGUAGE before the ROM file name in the decompile command line to decompile using that language.\n\
+");
+}
+
+#define LANGUAGE_DIR_NAME "sublang"
+
+int main(int argc, char **argv) {
+  char *rom_file_name;
+  char *script_file_name;
+  FILE *romfile;
+
   char command_line = DECOMPILE;
   bool autodetect_mode = true;
-  char* file_name;
-  char* export_name;
-  FILE* romfile;
-  FILE* otherfile;
-  unsigned int i;
-  int file_location = 0;
   uint32_t decompile_at;
-  uint32_t narc;
+  char *decompile_lang;
+
+  char *positional_arguments[MAX_POSITIONAL_ARGUMENTS];
+  int positional_argument_count = 0;
+  bool opts_ended = false;
 
   // n.b. dirname doesn't make a copy of the input, so we do it ourselves
   // because we are not supposed to modify argv
@@ -70,91 +86,82 @@ int main(int argc, char** argv) {
   pokeinc_txt_location[exe_dirlen] = '/';
   strcpy(pokeinc_txt_location + exe_dirlen + 1, INCLUDES_FILE);
 
+  char *language_dir = malloc(exe_dirlen + strlen(LANGUAGE_DIR_NAME) + 2);
+  strcpy(language_dir, exe_dirname);
+  language_dir[exe_dirlen] = '/';
+  strcpy(language_dir + exe_dirlen + 1, LANGUAGE_DIR_NAME);
+
   free(exename);
 
   // Argument Processing
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] != '-') {
-      if (file_location == 0) file_location = i;
-      continue;
-    }
-    if (!strcmp(argv[i], "-r")) {
+  for (int i = 1; i < argc; i++) {
+    if (opts_ended || argv[i][0] != '-') {
+      if (positional_argument_count < MAX_POSITIONAL_ARGUMENTS) {
+        positional_arguments[positional_argument_count++] = argv[i];
+      } else {
+        fprintf(stderr, "Too many positional arguments.\n");
+        show_help(stderr);
+        return 1;
+      }
+    } else if (!strcmp(argv[i], "-r")) {
       command_line = RECOMPILE;
-    } else if (!strcmp(argv[i], "-t")) {
-      command_line = TXT;
     } else if (!strcmp(argv[i], "-e")) {
       command_line = RECOMPILE;
       testing = 1;
-    } else if (!strcmp(argv[i], "-m")) {
-      command_line = MOVEMENT;
-    } else if (!strcmp(argv[i], "-b")) {
-      command_line = BRAILLE;
     } else if (!strcmp(argv[i], "-d")) {
       command_line = DECOMPILE;
-    } else if (!strcmp(argv[i], "--gs")) {
-      mode = GOLD;
-      autodetect_mode = false;
-    } else if (!strcmp(argv[i], "--rse")) {
-      mode = RUBY;
-      autodetect_mode = false;
-    } else if (!strcmp(argv[i], "--dp")) {
-      mode = DIAMOND;
-      autodetect_mode = false;
-    } else if (!strcmp(argv[i], "--crystal")) {
-      mode = CRYSTAL;
-      autodetect_mode = false;
-    } else if (!strcmp(argv[i], "--frlg")) {
-      mode = FIRE_RED;
-      autodetect_mode = false;
+    } else if (!strcmp(argv[i], "--lang")) {
+      if (i + 1 < argc) {
+        decompile_lang = argv[++i];
+        autodetect_mode = false;
+      } else {
+        fprintf(stderr, "--lang requires an argument\n");
+        show_help(stderr);
+        return 1;
+      }
     } else if (!strcmp(argv[i], "--help")) {
-      printf("PKSV V" PKSV_VERSION
-             " - Command line tool to compile/decompile PokeScript.\n\
-pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
-pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
-pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
-You can insert -t, -m, or -b before the ROM filename (in the \"decompile\" syntax) to decompile as text, movement, or braille respectively.\n\
-You can also insert at the same position, one of --gs, --crystal, --rse, --frlg, --dp to override ROM type detection\
-");
+      show_help(stdout);
       return 0;
+    } else if (!strcmp(argv[i], "--")) {
+      opts_ended = true;
+    } else {
+      fprintf(stderr, "Unknown option: %s\n", argv[i]);
+      show_help(stderr);
+      return 1;
     }
   }
-  if (argc < 4) {
+
+  if (positional_argument_count < 2) {
     printf("Not enough arguments...\n");
-    return 0;
-  }
-  if (file_location == 0) {
-    puts("No file specified.");
+    show_help(stderr);
     return 1;
   }
+
   // Filename, etc processing
-  file_name = argv[file_location];
-  if (command_line != RECOMPILE) {
-    if (argc <= file_location + 2) {
+  if (command_line == DECOMPILE) {
+    if (positional_argument_count < 3) {
       fprintf(stderr, "Please specify a filename to export the script to.\n");
+      show_help(stderr);
       return 1;
     }
 
-    if (*hex_to_uint32(argv[file_location + 1], SIZE_MAX, &decompile_at)) {
+    rom_file_name = positional_arguments[0];
+
+    if (*hex_to_uint32(positional_arguments[1], SIZE_MAX, &decompile_at)) {
       fprintf(stderr, "Please specify a valid offset to decompile at.\n");
+      show_help(stderr);
       return 1;
     }
-    export_name = argv[file_location + 2];
+
+    script_file_name = positional_arguments[2];
   } else {
-    if (argc <= file_location + 1) {
-      fprintf(stderr, "Please specify a ROM to write to\n");
-      return 1;
-    }
-    export_name = argv[file_location + 1];
+    script_file_name = positional_arguments[0];
+    rom_file_name = positional_arguments[1];
   }
-  if (command_line == RECOMPILE)
-    romfile = fopen(export_name, "r+b");
-  else
-    romfile = fopen(file_name, "rb");
+
+  romfile = fopen(rom_file_name, "rb");
   if (!romfile) {
-    if (command_line == RECOMPILE)
-      printf("Unable to open file %s.", export_name);
-    else
-      printf("Unable to open file %s.", file_name);
+    printf("Unable to open file %s.", rom_file_name);
     return 1;
   }
   if (autodetect_mode) {
@@ -163,45 +170,50 @@ You can also insert at the same position, one of --gs, --crystal, --rse, --frlg,
       mode = rom_mode.type;
       search = rom_mode.search;
     }
-  }
-  if (command_line == TXT) {
-    otherfile = fopen(export_name, "wt");
-    transtxt(decompile_at, file_name, 0, NULL);
-    fwrite(trans, 1, strlen(trans), otherfile);
-    fclose(otherfile);
-  } else if (command_line == MOVEMENT) {
-    otherfile = fopen(export_name, "wt");
-    transmove(decompile_at, file_name);
-    fwrite(trans, 1, strlen(trans), otherfile);
-    fclose(otherfile);
-  } else if (command_line == BRAILLE) {
-    otherfile = fopen(export_name, "wt");
-    transbrl(decompile_at, file_name, otherfile);
-    fwrite(trans, 1, strlen(trans), otherfile);
-    fclose(otherfile);
-  } else if (command_line == DECOMPILE) {
-    initDoneProcs();
-    otherfile = fopen(export_name, "wt");
-    if (mode == DIAMOND) {
-      if (*hex_to_uint32(argv[file_location + 2], SIZE_MAX, &narc)) {
-        printf("Invalid hex value for nARC index\n");
-        return 1;
-      }
-      export_name = argv[file_location + 3];
-      if (argc < file_location + 3) {
-        printf("Please specify a filename to export the script to.\n");
-        return 1;
-      }
-      fclose(otherfile);
-      otherfile = fopen(export_name, "wt");
-      DecodeProc(romfile, narc, decompile_at, file_name, otherfile);
-    } else {
-      DecodeProc(romfile, 0, decompile_at, file_name, otherfile);
+    switch (rom_mode.type) {
+      case GOLD:
+        decompile_lang = "gs";
+        break;
+      case CRYSTAL:
+        decompile_lang = "cry";
+        break;
+      case RUBY:
+      default:
+        decompile_lang = "rse";
+        break;
+      case FIRE_RED:
+        decompile_lang = "frlg";
+        break;
     }
-    fclose(otherfile);
-  } else if (command_line == RECOMPILE) {
-    RecodeProc(file_name, export_name);
   }
-  fclose(romfile);
+
+  if (command_line == DECOMPILE) {
+    struct language_cache *lang_cache = create_language_cache(language_dir);
+    struct parser_cache *parser_cache = create_parser_cache(language_dir);
+
+    const struct language_def *language =
+        get_language(lang_cache, decompile_lang);
+
+    FILE *script_file = fopen(script_file_name, "wt");
+    decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
+                  script_file);
+
+#ifndef NDEBUG
+    // This is to keep valgrind happy.
+    // The program is exiting, so we don't really have to free everything.
+    // But, it's also nice to know if we have any real leaks.
+    destroy_language_cache(lang_cache);
+    destroy_parser_cache(parser_cache);
+#endif
+    fclose(script_file);
+    fclose(romfile);
+  } else if (command_line == RECOMPILE) {
+    fclose(romfile);  // Reopened by RecodeProc
+    RecodeProc(rom_file_name, script_file_name);
+  }
+
+#ifndef NDEBUG
+  free(language_dir);
+#endif
   return 0;
 }

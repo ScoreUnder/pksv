@@ -11,6 +11,7 @@
 
 struct parser_cache {
   struct bsearch_root loaded_parsers;
+  char *parser_dir;
 };
 
 void deinit_loaded_parser(struct loaded_parser *parser) {
@@ -124,7 +125,6 @@ char *get_definitions_file_name(const char *parser_dir, const char *defs_name) {
 }
 
 struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
-                                            const char *parser_dir,
                                             const char *defs_name,
                                             bool required) {
   ssize_t index = bsearch_find(&cache->loaded_parsers, defs_name);
@@ -132,7 +132,8 @@ struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
     return cache->loaded_parsers.pairs[index].value;
   }
 
-  char *parser_filename = get_definitions_file_name(parser_dir, defs_name);
+  char *parser_filename =
+      get_definitions_file_name(cache->parser_dir, defs_name);
   struct loaded_parser *defs = load_definitions(defs_name, required);
   free(parser_filename);
   if (defs) {
@@ -194,8 +195,7 @@ struct take_parser_state {
 
 struct loaded_or_builtin_parser *take_parser(
     struct parser_cache *cache, struct language_def *lang,
-    const char *parser_dir, struct parser_list parsers,
-    struct take_parser_state *restrict state) {
+    struct parser_list parsers, struct take_parser_state *restrict state) {
   while (state->parser_idx < parsers.length) {
     const char *parser_name = parsers.parsers[state->parser_idx].name;
     bool is_prefixed = parsers.parsers[state->parser_idx].is_prefixed;
@@ -228,7 +228,7 @@ struct loaded_or_builtin_parser *take_parser(
         *next_name_pos = '\0';
 
         // Load or use this parser
-        generic_parser = get_parser(cache, parser_dir, next_name, false);
+        generic_parser = get_parser(cache, next_name, false);
         free(next_name);  // note: already strdup'd
       }
       state->prefix_idx = 0;
@@ -236,7 +236,7 @@ struct loaded_or_builtin_parser *take_parser(
 
     if (generic_parser == NULL) {
       // Try unprefixed parser, even if prefixed was requested
-      generic_parser = get_parser(cache, parser_dir, parser_name, true);
+      generic_parser = get_parser(cache, parser_name, true);
     }
 
     if (generic_parser != NULL) {
@@ -256,7 +256,6 @@ struct loaded_or_builtin_parser *take_parser(
 
 struct parse_result parse_for_recomp(struct parser_cache *cache,
                                      struct language_def *lang,
-                                     const char *parser_dir,
                                      struct parser_list parsers, char *token,
                                      size_t token_len) {
   struct parse_result result = {PARSE_RESULT_FAIL};
@@ -264,7 +263,7 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
   struct loaded_or_builtin_parser *generic_parser;
 
   do {
-    generic_parser = take_parser(cache, lang, parser_dir, parsers, &state);
+    generic_parser = take_parser(cache, lang, parsers, &state);
     if (generic_parser != NULL) {
       result = execute_parser_parse(generic_parser, token, token_len);
     }
@@ -275,14 +274,14 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
 
 struct parse_result format_for_decomp(
     struct parser_cache *cache, struct language_def *lang,
-    const char *parser_dir, struct parser_list parsers, uint32_t value,
+    struct parser_list parsers, uint32_t value,
     struct decompiler_informative_state *decstate) {
   struct parse_result result = {PARSE_RESULT_FAIL};
   struct take_parser_state state = {0, 0};
   struct loaded_or_builtin_parser *generic_parser;
 
   do {
-    generic_parser = take_parser(cache, lang, parser_dir, parsers, &state);
+    generic_parser = take_parser(cache, lang, parsers, &state);
     if (generic_parser != NULL) {
       result = execute_parser_format(generic_parser, value, decstate);
     }
@@ -291,8 +290,10 @@ struct parse_result format_for_decomp(
   return result;
 }
 
-struct parser_cache *create_parser_cache(void) {
+struct parser_cache *create_parser_cache(const char *parser_dir) {
   struct parser_cache *cache = malloc(sizeof *cache);
+  cache->parser_dir = strdup(parser_dir);
+
   bsearch_init_root(&cache->loaded_parsers, bsearch_key_strcmp,
                     bsearch_key_strdup, free,
                     bsearch_destroy_loaded_or_builtin_parser);
@@ -308,5 +309,6 @@ struct parser_cache *create_parser_cache(void) {
 
 void destroy_parser_cache(struct parser_cache *cache) {
   bsearch_deinit_root(&cache->loaded_parsers);
+  free(cache->parser_dir);
   free(cache);
 }

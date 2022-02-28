@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "lang_parsers.h"
+#include "lang_parsers_types.h"
 
 struct parse_result parse_from_loaded_parser(struct loaded_parser *parser,
                                              const char *token,
