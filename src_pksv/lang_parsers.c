@@ -249,6 +249,8 @@ struct loaded_or_builtin_parser *take_parser(
       generic_parser = get_parser(cache, parser_name, !had_parser);
     }
 
+    had_parser = false;
+
     if (generic_parser != NULL) {
       return generic_parser;
     }
