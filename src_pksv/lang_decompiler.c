@@ -365,10 +365,11 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                                            language->rules_by_bytes);
   }
   uint8_t translated_byte;
-  if (matched_rule == NULL
-      && language_type == METAFLAG_LANGTYPE_TEXT
-      && visit_state->lookahead.bytes.length >= 1
-      && (translated_byte = language->lookup_bytes->decomp[visit_state->lookahead.bytes.bytes[0]]) != '\0') {
+  if (matched_rule == NULL && language_type == METAFLAG_LANGTYPE_TEXT &&
+      visit_state->lookahead.bytes.length >= 1 &&
+      (translated_byte = language->lookup_bytes
+                             ->decomp[visit_state->lookahead.bytes.bytes[0]]) !=
+          '\0') {
     // Special case: if we're decompiling a text language, and we have a
     // "simple" (byte table lookup) rule, we can just use the byte as-is.
     // This lets us skip a lot of logic and saves on memory too.
@@ -387,10 +388,11 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       }
 
       if (matched_rule->bytes.length != 0) {
-        fprintf(stderr,
-                "Warning: default rule for \"%s\" is not empty\nThis will result "
-                "in decompilation/recompilation asymmetry.\n",
-                language->name);
+        fprintf(
+            stderr,
+            "Warning: default rule for \"%s\" is not empty\nThis will result "
+            "in decompilation/recompilation asymmetry.\n",
+            language->name);
       }
     }
 
@@ -417,7 +419,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
 
     consume_and_refill_lookahead(&visit_state->lookahead,
-                                matched_rule->bytes.length);
+                                 matched_rule->bytes.length);
     visit_state->address += matched_rule->bytes.length;
 
     for (size_t i = 0; i < matched_rule->args.length; i++) {
@@ -429,8 +431,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           putc(' ', state->output);
           visit_state->line_length++;
         }
-        uint32_t value =
-            arr_get_little_endian(visit_state->lookahead.bytes.bytes, arg->size);
+        uint32_t value = arr_get_little_endian(
+            visit_state->lookahead.bytes.bytes, arg->size);
         struct parse_result result = format_for_decomp(
             state->parser_cache, language, matched_rule->args.args[i].parsers,
             value, &state->info);
@@ -477,13 +479,13 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             }
 
             queue_decompilation_from_lookahead(state->remaining_blocks,
-                                              &visit_state->lookahead,
-                                              next_language, NULL, arg->size);
+                                               &visit_state->lookahead,
+                                               next_language, NULL, arg->size);
             break;
           }
           case LC_TYPE_COMMAND: {
             ssize_t index = bsearch_find(language->rules_by_command_name,
-                                        arg->as_language.command);
+                                         arg->as_language.command);
             if (index < 0) {
               fprintf(stderr,
                       "Warning: command \"%s\" not found in language \"%s\"\n",
@@ -494,8 +496,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                 language->rules_by_command_name->pairs[index].value;
 
             queue_decompilation_from_lookahead(
-                state->remaining_blocks, &visit_state->lookahead, state->language,
-                command, arg->size);
+                state->remaining_blocks, &visit_state->lookahead,
+                state->language, command, arg->size);
             break;
           }
           default:
@@ -506,10 +508,13 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       consume_and_refill_lookahead(&visit_state->lookahead, arg->size);
       visit_state->address += arg->size;
 
-      // Special case for commands with spaces in (insert second half after first argument)
-      if (i == 0 && visit_state->decompile && matched_rule->command_name[cmd_first_len] == ' ') {
+      // Special case for commands with spaces in (insert second half after
+      // first argument)
+      if (i == 0 && visit_state->decompile &&
+          matched_rule->command_name[cmd_first_len] == ' ') {
         fputs(&matched_rule->command_name[cmd_first_len], state->output);
-        visit_state->line_length += strlen(&matched_rule->command_name[cmd_first_len]);
+        visit_state->line_length +=
+            strlen(&matched_rule->command_name[cmd_first_len]);
       }
     }
 
@@ -552,9 +557,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       // same line
       // ... unless... we can line-wrap?
       uint8_t attributes = matched_rule == NULL ? 0 : matched_rule->attributes;
-      bool want_linewrap =
-          visit_state->line_length >= 80 ||
-          (attributes & RULE_ATTR_PREFER_BREAK) != 0;
+      bool want_linewrap = visit_state->line_length >= 80 ||
+                           (attributes & RULE_ATTR_PREFER_BREAK) != 0;
       if (want_linewrap && lang_can_split_lines(language) &&
           (language_type != METAFLAG_LANGTYPE_TEXT ||
            (attributes & RULE_ATTR_BREAK) != 0)) {
