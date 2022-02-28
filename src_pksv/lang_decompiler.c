@@ -455,7 +455,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         decomp_get_next_language(state, matched_rule->oneshot_lang);
     if (next_language == NULL) {
       if (visit_state->decompile) {
-        fprintf(state->output, "  ' Can't find language \"%s\" for the rest of this command\n", matched_rule->oneshot_lang.name);
+        fprintf(state->output, "  ' Can't find language \"%s\" for the rest of this command", matched_rule->oneshot_lang.name);
+        // Newline gets output after return
       } else {
         fprintf(stderr, "Warning: language \"%s\" not found\n",
                 matched_rule->oneshot_lang.name);
