@@ -205,8 +205,8 @@
 [0xB8] = setvaddress 4:address
 [0xB9] = vjump+end   4:address@*
 [0xBA] = vcall       4:address@*
-[0xBB] = "if vjump"+end 1:*condition:dec 4:address@*
-[0xBC] = "if vcall"     1:*condition:dec 4:address@*
+[0xBB] = "if vjump"  1:*condition:dec 4:address@*
+[0xBC] = "if vcall"  1:*condition:dec 4:address@*
 [0xBD] = vmessage 4:address@cmd=.text
 [0xBE] = vloadptr 4:address@cmd=.text
 [0xBF] = vbufferstring 1:dec 4:address@cmd=.text
