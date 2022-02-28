@@ -136,6 +136,11 @@
 [0x74] = drawboxtext        1 1 1 1    # x, y, id, ignoreButton
 [0x75] = showpokepic 2:*var:*pokemon 1 1  # poke, x, y
 [0x76] = hidepokepic
-
+# ...
+[0x83] = storevar 1 2:*var
+[0x84] = storestdstring 1 2:*stdstring
+[0x85] = storetext 1 4:address@cmd=.text
 # ...
 [0x90] = givemoney 4:dec 1  # amount, ???
+# ...
+[0x97] = fadescreen 1:*fadescreen

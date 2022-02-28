@@ -19,8 +19,8 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
                                      struct parser_list parsers, char *token,
                                      size_t token_len);
 struct parse_result format_for_decomp(
-    struct parser_cache *cache, struct language_def *lang,
-    struct parser_list parsers, uint32_t value,
+    struct parser_cache *cache, const struct language_def *lang,
+    const struct parser_list parsers, uint32_t value,
     struct decompiler_informative_state *decstate);
 
 #endif

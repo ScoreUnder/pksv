@@ -25,6 +25,7 @@ void destroy_loaded_parser(struct loaded_parser *parser) {
 }
 
 void bsearch_destroy_loaded_or_builtin_parser(void *ptr) {
+  if (ptr == NULL) return;
   struct loaded_or_builtin_parser *parser = ptr;
   if (parser->which == PARSER_TYPE_LOADED) {
     deinit_loaded_parser(&parser->loaded);
@@ -194,8 +195,8 @@ struct take_parser_state {
 };
 
 struct loaded_or_builtin_parser *take_parser(
-    struct parser_cache *cache, struct language_def *lang,
-    struct parser_list parsers, struct take_parser_state *restrict state) {
+    struct parser_cache *cache, const struct language_def *lang,
+    const struct parser_list parsers, struct take_parser_state *restrict state) {
   while (state->parser_idx < parsers.length) {
     const char *parser_name = parsers.parsers[state->parser_idx].name;
     bool is_prefixed = parsers.parsers[state->parser_idx].is_prefixed;
@@ -273,8 +274,8 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
 }
 
 struct parse_result format_for_decomp(
-    struct parser_cache *cache, struct language_def *lang,
-    struct parser_list parsers, uint32_t value,
+    struct parser_cache *cache, const struct language_def *lang,
+    const struct parser_list parsers, uint32_t value,
     struct decompiler_informative_state *decstate) {
   struct parse_result result = {PARSE_RESULT_FAIL};
   struct take_parser_state state = {0, 0};

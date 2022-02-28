@@ -192,6 +192,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
     lang->def.parents[i] =
         fgettabledstr(lang->string_table, string_table_len, file);
   }
+  lang->def.parents[parents_len] = NULL;
 
   size_t rules_len = fgetvarint(file);
   lang->def.rules_by_bytes =

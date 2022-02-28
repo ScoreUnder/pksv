@@ -21,16 +21,19 @@ struct queued_decompilation {
 
 struct decomp_internal_state {
   FILE *input;
+  FILE *output;
   struct bsearch_root *remaining_blocks;
   struct bsearch_root *seen_addresses;
+  struct bsearch_root *labels;
   const struct language_def *language;
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
+  struct decompiler_informative_state info;
 };
 
 static void decomp_visit_address(
     struct decomp_internal_state *state,
-    struct queued_decompilation *decompilation_type, uint32_t address);
+    struct queued_decompilation *decompilation_type, uint32_t initial_address, bool decompile);
 static struct queued_decompilation *duplicate_queued_decompilation(
     struct queued_decompilation *queued_decompilation);
 
@@ -66,8 +69,10 @@ void decompile_all(FILE *input_file, size_t start_offset,
 
   struct decomp_internal_state decomp_state = {
       .input = input_file,
+      .output = output_file,
       .remaining_blocks = &unvisited_blocks,
       .seen_addresses = &decomp_seen_addresses,
+      .labels = NULL,
       .language_cache = language_cache,
       .parser_cache = parser_cache,
       .language = start_language,
@@ -95,21 +100,23 @@ void decompile_all(FILE *input_file, size_t start_offset,
 
     bsearch_remove(&unvisited_blocks, 0);
 
-    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr);
+    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr, false);
   }
   bsearch_deinit_root(&unvisited_blocks);
+  decomp_state.remaining_blocks = NULL;
 
   struct bsearch_root labels;
   bsearch_init_root(&labels, bsearch_key_int32cmp, bsearch_key_nocopy, NULL,
                     free);
 
   // Assign labels to decompiled blocks, remove any which overlap.
+  size_t label_num = 0;
   for (size_t i = 0; i < decomp_blocks.size; i++) {
     uint32_t decomp_addr = (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
 
     // Create a label for the decompiled block.
     char *label = malloc(32);
-    snprintf(label, 32, "label_%zu", i);
+    snprintf(label, 32, "label_%zu", label_num++);
     bsearch_upsert(&labels, (void *)(intptr_t)decomp_addr, label);
 
     // Find the start of the decompiled block.
@@ -137,9 +144,22 @@ void decompile_all(FILE *input_file, size_t start_offset,
     }
   }
   bsearch_deinit_root(&decomp_seen_addresses);
+  decomp_state.seen_addresses = NULL;
 
+  ssize_t start_label_index = bsearch_find(&labels, (void *)(intptr_t)start_offset);
+  assert(start_label_index >= 0);
+  fprintf(output_file, "' Script starts at :%s\n", labels.pairs[start_label_index].value);
+
+  decomp_state.labels = &labels;
   // Decompile the blocks.
-  // TODO
+  for (size_t i = 0; i < decomp_blocks.size; i++) {
+    putc('\n', decomp_state.output);
+
+    uint32_t decompilation_addr = (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
+    struct queued_decompilation *decompilation_type = decomp_blocks.pairs[i].value;
+
+    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr, true);
+  }
 
   bsearch_deinit_root(&decomp_blocks);
   bsearch_deinit_root(&labels);
@@ -194,9 +214,6 @@ static struct rule *get_rule_from_lookahead(
     // else, we matched nothing, so we're done.
   }
 
-  if (matched_rule != NULL) {
-    consume_and_refill_lookahead(lookahead, matched_rule->bytes.length);
-  }
   return matched_rule;
 }
 
@@ -270,6 +287,7 @@ struct decomp_visit_state {
   uint32_t address;
   uint32_t initial_address;
   bool still_going;
+  bool decompile;  // false = just visiting to collect block info
 };
 
 static bool lang_can_split_lines(const struct language_def *language) {
@@ -287,7 +305,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                                 const struct language_def *language,
                                 const struct rule *force_command, bool first) {
   uint32_t command_start_address = visit_state->address;
-  if (first || lang_can_split_lines(language)) {
+  if (!visit_state->decompile && (first || lang_can_split_lines(language))) {
     // Record this address as a visited "line"
     ssize_t index = bsearch_find(state->seen_addresses,
                                  (void *)(intptr_t)visit_state->address);
@@ -328,6 +346,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
   }
 
+  if (visit_state->decompile) {
+    fputs(matched_rule->command_name, state->output);
+  }
+
   if (matched_rule->attributes & RULE_ATTR_END) {
     visit_state->still_going = false;
   }
@@ -340,46 +362,80 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     struct command_arg *arg = &matched_rule->args.args[i];
     if (visit_state->lookahead.bytes.length < arg->size) {
       visit_state->still_going = false;
+      if (visit_state->decompile) {
+        fputs("  ' EOF\n", state->output);
+      }
       return;  // Reached end of file
     }
 
-    // Handle request for a new language
-    switch (arg->as_language.type) {
-      case LC_TYPE_NONE:
-        break;
-      case LC_TYPE_LANG: {
-        const struct language_def *next_language =
-            decomp_get_next_language(state, arg->as_language.lang);
-        if (next_language == NULL) {
-          fprintf(stderr, "Warning: language \"%s\" not found\n",
-                  arg->as_language.lang.name);
+    if (visit_state->decompile) {
+      putc(' ', state->output);
+      uint32_t value = arr_get_little_endian(visit_state->lookahead.bytes.bytes,
+                                             arg->size);
+      struct parse_result result = format_for_decomp(
+        state->parser_cache, language, matched_rule->args.args[i].parsers, value, &state->info);
+
+      switch (result.type) {
+        case PARSE_RESULT_FAIL:
+          assert(false); // should always be able to parse at least fallbacks
+          break;
+        case PARSE_RESULT_VALUE:
+          assert(false); // this shouldn't be returned by a formatter
+          break;
+        case PARSE_RESULT_TOKEN:
+          fputs(result.token, state->output);
+          free(result.token);
+          break;
+        case PARSE_RESULT_LABEL: {
+          value = result.value;
+          ssize_t label_index = bsearch_find(state->labels,
+                                             (void *)(intptr_t)value);
+          assert(label_index >= 0);  // all labels should be found
+          putc(':', state->output);
+          fputs(state->labels->pairs[label_index].value, state->output);
           break;
         }
-
-        queue_decompilation_from_lookahead(state->remaining_blocks,
-                                           &visit_state->lookahead,
-                                           next_language, NULL, arg->size);
-        break;
       }
-      case LC_TYPE_COMMAND: {
-        ssize_t index = bsearch_find(language->rules_by_command_name,
-                                     arg->as_language.command);
-        if (index < 0) {
-          fprintf(stderr,
-                  "Warning: command \"%s\" not found in language \"%s\"\n",
-                  arg->as_language.command, language->name);
+    } else {
+      // If collecting block info, we need to follow addresses
+      // Handle request for a new language
+      switch (arg->as_language.type) {
+        case LC_TYPE_NONE:
+          break;
+        case LC_TYPE_LANG: {
+          const struct language_def *next_language =
+              decomp_get_next_language(state, arg->as_language.lang);
+          if (next_language == NULL) {
+            fprintf(stderr, "Warning: language \"%s\" not found\n",
+                    arg->as_language.lang.name);
+            break;
+          }
+
+          queue_decompilation_from_lookahead(state->remaining_blocks,
+                                            &visit_state->lookahead,
+                                            next_language, NULL, arg->size);
           break;
         }
-        const struct rule *command =
-            language->rules_by_command_name->pairs[index].value;
+        case LC_TYPE_COMMAND: {
+          ssize_t index = bsearch_find(language->rules_by_command_name,
+                                      arg->as_language.command);
+          if (index < 0) {
+            fprintf(stderr,
+                    "Warning: command \"%s\" not found in language \"%s\"\n",
+                    arg->as_language.command, language->name);
+            break;
+          }
+          const struct rule *command =
+              language->rules_by_command_name->pairs[index].value;
 
-        queue_decompilation_from_lookahead(state->remaining_blocks,
-                                           &visit_state->lookahead,
-                                           state->language, command, arg->size);
-        break;
+          queue_decompilation_from_lookahead(state->remaining_blocks,
+                                            &visit_state->lookahead,
+                                            state->language, command, arg->size);
+          break;
+        }
+        default:
+          assert(false);
       }
-      default:
-        assert(false);
     }
 
     consume_and_refill_lookahead(&visit_state->lookahead, arg->size);
@@ -391,8 +447,12 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     const struct language_def *next_language =
         decomp_get_next_language(state, matched_rule->oneshot_lang);
     if (next_language == NULL) {
-      fprintf(stderr, "Warning: language \"%s\" not found\n",
-              matched_rule->oneshot_lang.name);
+      if (visit_state->decompile) {
+        fprintf(state->output, "  ' Can't find language \"%s\" for the rest of this command\n", matched_rule->oneshot_lang.name);
+      } else {
+        fprintf(stderr, "Warning: language \"%s\" not found\n",
+                matched_rule->oneshot_lang.name);
+      }
       if (visit_state->address == command_start_address) {
         // Stop, or end up in an infinite loop.
         visit_state->still_going = false;
@@ -400,14 +460,22 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       return;
     }
 
+    if (visit_state->decompile) {
+      putc(' ', state->output);
+    }
+
     decomp_visit_single(state, visit_state, next_language, NULL, false);
+  }
+
+  if (visit_state->decompile) {
+    fputs("\n", state->output);
   }
 }
 
 static void decomp_visit_address(
     struct decomp_internal_state *restrict state,
     struct queued_decompilation *restrict decompilation_type,
-    uint32_t initial_address) {
+    uint32_t initial_address, bool decompile) {
   const struct language_def *language = decompilation_type->language;
   const size_t LOOKAHEAD_SIZE = 16;  // TODO: record maximum bytes_list length
                                      // per language, max with arg sizes
@@ -425,13 +493,40 @@ static void decomp_visit_address(
       .address = initial_address,
       .initial_address = initial_address,
       .still_going = true,
+      .decompile = decompile,
   };
 
   // TODO: GSC offset handling
   fseek(state->input, initial_address, SEEK_SET);
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
 
+  if (decompile) {
+    fprintf(state->output, "#org 0x%08x\n", initial_address);
+  }
+
+  uint32_t next_label_address = UINT32_MAX;
+  ssize_t next_label_index;
+
+  if (decompile) {
+    next_label_index = bsearch_find(state->labels, (void *)(intptr_t)initial_address);
+    if (next_label_index < 0) {
+      next_label_index = -next_label_index - 1;
+    }
+    if ((size_t)next_label_index < state->labels->size) {
+      next_label_address = (uint32_t)(intptr_t) state->labels->pairs[next_label_index].key;
+    }
+  }
+
   while (visit_state.still_going) {
+    if (decompile) {
+      if (visit_state.address == next_label_address && (size_t)next_label_index < state->labels->size) {
+        fprintf(state->output, ":%s\n", state->labels->pairs[next_label_index].value);
+        next_label_index++;
+        if ((size_t)next_label_index < state->labels->size) {
+          next_label_address = (uint32_t)(intptr_t) state->labels->pairs[next_label_index].key;
+        }
+      }
+    }
     decomp_visit_single(state, &visit_state, language,
                         decompilation_type->command, true);
   }
