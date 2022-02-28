@@ -317,10 +317,25 @@ static bool lang_can_split_lines(const struct language_def *language) {
   }
 }
 
+static bool check_and_report_eof(struct decomp_internal_state *state,
+                                 struct decomp_visit_state *visit_state,
+                                 size_t needed_bytes) {
+  if (visit_state->lookahead.bytes.length < needed_bytes) {
+    if (visit_state->decompile) {
+      fputs("\n' EOF\n", state->output);
+    }
+    visit_state->still_going = false;
+    return true;
+  }
+  return false;
+}
+
 static void decomp_visit_single(struct decomp_internal_state *state,
                                 struct decomp_visit_state *visit_state,
                                 const struct language_def *language,
                                 const struct rule *force_command, bool first) {
+  if (check_and_report_eof(state, visit_state, 1)) return;
+
   uint32_t command_start_address = visit_state->address;
   if (!visit_state->decompile && (first || lang_can_split_lines(language))) {
     // Record this address as a visited "line"
@@ -407,13 +422,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
     for (size_t i = 0; i < matched_rule->args.length; i++) {
       struct command_arg *arg = &matched_rule->args.args[i];
-      if (visit_state->lookahead.bytes.length < arg->size) {
-        visit_state->still_going = false;
-        if (visit_state->decompile) {
-          fputs("  ' EOF\n", state->output);
-        }
-        return;  // Reached end of file
-      }
+      if (check_and_report_eof(state, visit_state, arg->size)) return;
 
       if (visit_state->decompile) {
         if (language_type != METAFLAG_LANGTYPE_TEXT) {
