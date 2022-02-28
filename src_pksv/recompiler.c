@@ -1604,7 +1604,6 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYN\n");
               start = GetNum("#DYN");
               if (!gffs) return;
-              dyntype = 0;
               bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
               ec();
             }
@@ -1612,14 +1611,12 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYN2\n");
               start = GetNum("#DYN2");
               if (!gffs) return;
-              dyntype = 1;
               ec();
             }
             aa("#dynamic") {
               vlog_txt("#DYNAMIC\n");
               start = GetNum("#DYNAMIC");
               if (!gffs) return;
-              dyntype = 0;
               bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
               ec();
             }
@@ -1653,7 +1650,7 @@ void RecodeProc(char *script, char *romfn) {
               if (*buf == 0)
                 init_codeblock(d, NULL, k);
               else
-                init_codeblock(d, buf, (start & 0x0FFFFFFF) | (dyntype << 24));
+                init_codeblock(d, buf, start);
               d->prev = c;
               if (c != NULL) c->next = d;
               c = d;
@@ -1684,7 +1681,7 @@ void RecodeProc(char *script, char *romfn) {
               if (*buf == 0)
                 init_codeblock(d, NULL, k);
               else
-                init_codeblock(d, buf, (start & 0x0FFFFFFF) | (dyntype << 24));
+                init_codeblock(d, buf, start);
               d->prev = c;
               if (c != NULL) c->next = d;
               c = d;
@@ -3708,7 +3705,6 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYN\n");
               start = GetNum("#DYN");
               if (!gffs) return;
-              dyntype = 0;
               bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
               ec();
             }
@@ -3716,14 +3712,12 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYN2\n");
               start = GetNum("#DYN2");
               if (!gffs) return;
-              dyntype = 1;
               ec();
             }
             aa("#dynamic") {
               vlog_txt("#DYNAMIC\n");
               start = GetNum("#DYNAMIC");
               if (!gffs) return;
-              dyntype = 0;
               bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
               ec();
             }
@@ -3757,7 +3751,7 @@ void RecodeProc(char *script, char *romfn) {
               if (*buf == 0)
                 init_codeblock(d, NULL, k);
               else
-                init_codeblock(d, buf, (start & 0x0FFFFFFF) | (dyntype << 24));
+                init_codeblock(d, buf, start);
               d->prev = c;
               if (c != NULL) c->next = d;
               c = d;
@@ -3788,7 +3782,7 @@ void RecodeProc(char *script, char *romfn) {
               if (*buf == 0)
                 init_codeblock(d, NULL, k);
               else
-                init_codeblock(d, buf, (start & 0x0FFFFFFF) | (dyntype << 24));
+                init_codeblock(d, buf, start);
               d->prev = c;
               if (c != NULL) c->next = d;
               c = d;
@@ -5859,20 +5853,17 @@ void RecodeProc(char *script, char *romfn) {
                   vlog_txt("#DYN\n");
                   start = GetNum("#DYN");
                   if (!gffs) return;
-                  dyntype = 0;
                   bsearch_upsert(defines, "findfrom", (void *)(intptr_t)start);
                 }
                 aa("#dyn2") {
                   vlog_txt("#DYN2\n");
                   start = GetNum("#DYN2");
                   if (!gffs) return;
-                  dyntype = 1;
                 }
                 aa("#dynamic") {
                   vlog_txt("#DYNAMIC\n");
                   start = GetNum("#DYNAMIC");
                   if (!gffs) return;
-                  dyntype = 0;
                   bsearch_upsert(defines, "findfrom", (void *)(intptr_t)start);
                 }
                 aa("#org") {
@@ -5904,8 +5895,7 @@ void RecodeProc(char *script, char *romfn) {
                   if (*buf == 0)
                     init_codeblock(d, NULL, k);
                   else
-                    init_codeblock(d, buf,
-                                   (start & 0x0FFFFFFF) | (dyntype << 24));
+                    init_codeblock(d, buf, start);
                   d->prev = c;
                   if (c != NULL) c->next = d;
                   c = d;
@@ -5939,8 +5929,7 @@ void RecodeProc(char *script, char *romfn) {
                   if (*buf == 0)
                     init_codeblock(d, NULL, k);
                   else
-                    init_codeblock(d, buf,
-                                   (start & 0x0FFFFFFF) | (dyntype << 24));
+                    init_codeblock(d, buf, start);
                   d->prev = c;
                   if (c != NULL) c->next = d;
                   c = d;
@@ -5973,8 +5962,7 @@ void RecodeProc(char *script, char *romfn) {
                   if (*buf == 0)
                     init_codeblock(d, NULL, k);
                   else
-                    init_codeblock(d, buf,
-                                   (start & 0x0FFFFFFF) | (dyntype << 24));
+                    init_codeblock(d, buf, start);
                   d->prev = c;
                   if (c != NULL) c->next = d;
                   c = d;
