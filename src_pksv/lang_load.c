@@ -93,7 +93,9 @@ static void free_loaded_lang(struct loaded_lang *lang) {
   free(lang->def.name);
   free(lang->def.parents);
   for (size_t i = 0; i < NUM_SPECIAL_RULES; i++) {
-    free(lang->def.special_rules[i]);
+    if (lang->def.special_rules[i] != NULL) {
+      bsearch_free_language_rule(lang->def.special_rules[i]);
+    }
   }
   bsearch_destroy_root(lang->def.rules_by_bytes);
   bsearch_destroy_root(lang->def.rules_by_command_name);
