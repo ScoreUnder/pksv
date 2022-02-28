@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "lang_decompiler.h"
+#include "lang_default_parsers.h"
 #include "lang_parsers.h"
 #include "lang_load.h"
 #include "language-defs.h"
@@ -460,11 +461,17 @@ static void decomp_visit_single(struct decomp_internal_state *state,
               value = result.value & GBA_OFFSET_MASK;
               ssize_t label_index =
                   bsearch_find(state->labels, (void *)(intptr_t)value);
-              assert(label_index >= 0);  // all labels should be found
-              const char *label = state->labels->pairs[label_index].value;
-              putc(':', state->output);
-              fputs(label, state->output);
-              visit_state->line_length += strlen(label) + 1;
+              if (label_index >= 0) {
+                const char *label = state->labels->pairs[label_index].value;
+                putc(':', state->output);
+                fputs(label, state->output);
+                visit_state->line_length += strlen(label) + 1;
+              } else {
+                result = builtin_parser_hex.builtin.format(value, &state->info);
+                assert(result.type == PARSE_RESULT_TOKEN);  // Default hex fallback parser can't fail on us
+                fputs(result.token, state->output);
+                visit_state->line_length += strlen(result.token);
+              }
               break;
             }
           }
