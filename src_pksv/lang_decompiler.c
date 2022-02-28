@@ -204,7 +204,7 @@ static const struct language_def *get_prefixed_language(
     struct language_cache *cache, const char *prefix, const char *orig,
     size_t orig_len) {
   char *buffer = malloc(orig_len + strlen(prefix) + 2);
-  sprintf("%s_%s", prefix, orig);
+  sprintf(buffer, "%s_%s", prefix, orig);
 
   const struct language_def *language = get_language(cache, buffer);
 
@@ -229,7 +229,7 @@ static const struct language_def *decomp_get_next_language(
     }
 
     char **parents = state->language->parents;
-    while (parents != NULL) {
+    while (*parents != NULL) {
       next = get_prefixed_language(state->language_cache, *parents, lang.name,
                                    lang_name_len);
       if (next != NULL) {
@@ -362,7 +362,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       }
       case LC_TYPE_COMMAND: {
         ssize_t index = bsearch_find(language->rules_by_command_name,
-                                     &arg->as_language.command);
+                                     arg->as_language.command);
         if (index < 0) {
           fprintf(stderr,
                   "Warning: command \"%s\" not found in language \"%s\"\n",
@@ -392,6 +392,11 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     if (next_language == NULL) {
       fprintf(stderr, "Warning: language \"%s\" not found\n",
               matched_rule->oneshot_lang.name);
+      if (force_command != NULL) {
+        // If we have a forced command, we can't continue
+        // Otherwise we end up in an infinite loop
+        visit_state->still_going = false;
+      }
       return;
     }
 

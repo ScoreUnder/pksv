@@ -32,9 +32,9 @@ LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lcomctl32
 LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROFILE))
 
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE
-
 CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
-CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic
+CFLAGS_PR_debug = -ggdb3 -Og
+CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic $(CFLAGS_PR_$(PROFILE))
 CFLAGS_SH = -shared -fpic -DDLL
 
 LDFLAGS_CONSOLE_P_win = -mconsole
@@ -162,7 +162,7 @@ $(BIN_LANGUAGE_PARSER): $(OBJ_LANGUAGE_PARSER)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_LANGUAGE_PARSER) -o $@
 
 $(PKSV): $(OBJ_PKSV_MAIN)
-	$(LINK.c) $(LDFLAGS_CONSOLE) $(CFLAGS) $(OBJ_PKSV_MAIN) -o $@
+	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PKSV_MAIN) -o $@
 
 $(PKSV_SHLIB): $(OBJ_PKSV_SHLIB) $(LIB_FMEM_A)
 	$(LINK.c) $(CFLAGS_SH) $(LDFLAGS_SH) $(OBJ_PKSV_SHLIB) $(LDLIBS_SH) -o $@
