@@ -228,14 +228,49 @@ static void queue_decompilation_from_lookahead(
 struct decomp_visit_state {
   struct lookahead lookahead;
   uint32_t address;
+  uint32_t initial_address;
   bool still_going;
 };
 
+static bool lang_can_split_lines(const struct language_def *language) {
+  switch (language->meta_flags & METAFLAG_MASK_LANGTYPE) {
+    case METAFLAG_LANGTYPE_TEXT:
+    case METAFLAG_LANGTYPE_LINE:
+      return language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
+    default:
+      return false;
+  }
+}
+
 static void decomp_visit_single(struct decomp_internal_state *state,
                                 struct decomp_visit_state *visit_state,
-                                const struct language_def *language) {
-  struct rule *matched_rule = get_rule_from_lookahead(&visit_state->lookahead,
-                                                      language->rules_by_bytes);
+                                const struct language_def *language,
+                                const struct rule *force_command, bool first) {
+  if (first || lang_can_split_lines(language)) {
+    // Record this address as a visited "line"
+    ssize_t index = bsearch_find(state->seen_addresses,
+                                 (void *)(intptr_t)visit_state->address);
+    if (index >= 0) {
+      if ((uint32_t)(intptr_t)state->seen_addresses->pairs[index].value >
+          visit_state->initial_address) {
+        // We have visited this address before, but this time we have a fuller
+        // view of the block
+        state->seen_addresses->pairs[index].value =
+            (void *)(intptr_t)visit_state->initial_address;
+      }
+    } else {
+      // Newly visited address
+      bsearch_unsafe_insert(state->seen_addresses, index,
+                            (void *)(intptr_t)visit_state->address,
+                            (void *)(intptr_t)visit_state->initial_address);
+    }
+  }
+
+  const struct rule *matched_rule = force_command;
+  if (matched_rule == NULL) {
+    matched_rule = get_rule_from_lookahead(&visit_state->lookahead,
+                                           language->rules_by_bytes);
+  }
   if (matched_rule == NULL) {
     matched_rule = language->special_rules[SPECIAL_RULE_DEFAULT];
     if (matched_rule == NULL) {
@@ -320,7 +355,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       return;
     }
 
-    decomp_visit_single(state, visit_state, next_language);
+    decomp_visit_single(state, visit_state, next_language, NULL, false);
   }
 }
 
@@ -329,8 +364,8 @@ static void decomp_visit_address(
     struct queued_decompilation *restrict decompilation_type,
     uint32_t initial_address) {
   const struct language_def *language = decompilation_type->language;
-  const size_t LOOKAHEAD_SIZE =
-      16;  // TODO: record maximum bytes_list length per language
+  const size_t LOOKAHEAD_SIZE = 16;  // TODO: record maximum bytes_list length
+                                     // per language, max with arg sizes
   struct decomp_visit_state visit_state = {
       .lookahead =
           {
@@ -343,6 +378,7 @@ static void decomp_visit_address(
               .file = state->input,
           },
       .address = initial_address,
+      .initial_address = initial_address,
       .still_going = true,
   };
 
@@ -351,26 +387,8 @@ static void decomp_visit_address(
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
 
   while (visit_state.still_going) {
-    // Note: address is recorded here rather than in the call to
-    // decomp_visit_single, because the recursive calls as a result of
-    // oneshot_lang do not have their own line in the decompiled output.
-    ssize_t index = bsearch_find(state->seen_addresses,
-                                 (void *)(intptr_t)visit_state.address);
-    if (index >= 0) {
-      if ((uint32_t)(intptr_t)state->seen_addresses->pairs[index].value >
-          initial_address) {
-        // We have visited this address before, but this time we have a fuller
-        // view of the block
-        state->seen_addresses->pairs[index].value =
-            (void *)(intptr_t)initial_address;
-      }
-    } else {
-      // Newly visited address
-      bsearch_unsafe_insert(state->seen_addresses, index,
-                            (void *)(intptr_t)visit_state.address,
-                            (void *)(intptr_t)initial_address);
-    }
-    decomp_visit_single(state, &visit_state, language);
+    decomp_visit_single(state, &visit_state, language,
+                        decompilation_type->command, true);
   }
 
   free(visit_state.lookahead.bytes.bytes);
