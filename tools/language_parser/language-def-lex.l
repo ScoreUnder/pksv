@@ -10,18 +10,44 @@ _Static_assert(sizeof(long) >= 4, "Need 32-bit longs at least for this grammar t
 int l_err(const char*);
 char *lex_error_msg;
 
+char *strbuf = NULL;
+size_t strbuf_len = 0;
+size_t strbuf_alloc = 0;
+
+void put_strbuf(const char *s) {
+  size_t len = strlen(s);
+  if (strbuf_len + len + 1 > strbuf_alloc) {
+    strbuf_alloc = (strbuf_len + len + 1) * 2;
+    strbuf = realloc(strbuf, strbuf_alloc);
+  }
+  memcpy(strbuf + strbuf_len, s, len + 1);
+  strbuf_len += len;
+  strbuf[strbuf_len] = '\0';
+}
+
 %}
 
+%x QUOTED_STRING
 %%
 
-[ \t] ; /* ignore whitespace */
+\" BEGIN(QUOTED_STRING);
 
-\"[^"\n]*\" {
-    char *found = strdup(&yytext[1]);
-    found[yyleng-2] = '\0';
-    yylval.strval = found;
+<QUOTED_STRING>{
+  \\n put_strbuf("\n");
+  \\\\ put_strbuf("\\");
+  \\\" put_strbuf("\"");
+  [^\\\"]+ put_strbuf(yytext);
+  \" {
+    BEGIN(INITIAL);
+    yylval.strval = strbuf == NULL ? strdup("") : strbuf;
+    strbuf = NULL;
+    strbuf_len = 0;
+    strbuf_alloc = 0;
     return T_string;
+  }
 }
+
+[ \t] ; /* ignore whitespace */
 
 \n { return yytext[0]; }
 

@@ -115,10 +115,15 @@ attributes: /*empty*/ { $$ = RULE_ATTR_NONE; }
                 $$ |= RULE_ATTR_CMP_FLAG;
               } else if (strcmp($3, "cmp_int") == 0) {
                 $$ |= RULE_ATTR_CMP_INT;
+              } else if (strcmp($3, "break") == 0) {
+                $$ |= RULE_ATTR_BREAK;
+              } else if (strcmp($3, "prefer_break") == 0) {
+                $$ |= RULE_ATTR_PREFER_BREAK;
               } else {
                 yyerror("Unknown attribute");
                 YYERROR;
               }
+              free($3);
             }
           ;
 

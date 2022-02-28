@@ -265,9 +265,18 @@ static struct loaded_lang *load_language(struct language_cache *cache,
       overwrite_special_rule(&lang->def, rule, SPECIAL_RULE_NO_TERMINATE);
     }
 
-    bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
-                   ref_language_rule(rule));
-    bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
+    if (rule->bytes.length > 0) {
+      bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
+                     ref_language_rule(rule));
+    }
+    if (rule->command_name[0] != '\0') {
+      bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
+    } else {
+      // Unref "master" copy once
+      // If it wasn't inserted into the special rules tables or the
+      // rule-by-bytes tables, this will completely delete it.
+      bsearch_free_language_rule(rule);
+    }
   }
 
   return lang;

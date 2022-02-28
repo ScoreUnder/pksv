@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -204,24 +205,29 @@ static struct rule *get_rule_from_lookahead(
   struct rule *matched_rule = NULL;
   ssize_t index = bsearch_find(rules_by_bytes, &lookahead->bytes);
   if (index >= 0) {
-    matched_rule = (struct rule *)rules_by_bytes->pairs[index].value;
+    // Perfect match (somehow??)
+    return rules_by_bytes->pairs[index].value;
   } else {
     index = -index - 1;
     // If we match any rule's bytes as a prefix, it must be to the left of the
     // index. i.e. we matched everything, but were > the rule because our length
     // wins out.
-    if (index > 0) {
-      matched_rule = (struct rule *)rules_by_bytes->pairs[index - 1].value;
-      if (matched_rule->bytes.length >= lookahead->bytes.length ||
+    while (--index >= 0) {
+      matched_rule = (struct rule *)rules_by_bytes->pairs[index].value;
+      if (matched_rule->bytes.length < lookahead->bytes.length &&
           memcmp(matched_rule->bytes.bytes, lookahead->bytes.bytes,
-                 matched_rule->bytes.length) != 0) {
-        matched_rule = NULL;
+                 matched_rule->bytes.length) == 0) {
+        return matched_rule;
+      }
+      if (matched_rule->bytes.length >= 1 &&
+          matched_rule->bytes.bytes[0] < lookahead->bytes.bytes[0]) {
+        // Scrolled too far back; no match
+        break;
       }
     }
     // else, we matched nothing, so we're done.
+    return NULL;
   }
-
-  return matched_rule;
 }
 
 static const struct language_def *get_prefixed_language(
@@ -291,6 +297,7 @@ static void queue_decompilation_from_lookahead(
 
 struct decomp_visit_state {
   struct lookahead lookahead;
+  size_t line_length;
   uint32_t address;
   uint32_t initial_address;
   bool still_going;
@@ -363,6 +370,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       state->info.is_checkflag = false;
 
     fputs(matched_rule->command_name, state->output);
+    visit_state->line_length += strlen(matched_rule->command_name);
   }
 
   if (matched_rule->attributes & RULE_ATTR_END) {
@@ -372,6 +380,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   consume_and_refill_lookahead(&visit_state->lookahead,
                                matched_rule->bytes.length);
   visit_state->address += matched_rule->bytes.length;
+
+  unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
 
   for (size_t i = 0; i < matched_rule->args.length; i++) {
     struct command_arg *arg = &matched_rule->args.args[i];
@@ -384,7 +394,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
 
     if (visit_state->decompile) {
-      putc(' ', state->output);
+      if (language_type != METAFLAG_LANGTYPE_TEXT) {
+        putc(' ', state->output);
+        visit_state->line_length++;
+      }
       uint32_t value =
           arr_get_little_endian(visit_state->lookahead.bytes.bytes, arg->size);
       struct parse_result result = format_for_decomp(
@@ -401,6 +414,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           break;
         case PARSE_RESULT_TOKEN:
           fputs(result.token, state->output);
+          visit_state->line_length += strlen(result.token);
           free(result.token);
           break;
         case PARSE_RESULT_LABEL: {
@@ -409,8 +423,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           ssize_t label_index =
               bsearch_find(state->labels, (void *)(intptr_t)value);
           assert(label_index >= 0);  // all labels should be found
+          const char *label = state->labels->pairs[label_index].value;
           putc(':', state->output);
-          fputs(state->labels->pairs[label_index].value, state->output);
+          fputs(label, state->output);
+          visit_state->line_length += strlen(label) + 1;
           break;
         }
       }
@@ -481,32 +497,38 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       return;
     }
 
-    if (visit_state->decompile) {
+    if (visit_state->decompile && language_type != METAFLAG_LANGTYPE_TEXT) {
       putc(' ', state->output);
+      visit_state->line_length++;
     }
 
     decomp_visit_single(state, visit_state, next_language, NULL, false);
   } else if (visit_state->decompile) {
     // Only need concatenated command lines if decompiling
-    unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
     if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE ||
                                      language_type == METAFLAG_LANGTYPE_TEXT)) {
       // If we're in a line or text language, we need to produce more on the
       // same line
       // ... unless... we can line-wrap?
       bool want_linewrap =
-          rand() % 4 == 0;  // TODO: replace with something sensible
-      if (want_linewrap && lang_can_split_lines(language)) {
+          visit_state->line_length >= 80 ||
+          (matched_rule->attributes & RULE_ATTR_PREFER_BREAK) != 0;
+      if (want_linewrap && lang_can_split_lines(language) &&
+          (language_type != METAFLAG_LANGTYPE_TEXT ||
+           (matched_rule->attributes & RULE_ATTR_BREAK) != 0)) {
         // output no-terminate token if needed
         const struct rule *noterm =
             language->special_rules[SPECIAL_RULE_NO_TERMINATE];
         if (noterm != NULL) {
           fputs(noterm->command_name, state->output);
         }
-        // ...then just drop off the end of the function
+        return;
       } else {
         // otherwise, we can't line-wrap, so we just continue
-        putc(' ', state->output);
+        if (language_type != METAFLAG_LANGTYPE_TEXT) {
+          putc(' ', state->output);
+          visit_state->line_length++;
+        }
         decomp_visit_single(state, visit_state, language, NULL, false);
       }
     }
@@ -535,6 +557,7 @@ static void decomp_visit_address(
       .initial_address = initial_address,
       .still_going = true,
       .decompile = decompile,
+      .line_length = 0,
   };
 
   // TODO: GSC offset handling
@@ -562,6 +585,7 @@ static void decomp_visit_address(
 
   while (visit_state.still_going) {
     if (decompile) {
+      visit_state.line_length = 0;
       if (visit_state.address == next_label_address &&
           (size_t)next_label_index < state->labels->size) {
         fprintf(state->output, ":%s\n",
