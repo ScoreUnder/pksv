@@ -427,40 +427,46 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       if (check_and_report_eof(state, visit_state, arg->size)) return;
 
       if (visit_state->decompile) {
-        if (language_type != METAFLAG_LANGTYPE_TEXT) {
-          putc(' ', state->output);
-          visit_state->line_length++;
-        }
         uint32_t value = arr_get_little_endian(
             visit_state->lookahead.bytes.bytes, arg->size);
-        struct parse_result result = format_for_decomp(
-            state->parser_cache, language, matched_rule->args.args[i].parsers,
-            value, &state->info);
 
-        switch (result.type) {
-          default:
-          case PARSE_RESULT_FAIL:
-            assert(false);  // should always be able to parse at least fallbacks
-            break;
-          case PARSE_RESULT_VALUE:
-            assert(false);  // this shouldn't be returned by a formatter
-            break;
-          case PARSE_RESULT_TOKEN:
-            fputs(result.token, state->output);
-            visit_state->line_length += strlen(result.token);
-            free(result.token);
-            break;
-          case PARSE_RESULT_LABEL: {
-            // TODO: GSC offset handling
-            value = result.value & GBA_OFFSET_MASK;
-            ssize_t label_index =
-                bsearch_find(state->labels, (void *)(intptr_t)value);
-            assert(label_index >= 0);  // all labels should be found
-            const char *label = state->labels->pairs[label_index].value;
-            putc(':', state->output);
-            fputs(label, state->output);
-            visit_state->line_length += strlen(label) + 1;
-            break;
+        if (language_type == METAFLAG_LANGTYPE_TEXT) {
+          // No parsers supported for raw bytes in text languages
+          // ...yet?
+          fprintf(state->output, "%0*x", (int)arg->size * 2, value);
+        } else {
+          putc(' ', state->output);
+          visit_state->line_length++;
+
+          struct parse_result result = format_for_decomp(
+              state->parser_cache, language, matched_rule->args.args[i].parsers,
+              value, &state->info);
+
+          switch (result.type) {
+            default:
+            case PARSE_RESULT_FAIL:
+              assert(false);  // should always be able to parse at least fallbacks
+              break;
+            case PARSE_RESULT_VALUE:
+              assert(false);  // this shouldn't be returned by a formatter
+              break;
+            case PARSE_RESULT_TOKEN:
+              fputs(result.token, state->output);
+              visit_state->line_length += strlen(result.token);
+              free(result.token);
+              break;
+            case PARSE_RESULT_LABEL: {
+              // TODO: GSC offset handling
+              value = result.value & GBA_OFFSET_MASK;
+              ssize_t label_index =
+                  bsearch_find(state->labels, (void *)(intptr_t)value);
+              assert(label_index >= 0);  // all labels should be found
+              const char *label = state->labels->pairs[label_index].value;
+              putc(':', state->output);
+              fputs(label, state->output);
+              visit_state->line_length += strlen(label) + 1;
+              break;
+            }
           }
         }
       } else {
