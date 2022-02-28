@@ -99,10 +99,50 @@ void decompile_all(FILE *input_file, size_t start_offset,
   }
   bsearch_deinit_root(&unvisited_blocks);
 
+  struct bsearch_root labels;
+  bsearch_init_root(&labels, bsearch_key_int32cmp, bsearch_key_nocopy, NULL,
+                    free);
+
+  // Assign labels to decompiled blocks, remove any which overlap.
+  for (size_t i = 0; i < decomp_blocks.size; i++) {
+    uint32_t decomp_addr = (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
+
+    // Create a label for the decompiled block.
+    char *label = malloc(32);
+    snprintf(label, 32, "label_%zu", i);
+    bsearch_upsert(&labels, (void *)(intptr_t)decomp_addr, label);
+
+    // Find the start of the decompiled block.
+    ssize_t decomp_block_index =
+        bsearch_find(&decomp_seen_addresses, (void *)(intptr_t)decomp_addr);
+    assert(decomp_block_index >= 0);
+
+    // Remove this block from decompilation queue if it overlaps with another
+    // of the same decompilation type.
+    uint32_t decomp_block_start =
+        (uint32_t)(intptr_t)decomp_seen_addresses.pairs[decomp_block_index]
+            .value;
+    if (decomp_block_start != decomp_addr) {
+      struct queued_decompilation *decompilation_type =
+          decomp_blocks.pairs[i].value;
+      ssize_t other_decomp_info_index =
+          bsearch_find(&decomp_blocks, (void *)(intptr_t)decomp_block_start);
+      assert(other_decomp_info_index >= 0);
+      struct queued_decompilation *other_decomp_info =
+          decomp_blocks.pairs[other_decomp_info_index].value;
+      if (decompilation_type->language == other_decomp_info->language) {
+        bsearch_remove(&decomp_blocks, i);
+        i--;
+      }
+    }
+  }
+  bsearch_deinit_root(&decomp_seen_addresses);
+
+  // Decompile the blocks.
   // TODO
 
-  bsearch_deinit_root(&decomp_seen_addresses);
   bsearch_deinit_root(&decomp_blocks);
+  bsearch_deinit_root(&labels);
 }
 
 static struct queued_decompilation *duplicate_queued_decompilation(
