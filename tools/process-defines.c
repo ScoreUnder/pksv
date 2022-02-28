@@ -113,7 +113,11 @@ int main(int argc, char **argv) {
   }
   fclose(f);
 
-  FILE *outfile = fopen("defines.dat", "wb");
+  char *out_filename = "defines.dat";
+  if (argc >= 3) {
+    out_filename = argv[2];
+  }
+  FILE *outfile = fopen(out_filename, "wb");
   if (!outfile) {
     perror("opening defines.dat for writing");
     return 1;

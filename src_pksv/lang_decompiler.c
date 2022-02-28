@@ -376,6 +376,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         state->parser_cache, language, matched_rule->args.args[i].parsers, value, &state->info);
 
       switch (result.type) {
+        default:
         case PARSE_RESULT_FAIL:
           assert(false); // should always be able to parse at least fallbacks
           break;

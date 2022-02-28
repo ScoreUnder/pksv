@@ -135,7 +135,7 @@ struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
 
   char *parser_filename =
       get_definitions_file_name(cache->parser_dir, defs_name);
-  struct loaded_parser *defs = load_definitions(defs_name, required);
+  struct loaded_parser *defs = load_definitions(parser_filename, required);
   free(parser_filename);
   if (defs) {
     struct loaded_or_builtin_parser *parser = malloc(sizeof *parser);

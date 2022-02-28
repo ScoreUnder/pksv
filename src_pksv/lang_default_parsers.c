@@ -38,7 +38,7 @@ struct parse_result format_from_loaded_parser(struct loaded_parser *parser,
   if (index >= 0) {
     return (struct parse_result){
         .type = PARSE_RESULT_TOKEN,
-        .token = parser->lookup_by_id.pairs[index].value,
+        .token = strdup(parser->lookup_by_id.pairs[index].value),
     };
   } else {
     return (struct parse_result){
