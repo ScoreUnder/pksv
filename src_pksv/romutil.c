@@ -28,10 +28,5 @@ struct rom_mode determine_mode(FILE *romfile) {
   if (memcmp(buf, "BY", 2) == 0) {
     return (struct rom_mode){.type = CRYSTAL, .search = 0};
   }
-  fseek(romfile, 0x0, SEEK_SET);
-  fread(buf, 1, 4, romfile);
-  if (memcmp(buf, "NARC", 4) == 0) {
-    return (struct rom_mode){.type = DIAMOND, .search = 0};
-  }
   return (struct rom_mode){.type = ROM_UNKNOWN, .search = 0};
 }

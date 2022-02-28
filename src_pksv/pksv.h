@@ -31,7 +31,6 @@ extern HWND HW_DLG;
 #define FIRE_RED 0
 #define RUBY 1
 #define GOLD 2
-#define DIAMOND 3
 #define CRYSTAL 4
 
 // Operation modes

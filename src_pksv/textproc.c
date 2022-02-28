@@ -933,8 +933,6 @@ static const char *get_romtype_name() {
       return "Ruby/Sapphire/Emerald";
     case FIRE_RED:
       return "FireRed/LeafGreen";
-    case DIAMOND:
-      return "Diamond/Pearl";
     default:
       return "unidentified";
   }

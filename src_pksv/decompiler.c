@@ -2315,55 +2315,6 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
   }
   if (mode == GOLD || mode == CRYSTAL) {
     fprintf(fsend, "#org 0x%X\n", FileZoomPos);
-  } else if (mode == DIAMOND) {
-    fprintf(fsend, "#narc 0x%X 0x%X\n", narc, FileZoomPos);
-    fseek(fileM, 0xE, SEEK_SET);
-    arg3 = 0;
-    fread(&arg3, 1, 2, fileM);
-    fseek(fileM, 0x10, SEEK_SET);
-    fread(&buf, 1, 4, fileM);
-    buf[4] = 0;
-    arg5 = 0;
-    while (arg5 < arg3 && strcmp(buf, "BTAF")) {
-      arg4 = 0;
-      fread(&arg4, 1, 4, fileM);
-      fseek(fileM, arg4 - 0x8, SEEK_CUR);
-      fread(&buf, 1, 4, fileM);
-      buf[4] = 0;
-      arg5++;
-    }
-    if (!strcmp(buf, "BTAF")) {
-      arg1 = 0;
-      endat = 0;
-      fseek(fileM, 8 * (narc + 1), SEEK_CUR);
-      fread(&arg1, 1, 4, fileM);
-      fread(&endat, 1, 4, fileM);
-      // fprintf(fsend,"'%X %X\n",arg1,endat);
-      fseek(fileM, 0x10, SEEK_SET);
-      fread(&buf, 1, 4, fileM);
-      buf[4] = 0;
-      arg5 = 0;
-      while (arg5 < arg3 && strcmp(buf, "GMIF")) {
-        arg4 = 0;
-        fread(&arg4, 1, 4, fileM);
-        fseek(fileM, arg4 - 0x8, SEEK_CUR);
-        fread(&buf, 1, 4, fileM);
-        buf[4] = 0;
-        arg5++;
-      }
-      if (!strcmp(buf, "GMIF")) {
-        arg2 = ftell(fileM);
-        endat += arg2 + 4;
-        // fprintf(fsend,"'%X %X\n",arg1+FileZoomPos+4+arg2,endat);
-        fseek(fileM, 4 + arg1 + FileZoomPos, SEEK_CUR);
-      } else {
-        fprintf(fsend, "'ERROR: Incomplete NARC.\n");
-        return;
-      }
-    } else {
-      fprintf(fsend, "'ERROR: Incomplete NARC.\n");
-      return;
-    }
   } else {
     if (dyndec) {
       if (!Defined2(FileZoomPos | 0x08000000)) {
@@ -2380,24 +2331,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
       fprintf(fsend, "#org 0x%X\n", (FileZoomPos | 0x08000000));
   }
   fprintf(fsend, "'-----------------------------------\n");
-  if (mode == DIAMOND) {
-    while (still_going && (signed int)ftell(fileM) < (signed int)endat) {
-      lastcmd = command;
-      read = fread(&command, 1, 1, fileM);
-      if (read > 0) {
-#define GENERIC(x) fprintf(fsend, "%s\n", x)
-        arg1 = arg2 = arg3 = arg4 = arg5 = arg6 = arg7 = 0;
-        switch (command) {
-          default:
-            fprintf(fsend, "#raw 0x%X\n", command);
-            break;
-        }
-      } else {
-        fputs("'--EOF--\n", fsend);
-        still_going = 0;
-      }
-    }
-  } else if (mode != GOLD && mode != CRYSTAL) {
+  if (mode != GOLD && mode != CRYSTAL) {
     while (still_going) {
       lastcmd = command;
       read = (signed int)fread(&command, 1, 1, fileM);
@@ -6238,9 +6172,6 @@ void DecodeProcLevel(FILE* fileM, unsigned int FileZoomPos, char* fname,
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
         break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
-        break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
         break;
@@ -6418,9 +6349,6 @@ void DecodeProc(FILE* fileM, unsigned int narc, unsigned int FileZoomPos,
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
         break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
-        break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
         break;
@@ -6557,9 +6485,6 @@ void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, char* fname,
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
         break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
-        break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
         break;
@@ -6646,9 +6571,6 @@ void DecodeProcText(FILE* fileM, unsigned int FileZoomPos, char* fname,
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
         break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
-        break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
         break;
@@ -6674,9 +6596,6 @@ void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, char* fname,
         break;
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
-        break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
         break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");
@@ -6789,9 +6708,6 @@ void DecodeProcAttacks(FILE* fileM, unsigned int FileZoomPos, char* fname,
         break;
       case FIRE_RED:
         fprintf(fsend, "#frlg\n\n");
-        break;
-      case DIAMOND:
-        fprintf(fsend, "#dp\n\n");
         break;
       case CRYSTAL:
         fprintf(fsend, "#c\n\n");

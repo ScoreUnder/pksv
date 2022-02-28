@@ -178,7 +178,7 @@ __declspec(dllexport) __cdecl char* decompile(char* fname, int loc, int narc) {
 
   START_FMEM(script_file);
 
-  DecodeProc(romfile, mode == DIAMOND ? narc : 0, loc, fname, script_file);
+  DecodeProc(romfile, 0, loc, fname, script_file);
 
   pksv_reset_all();
   OutputDebugString("Finished decompiling");
