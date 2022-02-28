@@ -15,6 +15,23 @@
 
 #define GBA_OFFSET_MASK 0x1FFFFFF
 
+struct language_def error_lang = {
+  .rules_by_bytes = &(struct bsearch_root){0},
+  .rules_by_command_name = &(struct bsearch_root){0},
+  .special_rules = { [SPECIAL_RULE_DEFAULT] = &(struct rule){
+      .bytes = {0, 0},
+      .args = {0, 0},
+      .oneshot_lang = {"", 0},
+      .command_name = "' Missing language definition for this block",
+      .attributes = RULE_ATTR_END,
+    },
+  },
+  .lookup_bytes = &(struct byte_lookup_tables){0},
+  .parents = (char*[]){NULL},
+  .name = "",
+  .meta_flags = METAFLAG_LANGTYPE_TEXT,
+};
+
 struct queued_decompilation {
   const struct language_def *language;
   const struct rule *command;  // NULL if no forced command
@@ -488,7 +505,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             if (next_language == NULL) {
               fprintf(stderr, "Warning: language \"%s\" not found\n",
                       arg->as_language.lang.name);
-              break;
+              next_language = &error_lang;
             }
 
             queue_decompilation_from_lookahead(state->remaining_blocks,
