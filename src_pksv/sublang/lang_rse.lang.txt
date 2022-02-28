@@ -41,8 +41,8 @@
 [0x17] = addvar 2:*var 2:*var
 [0x18] = subtractvar 2:*var 2:*var
 [0x19] = copyvar 2:*var 2:*var
-[0x1A] = setorcopyvar 2:*var 2:*var
 [0x1A] = copyvarifnotzero 2:*var 2:*var
+[0x1A] = setorcopyvar 2:*var 2:*var
 [0x1B] = comparelocals+cmp_int 2:*var 2:*var
 [0x1C] = comparelocaltobyte+cmp_int 2:*var 1
 [0x1D] = comparelocaltofarbyte+cmp_int 2:*var 4:address
@@ -52,8 +52,8 @@
 [0x21] = compare+cmp_int 2:*var 2
 [0x22] = comparevars+cmp_int 2:*var 2:*var
 [0x23] = callasm 4:address@gba_arm
-[0x24] = jumpasm+end 4:address@gba_arm
 [0x24] = callasm2 4:address@gba_arm
+[0x24] = jumpasm+end 4:address@gba_arm
 [0x25] = special 2:*special
 [0x26] = specialvar 2:*var 2:*special
 [0x27] = waitspecial
