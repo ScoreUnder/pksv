@@ -3,8 +3,6 @@
 [] = "=" !*text  # old alias for .text
 [] = m !*moves
 [] = .move !*moves
-[] = item !*items
-[] = furniture !*furniture
 [] = .braille !braille
 
 # Actual commands
@@ -147,9 +145,9 @@
 [0x83] = bufferint 1:dec 2:*var
 [0x84] = bufferstdstring 1:dec 2:*stdstring
 [0x85] = buffertext 1:dec 4:address@cmd=.text
-[0x86] = pokemart 4:address@cmd=item
-[0x87] = furnituremart 4:address@cmd=furniture
-[0x88] = furnituremart2 4:address@cmd=furniture
+[0x86] = pokemart 4:address@*item
+[0x87] = furnituremart 4:address@*furniture
+[0x88] = furnituremart2 4:address@*furniture
 [0x89] = slotmachine 2:*var:*slotmachine
 [0x8A] = setberrytree 1 1 1  # tree ID, berry, growth stage
 [0x8B] = choosecontestpokemon
