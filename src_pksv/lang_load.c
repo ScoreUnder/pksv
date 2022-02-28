@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,42 +52,20 @@ static void bsearch_free_bytes(void *a) {
 static void bsearch_free_language_rule(void *a) {
   // Note: all strings are pooled; do not free them here.
   struct rule *rule = a;
-  free(rule->bytes.bytes);
-  for (size_t i = 0; i < rule->args.length; i++) {
-    free(rule->args.args[i].parsers.parsers);
+  if (rule->refcnt-- == 1) {
+    free(rule->bytes.bytes);
+    for (size_t i = 0; i < rule->args.length; i++) {
+      free(rule->args.args[i].parsers.parsers);
+    }
+    free(rule->args.args);
+    free(rule);
   }
-  free(rule->args.args);
-  free(rule);
 }
 
-__attribute__((malloc)) static struct rule *dup_language_rule(
-    struct rule *rule) {
-  // Note: all strings are pooled; can just have pointers copied.
-  struct rule *rule2 = malloc(sizeof *rule2);
-  rule2->bytes.length = rule->bytes.length;
-  rule2->bytes.bytes = malloc(rule->bytes.length);
-  memcpy(rule2->bytes.bytes, rule->bytes.bytes, rule->bytes.length);
-
-  rule2->args.length = rule->args.length;
-  rule2->args.args = malloc(rule->args.length * sizeof *rule2->args.args);
-  for (size_t i = 0; i < rule->args.length; i++) {
-    struct command_arg *arg = &rule->args.args[i];
-    struct command_arg *arg2 = &rule2->args.args[i];
-
-    arg2->size = arg->size;
-    arg2->as_language = arg->as_language;
-
-    arg2->parsers.length = arg->parsers.length;
-    arg2->parsers.parsers =
-        malloc(arg->parsers.length * sizeof *arg2->parsers.parsers);
-    memcpy(arg2->parsers.parsers, arg->parsers.parsers,
-           arg->parsers.length * sizeof *arg2->parsers.parsers);
-  }
-
-  rule2->oneshot_lang = rule->oneshot_lang;
-  rule2->command_name = rule->command_name;
-  rule2->attributes = rule->attributes;
-  return rule2;
+static struct rule *ref_language_rule(struct rule *rule) {
+  assert(rule->refcnt != UINT8_MAX);
+  rule->refcnt++;
+  return rule;
 }
 
 static void free_loaded_lang(struct loaded_lang *lang) {
@@ -161,7 +140,7 @@ void overwrite_special_rule(struct language_def *dest, struct rule *src,
   if (dest->special_rules[type] != NULL) {
     bsearch_free_language_rule(dest->special_rules[type]);
   }
-  dest->special_rules[type] = dup_language_rule(src);
+  dest->special_rules[type] = ref_language_rule(src);
 }
 
 static struct loaded_lang *load_language(struct language_cache *cache,
@@ -220,13 +199,13 @@ static struct loaded_lang *load_language(struct language_cache *cache,
     for (size_t j = 0; j < parent->rules_by_bytes->size; j++) {
       struct rule *rule = parent->rules_by_bytes->pairs[j].value;
       bsearch_upsert(lang->def.rules_by_bytes, rule->bytes.bytes,
-                     dup_language_rule(rule));
+                     ref_language_rule(rule));
     }
 
     for (size_t j = 0; j < parent->rules_by_command_name->size; j++) {
       struct rule *rule = parent->rules_by_command_name->pairs[j].value;
       bsearch_upsert(lang->def.rules_by_command_name, rule->command_name,
-                     dup_language_rule(rule));
+                     ref_language_rule(rule));
     }
 
     for (size_t j = 0; j < NUM_SPECIAL_RULES; j++) {
@@ -238,6 +217,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
 
   for (size_t i = 0; i < rules_len; i++) {
     struct rule *rule = malloc(sizeof *rule);
+    rule->refcnt = 1;
     rule->attributes = getc(file);
     rule->bytes.length = fgetvarint(file);
     rule->bytes.bytes = malloc(rule->bytes.length);
@@ -286,7 +266,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
     }
 
     bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
-                   dup_language_rule(rule));
+                   ref_language_rule(rule));
     bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
   }
 

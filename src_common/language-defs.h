@@ -117,6 +117,7 @@ struct rule {
   struct language oneshot_lang;
   char *command_name;
   uint8_t attributes;
+  uint8_t refcnt;
 };
 
 struct language_def {
