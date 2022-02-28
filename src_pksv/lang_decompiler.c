@@ -363,14 +363,24 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
   }
 
+  unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
+
+  size_t cmd_first_len;
+  if (language_type == METAFLAG_LANGTYPE_TEXT) {
+    // Text languages should not have split commands
+    cmd_first_len = strlen(matched_rule->command_name);
+  } else {
+    cmd_first_len = strcspn(matched_rule->command_name, " ");
+  }
+
   if (visit_state->decompile) {
     if (matched_rule->attributes & RULE_ATTR_CMP_FLAG)
       state->info.is_checkflag = true;
     else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
       state->info.is_checkflag = false;
 
-    fputs(matched_rule->command_name, state->output);
-    visit_state->line_length += strlen(matched_rule->command_name);
+    fwrite(matched_rule->command_name, 1, cmd_first_len, state->output);
+    visit_state->line_length += cmd_first_len;
   }
 
   if (matched_rule->attributes & RULE_ATTR_END) {
@@ -380,8 +390,6 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   consume_and_refill_lookahead(&visit_state->lookahead,
                                matched_rule->bytes.length);
   visit_state->address += matched_rule->bytes.length;
-
-  unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
 
   for (size_t i = 0; i < matched_rule->args.length; i++) {
     struct command_arg *arg = &matched_rule->args.args[i];
@@ -474,6 +482,12 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
     consume_and_refill_lookahead(&visit_state->lookahead, arg->size);
     visit_state->address += arg->size;
+
+    // Special case for commands with spaces in (insert second half after first argument)
+    if (i == 0 && visit_state->decompile && matched_rule->command_name[cmd_first_len] == ' ') {
+      fputs(&matched_rule->command_name[cmd_first_len], state->output);
+      visit_state->line_length += strlen(&matched_rule->command_name[cmd_first_len]);
+    }
   }
 
   // Handle oneshot language
