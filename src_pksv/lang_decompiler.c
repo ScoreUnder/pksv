@@ -342,194 +342,213 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
   }
 
+  unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
+
   const struct rule *matched_rule = force_command;
   if (matched_rule == NULL) {
     matched_rule = get_rule_from_lookahead(&visit_state->lookahead,
                                            language->rules_by_bytes);
   }
-  if (matched_rule == NULL) {
-    matched_rule = language->special_rules[SPECIAL_RULE_DEFAULT];
-    if (matched_rule == NULL) {
-      // No matched rule, no default rule, so decompilation can't continue.
-      visit_state->still_going = false;
-      return;
+  uint8_t translated_byte;
+  if (matched_rule == NULL
+      && language_type == METAFLAG_LANGTYPE_TEXT
+      && visit_state->lookahead.bytes.length >= 1
+      && (translated_byte = language->lookup_bytes->decomp[visit_state->lookahead.bytes.bytes[0]]) != '\0') {
+    // Special case: if we're decompiling a text language, and we have a
+    // "simple" (byte table lookup) rule, we can just use the byte as-is.
+    // This lets us skip a lot of logic and saves on memory too.
+    if (visit_state->decompile) {
+      putc(translated_byte, state->output);
+      visit_state->line_length++;
     }
-
-    if (matched_rule->bytes.length != 0) {
-      fprintf(stderr,
-              "Warning: default rule for \"%s\" is not empty\nThis will result "
-              "in decompilation/recompilation asymmetry.\n",
-              language->name);
-    }
-  }
-
-  unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
-
-  size_t cmd_first_len;
-  if (language_type == METAFLAG_LANGTYPE_TEXT) {
-    // Text languages should not have split commands
-    cmd_first_len = strlen(matched_rule->command_name);
+    consume_and_refill_lookahead(&visit_state->lookahead, 1);
   } else {
-    cmd_first_len = strcspn(matched_rule->command_name, " ");
-  }
-
-  if (visit_state->decompile) {
-    if (matched_rule->attributes & RULE_ATTR_CMP_FLAG)
-      state->info.is_checkflag = true;
-    else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
-      state->info.is_checkflag = false;
-
-    fwrite(matched_rule->command_name, 1, cmd_first_len, state->output);
-    visit_state->line_length += cmd_first_len;
-  }
-
-  if (matched_rule->attributes & RULE_ATTR_END) {
-    visit_state->still_going = false;
-  }
-
-  consume_and_refill_lookahead(&visit_state->lookahead,
-                               matched_rule->bytes.length);
-  visit_state->address += matched_rule->bytes.length;
-
-  for (size_t i = 0; i < matched_rule->args.length; i++) {
-    struct command_arg *arg = &matched_rule->args.args[i];
-    if (visit_state->lookahead.bytes.length < arg->size) {
-      visit_state->still_going = false;
-      if (visit_state->decompile) {
-        fputs("  ' EOF\n", state->output);
+    if (matched_rule == NULL) {
+      matched_rule = language->special_rules[SPECIAL_RULE_DEFAULT];
+      if (matched_rule == NULL) {
+        // No matched rule, no default rule, so decompilation can't continue.
+        visit_state->still_going = false;
+        return;
       }
-      return;  // Reached end of file
+
+      if (matched_rule->bytes.length != 0) {
+        fprintf(stderr,
+                "Warning: default rule for \"%s\" is not empty\nThis will result "
+                "in decompilation/recompilation asymmetry.\n",
+                language->name);
+      }
+    }
+
+    size_t cmd_first_len;
+    if (language_type == METAFLAG_LANGTYPE_TEXT) {
+      // Text languages should not have split commands
+      cmd_first_len = strlen(matched_rule->command_name);
+    } else {
+      cmd_first_len = strcspn(matched_rule->command_name, " ");
     }
 
     if (visit_state->decompile) {
-      if (language_type != METAFLAG_LANGTYPE_TEXT) {
+      if (matched_rule->attributes & RULE_ATTR_CMP_FLAG)
+        state->info.is_checkflag = true;
+      else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
+        state->info.is_checkflag = false;
+
+      fwrite(matched_rule->command_name, 1, cmd_first_len, state->output);
+      visit_state->line_length += cmd_first_len;
+    }
+
+    if (matched_rule->attributes & RULE_ATTR_END) {
+      visit_state->still_going = false;
+    }
+
+    consume_and_refill_lookahead(&visit_state->lookahead,
+                                matched_rule->bytes.length);
+    visit_state->address += matched_rule->bytes.length;
+
+    for (size_t i = 0; i < matched_rule->args.length; i++) {
+      struct command_arg *arg = &matched_rule->args.args[i];
+      if (visit_state->lookahead.bytes.length < arg->size) {
+        visit_state->still_going = false;
+        if (visit_state->decompile) {
+          fputs("  ' EOF\n", state->output);
+        }
+        return;  // Reached end of file
+      }
+
+      if (visit_state->decompile) {
+        if (language_type != METAFLAG_LANGTYPE_TEXT) {
+          putc(' ', state->output);
+          visit_state->line_length++;
+        }
+        uint32_t value =
+            arr_get_little_endian(visit_state->lookahead.bytes.bytes, arg->size);
+        struct parse_result result = format_for_decomp(
+            state->parser_cache, language, matched_rule->args.args[i].parsers,
+            value, &state->info);
+
+        switch (result.type) {
+          default:
+          case PARSE_RESULT_FAIL:
+            assert(false);  // should always be able to parse at least fallbacks
+            break;
+          case PARSE_RESULT_VALUE:
+            assert(false);  // this shouldn't be returned by a formatter
+            break;
+          case PARSE_RESULT_TOKEN:
+            fputs(result.token, state->output);
+            visit_state->line_length += strlen(result.token);
+            free(result.token);
+            break;
+          case PARSE_RESULT_LABEL: {
+            // TODO: GSC offset handling
+            value = result.value & GBA_OFFSET_MASK;
+            ssize_t label_index =
+                bsearch_find(state->labels, (void *)(intptr_t)value);
+            assert(label_index >= 0);  // all labels should be found
+            const char *label = state->labels->pairs[label_index].value;
+            putc(':', state->output);
+            fputs(label, state->output);
+            visit_state->line_length += strlen(label) + 1;
+            break;
+          }
+        }
+      } else {
+        // If collecting block info, we need to follow addresses
+        // Handle request for a new language
+        switch (arg->as_language.type) {
+          case LC_TYPE_NONE:
+            break;
+          case LC_TYPE_LANG: {
+            const struct language_def *next_language =
+                decomp_get_next_language(state, arg->as_language.lang);
+            if (next_language == NULL) {
+              fprintf(stderr, "Warning: language \"%s\" not found\n",
+                      arg->as_language.lang.name);
+              break;
+            }
+
+            queue_decompilation_from_lookahead(state->remaining_blocks,
+                                              &visit_state->lookahead,
+                                              next_language, NULL, arg->size);
+            break;
+          }
+          case LC_TYPE_COMMAND: {
+            ssize_t index = bsearch_find(language->rules_by_command_name,
+                                        arg->as_language.command);
+            if (index < 0) {
+              fprintf(stderr,
+                      "Warning: command \"%s\" not found in language \"%s\"\n",
+                      arg->as_language.command, language->name);
+              break;
+            }
+            const struct rule *command =
+                language->rules_by_command_name->pairs[index].value;
+
+            queue_decompilation_from_lookahead(
+                state->remaining_blocks, &visit_state->lookahead, state->language,
+                command, arg->size);
+            break;
+          }
+          default:
+            assert(false);
+        }
+      }
+
+      consume_and_refill_lookahead(&visit_state->lookahead, arg->size);
+      visit_state->address += arg->size;
+
+      // Special case for commands with spaces in (insert second half after first argument)
+      if (i == 0 && visit_state->decompile && matched_rule->command_name[cmd_first_len] == ' ') {
+        fputs(&matched_rule->command_name[cmd_first_len], state->output);
+        visit_state->line_length += strlen(&matched_rule->command_name[cmd_first_len]);
+      }
+    }
+
+    // Handle oneshot language
+    if (matched_rule->oneshot_lang.name[0] != '\0') {
+      const struct language_def *next_language =
+          decomp_get_next_language(state, matched_rule->oneshot_lang);
+      if (next_language == NULL) {
+        if (visit_state->decompile) {
+          fprintf(state->output,
+                  "  ' Can't find language \"%s\" for the rest of this command",
+                  matched_rule->oneshot_lang.name);
+          // Newline gets output after return
+        } else {
+          fprintf(stderr, "Warning: language \"%s\" not found\n",
+                  matched_rule->oneshot_lang.name);
+        }
+        if (visit_state->address == command_start_address) {
+          // Stop, or end up in an infinite loop.
+          visit_state->still_going = false;
+        }
+        return;
+      }
+
+      if (visit_state->decompile && language_type != METAFLAG_LANGTYPE_TEXT) {
         putc(' ', state->output);
         visit_state->line_length++;
       }
-      uint32_t value =
-          arr_get_little_endian(visit_state->lookahead.bytes.bytes, arg->size);
-      struct parse_result result = format_for_decomp(
-          state->parser_cache, language, matched_rule->args.args[i].parsers,
-          value, &state->info);
 
-      switch (result.type) {
-        default:
-        case PARSE_RESULT_FAIL:
-          assert(false);  // should always be able to parse at least fallbacks
-          break;
-        case PARSE_RESULT_VALUE:
-          assert(false);  // this shouldn't be returned by a formatter
-          break;
-        case PARSE_RESULT_TOKEN:
-          fputs(result.token, state->output);
-          visit_state->line_length += strlen(result.token);
-          free(result.token);
-          break;
-        case PARSE_RESULT_LABEL: {
-          // TODO: GSC offset handling
-          value = result.value & GBA_OFFSET_MASK;
-          ssize_t label_index =
-              bsearch_find(state->labels, (void *)(intptr_t)value);
-          assert(label_index >= 0);  // all labels should be found
-          const char *label = state->labels->pairs[label_index].value;
-          putc(':', state->output);
-          fputs(label, state->output);
-          visit_state->line_length += strlen(label) + 1;
-          break;
-        }
-      }
-    } else {
-      // If collecting block info, we need to follow addresses
-      // Handle request for a new language
-      switch (arg->as_language.type) {
-        case LC_TYPE_NONE:
-          break;
-        case LC_TYPE_LANG: {
-          const struct language_def *next_language =
-              decomp_get_next_language(state, arg->as_language.lang);
-          if (next_language == NULL) {
-            fprintf(stderr, "Warning: language \"%s\" not found\n",
-                    arg->as_language.lang.name);
-            break;
-          }
-
-          queue_decompilation_from_lookahead(state->remaining_blocks,
-                                             &visit_state->lookahead,
-                                             next_language, NULL, arg->size);
-          break;
-        }
-        case LC_TYPE_COMMAND: {
-          ssize_t index = bsearch_find(language->rules_by_command_name,
-                                       arg->as_language.command);
-          if (index < 0) {
-            fprintf(stderr,
-                    "Warning: command \"%s\" not found in language \"%s\"\n",
-                    arg->as_language.command, language->name);
-            break;
-          }
-          const struct rule *command =
-              language->rules_by_command_name->pairs[index].value;
-
-          queue_decompilation_from_lookahead(
-              state->remaining_blocks, &visit_state->lookahead, state->language,
-              command, arg->size);
-          break;
-        }
-        default:
-          assert(false);
-      }
-    }
-
-    consume_and_refill_lookahead(&visit_state->lookahead, arg->size);
-    visit_state->address += arg->size;
-
-    // Special case for commands with spaces in (insert second half after first argument)
-    if (i == 0 && visit_state->decompile && matched_rule->command_name[cmd_first_len] == ' ') {
-      fputs(&matched_rule->command_name[cmd_first_len], state->output);
-      visit_state->line_length += strlen(&matched_rule->command_name[cmd_first_len]);
+      decomp_visit_single(state, visit_state, next_language, NULL, false);
+      return;
     }
   }
 
-  // Handle oneshot language
-  if (matched_rule->oneshot_lang.name[0] != '\0') {
-    const struct language_def *next_language =
-        decomp_get_next_language(state, matched_rule->oneshot_lang);
-    if (next_language == NULL) {
-      if (visit_state->decompile) {
-        fprintf(state->output,
-                "  ' Can't find language \"%s\" for the rest of this command",
-                matched_rule->oneshot_lang.name);
-        // Newline gets output after return
-      } else {
-        fprintf(stderr, "Warning: language \"%s\" not found\n",
-                matched_rule->oneshot_lang.name);
-      }
-      if (visit_state->address == command_start_address) {
-        // Stop, or end up in an infinite loop.
-        visit_state->still_going = false;
-      }
-      return;
-    }
-
-    if (visit_state->decompile && language_type != METAFLAG_LANGTYPE_TEXT) {
-      putc(' ', state->output);
-      visit_state->line_length++;
-    }
-
-    decomp_visit_single(state, visit_state, next_language, NULL, false);
-  } else if (visit_state->decompile) {
+  if (visit_state->decompile) {
     // Only need concatenated command lines if decompiling
     if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE ||
                                      language_type == METAFLAG_LANGTYPE_TEXT)) {
       // If we're in a line or text language, we need to produce more on the
       // same line
       // ... unless... we can line-wrap?
+      uint8_t attributes = matched_rule == NULL ? 0 : matched_rule->attributes;
       bool want_linewrap =
           visit_state->line_length >= 80 ||
-          (matched_rule->attributes & RULE_ATTR_PREFER_BREAK) != 0;
+          (attributes & RULE_ATTR_PREFER_BREAK) != 0;
       if (want_linewrap && lang_can_split_lines(language) &&
           (language_type != METAFLAG_LANGTYPE_TEXT ||
-           (matched_rule->attributes & RULE_ATTR_BREAK) != 0)) {
+           (attributes & RULE_ATTR_BREAK) != 0)) {
         // output no-terminate token if needed
         const struct rule *noterm =
             language->special_rules[SPECIAL_RULE_NO_TERMINATE];

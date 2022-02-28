@@ -122,10 +122,17 @@ struct rule {
   uint8_t refcnt;
 };
 
+struct byte_lookup_tables {
+  // entry value of 0 = missing.
+  uint8_t decomp[0x100];
+  uint8_t recomp[0x100];
+};
+
 struct language_def {
   struct bsearch_root *rules_by_bytes;
   struct bsearch_root *rules_by_command_name;
   struct rule *special_rules[NUM_SPECIAL_RULES];
+  struct byte_lookup_tables *lookup_bytes;  // if METAFLAG_LANGTYPE_TEXT
   char **parents;
   char *name;
   uint8_t meta_flags;

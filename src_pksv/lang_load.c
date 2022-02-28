@@ -78,6 +78,9 @@ static void free_loaded_lang(struct loaded_lang *lang) {
   }
   bsearch_destroy_root(lang->def.rules_by_bytes);
   bsearch_destroy_root(lang->def.rules_by_command_name);
+  if ((lang->def.meta_flags & METAFLAG_MASK_LANGTYPE) == METAFLAG_LANGTYPE_TEXT) {
+    free(lang->def.lookup_bytes);
+  }
 
   char **stringp = lang->string_table;
   while (*stringp) free(*stringp++);
@@ -143,6 +146,15 @@ void overwrite_special_rule(struct language_def *dest, struct rule *src,
   dest->special_rules[type] = ref_language_rule(src);
 }
 
+static bool is_simple_rule(const struct rule *rule) {
+  return rule->bytes.length == 1
+    && rule->bytes.bytes[0] != 0 /* 0 is reserved */
+    && rule->args.length == 0
+    && rule->oneshot_lang.name[0] == '\0'
+    && strlen(rule->command_name) == 1
+    && rule->attributes == 0;
+}
+
 static struct loaded_lang *load_language(struct language_cache *cache,
                                          const char *dir, const char *name) {
   char *filename = get_lang_filename(dir, name);
@@ -164,6 +176,12 @@ static struct loaded_lang *load_language(struct language_cache *cache,
   lang->string_table[string_table_len] = NULL;
 
   lang->def.meta_flags = getc(file);
+
+  int langtype = lang->def.meta_flags & METAFLAG_MASK_LANGTYPE;
+  if (langtype == METAFLAG_LANGTYPE_TEXT) {
+    lang->def.lookup_bytes = malloc(sizeof(struct byte_lookup_tables));
+    memset(lang->def.lookup_bytes, 0, sizeof(struct byte_lookup_tables));
+  }
 
   size_t parents_len = fgetvarint(file);
   lang->def.parents = malloc(sizeof *lang->def.parents * (parents_len + 1));
@@ -265,17 +283,24 @@ static struct loaded_lang *load_language(struct language_cache *cache,
       overwrite_special_rule(&lang->def, rule, SPECIAL_RULE_NO_TERMINATE);
     }
 
-    if (rule->bytes.length > 0) {
-      bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
-                     ref_language_rule(rule));
-    }
-    if (rule->command_name[0] != '\0') {
-      bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
-    } else {
-      // Unref "master" copy once
-      // If it wasn't inserted into the special rules tables or the
-      // rule-by-bytes tables, this will completely delete it.
+    if (langtype == METAFLAG_LANGTYPE_TEXT && is_simple_rule(rule)) {
+      struct byte_lookup_tables *lookup = lang->def.lookup_bytes;
+      lookup->decomp[rule->bytes.bytes[0]] = rule->command_name[0];
+      lookup->recomp[(uint8_t)rule->command_name[0]] = rule->bytes.bytes[0];
       bsearch_free_language_rule(rule);
+    } else {
+      if (rule->bytes.length > 0) {
+        bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
+                      ref_language_rule(rule));
+      }
+      if (rule->command_name[0] != '\0') {
+        bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
+      } else {
+        // Unref "master" copy once
+        // If it wasn't inserted into the special rules tables or the
+        // rule-by-bytes tables, this will completely delete it.
+        bsearch_free_language_rule(rule);
+      }
     }
   }
 
