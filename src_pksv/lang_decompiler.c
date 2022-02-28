@@ -472,7 +472,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
 
     decomp_visit_single(state, visit_state, next_language, NULL, false);
-  } else {
+  } else if (visit_state->decompile) {  // Don't need wrapping if not decompiling
     unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
     if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE || language_type == METAFLAG_LANGTYPE_TEXT)) {
       // If we're in a line or text language, we need to produce more on the same line
