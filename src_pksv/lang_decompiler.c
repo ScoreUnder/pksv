@@ -390,7 +390,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           free(result.token);
           break;
         case PARSE_RESULT_LABEL: {
-          value = result.value;
+          // TODO: GSC offset handling
+          value = result.value & GBA_OFFSET_MASK;
           ssize_t label_index = bsearch_find(state->labels,
                                              (void *)(intptr_t)value);
           assert(label_index >= 0);  // all labels should be found

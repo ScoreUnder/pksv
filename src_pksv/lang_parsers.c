@@ -196,7 +196,8 @@ struct take_parser_state {
 
 struct loaded_or_builtin_parser *take_parser(
     struct parser_cache *cache, const struct language_def *lang,
-    const struct parser_list parsers, struct take_parser_state *restrict state) {
+    const struct parser_list parsers,
+    struct take_parser_state *restrict state) {
   while (state->parser_idx < parsers.length) {
     const char *parser_name = parsers.parsers[state->parser_idx].name;
     bool is_prefixed = parsers.parsers[state->parser_idx].is_prefixed;
@@ -300,6 +301,8 @@ struct parser_cache *create_parser_cache(const char *parser_dir) {
                     bsearch_destroy_loaded_or_builtin_parser);
 
   // Populate cache with builtin parsers.
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("address"),
+                        &builtin_parser_address);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"),
                         &builtin_parser_dec);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"),

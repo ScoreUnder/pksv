@@ -104,6 +104,31 @@ struct parse_result default_format_dec(
   };
 }
 
+struct parse_result default_parse_address(const char *token, size_t token_len) {
+  if (token_len >= 2 && (token[0] == '@' || token[0] == ':')) {
+    char *s = malloc(token_len + 1);
+    memcpy(s, token, token_len);
+    s[token_len] = '\0';
+    return (struct parse_result){
+        .type = PARSE_RESULT_LABEL,
+        .label = s,
+    };
+  }
+  return (struct parse_result){
+      .type = PARSE_RESULT_FAIL,
+  };
+}
+
+struct parse_result default_format_address(
+    uint32_t value, struct decompiler_informative_state *state) {
+  (void)state;
+
+  return (struct parse_result){
+      .type = PARSE_RESULT_LABEL,
+      .value = value,
+  };
+}
+
 struct loaded_or_builtin_parser builtin_parser_hex = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
@@ -122,7 +147,14 @@ struct loaded_or_builtin_parser builtin_parser_dec = {
         },
 };
 
-// TODO
-struct loaded_or_builtin_parser builtin_parser_address = {0};
+struct loaded_or_builtin_parser builtin_parser_address = {
+    .which = PARSER_TYPE_BUILTIN,
+    .builtin =
+        {
+            .parse = default_parse_address,
+            .format = default_format_address,
+        },
+};
 
+// TODO
 struct loaded_or_builtin_parser builtin_parser_condition = {0};
