@@ -33,7 +33,8 @@ struct decomp_internal_state {
 
 static void decomp_visit_address(
     struct decomp_internal_state *state,
-    struct queued_decompilation *decompilation_type, uint32_t initial_address, bool decompile);
+    struct queued_decompilation *decompilation_type, uint32_t initial_address,
+    bool decompile);
 static struct queued_decompilation *duplicate_queued_decompilation(
     struct queued_decompilation *queued_decompilation);
 
@@ -100,7 +101,8 @@ void decompile_all(FILE *input_file, size_t start_offset,
 
     bsearch_remove(&unvisited_blocks, 0);
 
-    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr, false);
+    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
+                         false);
   }
   bsearch_deinit_root(&unvisited_blocks);
   decomp_state.remaining_blocks = NULL;
@@ -146,19 +148,24 @@ void decompile_all(FILE *input_file, size_t start_offset,
   bsearch_deinit_root(&decomp_seen_addresses);
   decomp_state.seen_addresses = NULL;
 
-  ssize_t start_label_index = bsearch_find(&labels, (void *)(intptr_t)start_offset);
+  ssize_t start_label_index =
+      bsearch_find(&labels, (void *)(intptr_t)start_offset);
   assert(start_label_index >= 0);
-  fprintf(output_file, "' Script starts at :%s\n", labels.pairs[start_label_index].value);
+  fprintf(output_file, "' Script starts at :%s\n",
+          (char *)labels.pairs[start_label_index].value);
 
   decomp_state.labels = &labels;
   // Decompile the blocks.
   for (size_t i = 0; i < decomp_blocks.size; i++) {
     putc('\n', decomp_state.output);
 
-    uint32_t decompilation_addr = (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
-    struct queued_decompilation *decompilation_type = decomp_blocks.pairs[i].value;
+    uint32_t decompilation_addr =
+        (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
+    struct queued_decompilation *decompilation_type =
+        decomp_blocks.pairs[i].value;
 
-    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr, true);
+    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
+                         true);
   }
 
   bsearch_deinit_root(&decomp_blocks);
@@ -296,7 +303,8 @@ static bool lang_can_split_lines(const struct language_def *language) {
     case METAFLAG_LANGTYPE_LINE:
       // If we want to wrap a text or line-type language,
       // we need to have a way to suppress line terminators.
-      return language->special_rules[SPECIAL_RULE_TERMINATOR] == NULL || language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
+      return language->special_rules[SPECIAL_RULE_TERMINATOR] == NULL ||
+             language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
     default:
       return false;
   }
@@ -349,8 +357,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   }
 
   if (visit_state->decompile) {
-    if (matched_rule->attributes & RULE_ATTR_CMP_FLAG) state->info.is_checkflag = true;
-    else if (matched_rule->attributes & RULE_ATTR_CMP_INT) state->info.is_checkflag = false;
+    if (matched_rule->attributes & RULE_ATTR_CMP_FLAG)
+      state->info.is_checkflag = true;
+    else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
+      state->info.is_checkflag = false;
 
     fputs(matched_rule->command_name, state->output);
   }
@@ -375,18 +385,19 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
     if (visit_state->decompile) {
       putc(' ', state->output);
-      uint32_t value = arr_get_little_endian(visit_state->lookahead.bytes.bytes,
-                                             arg->size);
+      uint32_t value =
+          arr_get_little_endian(visit_state->lookahead.bytes.bytes, arg->size);
       struct parse_result result = format_for_decomp(
-        state->parser_cache, language, matched_rule->args.args[i].parsers, value, &state->info);
+          state->parser_cache, language, matched_rule->args.args[i].parsers,
+          value, &state->info);
 
       switch (result.type) {
         default:
         case PARSE_RESULT_FAIL:
-          assert(false); // should always be able to parse at least fallbacks
+          assert(false);  // should always be able to parse at least fallbacks
           break;
         case PARSE_RESULT_VALUE:
-          assert(false); // this shouldn't be returned by a formatter
+          assert(false);  // this shouldn't be returned by a formatter
           break;
         case PARSE_RESULT_TOKEN:
           fputs(result.token, state->output);
@@ -395,8 +406,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         case PARSE_RESULT_LABEL: {
           // TODO: GSC offset handling
           value = result.value & GBA_OFFSET_MASK;
-          ssize_t label_index = bsearch_find(state->labels,
-                                             (void *)(intptr_t)value);
+          ssize_t label_index =
+              bsearch_find(state->labels, (void *)(intptr_t)value);
           assert(label_index >= 0);  // all labels should be found
           putc(':', state->output);
           fputs(state->labels->pairs[label_index].value, state->output);
@@ -419,13 +430,13 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           }
 
           queue_decompilation_from_lookahead(state->remaining_blocks,
-                                            &visit_state->lookahead,
-                                            next_language, NULL, arg->size);
+                                             &visit_state->lookahead,
+                                             next_language, NULL, arg->size);
           break;
         }
         case LC_TYPE_COMMAND: {
           ssize_t index = bsearch_find(language->rules_by_command_name,
-                                      arg->as_language.command);
+                                       arg->as_language.command);
           if (index < 0) {
             fprintf(stderr,
                     "Warning: command \"%s\" not found in language \"%s\"\n",
@@ -435,9 +446,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           const struct rule *command =
               language->rules_by_command_name->pairs[index].value;
 
-          queue_decompilation_from_lookahead(state->remaining_blocks,
-                                            &visit_state->lookahead,
-                                            state->language, command, arg->size);
+          queue_decompilation_from_lookahead(
+              state->remaining_blocks, &visit_state->lookahead, state->language,
+              command, arg->size);
           break;
         }
         default:
@@ -455,7 +466,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         decomp_get_next_language(state, matched_rule->oneshot_lang);
     if (next_language == NULL) {
       if (visit_state->decompile) {
-        fprintf(state->output, "  ' Can't find language \"%s\" for the rest of this command", matched_rule->oneshot_lang.name);
+        fprintf(state->output,
+                "  ' Can't find language \"%s\" for the rest of this command",
+                matched_rule->oneshot_lang.name);
         // Newline gets output after return
       } else {
         fprintf(stderr, "Warning: language \"%s\" not found\n",
@@ -473,15 +486,20 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
 
     decomp_visit_single(state, visit_state, next_language, NULL, false);
-  } else if (visit_state->decompile) {  // Don't need wrapping if not decompiling
+  } else if (visit_state->decompile) {
+    // Only need concatenated command lines if decompiling
     unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
-    if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE || language_type == METAFLAG_LANGTYPE_TEXT)) {
-      // If we're in a line or text language, we need to produce more on the same line
+    if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE ||
+                                     language_type == METAFLAG_LANGTYPE_TEXT)) {
+      // If we're in a line or text language, we need to produce more on the
+      // same line
       // ... unless... we can line-wrap?
-      bool want_linewrap = rand() % 4 == 0;  // TODO: replace with something sensible
+      bool want_linewrap =
+          rand() % 4 == 0;  // TODO: replace with something sensible
       if (want_linewrap && lang_can_split_lines(language)) {
         // output no-terminate token if needed
-        const struct rule *noterm = language->special_rules[SPECIAL_RULE_NO_TERMINATE];
+        const struct rule *noterm =
+            language->special_rules[SPECIAL_RULE_NO_TERMINATE];
         if (noterm != NULL) {
           fputs(noterm->command_name, state->output);
         }
@@ -528,25 +546,30 @@ static void decomp_visit_address(
   }
 
   uint32_t next_label_address = UINT32_MAX;
-  ssize_t next_label_index;
+  ssize_t next_label_index = SSIZE_MAX;
 
   if (decompile) {
-    next_label_index = bsearch_find(state->labels, (void *)(intptr_t)initial_address);
+    next_label_index =
+        bsearch_find(state->labels, (void *)(intptr_t)initial_address);
     if (next_label_index < 0) {
       next_label_index = -next_label_index - 1;
     }
     if ((size_t)next_label_index < state->labels->size) {
-      next_label_address = (uint32_t)(intptr_t) state->labels->pairs[next_label_index].key;
+      next_label_address =
+          (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
     }
   }
 
   while (visit_state.still_going) {
     if (decompile) {
-      if (visit_state.address == next_label_address && (size_t)next_label_index < state->labels->size) {
-        fprintf(state->output, ":%s\n", state->labels->pairs[next_label_index].value);
+      if (visit_state.address == next_label_address &&
+          (size_t)next_label_index < state->labels->size) {
+        fprintf(state->output, ":%s\n",
+                (char *)state->labels->pairs[next_label_index].value);
         next_label_index++;
         if ((size_t)next_label_index < state->labels->size) {
-          next_label_address = (uint32_t)(intptr_t) state->labels->pairs[next_label_index].key;
+          next_label_address =
+              (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
         }
       }
     }
