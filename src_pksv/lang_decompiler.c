@@ -349,6 +349,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   }
 
   if (visit_state->decompile) {
+    if (matched_rule->attributes & RULE_ATTR_CMP_FLAG) state->info.is_checkflag = true;
+    else if (matched_rule->attributes & RULE_ATTR_CMP_INT) state->info.is_checkflag = false;
+
     fputs(matched_rule->command_name, state->output);
   }
 

@@ -303,6 +303,8 @@ struct parser_cache *create_parser_cache(const char *parser_dir) {
   // Populate cache with builtin parsers.
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("address"),
                         &builtin_parser_address);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("condition"),
+                        &builtin_parser_condition);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"),
                         &builtin_parser_dec);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"),

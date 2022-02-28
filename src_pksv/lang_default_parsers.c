@@ -129,6 +129,91 @@ struct parse_result default_format_address(
   };
 }
 
+struct parse_result default_parse_condition(const char *token,
+                                            size_t token_len) {
+  int value = -1;
+  if (token_len >= 1) {
+    switch (token[0]) {
+      case '<':
+        if (token_len == 1)
+          value = 0;
+        else if (token_len == 2) {
+          if (token[1] == '=')
+            value = 3;
+          else if (token[1] == '>')
+            value = 5;
+        }
+        break;
+      case '=':
+        if (token_len == 1 || (token_len == 2 && token[1] == '=')) value = 1;
+        break;
+      case '>':
+        if (token_len == 1)
+          value = 2;
+        else if (token_len == 2 && token[1] == '=')
+          value = 4;
+        break;
+      case '!':
+        if (token_len == 2 && token[1] == '=') value = 5;
+        break;
+      default:
+        if (token_len == 4 && strncmp(token, "true", 4) == 0) {
+          value = 1;
+        } else if (token_len == 5 && strncmp(token, "false", 5) == 0) {
+          value = 0;
+        }
+        break;
+    }
+  }
+  if (value == -1) {
+    return (struct parse_result){
+        .type = PARSE_RESULT_FAIL,
+    };
+  } else {
+    return (struct parse_result){
+        .type = PARSE_RESULT_VALUE,
+        .value = value,
+    };
+  }
+}
+
+struct parse_result default_format_condition(
+    uint32_t value, struct decompiler_informative_state *state) {
+  char *token = NULL;
+
+  switch (value) {
+    case 0:
+      token = strdup(state->is_checkflag ? "false" : "<");
+      break;
+    case 1:
+      token = strdup(state->is_checkflag ? "true" : "=");
+      break;
+    case 2:
+      token = strdup(">");
+      break;
+    case 3:
+      token = strdup("<=");
+      break;
+    case 4:
+      token = strdup(">=");
+      break;
+    case 5:
+      token = strdup("!=");
+      break;
+  }
+
+  if (token == NULL) {
+    return (struct parse_result){
+        .type = PARSE_RESULT_FAIL,
+    };
+  } else {
+    return (struct parse_result){
+        .type = PARSE_RESULT_TOKEN,
+        .token = token,
+    };
+  }
+}
+
 struct loaded_or_builtin_parser builtin_parser_hex = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
@@ -156,5 +241,11 @@ struct loaded_or_builtin_parser builtin_parser_address = {
         },
 };
 
-// TODO
-struct loaded_or_builtin_parser builtin_parser_condition = {0};
+struct loaded_or_builtin_parser builtin_parser_condition = {
+    .which = PARSER_TYPE_BUILTIN,
+    .builtin =
+        {
+            .parse = default_parse_condition,
+            .format = default_format_condition,
+        },
+};
