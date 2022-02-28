@@ -47,9 +47,9 @@ FILE *LogFile;
 void show_help(FILE *where) {
   fprintf(where, "PKSV V" PKSV_VERSION
                  " - Command line tool to compile/decompile PokeScript.\n\
-pksv -e ScriptFile.txt RomFile.gba        -- Debug compile\n\
-pksv -r ScriptFile.txt RomFile.gba        -- Compile\n\
-pksv RomFile.gba HexOffset OutputFile.txt -- Decompile\n\
+pksv -e ScriptFile.txt RomFile.gba          -- Debug compile\n\
+pksv -r ScriptFile.txt RomFile.gba          -- Compile\n\
+pksv RomFile.gba HexOffset [OutputFile.txt] -- Decompile\n\
 You can insert --lang LANGUAGE before the ROM file name in the decompile command line to decompile using that language.\n\
 ");
 }
@@ -139,12 +139,6 @@ int main(int argc, char **argv) {
 
   // Filename, etc processing
   if (command_line == DECOMPILE) {
-    if (positional_argument_count < 3) {
-      fprintf(stderr, "Please specify a filename to export the script to.\n");
-      show_help(stderr);
-      return 1;
-    }
-
     rom_file_name = positional_arguments[0];
 
     if (*hex_to_uint32(positional_arguments[1], SIZE_MAX, &decompile_at)) {
@@ -153,7 +147,11 @@ int main(int argc, char **argv) {
       return 1;
     }
 
-    script_file_name = positional_arguments[2];
+    if (positional_argument_count >= 3) {
+      script_file_name = positional_arguments[2];
+    } else {
+      script_file_name = NULL;
+    }
   } else {
     script_file_name = positional_arguments[0];
     rom_file_name = positional_arguments[1];
@@ -194,7 +192,7 @@ int main(int argc, char **argv) {
     const struct language_def *language =
         get_language(lang_cache, decompile_lang);
 
-    FILE *script_file = fopen(script_file_name, "wt");
+    FILE *script_file = script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
     decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
                   script_file);
 
@@ -205,7 +203,9 @@ int main(int argc, char **argv) {
     destroy_language_cache(lang_cache);
     destroy_parser_cache(parser_cache);
 #endif
-    fclose(script_file);
+    if (script_file != stdout) {
+      fclose(script_file);
+    }
     fclose(romfile);
   } else if (command_line == RECOMPILE) {
     fclose(romfile);  // Reopened by RecodeProc
