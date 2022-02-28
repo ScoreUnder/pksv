@@ -16,7 +16,6 @@ extern bool dyndec;  // Decompile with dynamic names (helps newbies edit scripts
 extern bool eorg;    // Erase length of code instead of compiling
 extern char mode;
 extern int dynplace;
-extern char dyntype;
 extern unsigned char
     search;  // Character to look for when searching for free space
 extern FILE *LogFile;

@@ -35,7 +35,6 @@
 bool dyndec = false;
 int dynplace = 0;
 bool VersionOverride = false;
-char dyntype = 1;
 char mode = FIRE_RED;
 bool IsVerbose = true;
 unsigned char search = 0xFF;  // Free Space character

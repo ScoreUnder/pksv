@@ -176,37 +176,23 @@ void calc_org(codeblock* c, unsigned int start, char* file,
   b = rewind_codeblock(c);
   while (b != NULL) {
     if (b->name != NULL) {
-      if (dyntype == 1) {
-        b->org = a;
-        if (b->align && b->org % b->align)
-          b->org += b->align - (b->org % b->align);
-        if ((mode == GOLD || mode == CRYSTAL) && b->size < 0x3FFF) {
-          while ((OffsetToPointer(b->org) & 0xFF) !=
-                 (OffsetToPointer(b->org + b->size) & 0xFF)) {
-            a++;
-            b->org = a;
-          }
+      b->org = FindFreeSpace(file, b->size + b->align - 1, defines);
+      if (b->align && b->org % b->align)
+        b->org += b->align - (b->org % b->align);
+      if ((mode == GOLD || mode == CRYSTAL) && b->size < 0x3FFF) {
+        while ((OffsetToPointer(b->org) & 0xFF) !=
+                (OffsetToPointer(b->org + b->size) & 0xFF)) {
+          ffoff -= b->size - 1;
+          b->org = FindFreeSpace(file, b->size, defines);
         }
-        a = b->org + b->size;
-      } else {
-        b->org = FindFreeSpace(file, b->size + b->align - 1, defines);
-        if (b->align && b->org % b->align)
-          b->org += b->align - (b->org % b->align);
-        if ((mode == GOLD || mode == CRYSTAL) && b->size < 0x3FFF) {
-          while ((OffsetToPointer(b->org) & 0xFF) !=
-                 (OffsetToPointer(b->org + b->size) & 0xFF)) {
-            ffoff -= b->size - 1;
-            b->org = FindFreeSpace(file, b->size, defines);
-          }
-        }
-#ifdef WIN32
-        else if (mode == GOLD || mode == CRYSTAL) {
-          snprintf(buf, sizeof(buf),
-                   "Offset %s cannot be used as it is too large.", b->name);
-          MessageBox(NULL, buf, "Error", 0x10);
-        }
-#endif
       }
+#ifdef WIN32
+      else if (mode == GOLD || mode == CRYSTAL) {
+        snprintf(buf, sizeof(buf),
+                  "Offset %s cannot be used as it is too large.", b->name);
+        MessageBox(NULL, buf, "Error", 0x10);
+      }
+#endif
     }
     b = b->next;
   }

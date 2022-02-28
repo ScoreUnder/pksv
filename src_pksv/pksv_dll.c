@@ -31,7 +31,6 @@
 
 #define _CRT_SECURE_NO_DEPRECATE
 #include <windows.h>
-char dyntype = 1;
 HINSTANCE inst = NULL;
 bool dyndec = false;
 int dynplace = 0;
