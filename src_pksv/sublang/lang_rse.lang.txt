@@ -1,16 +1,11 @@
-# extra features we need:
-# turn "if jump" to "if arg jump"
-# default hex parser
-# cmp_flag cmp_int
-# aliases
-# string pooling
-
 # Pseudo-commands
 [] = .text !*text
 [] = "=" !*text  # old alias for .text
 [] = m !*moves
 [] = .move !*moves
 [] = item !*items
+[] = furniture !*furniture
+[] = .braille !braille
 
 # Actual commands
 [] = "#raw"+default 1
@@ -136,11 +131,90 @@
 [0x74] = drawboxtext        1 1 1 1    # x, y, id, ignoreButton
 [0x75] = showpokepic 2:*var:*pokemon 1 1  # poke, x, y
 [0x76] = hidepokepic
-# ...
-[0x83] = storevar 1 2:*var
-[0x84] = storestdstring 1 2:*stdstring
-[0x85] = storetext 1 4:address@cmd=.text
-# ...
-[0x90] = givemoney 4:dec 1  # amount, ???
-# ...
+[0x77] = showcontestwinner 1:bool
+[0x78] = braille 4:address@cmd=.braille
+[0x79] = addpokemon 2:*var:*pokemon 1:dec 2:*var:*item 4 4 1
+[0x79] = givepokemon 2:*var:*pokemon 1:dec 2:*var:*item 4 4 1
+[0x7A] = giveegg 2:*var:*pokemon
+[0x7B] = setattack 1:dec 1:dec 2:*attack  # party slot, attack slot, attack; note: resets pp
+[0x7C] = checkattack 2:*attack
+[0x7D] = bufferpokemon 1:dec 2:*var:*pokemon
+[0x7E] = bufferfirstpokemon 1:dec
+[0x7F] = bufferpokemonnickname 1:dec 2:*var
+[0x80] = bufferitem 1:dec 2:*var:*item
+[0x81] = bufferfurniture 1:dec 2:*var:*furniture
+[0x82] = bufferattack 1:dec 2:*var:*attack
+[0x83] = bufferint 1:dec 2:*var
+[0x84] = bufferstdstring 1:dec 2:*stdstring
+[0x85] = buffertext 1:dec 4:address@cmd=.text
+[0x86] = pokemart 4:address@cmd=item
+[0x87] = furnituremart 4:address@cmd=furniture
+[0x88] = furnituremart2 4:address@cmd=furniture
+[0x89] = slotmachine 2:*var:*slotmachine
+[0x8A] = setberrytree 1 1 1  # tree ID, berry, growth stage
+[0x8B] = choosecontestpokemon
+[0x8C] = startcontest
+[0x8D] = showcontestresults
+[0x8E] = contestlinktransfer
+[0x8F] = random 2:*var  # maximum (not inclusive); goes into LASTRESULT
+[0x90] = givemoney 4:dec 1:bool   # amount, nop (true = the command does nothing)
+[0x91] = takemoney 4:dec 1:bool   # as above
+[0x92] = checkmoney 4:dec 1:bool  # as above; stores in LASTRESULT
+[0x93] = showmoney   1 1 1:bool   # x, y, nop
+[0x94] = hidemoney   1 1          # x, y
+[0x95] = updatemoney 1 1 1:bool   # x, y, nop (updates the money display)
+[0x96] = checkdiscount 2:*var     # checks if the discount event is active (energy guru, lilycove vending machines); stores in LASTRESULT
 [0x97] = fadescreen 1:*fadescreen
+[0x98] = fadescreendelay 1:*fadescreen 1:dec
+[0x99] = setcavevisibility 2:*var     # sets the cave visibility (0 to 4) for use with flash
+[0x9A] = animatecavevisibility 1:dec  # animates flash level changing (1 to 4)
+[0x9B] = messageautoscroll 4:address@cmd=.text
+[0x9C] = doanimation 2:*var:*animation
+[0x9D] = setanimationvar 1 2:*var     # sets a numbered parameter to pass to the next animation
+[0x9E] = waitanimation 2:*var:*animation
+[0x9F] = setspawnpoint 2:*var:*spawnpoint  # sets your spawn point. there is a list of them hardcoded in rom somewhere.
+[0xA0] = checkgender
+[0xA1] = cry 2:*var:*pokemon 2:*var  # pokemon, mode (0-5) (tweaks the sound of the cry)
+[0xA2] = setmaptile 2:*var 2:*var 2:*var 2:*var:bool  # x, y, tile ID, solid
+[0xA3] = resetweather
+[0xA4] = setweather 2:*var:*weather
+[0xA5] = doweather
+[0xA6] = setstepcallback 1:*stepcallback
+[0xA7] = setmaplayoutindex 2:*var
+[0xA8] = setspritepriority   2:*var:*sprite 1 1 1  # sprite, map bank, map, priority
+[0xA9] = resetspritepriority 2:*var:*sprite 1 1    # sprite, map bank, map
+[0xAA] = createtempsprite    1 1 2:*var 2:*var 1 1:*direction  # graphic, sprite, x, y, z, facing
+[0xAB] = settempspritefacing 1 1:*direction  # sprite, facing
+[0xAC] = opendoor      2:*var 2:*var  # x, y
+[0xAD] = closedoor     2:*var 2:*var  # x, y
+[0xAE] = waitdoor
+[0xAF] = setdooropen   2:*var 2:*var  # x, y
+[0xB0] = setdoorclosed 2:*var 2:*var  # x, y
+[0xB1] = addelevatorbutton 1 2:*var 2:*var 2:*var  # ? ? ? ?
+[0xB2] = showelevatormenu
+[0xB3] = coincasetovar    2:*var
+[0xB4] = givetocoincase   2:*var
+[0xB5] = takefromcoincase 2:*var
+[0xB6] = setwildbattle 2:*pokemon 1:dec 2:*item  # pokemon, level, held item
+[0xB7] = dowildbattle
+
+# Seems to be for position-independent code.
+# Use `setvaddress` with a label pointing to the start of that instruction,
+# and it will adjust the offset of all later instructions by that much.
+# Also, could be used for script obfuscation if you're feeling evil.
+[0xB8] = setvaddress 4:address
+[0xB9] = vjump+end   4:address@*
+[0xBA] = vcall       4:address@*
+[0xBB] = "if vjump"+end 1:*condition:dec 4:address@*
+[0xBC] = "if vcall"     1:*condition:dec 4:address@*
+[0xBD] = vmessage 4:address@cmd=.text
+[0xBE] = vloadptr 4:address@cmd=.text
+[0xBF] = vbufferstring 1:dec 4:address@cmd=.text
+
+
+[0xC0] = showcoincase   1 1  # x, y
+[0xC1] = hidecoincase   1 1  # x, y
+[0xC2] = updatecoincase 1 1  # x, y
+[0xC3] = incrementgamestat 1
+[0xC4] = setescapewarp 1 1 1 2:*var 2:*var  # bank, map, warp, x, y
+[0xC5] = waitcry
