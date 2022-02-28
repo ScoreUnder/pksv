@@ -208,7 +208,7 @@ src_pksv/sublang/lang_rse.dat: src_pksv/sublang/lang_rse.lang.txt $(BIN_LANGUAGE
 	$(YACC) -d -b $(@D)/$(*F) $<
 
 .lang.txt.dat:
-	$(BIN_LANGUAGE_PARSER) $< $@
+	$(TOOL_WRAPPER) $(BIN_LANGUAGE_PARSER) $< $@
 
 .PHONY: all check clean clean-fmem compat dist
 
