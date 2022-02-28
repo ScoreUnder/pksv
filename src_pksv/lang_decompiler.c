@@ -294,7 +294,9 @@ static bool lang_can_split_lines(const struct language_def *language) {
   switch (language->meta_flags & METAFLAG_MASK_LANGTYPE) {
     case METAFLAG_LANGTYPE_TEXT:
     case METAFLAG_LANGTYPE_LINE:
-      return language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
+      // If we want to wrap a text or line-type language,
+      // we need to have a way to suppress line terminators.
+      return language->special_rules[SPECIAL_RULE_TERMINATOR] == NULL || language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
     default:
       return false;
   }
@@ -466,10 +468,25 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
 
     decomp_visit_single(state, visit_state, next_language, NULL, false);
-  }
-
-  if (visit_state->decompile) {
-    fputs("\n", state->output);
+  } else {
+    unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
+    if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE || language_type == METAFLAG_LANGTYPE_TEXT)) {
+      // If we're in a line or text language, we need to produce more on the same line
+      // ... unless... we can line-wrap?
+      bool want_linewrap = rand() % 4 == 0;  // TODO: replace with something sensible
+      if (want_linewrap && lang_can_split_lines(language)) {
+        // output no-terminate token if needed
+        const struct rule *noterm = language->special_rules[SPECIAL_RULE_NO_TERMINATE];
+        if (noterm != NULL) {
+          fputs(noterm->command_name, state->output);
+        }
+        // ...then just drop off the end of the function
+      } else {
+        // otherwise, we can't line-wrap, so we just continue
+        putc(' ', state->output);
+        decomp_visit_single(state, visit_state, language, NULL, false);
+      }
+    }
   }
 }
 
@@ -530,6 +547,9 @@ static void decomp_visit_address(
     }
     decomp_visit_single(state, &visit_state, language,
                         decompilation_type->command, true);
+    if (visit_state.decompile) {
+      fputs("\n", state->output);
+    }
   }
 
   free(visit_state.lookahead.bytes.bytes);
