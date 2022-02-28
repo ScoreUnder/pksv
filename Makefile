@@ -31,10 +31,12 @@ LIBS_PKSVUI_P_win_PR_release = -lwsock32
 LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lcomctl32
 LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROFILE))
 
-CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE
+CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
+CPPFLAGS_PR_release = -DNDEBUG=1
 CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og
-CFLAGS = -Os -ggdb -Wall -Wextra -Wpedantic -pedantic $(CFLAGS_PR_$(PROFILE))
+CFLAGS_PR_release = -flto -Os
+CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic $(CFLAGS_PR_$(PROFILE))
 CFLAGS_SH = -shared -fpic -DDLL
 
 LDFLAGS_CONSOLE_P_win = -mconsole
