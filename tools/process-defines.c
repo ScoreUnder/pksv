@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Duplicate #define of %s\n", identifier);
         return 1;
       }
-      idx = (ssize_t)bsearch_unsafe_insert(&defines, idx, identifier,
+      idx = (ssize_t)bsearch_unsafe_insert(&defines, idx, strdup(identifier),
                                            (void *)(intptr_t)value_parsed);
       bsearch_upsert(&defines_by_value, (void *)(intptr_t)value_parsed,
                      defines.pairs[idx].key);
@@ -132,7 +132,9 @@ int main(int argc, char **argv) {
   fputvarint(defines_by_value.size, outfile);
   for (size_t i = 0; i < defines_by_value.size; i++) {
     fputvarint((uint32_t)(intptr_t)defines_by_value.pairs[i].key, outfile);
-    fputvarint((uint32_t)bsearch_find(&defines, defines_by_value.pairs[i].value), outfile);
+    fputvarint(
+        (uint32_t)bsearch_find(&defines, defines_by_value.pairs[i].value),
+        outfile);
   }
 
   if (fflush(outfile)) {

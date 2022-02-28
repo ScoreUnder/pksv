@@ -72,10 +72,11 @@ ssize_t bsearch_find(struct bsearch_root const *restrict root,
 }
 
 size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
-                             void const *key, void *value) {
+                             void *key, void *value) {
   assert(index < 0);
   size_t pos_index = (size_t)(-index - 1);
   size_t len = root->size;
+  assert(pos_index <= len);
 
 #ifndef NDEBUG
   if (pos_index < len) {
@@ -91,11 +92,14 @@ size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
     memmove(&root->pairs[pos_index + 1], &root->pairs[pos_index],
             (len - pos_index) * sizeof(struct bsearch_kv));
   }
-  void *key_copied = root->copy(key);
-  root->pairs[pos_index] =
-      (struct bsearch_kv){.key = key_copied, .value = value};
+  root->pairs[pos_index] = (struct bsearch_kv){.key = key, .value = value};
   root->size++;
   return pos_index;
+}
+
+size_t bsearch_unsafe_append(struct bsearch_root *restrict root, void *key,
+                             void *value) {
+  return bsearch_unsafe_insert(root, -root->size - 1, key, value);
 }
 
 size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
@@ -107,7 +111,7 @@ size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
     kvs->pairs[index].value = value;
     return index;
   } else {
-    return bsearch_unsafe_insert(kvs, index, key, value);
+    return bsearch_unsafe_insert(kvs, index, kvs->copy(key), value);
   }
 }
 

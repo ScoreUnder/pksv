@@ -61,10 +61,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
     }
 
     // Note: safe to insert directly because defines.dat is already sorted
-    by_name->pairs[by_name->size++] = (struct bsearch_kv){
-        .key = str,
-        .value = (void *)(intptr_t)value,
-    };
+    bsearch_unsafe_append(by_name, str, (void *)(intptr_t)value);
   }
 
   size_t num_reverse_defines = fgetvarint(f);
@@ -79,10 +76,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
       goto error;
     }
 
-    by_id->pairs[by_id->size++] = (struct bsearch_kv){
-        .key = (void *)(intptr_t)value,
-        .value = str,
-    };
+    bsearch_unsafe_append(by_id, (void *)(intptr_t)value, str);
   }
 
   if (feof(f) || ferror(f)) {
@@ -146,11 +140,13 @@ struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
     parser->which = PARSER_TYPE_LOADED;
     parser->loaded = *defs;
     free(defs);
-    bsearch_unsafe_insert(&cache->loaded_parsers, index, defs_name, parser);
+    bsearch_unsafe_insert(&cache->loaded_parsers, index, strdup(defs_name),
+                          parser);
     return parser;
   } else {
     // Negative cache entry
-    bsearch_unsafe_insert(&cache->loaded_parsers, index, defs_name, NULL);
+    bsearch_unsafe_insert(&cache->loaded_parsers, index, strdup(defs_name),
+                          NULL);
     return NULL;
   }
 }

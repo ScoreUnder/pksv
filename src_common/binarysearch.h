@@ -48,8 +48,7 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity);
 
 /** @brief Inserts a value into the bsearch_root at the given index.
  * No sanity checks are performed.
- * The key will be duplicated by the copy function provided to
- * bsearch_init_root.
+ * The key will be inserted as-is, not copied.
  *
  * @param root The bsearch_root to insert into.
  * @param index The negative index to insert at, as returned by bsearch_find.
@@ -58,7 +57,17 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity);
  * @return The non-negative index of the inserted value.
  */
 size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
-                             void const *key, void *value);
+                             void *key, void *value);
+
+/** @brief Appends a value to the end of the bsearch_root.
+ * Similar to bsearch_unsafe_insert, but always inserts at the end.
+ *
+ * @param root The bsearch_root to insert into.
+ * @param key The key to insert.
+ * @param value The value to insert.
+ */
+size_t bsearch_unsafe_append(struct bsearch_root *restrict root, void *key,
+                             void *value);
 
 /** @brief Insert a key/value pair into a bsearch_root.
  * Overwrites the value at the given key if the key already exists,
