@@ -286,6 +286,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                                 struct decomp_visit_state *visit_state,
                                 const struct language_def *language,
                                 const struct rule *force_command, bool first) {
+  uint32_t command_start_address = visit_state->address;
   if (first || lang_can_split_lines(language)) {
     // Record this address as a visited "line"
     ssize_t index = bsearch_find(state->seen_addresses,
@@ -392,9 +393,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     if (next_language == NULL) {
       fprintf(stderr, "Warning: language \"%s\" not found\n",
               matched_rule->oneshot_lang.name);
-      if (force_command != NULL) {
-        // If we have a forced command, we can't continue
-        // Otherwise we end up in an infinite loop
+      if (visit_state->address == command_start_address) {
+        // Stop, or end up in an infinite loop.
         visit_state->still_going = false;
       }
       return;
