@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -39,18 +40,28 @@ size_t fput_little_endian(uint32_t u32, size_t size, FILE *stream) {
 #endif
 }
 
-uint32_t fget_little_endian(size_t size, FILE *stream) {
+uint32_t arr_get_little_endian(uint8_t *arr, size_t size) {
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-  uint32_t result;
-  fread(&result, 1, size, stream);
-  return result;
+  uint32_t mask = 0xFFFFFFFF;
+  assert(size <= 4);
+  if (size < 4) {
+    mask >>= (4 - size) * 8;
+  }
+  return *(uint32_t *)arr & mask;
 #else
   uint32_t result = 0;
-  for (size_t i = 0; i < size; i++) {
-    result |= getc(stream) << (i * 8);
+  while (size--) {
+    result <<= 8;
+    result |= *arr++;
   }
   return result;
 #endif
+}
+
+uint32_t fget_little_endian(size_t size, FILE *stream) {
+  uint8_t bytes[4];
+  size = fread(bytes, 1, size, stream);
+  return arr_get_little_endian(bytes, size);
 }
 
 size_t fputstr(const char *str, FILE *stream) {

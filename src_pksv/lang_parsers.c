@@ -171,7 +171,7 @@ struct parse_result execute_parser_parse(
 
 struct parse_result execute_parser_format(
     struct loaded_or_builtin_parser *generic_parser, uint32_t value,
-    bool is_dyndec, struct decompiler_informative_state *decstate) {
+    struct decompiler_informative_state *decstate) {
   switch (generic_parser->which) {
     case PARSER_TYPE_LOADED: {
       struct loaded_parser *parser = &generic_parser->loaded;
@@ -179,7 +179,7 @@ struct parse_result execute_parser_format(
     }
     case PARSER_TYPE_BUILTIN: {
       struct builtin_parser *parser = &generic_parser->builtin;
-      return parser->format(value, is_dyndec, decstate);
+      return parser->format(value, decstate);
     }
     default:
       fprintf(stderr, "Unknown parser type\n");
@@ -273,10 +273,10 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
   return result;
 }
 
-struct parse_result format_for_recomp(
+struct parse_result format_for_decomp(
     struct parser_cache *cache, struct language_def *lang,
     const char *parser_dir, struct parser_list parsers, uint32_t value,
-    bool is_dyndec, struct decompiler_informative_state *decstate) {
+    struct decompiler_informative_state *decstate) {
   struct parse_result result = {PARSE_RESULT_FAIL};
   struct take_parser_state state = {0, 0};
   struct loaded_or_builtin_parser *generic_parser;
@@ -284,8 +284,7 @@ struct parse_result format_for_recomp(
   do {
     generic_parser = take_parser(cache, lang, parser_dir, parsers, &state);
     if (generic_parser != NULL) {
-      result =
-          execute_parser_format(generic_parser, value, is_dyndec, decstate);
+      result = execute_parser_format(generic_parser, value, decstate);
     }
   } while (generic_parser != NULL && result.type == PARSE_RESULT_FAIL);
 
@@ -299,8 +298,10 @@ struct parser_cache *create_parser_cache(void) {
                     bsearch_destroy_loaded_or_builtin_parser);
 
   // Populate cache with builtin parsers.
-  bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"), &builtin_parser_dec);
-  bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"), &builtin_parser_hex);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"),
+                        &builtin_parser_dec);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"),
+                        &builtin_parser_hex);
 
   return cache;
 }

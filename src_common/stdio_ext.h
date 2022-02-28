@@ -15,6 +15,9 @@ uint32_t fgetvarint(FILE *stream);
 /** @brief Write an integer to a file in little-endian. */
 size_t fput_little_endian(uint32_t u32, size_t size, FILE *stream);
 
+/** @brief Read an integer from a byte array in little-endian. */
+uint32_t arr_get_little_endian(uint8_t *arr, size_t size);
+
 /** @brief Read an integer from a file in little-endian. */
 uint32_t fget_little_endian(size_t size, FILE *stream);
 

@@ -39,7 +39,8 @@ labels can be resolved after the fact by (de)compiler engine
 struct parse_result {
   uint_fast8_t type;
   union {
-    uint32_t value;  // if parser's PARSE_RESULT_VALUE or formatter's PARSE_RESULT_LABEL
+    uint32_t value;  // if parser's PARSE_RESULT_VALUE or formatter's
+                     // PARSE_RESULT_LABEL
     char *label;     // if parser's PARSE_RESULT_LABEL
     char *token;     // if formatter's PARSE_RESULT_TOKEN
   };
@@ -48,7 +49,7 @@ struct parse_result {
 typedef struct parse_result builtin_parser_parse(const char *token,
                                                  size_t token_len);
 typedef struct parse_result builtin_parser_format(
-    uint32_t value, bool is_dyndec, struct decompiler_informative_state *state);
+    uint32_t value, struct decompiler_informative_state *state);
 
 struct builtin_parser {
   builtin_parser_parse *parse;
@@ -77,9 +78,9 @@ struct parse_result parse_for_recomp(struct parser_cache *cache,
                                      const char *parser_dir,
                                      struct parser_list parsers, char *token,
                                      size_t token_len);
-struct parse_result format_for_recomp(
+struct parse_result format_for_decomp(
     struct parser_cache *cache, struct language_def *lang,
     const char *parser_dir, struct parser_list parsers, uint32_t value,
-    bool is_dyndec, struct decompiler_informative_state *decstate);
+    struct decompiler_informative_state *decstate);
 
 #endif

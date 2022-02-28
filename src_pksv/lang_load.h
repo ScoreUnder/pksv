@@ -6,7 +6,7 @@
 struct language_cache;  // opaque
 
 /** @brief Creates an empty language cache. */
-struct language_cache *create_language_cache(void);
+struct language_cache *create_language_cache(const char *dir);
 
 /** @brief Gets a language from the cache, or loads if not found.
  *
@@ -15,7 +15,8 @@ struct language_cache *create_language_cache(void);
  * @param name The language to load.
  * @return The language, or NULL if not available.
  */
-const struct language_def *get_language(struct language_cache *cache, const char *dir, const char *name);
+const struct language_def *get_language(struct language_cache *cache,
+                                        const char *name);
 
 /** @brief Frees a language cache. */
 void destroy_language_cache(struct language_cache *cache);
