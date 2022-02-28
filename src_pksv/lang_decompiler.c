@@ -502,7 +502,7 @@ static void decomp_visit_address(
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
 
   if (decompile) {
-    fprintf(state->output, "#org 0x%08x\n", initial_address);
+    fprintf(state->output, "#org 0x%08x %s\n", initial_address, language->name);
   }
 
   uint32_t next_label_address = UINT32_MAX;
