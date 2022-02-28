@@ -299,8 +299,8 @@ struct parser_cache *create_parser_cache(void) {
                     bsearch_destroy_loaded_or_builtin_parser);
 
   // Populate cache with builtin parsers.
-  bsearch_upsert(&cache->loaded_parsers, "dec", &builtin_parser_dec);
-  bsearch_upsert(&cache->loaded_parsers, "hex", &builtin_parser_hex);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"), &builtin_parser_dec);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"), &builtin_parser_hex);
 
   return cache;
 }
