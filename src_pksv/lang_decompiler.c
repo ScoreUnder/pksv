@@ -316,10 +316,20 @@ static void queue_decompilation_from_lookahead(
 struct decomp_visit_state {
   struct lookahead lookahead;
   size_t line_length;
+  const struct language_def *base_language;
+  const struct rule *base_command;
+  const struct language_def *curr_language;
+  const struct rule *curr_command;
   uint32_t address;
   uint32_t initial_address;
   bool still_going;
-  bool decompile;  // false = just visiting to collect block info
+  // false = just visiting to collect block info
+  // true = decompiling
+  bool decompile;
+  // reported by decomp_visit_single: whether to continue on the same line
+  bool continue_line;
+  // informative for decomp_visit_single: whether this started on a new line
+  bool is_new_line;
 };
 
 static bool lang_can_split_lines(const struct language_def *language) {
@@ -349,13 +359,12 @@ static bool check_and_report_eof(struct decomp_internal_state *state,
 }
 
 static void decomp_visit_single(struct decomp_internal_state *state,
-                                struct decomp_visit_state *visit_state,
-                                const struct language_def *language,
-                                const struct rule *force_command, bool first) {
+                                struct decomp_visit_state *visit_state) {
   if (check_and_report_eof(state, visit_state, 1)) return;
+  const struct language_def *language = visit_state->curr_language;
 
   uint32_t command_start_address = visit_state->address;
-  if (!visit_state->decompile && (first || lang_can_split_lines(language))) {
+  if (!visit_state->decompile && (visit_state->is_new_line || lang_can_split_lines(language))) {
     // Record this address as a visited "line"
     ssize_t index = bsearch_find(state->seen_addresses,
                                  (void *)(intptr_t)visit_state->address);
@@ -377,7 +386,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
   unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
 
-  const struct rule *matched_rule = force_command;
+  const struct rule *matched_rule = visit_state->curr_command;
   if (matched_rule == NULL) {
     matched_rule = get_rule_from_lookahead(&visit_state->lookahead,
                                            language->rules_by_bytes);
@@ -574,7 +583,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         visit_state->line_length++;
       }
 
-      decomp_visit_single(state, visit_state, next_language, NULL, false);
+      visit_state->curr_language = next_language;
+      visit_state->curr_command = NULL;
+      visit_state->continue_line = true;
       return;
     }
   }
@@ -605,7 +616,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           putc(' ', state->output);
           visit_state->line_length++;
         }
-        decomp_visit_single(state, visit_state, language, NULL, false);
+        visit_state->continue_line = true;
+        return;
       }
     }
   }
@@ -634,6 +646,12 @@ static void decomp_visit_address(
       .still_going = true,
       .decompile = decompile,
       .line_length = 0,
+      .base_language = language,
+      .base_command = decompilation_type->command,
+      .curr_language = language,
+      .curr_command = decompilation_type->command,
+      .continue_line = false,
+      .is_new_line = true,
   };
 
   // TODO: GSC offset handling
@@ -660,24 +678,32 @@ static void decomp_visit_address(
   }
 
   while (visit_state.still_going) {
-    if (decompile) {
-      visit_state.line_length = 0;
-      if (visit_state.address == next_label_address &&
-          (size_t)next_label_index < state->labels->size) {
-        fprintf(state->output, ":%s\n",
-                (char *)state->labels->pairs[next_label_index].value);
-        next_label_index++;
-        if ((size_t)next_label_index < state->labels->size) {
-          next_label_address =
-              (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
-        }
+    if (decompile && visit_state.is_new_line &&
+        visit_state.address == next_label_address &&
+        (size_t)next_label_index < state->labels->size) {
+      fprintf(state->output, ":%s\n",
+              (char *)state->labels->pairs[next_label_index].value);
+      next_label_index++;
+      if ((size_t)next_label_index < state->labels->size) {
+        next_label_address =
+            (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
       }
     }
-    decomp_visit_single(state, &visit_state, language,
-                        decompilation_type->command, true);
-    if (visit_state.decompile) {
+
+    visit_state.continue_line = false;
+    decomp_visit_single(state, &visit_state);
+
+    if (visit_state.decompile && !visit_state.continue_line) {
       fputs("\n", state->output);
+      visit_state.line_length = 0;
+      if (!visit_state.is_new_line) {
+        // If we started this loop trying a sub-language, and now we have
+        // a new line, we need to reset the language to the base language
+        visit_state.curr_language = visit_state.base_language;
+        visit_state.curr_command = visit_state.base_command;
+      }
     }
+    visit_state.is_new_line = !visit_state.continue_line;
   }
 
   free(visit_state.lookahead.bytes.bytes);
