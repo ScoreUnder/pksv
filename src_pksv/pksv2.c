@@ -213,6 +213,8 @@ int main(int argc, char **argv) {
   }
 
 #ifndef NDEBUG
+  free(defines_dat_location);
+  free(pokeinc_txt_location);
   free(language_dir);
 #endif
   return 0;
