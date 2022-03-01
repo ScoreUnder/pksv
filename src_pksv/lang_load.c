@@ -8,6 +8,7 @@
 #include "language-defs.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
+#include "textutil.h"
 
 struct language_cache {
   struct bsearch_root languages;
@@ -319,7 +320,7 @@ struct language_cache *create_language_cache(const char *dir) {
 
 const struct language_def *get_language(struct language_cache *cache,
                                         const char *name) {
-  ssize_t index = bsearch_find(&cache->languages, name);
+  ptrdiff_t index = bsearch_find(&cache->languages, name);
   if (index < 0) {
     bsearch_upsert(&cache->languages, name,
                    NULL);  // Disallow infinite recursion

@@ -2,7 +2,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
+#include "textutil.h"
 #include "language-defs-builder.h"
 #include "language-def-yacc.tab.h"
 

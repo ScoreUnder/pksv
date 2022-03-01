@@ -10,15 +10,15 @@ void int32_interval_init_bsearch_root(struct bsearch_root *root) {
 
 void int32_interval_add(struct bsearch_root *restrict root, uint32_t start,
                         uint32_t end) {
-  ssize_t index = bsearch_find(root, (void *)start);
+  ptrdiff_t s_index = bsearch_find(root, (void *)start);
 
-  if (index >= 0) {
+  if (s_index >= 0) {
     // overwriting? this is user error
     // but let's handle it anyway
-    if ((uint32_t)root->pairs[index].value < end)
-      root->pairs[index].value = (void *)end;
+    if ((uint32_t)root->pairs[s_index].value < end)
+      root->pairs[s_index].value = (void *)end;
   } else {
-    index = -index - 1;
+    size_t index = (size_t) (-s_index - 1);
 
     // Can merge left?
     if (index > 0 && (uint32_t)root->pairs[index - 1].value >= start) {

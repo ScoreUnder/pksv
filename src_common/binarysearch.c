@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "binarysearch.h"
+#include "textutil.h"
 
 void bsearch_init_root(struct bsearch_root *root, bsearch_compare_func *compare,
                        bsearch_copy_func *copy, bsearch_free_key_func *free_key,
@@ -52,7 +53,7 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity) {
   }
 }
 
-ssize_t bsearch_find(struct bsearch_root const *restrict root,
+ptrdiff_t bsearch_find(struct bsearch_root const *restrict root,
                      void const *key) {
   struct bsearch_kv const *kvs = root->pairs;
   size_t left = 0;
@@ -71,7 +72,7 @@ ssize_t bsearch_find(struct bsearch_root const *restrict root,
   return -left - 1;
 }
 
-size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ssize_t index,
+size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ptrdiff_t index,
                              void *key, void *value) {
   assert(index < 0);
   size_t pos_index = (size_t)(-index - 1);
@@ -104,7 +105,7 @@ size_t bsearch_unsafe_append(struct bsearch_root *restrict root, void *key,
 
 size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
                       void *value) {
-  ssize_t index = bsearch_find(kvs, key);
+  ptrdiff_t index = bsearch_find(kvs, key);
   if (index >= 0) {
     // Overwrite value of existing element
     if (kvs->free_val) kvs->free_val(kvs->pairs[index].value);

@@ -141,7 +141,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
     bsearch_upsert(&labels, (void *)(intptr_t)decomp_addr, label);
 
     // Find the start of the decompiled block.
-    ssize_t decomp_block_index =
+    ptrdiff_t decomp_block_index =
         bsearch_find(&decomp_seen_addresses, (void *)(intptr_t)decomp_addr);
     assert(decomp_block_index >= 0);
 
@@ -153,7 +153,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
     if (decomp_block_start != decomp_addr) {
       struct queued_decompilation *decompilation_type =
           decomp_blocks.pairs[i].value;
-      ssize_t other_decomp_info_index =
+      ptrdiff_t other_decomp_info_index =
           bsearch_find(&decomp_blocks, (void *)(intptr_t)decomp_block_start);
       assert(other_decomp_info_index >= 0);
       struct queued_decompilation *other_decomp_info =
@@ -167,7 +167,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
   bsearch_deinit_root(&decomp_seen_addresses);
   decomp_state.seen_addresses = NULL;
 
-  ssize_t start_label_index =
+  ptrdiff_t start_label_index =
       bsearch_find(&labels, (void *)(intptr_t)start_offset);
   assert(start_label_index >= 0);
   fprintf(output_file, "' Script starts at :%s\n",
@@ -221,7 +221,7 @@ static void consume_and_refill_lookahead(struct lookahead *restrict lookahead,
 static struct rule *get_rule_from_lookahead(
     struct lookahead *lookahead, const struct bsearch_root *rules_by_bytes) {
   struct rule *matched_rule = NULL;
-  ssize_t index = bsearch_find(rules_by_bytes, &lookahead->bytes);
+  ptrdiff_t index = bsearch_find(rules_by_bytes, &lookahead->bytes);
   if (index >= 0) {
     // Perfect match (somehow??)
     return rules_by_bytes->pairs[index].value;
@@ -366,7 +366,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   uint32_t command_start_address = visit_state->address;
   if (!visit_state->decompile && (visit_state->is_new_line || lang_can_split_lines(language))) {
     // Record this address as a visited "line"
-    ssize_t index = bsearch_find(state->seen_addresses,
+    ptrdiff_t index = bsearch_find(state->seen_addresses,
                                  (void *)(intptr_t)visit_state->address);
     if (index >= 0) {
       if ((uint32_t)(intptr_t)state->seen_addresses->pairs[index].value >
@@ -485,7 +485,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             case PARSE_RESULT_LABEL: {
               // TODO: GSC offset handling
               value = result.value & GBA_OFFSET_MASK;
-              ssize_t label_index =
+              ptrdiff_t label_index =
                   bsearch_find(state->labels, (void *)(intptr_t)value);
               if (label_index >= 0) {
                 const char *label = state->labels->pairs[label_index].value;
@@ -523,7 +523,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             break;
           }
           case LC_TYPE_COMMAND: {
-            ssize_t index = bsearch_find(language->rules_by_command_name,
+            ptrdiff_t index = bsearch_find(language->rules_by_command_name,
                                          arg->as_language.command);
             if (index < 0) {
               fprintf(stderr,
@@ -663,7 +663,7 @@ static void decomp_visit_address(
   }
 
   uint32_t next_label_address = UINT32_MAX;
-  ssize_t next_label_index = SSIZE_MAX;
+  ptrdiff_t next_label_index = PTRDIFF_MAX;
 
   if (decompile) {
     next_label_index =

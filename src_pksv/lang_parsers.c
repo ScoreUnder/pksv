@@ -8,6 +8,7 @@
 #include "language-defs.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
+#include "textutil.h"
 
 struct parser_cache {
   struct bsearch_root loaded_parsers;
@@ -128,7 +129,7 @@ char *get_definitions_file_name(const char *parser_dir, const char *defs_name) {
 struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
                                             const char *defs_name,
                                             bool required) {
-  ssize_t index = bsearch_find(&cache->loaded_parsers, defs_name);
+  ptrdiff_t index = bsearch_find(&cache->loaded_parsers, defs_name);
   if (index >= 0) {
     return cache->loaded_parsers.pairs[index].value;
   }

@@ -6,6 +6,7 @@
 
 #include "binarysearch.h"
 #include "stdio_ext.h"
+#include "textutil.h"
 
 _Static_assert(sizeof(intptr_t) >= sizeof(uint32_t),
                "intptr_t must be at least 32 bits");
@@ -42,18 +43,17 @@ int main(int argc, char **argv) {
 
   char line[1024];
   while (fgets(line, sizeof(line), f)) {
-    char *saveptr = NULL;
-    char *p = strtok_r(line, " \t\r\n", &saveptr);
+    char *p = strtok(line, " \t\r\n");
     if (!p) continue;
 
     if (!strcmp(p, "#d") || !strcmp(p, "#define")) {
-      char *identifier = strtok_r(NULL, " \t\r\n", &saveptr);
+      char *identifier = strtok(NULL, " \t\r\n");
       if (!identifier) {
         fputs("#define without identifier", stderr);
         return 1;
       }
 
-      char *value = strtok_r(NULL, " \t\r\n", &saveptr);
+      char *value = strtok(NULL, " \t\r\n");
       if (!value) {
         fputs("#define without value", stderr);
         return 1;
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
       char *endptr;
       uint32_t value_parsed = strtoul(value, &endptr, base);
       if (!endptr || *endptr != '\0') {
-        ssize_t index = bsearch_find(&defines, value);
+        ptrdiff_t index = bsearch_find(&defines, value);
         if (index >= 0) {
           value_parsed = (uint32_t)(intptr_t)defines.pairs[index].value;
         } else {
@@ -93,12 +93,12 @@ int main(int argc, char **argv) {
         }
       }
 
-      ssize_t idx = bsearch_find(&defines, identifier);
+      ptrdiff_t idx = bsearch_find(&defines, identifier);
       if (idx >= 0) {
         fprintf(stderr, "Duplicate #define of %s\n", identifier);
         return 1;
       }
-      idx = (ssize_t)bsearch_unsafe_insert(&defines, idx, strdup(identifier),
+      idx = (ptrdiff_t)bsearch_unsafe_insert(&defines, idx, strdup(identifier),
                                            (void *)(intptr_t)value_parsed);
       bsearch_upsert(&defines_by_value, (void *)(intptr_t)value_parsed,
                      defines.pairs[idx].key);

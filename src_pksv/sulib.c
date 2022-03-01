@@ -9,6 +9,7 @@
 #include "codeproc.h"
 #include "binarysearch.h"
 #include "pksv.h"
+#include "textutil.h"
 
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** head) {

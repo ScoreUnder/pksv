@@ -16,7 +16,7 @@ struct parse_result parse_from_loaded_parser(struct loaded_parser *parser,
   memcpy(s, token, token_len);
   s[token_len] = '\0';
 
-  ssize_t index = bsearch_find(&parser->lookup_by_name, s);
+  ptrdiff_t index = bsearch_find(&parser->lookup_by_name, s);
   free(s);
 
   if (index >= 0) {
@@ -33,7 +33,7 @@ struct parse_result parse_from_loaded_parser(struct loaded_parser *parser,
 
 struct parse_result format_from_loaded_parser(struct loaded_parser *parser,
                                               uint32_t value) {
-  ssize_t index = bsearch_find(&parser->lookup_by_id, (void *)(intptr_t)value);
+  ptrdiff_t index = bsearch_find(&parser->lookup_by_id, (void *)(intptr_t)value);
 
   if (index >= 0) {
     return (struct parse_result){

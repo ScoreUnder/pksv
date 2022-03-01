@@ -6,6 +6,7 @@
 #include "language-defs-builder.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
+#include "textutil.h"
 
 extern int yylex(void);
 extern int yylineno;

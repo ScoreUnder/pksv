@@ -59,6 +59,13 @@ char *extract_text_interval(const char *start, const char *end) {
   return result;
 }
 
+char *strdup_compat(const char *str) {
+  size_t len = strlen(str) + 1;
+  char *result = malloc(len);
+  memcpy(result, str, len);
+  return result;
+}
+
 size_t skip_whitespace(const char *in, size_t pos) {
   while (in[pos] == ' ') pos++;
   return pos;
