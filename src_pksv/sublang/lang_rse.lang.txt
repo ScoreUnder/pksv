@@ -3,7 +3,7 @@
 [] = "=" !*text  # old alias for .text
 [] = m !*moves
 [] = .move !*moves
-[] = .braille !braille
+[] = .braille 1 1 1 1 1 1 !braille
 
 # Actual commands
 [] = "#raw"+default 1

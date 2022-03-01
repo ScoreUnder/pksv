@@ -1,0 +1,10 @@
+[]   =  unknown                          1                    4:address@cmd=.text  4:address@cmd=.text
+[0]  =  single                           4:address@cmd=.text  4:address@cmd=.text
+[1]  =  continue_script_no_music         4:address@cmd=.text  4:address@cmd=.text  4:address@*
+[2]  =  continue_script                  4:address@cmd=.text  4:address@cmd=.text  4:address@*
+[3]  =  single_no_intro                  4:address@cmd=.text
+[4]  =  double                           4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text
+[5]  =  rematch                          4:address@cmd=.text  4:address@cmd=.text
+[6]  =  continue_script_double           4:address@cmd=.text  4:address@cmd=.text  4:address@*
+[7]  =  rematch_double                   4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text
+[8]  =  continue_script_no_music_double  4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text  4:address@*

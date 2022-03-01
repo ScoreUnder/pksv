@@ -61,8 +61,17 @@ void put_strbuf(const char *s) {
     if (start[0] == '$') start++;
     else start += 2;
     unsigned long val = strtoul(start, &end, 16);
-    if (end != &yytext[yyleng]) return l_err("Internal error: cannot parse integer");
+    if (end != &yytext[yyleng]) return l_err("Internal error: cannot parse hex integer");
     if (val == ULONG_MAX && errno == ERANGE) return l_err("Oversize hexadecimal integer literal");
+    yylval.intval = val;
+    return T_integer;
+}
+
+0[Bb][01]+ {
+    char *end;
+    unsigned long val = strtoul(yytext + 2, &end, 2);
+    if (end != &yytext[yyleng]) return l_err("Internal error: cannot parse binary integer");
+    if (val == ULONG_MAX && errno == ERANGE) return l_err("Oversize binary integer literal");
     yylval.intval = val;
     return T_integer;
 }
@@ -70,7 +79,7 @@ void put_strbuf(const char *s) {
 [[:digit:]]+ {
     char *end;
     unsigned long val = strtoul(yytext, &end, 10);
-    if (end != &yytext[yyleng]) return l_err("Internal error: cannot parse integer");
+    if (end != &yytext[yyleng]) return l_err("Internal error: cannot parse decimal integer");
     if (val == ULONG_MAX && errno == ERANGE) return l_err("Oversize decimal integer literal");
     yylval.intval = val;
     return T_integer;

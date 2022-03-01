@@ -1,0 +1,2 @@
+[] = item+default 2:rse_item
+[0] = end+end
