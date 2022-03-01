@@ -93,6 +93,5 @@ void bsearch_remove(struct bsearch_root *restrict root, size_t index);
 int bsearch_key_strcmp(const void *a, const void *b);
 void *bsearch_key_strdup(const void *a);
 void *bsearch_key_nocopy(const void *a);
-int bsearch_key_int32cmp(const void *a, const void *b);
 
 #endif

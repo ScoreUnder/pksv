@@ -48,12 +48,12 @@ LDLIBS_SH = -lfmem
 SRC_PKSV_COMMON = \
 	src_pksv/codeproc.c src_pksv/gba_asm.c src_pksv/isdone.c \
 	src_pksv/recompiler.c src_pksv/sulib.c src_pksv/textproc.c src_common/binarysearch.c \
-	src_pksv/romutil.c src_common/textutil.c src_pksv/int32_interval.c \
+	src_pksv/romutil.c src_common/textutil.c src_pksv/uint32_interval.c \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
 	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
 	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
 	src_pksv/lang_parsers.c src_common/stdio_ext.c src_pksv/lang_default_parsers.c \
-	src_pksv/lang_decompiler.c src_pksv/lang_load.c
+	src_pksv/lang_decompiler.c src_pksv/lang_load.c src_common/binarysearch_u32.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 RES_PKSV_SHLIB = src_pksv/pksv.rc
@@ -63,7 +63,7 @@ RES_PKSVUI = src_pksvui/vcpksv2.rc
 
 SRC_PROCESS_DEFINES = \
 	tools/process-defines.c src_common/binarysearch.c src_common/stdio_ext.c \
-	src_common/textutil.c
+	src_common/textutil.c src_common/binarysearch_u32.c
 SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
 SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c src_common/stdio_ext.c
 SRC_LANGUAGE_PARSER = \

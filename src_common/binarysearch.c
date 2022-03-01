@@ -54,7 +54,7 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity) {
 }
 
 ptrdiff_t bsearch_find(struct bsearch_root const *restrict root,
-                     void const *key) {
+                       void const *key) {
   struct bsearch_kv const *kvs = root->pairs;
   size_t left = 0;
   size_t right = root->size;
@@ -72,8 +72,8 @@ ptrdiff_t bsearch_find(struct bsearch_root const *restrict root,
   return -left - 1;
 }
 
-size_t bsearch_unsafe_insert(struct bsearch_root *restrict root, ptrdiff_t index,
-                             void *key, void *value) {
+size_t bsearch_unsafe_insert(struct bsearch_root *restrict root,
+                             ptrdiff_t index, void *key, void *value) {
   assert(index < 0);
   size_t pos_index = (size_t)(-index - 1);
   size_t len = root->size;
@@ -132,11 +132,3 @@ int bsearch_key_strcmp(const void *a, const void *b) {
 void *bsearch_key_strdup(const void *a) { return strdup((const char *)a); }
 
 void *bsearch_key_nocopy(const void *a) { return (void *)a; }
-
-int bsearch_key_int32cmp(const void *a, const void *b) {
-  _Static_assert(sizeof(int32_t) <= sizeof(void *),
-                 "pointer size is too small");
-  if ((uint32_t)a < (uint32_t)b) return -1;
-  if ((uint32_t)a > (uint32_t)b) return 1;
-  return 0;
-}

@@ -10,26 +10,31 @@
 #include "lang_parsers.h"
 #include "lang_load.h"
 #include "language-defs.h"
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
 
 #define GBA_OFFSET_MASK 0x1FFFFFF
 
 struct language_def error_lang = {
-  .rules_by_bytes = &(struct bsearch_root){0},
-  .rules_by_command_name = &(struct bsearch_root){0},
-  .special_rules = { [SPECIAL_RULE_DEFAULT] = &(struct rule){
-      .bytes = {0, 0},
-      .args = {0, 0},
-      .oneshot_lang = {"", 0},
-      .command_name = "' Missing language definition for this block",
-      .attributes = RULE_ATTR_END,
-    },
-  },
-  .lookup_bytes = &(struct byte_lookup_tables){0},
-  .parents = (char*[]){NULL},
-  .name = "",
-  .meta_flags = METAFLAG_LANGTYPE_TEXT,
+    .rules_by_bytes = &(struct bsearch_root){0},
+    .rules_by_command_name = &(struct bsearch_root){0},
+    .special_rules =
+        {
+            [SPECIAL_RULE_DEFAULT] =
+                &(struct rule){
+                    .bytes = {0, 0},
+                    .args = {0, 0},
+                    .oneshot_lang = {"", 0},
+                    .command_name =
+                        "' Missing language definition for this block",
+                    .attributes = RULE_ATTR_END,
+                },
+        },
+    .lookup_bytes = &(struct byte_lookup_tables){0},
+    .parents = (char *[]){NULL},
+    .name = "",
+    .meta_flags = METAFLAG_LANGTYPE_TEXT,
 };
 
 struct queued_decompilation {
@@ -57,13 +62,13 @@ static void decomp_visit_address(
 static struct queued_decompilation *duplicate_queued_decompilation(
     struct queued_decompilation *queued_decompilation);
 
-void decompile_all(FILE *input_file, size_t start_offset,
+void decompile_all(FILE *input_file, uint32_t start_offset,
                    const struct language_def *start_language,
                    struct language_cache *language_cache,
                    struct parser_cache *parser_cache, FILE *output_file) {
   struct bsearch_root unvisited_blocks;
-  bsearch_init_root(&unvisited_blocks, bsearch_key_int32cmp, bsearch_key_nocopy,
-                    NULL, free);
+  bsearch_init_root(&unvisited_blocks, bsearch_key_uint32cmp,
+                    bsearch_key_nocopy, NULL, free);
 
   struct queued_decompilation *initial_decompilation =
       malloc(sizeof *initial_decompilation);
@@ -71,7 +76,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
       .language = start_language,
       .command = NULL,
   };
-  bsearch_upsert(&unvisited_blocks, (void *)start_offset,
+  bsearch_upsert(&unvisited_blocks, CAST_u32_pvoid(start_offset),
                  initial_decompilation);
 
   // Individual addresses seen by decompiler.
@@ -79,12 +84,12 @@ void decompile_all(FILE *input_file, size_t start_offset,
   // Key: address seen by decompiler
   // Value: address of start of decompiled block
   struct bsearch_root decomp_seen_addresses;
-  bsearch_init_root(&decomp_seen_addresses, bsearch_key_int32cmp,
+  bsearch_init_root(&decomp_seen_addresses, bsearch_key_uint32cmp,
                     bsearch_key_nocopy, NULL, NULL);
 
   // Addresses that are to be decompiled.
   struct bsearch_root decomp_blocks;
-  bsearch_init_root(&decomp_blocks, bsearch_key_int32cmp, bsearch_key_nocopy,
+  bsearch_init_root(&decomp_blocks, bsearch_key_uint32cmp, bsearch_key_nocopy,
                     NULL, free);
 
   struct decomp_internal_state decomp_state = {
@@ -103,11 +108,9 @@ void decompile_all(FILE *input_file, size_t start_offset,
   //   1. Gets all the blocks that need to be decompiled.
   //   2. Associates addresses with decompiled blocks.
   while (unvisited_blocks.size != 0) {
-    uint32_t decompilation_addr =
-        (uint32_t)(intptr_t)unvisited_blocks.pairs[0].key;
+    uint32_t decompilation_addr = bsearch_key_u32(&unvisited_blocks, 0);
 
-    if (bsearch_find(&decomp_blocks, (void *)(intptr_t)decompilation_addr) >=
-        0) {
+    if (bsearch_find_u32(&decomp_blocks, decompilation_addr) >= 0) {
       // Already queued for decompilation.
       bsearch_remove(&unvisited_blocks, 0);
       continue;
@@ -115,7 +118,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
 
     struct queued_decompilation *decompilation_type =
         duplicate_queued_decompilation(unvisited_blocks.pairs[0].value);
-    bsearch_upsert(&decomp_blocks, (void *)(intptr_t)decompilation_addr,
+    bsearch_upsert(&decomp_blocks, CAST_u32_pvoid(decompilation_addr),
                    decompilation_type);
 
     bsearch_remove(&unvisited_blocks, 0);
@@ -127,34 +130,33 @@ void decompile_all(FILE *input_file, size_t start_offset,
   decomp_state.remaining_blocks = NULL;
 
   struct bsearch_root labels;
-  bsearch_init_root(&labels, bsearch_key_int32cmp, bsearch_key_nocopy, NULL,
+  bsearch_init_root(&labels, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
                     free);
 
   // Assign labels to decompiled blocks, remove any which overlap.
   size_t label_num = 0;
   for (size_t i = 0; i < decomp_blocks.size; i++) {
-    uint32_t decomp_addr = (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
+    uint32_t decomp_addr = bsearch_key_u32(&decomp_blocks, i);
 
     // Create a label for the decompiled block.
     char *label = malloc(32);
     snprintf(label, 32, "label_%zu", label_num++);
-    bsearch_upsert(&labels, (void *)(intptr_t)decomp_addr, label);
+    bsearch_upsert(&labels, CAST_u32_pvoid(decomp_addr), label);
 
     // Find the start of the decompiled block.
     ptrdiff_t decomp_block_index =
-        bsearch_find(&decomp_seen_addresses, (void *)(intptr_t)decomp_addr);
+        bsearch_find_u32(&decomp_seen_addresses, decomp_addr);
     assert(decomp_block_index >= 0);
 
     // Remove this block from decompilation queue if it overlaps with another
     // of the same decompilation type.
     uint32_t decomp_block_start =
-        (uint32_t)(intptr_t)decomp_seen_addresses.pairs[decomp_block_index]
-            .value;
+        bsearch_val_u32(&decomp_seen_addresses, decomp_block_index);
     if (decomp_block_start != decomp_addr) {
       struct queued_decompilation *decompilation_type =
           decomp_blocks.pairs[i].value;
       ptrdiff_t other_decomp_info_index =
-          bsearch_find(&decomp_blocks, (void *)(intptr_t)decomp_block_start);
+          bsearch_find_u32(&decomp_blocks, decomp_block_start);
       assert(other_decomp_info_index >= 0);
       struct queued_decompilation *other_decomp_info =
           decomp_blocks.pairs[other_decomp_info_index].value;
@@ -167,8 +169,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
   bsearch_deinit_root(&decomp_seen_addresses);
   decomp_state.seen_addresses = NULL;
 
-  ptrdiff_t start_label_index =
-      bsearch_find(&labels, (void *)(intptr_t)start_offset);
+  ptrdiff_t start_label_index = bsearch_find_u32(&labels, start_offset);
   assert(start_label_index >= 0);
   fprintf(output_file, "' Script starts at :%s\n",
           (char *)labels.pairs[start_label_index].value);
@@ -178,8 +179,7 @@ void decompile_all(FILE *input_file, size_t start_offset,
   for (size_t i = 0; i < decomp_blocks.size; i++) {
     putc('\n', decomp_state.output);
 
-    uint32_t decompilation_addr =
-        (uint32_t)(intptr_t)decomp_blocks.pairs[i].key;
+    uint32_t decompilation_addr = bsearch_key_u32(&decomp_blocks, i);
     struct queued_decompilation *decompilation_type =
         decomp_blocks.pairs[i].value;
 
@@ -309,8 +309,8 @@ static void queue_decompilation_from_lookahead(
 
   // TODO: GSC offset handling
   bsearch_upsert(remaining_blocks,
-                 (void *)(intptr_t)(next_address & GBA_OFFSET_MASK),
-                 (void *)next_decompilation);
+                 CAST_u32_pvoid(next_address & GBA_OFFSET_MASK),
+                 next_decompilation);
 }
 
 struct decomp_visit_state {
@@ -364,23 +364,24 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   const struct language_def *language = visit_state->curr_language;
 
   uint32_t command_start_address = visit_state->address;
-  if (!visit_state->decompile && (visit_state->is_new_line || lang_can_split_lines(language))) {
+  if (!visit_state->decompile &&
+      (visit_state->is_new_line || lang_can_split_lines(language))) {
     // Record this address as a visited "line"
-    ptrdiff_t index = bsearch_find(state->seen_addresses,
-                                 (void *)(intptr_t)visit_state->address);
+    ptrdiff_t index =
+        bsearch_find_u32(state->seen_addresses, visit_state->address);
     if (index >= 0) {
-      if ((uint32_t)(intptr_t)state->seen_addresses->pairs[index].value >
+      if (bsearch_val_u32(state->seen_addresses, index) >
           visit_state->initial_address) {
         // We have visited this address before, but this time we have a fuller
         // view of the block
-        state->seen_addresses->pairs[index].value =
-            (void *)(intptr_t)visit_state->initial_address;
+        bsearch_setval_u32(state->seen_addresses, index,
+                           visit_state->initial_address);
       }
     } else {
       // Newly visited address
       bsearch_unsafe_insert(state->seen_addresses, index,
-                            (void *)(intptr_t)visit_state->address,
-                            (void *)(intptr_t)visit_state->initial_address);
+                            CAST_u32_pvoid(visit_state->address),
+                            CAST_u32_pvoid(visit_state->initial_address));
     }
   }
 
@@ -472,7 +473,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           switch (result.type) {
             default:
             case PARSE_RESULT_FAIL:
-              assert(false);  // should always be able to parse at least fallbacks
+              assert(
+                  false);  // should always be able to parse at least fallbacks
               break;
             case PARSE_RESULT_VALUE:
               assert(false);  // this shouldn't be returned by a formatter
@@ -485,8 +487,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             case PARSE_RESULT_LABEL: {
               // TODO: GSC offset handling
               value = result.value & GBA_OFFSET_MASK;
-              ptrdiff_t label_index =
-                  bsearch_find(state->labels, (void *)(intptr_t)value);
+              ptrdiff_t label_index = bsearch_find_u32(state->labels, value);
               if (label_index >= 0) {
                 const char *label = state->labels->pairs[label_index].value;
                 putc(':', state->output);
@@ -494,7 +495,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                 visit_state->line_length += strlen(label) + 1;
               } else {
                 result = builtin_parser_hex.builtin.format(value, &state->info);
-                assert(result.type == PARSE_RESULT_TOKEN);  // Default hex fallback parser can't fail on us
+                assert(result.type ==
+                       PARSE_RESULT_TOKEN);  // Default hex fallback parser
+                                             // can't fail on us
                 fputs(result.token, state->output);
                 visit_state->line_length += strlen(result.token);
               }
@@ -524,7 +527,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           }
           case LC_TYPE_COMMAND: {
             ptrdiff_t index = bsearch_find(language->rules_by_command_name,
-                                         arg->as_language.command);
+                                           arg->as_language.command);
             if (index < 0) {
               fprintf(stderr,
                       "Warning: command \"%s\" not found in language \"%s\"\n",
@@ -666,14 +669,12 @@ static void decomp_visit_address(
   ptrdiff_t next_label_index = PTRDIFF_MAX;
 
   if (decompile) {
-    next_label_index =
-        bsearch_find(state->labels, (void *)(intptr_t)initial_address);
+    next_label_index = bsearch_find_u32(state->labels, initial_address);
     if (next_label_index < 0) {
       next_label_index = -next_label_index - 1;
     }
     if ((size_t)next_label_index < state->labels->size) {
-      next_label_address =
-          (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
+      next_label_address = bsearch_key_u32(state->labels, next_label_index);
     }
   }
 
@@ -685,8 +686,7 @@ static void decomp_visit_address(
               (char *)state->labels->pairs[next_label_index].value);
       next_label_index++;
       if ((size_t)next_label_index < state->labels->size) {
-        next_label_address =
-            (uint32_t)(intptr_t)state->labels->pairs[next_label_index].key;
+        next_label_address = bsearch_key_u32(state->labels, next_label_index);
       }
     }
 

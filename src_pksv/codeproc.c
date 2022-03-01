@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 #include "codeproc.h"
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "textutil.h"
 #include "textproc.h"
@@ -128,7 +129,7 @@ unsigned int FindFreeSpace(char *romname, unsigned int len,
   ptrdiff_t index = bsearch_find(
       defines, (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom");
   if (index >= 0) {
-    findfrom = (uint32_t)(intptr_t)defines->pairs[index].value;
+    findfrom = bsearch_val_u32(defines, index);
   }
 
   filepos = findfrom + ffoff;
@@ -269,7 +270,7 @@ uint32_t GenForFunc(char *func, pos_int *ppos, char *Script,
     ptrdiff_t index = bsearch_find(defines, buf);
     if (index >= 0) {
       gffs = 1;
-      uint32_t value = (uint32_t)(intptr_t)defines->pairs[index].value;
+      uint32_t value = bsearch_val_u32(defines, index);
       if (IsVerbose) {
         sprintf(log_buf, "   -> %s\n      -> 0x%X\n", buf, value);
         log_txt(log_buf, strlen(log_buf));

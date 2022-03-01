@@ -6,6 +6,7 @@
 #include "lang_default_parsers.h"
 #include "lang_parsers.h"
 #include "language-defs.h"
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
 #include "textutil.h"
@@ -49,7 +50,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
                     bsearch_key_strdup, free, NULL);
   // Values of lookup_by_id are not freed because they are all keys in
   // lookup_by_name.
-  bsearch_init_root(&result->lookup_by_id, bsearch_key_int32cmp,
+  bsearch_init_root(&result->lookup_by_id, bsearch_key_uint32cmp,
                     bsearch_key_nocopy, NULL, NULL);
 
   size_t num_defines = fgetvarint(f);
@@ -64,7 +65,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
     }
 
     // Note: safe to insert directly because defines.dat is already sorted
-    bsearch_unsafe_append(by_name, str, (void *)(intptr_t)value);
+    bsearch_unsafe_append(by_name, str, CAST_u32_pvoid(value));
   }
 
   size_t num_reverse_defines = fgetvarint(f);
@@ -79,7 +80,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
       goto error;
     }
 
-    bsearch_unsafe_append(by_id, (void *)(intptr_t)value, str);
+    bsearch_unsafe_append(by_id, CAST_u32_pvoid(value), str);
   }
 
   if (feof(f) || ferror(f)) {

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "lang_parsers.h"
 #include "lang_default_parsers.h"
@@ -22,7 +23,7 @@ struct parse_result parse_from_loaded_parser(struct loaded_parser *parser,
   if (index >= 0) {
     return (struct parse_result){
         .type = PARSE_RESULT_VALUE,
-        .value = (uint32_t)(intptr_t)parser->lookup_by_name.pairs[index].value,
+        .value = bsearch_val_u32(&parser->lookup_by_name, index),
     };
   } else {
     return (struct parse_result){
@@ -33,7 +34,7 @@ struct parse_result parse_from_loaded_parser(struct loaded_parser *parser,
 
 struct parse_result format_from_loaded_parser(struct loaded_parser *parser,
                                               uint32_t value) {
-  ptrdiff_t index = bsearch_find(&parser->lookup_by_id, (void *)(intptr_t)value);
+  ptrdiff_t index = bsearch_find_u32(&parser->lookup_by_id, value);
 
   if (index >= 0) {
     return (struct parse_result){

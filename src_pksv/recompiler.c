@@ -24,7 +24,8 @@
 #include <windows.h>
 #endif
 
-#include "int32_interval.h"
+#include "uint32_interval.h"
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "lang_parsers.h"
 #include "recompiler.h"
@@ -1155,7 +1156,9 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
 struct bsearch_root *DoDefines() {
   struct loaded_parser *defines = load_definitions(defines_dat_location, false);
   if (defines == NULL) defines = load_definitions("defines.dat", true);
-  if (defines == NULL) return bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+  if (defines == NULL)
+    return bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free,
+                               NULL);
   bsearch_deinit_root(&defines->lookup_by_id);
   struct bsearch_root *result = malloc(sizeof *result);
   memcpy(result, &defines->lookup_by_name, sizeof *result);
@@ -1318,14 +1321,14 @@ void RecodeProc(char *script, char *romfn) {
               if (!gffs) {
                 return;
               }
-              bsearch_upsert(defines, buf, (void *)(intptr_t)k);
+              bsearch_upsert(defines, buf, CAST_u32_pvoid(k));
               ec();
             }
             aa("#dyn") {
               vlog_txt("#DYN\n");
               start = GetNum("#DYN");
               if (!gffs) return;
-              bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
+              bsearch_upsert(defines, "findfromgold", CAST_u32_pvoid(start));
               ec();
             }
             aa("#dyn2") {
@@ -1338,7 +1341,7 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYNAMIC\n");
               start = GetNum("#DYNAMIC");
               if (!gffs) return;
-              bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
+              bsearch_upsert(defines, "findfromgold", CAST_u32_pvoid(start));
               ec();
             }
             aa("#org") {
@@ -3414,14 +3417,14 @@ void RecodeProc(char *script, char *romfn) {
               if (!gffs) {
                 return;
               }
-              bsearch_upsert(defines, buf, (void *)(intptr_t)k);
+              bsearch_upsert(defines, buf, CAST_u32_pvoid(k));
               ec();
             }
             aa("#dyn") {
               vlog_txt("#DYN\n");
               start = GetNum("#DYN");
               if (!gffs) return;
-              bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
+              bsearch_upsert(defines, "findfromgold", CAST_u32_pvoid(start));
               ec();
             }
             aa("#dyn2") {
@@ -3434,7 +3437,7 @@ void RecodeProc(char *script, char *romfn) {
               vlog_txt("#DYNAMIC\n");
               start = GetNum("#DYNAMIC");
               if (!gffs) return;
-              bsearch_upsert(defines, "findfromgold", (void *)(intptr_t)start);
+              bsearch_upsert(defines, "findfromgold", CAST_u32_pvoid(start));
               ec();
             }
             aa("#org") {
@@ -5559,13 +5562,13 @@ void RecodeProc(char *script, char *romfn) {
                   }
                   k = GetNum("#DEFINE");
                   if (!gffs) return;
-                  bsearch_upsert(defines, buf, (void *)(intptr_t)k);
+                  bsearch_upsert(defines, buf, CAST_u32_pvoid(k));
                 }
                 aa("#dyn") {
                   vlog_txt("#DYN\n");
                   start = GetNum("#DYN");
                   if (!gffs) return;
-                  bsearch_upsert(defines, "findfrom", (void *)(intptr_t)start);
+                  bsearch_upsert(defines, "findfrom", CAST_u32_pvoid(start));
                 }
                 aa("#dyn2") {
                   vlog_txt("#DYN2\n");
@@ -5576,7 +5579,7 @@ void RecodeProc(char *script, char *romfn) {
                   vlog_txt("#DYNAMIC\n");
                   start = GetNum("#DYNAMIC");
                   if (!gffs) return;
-                  bsearch_upsert(defines, "findfrom", (void *)(intptr_t)start);
+                  bsearch_upsert(defines, "findfrom", CAST_u32_pvoid(start));
                 }
                 aa("#org") {
                   eorg = 0;
@@ -8580,17 +8583,17 @@ void RecodeProc(char *script, char *romfn) {
   } else {
     vlog_txt("\nDiscontinuous written regions:\n");
     struct bsearch_root root;
-    int32_interval_init_bsearch_root(&root);
+    uint32_interval_init_bsearch_root(&root);
 
     for (codeblock *curr = rewind_codeblock(c); curr != NULL;
          curr = curr->next) {
       curr->org &= 0x07FFFFFF;
-      int32_interval_add(&root, curr->org, curr->org + curr->size);
+      uint32_interval_add(&root, curr->org, curr->org + curr->size);
     }
 
     for (size_t i = 0; i < root.size; i++) {
-      uint32_t org = (uint32_t)root.pairs[i].key;
-      uint32_t end = (uint32_t)root.pairs[i].value;
+      uint32_t org = bsearch_key_u32(&root, i);
+      uint32_t end = bsearch_val_u32(&root, i);
       if (end != org) {
         sprintf(buf2, "   %08X - %08X\n", org, end);
         vlog_txt(buf2);

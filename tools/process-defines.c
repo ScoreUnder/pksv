@@ -4,12 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
 #include "textutil.h"
-
-_Static_assert(sizeof(intptr_t) >= sizeof(uint32_t),
-               "intptr_t must be at least 32 bits");
 
 void strtolower(char *str) {
   while (*str) {
@@ -38,8 +36,8 @@ int main(int argc, char **argv) {
 
   bsearch_init_root(&defines, bsearch_key_strcmp, bsearch_key_strdup, free,
                     NULL);
-  bsearch_init_root(&defines_by_value, bsearch_key_int32cmp, bsearch_key_nocopy,
-                    NULL, NULL);
+  bsearch_init_root(&defines_by_value, bsearch_key_uint32cmp,
+                    bsearch_key_nocopy, NULL, NULL);
 
   char line[1024];
   while (fgets(line, sizeof(line), f)) {
@@ -85,7 +83,7 @@ int main(int argc, char **argv) {
       if (!endptr || *endptr != '\0') {
         ptrdiff_t index = bsearch_find(&defines, value);
         if (index >= 0) {
-          value_parsed = (uint32_t)(intptr_t)defines.pairs[index].value;
+          value_parsed = bsearch_val_u32(&defines, index);
         } else {
           fprintf(stderr, "#define of %s with invalid value: %s\n", identifier,
                   value);
@@ -99,8 +97,8 @@ int main(int argc, char **argv) {
         return 1;
       }
       idx = (ptrdiff_t)bsearch_unsafe_insert(&defines, idx, strdup(identifier),
-                                           (void *)(intptr_t)value_parsed);
-      bsearch_upsert(&defines_by_value, (void *)(intptr_t)value_parsed,
+                                             CAST_u32_pvoid(value_parsed));
+      bsearch_upsert(&defines_by_value, CAST_u32_pvoid(value_parsed),
                      defines.pairs[idx].key);
     } else if (!strcmp(p, "#quiet") || !strcmp(p, "#loud")) {
       // ignore verbosity indicator
@@ -126,7 +124,7 @@ int main(int argc, char **argv) {
   fputvarint(defines.size, outfile);
   for (size_t i = 0; i < defines.size; i++) {
     fputstr(defines.pairs[i].key, outfile);
-    fputvarint((uint32_t)(intptr_t)defines.pairs[i].value, outfile);
+    fputvarint(bsearch_val_u32(&defines, i), outfile);
   }
 
   // Much of this can be derived from existing data, but specifying
@@ -135,7 +133,7 @@ int main(int argc, char **argv) {
   // the previous array.
   fputvarint(defines_by_value.size, outfile);
   for (size_t i = 0; i < defines_by_value.size; i++) {
-    fputvarint((uint32_t)(intptr_t)defines_by_value.pairs[i].key, outfile);
+    fputvarint(bsearch_key_u32(&defines_by_value, i), outfile);
     fputvarint(
         (uint32_t)bsearch_find(&defines, defines_by_value.pairs[i].value),
         outfile);
