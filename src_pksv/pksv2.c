@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
     fclose(romfile);
   } else if (command_line == RECOMPILE) {
     fclose(romfile);  // Reopened by RecodeProc
-    RecodeProc(rom_file_name, script_file_name);
+    RecodeProc(script_file_name, rom_file_name);
   }
 
 #ifndef NDEBUG
