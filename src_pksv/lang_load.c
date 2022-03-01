@@ -211,6 +211,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
               lang->def.parents[i], name);
 
       free_loaded_lang(lang);
+      fclose(file);
       return NULL;
     }
 
@@ -304,6 +305,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
     }
   }
 
+  fclose(file);
   return lang;
 }
 
