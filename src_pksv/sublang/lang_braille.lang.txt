@@ -43,6 +43,6 @@ type text
 
 [0x00] = " "
 [0xFE] = "\\n" + break + prefer_break
-[0xFF] = ""    + terminator
+[0xFF] = ""    + terminator+end
 [    ] = "\\x" + no_terminate
 [    ] = "\\h" + default 1
