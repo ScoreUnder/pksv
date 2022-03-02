@@ -262,17 +262,11 @@ static struct loaded_lang *load_language(struct language_cache *cache,
                            &arg->parsers.parsers[k], file);
       }
 
-      arg->as_language.type = getc(file);
-      switch (arg->as_language.type) {
-        case LC_TYPE_LANG:
-          read_language_name(lang->string_table, string_table_len,
-                             &arg->as_language.lang, file);
-          break;
-        case LC_TYPE_COMMAND:
-          arg->as_language.command =
-              fgettabledstr(lang->string_table, string_table_len, file);
-          break;
-      }
+      read_language_name(lang->string_table, string_table_len,
+                          &arg->as_language.lang, file);
+
+      arg->as_language.command =
+          fgettabledstr(lang->string_table, string_table_len, file);
     }
 
     if (rule->attributes & RULE_ATTR_DEFAULT) {

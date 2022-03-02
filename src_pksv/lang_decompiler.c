@@ -517,42 +517,34 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       } else {
         // If collecting block info, we need to follow addresses
         // Handle request for a new language
-        switch (arg->as_language.type) {
-          case LC_TYPE_NONE:
-            break;
-          case LC_TYPE_LANG: {
-            const struct language_def *next_language =
-                decomp_get_next_language(state, visit_state, arg->as_language.lang);
+        bool has_lang = arg->as_language.lang.name[0] != '\0' || arg->as_language.lang.is_prefixed;
+        if (has_lang || arg->as_language.command[0] != '\0') {
+          const struct language_def *next_language = language;
+          const struct rule *command = NULL;
+
+          if (has_lang) {
+            next_language = decomp_get_next_language(state, visit_state, arg->as_language.lang);
             if (next_language == NULL) {
               fprintf(stderr, "Warning: language \"%s\" not found\n",
                       arg->as_language.lang.name);
               next_language = &error_lang;
             }
-
-            queue_decompilation_from_lookahead(state->remaining_blocks,
-                                               &visit_state->lookahead,
-                                               next_language, NULL, arg->size);
-            break;
           }
-          case LC_TYPE_COMMAND: {
-            ptrdiff_t index = bsearch_find(language->rules_by_command_name,
+          if (arg->as_language.command[0] != '\0') {
+            ptrdiff_t index = bsearch_find(next_language->rules_by_command_name,
                                            arg->as_language.command);
             if (index < 0) {
               fprintf(stderr,
                       "Warning: command \"%s\" not found in language \"%s\"\n",
-                      arg->as_language.command, language->name);
-              break;
+                      arg->as_language.command, next_language->name);
+              next_language = &error_lang;
+            } else {
+              command = next_language->rules_by_command_name->pairs[index].value;
             }
-            const struct rule *command =
-                language->rules_by_command_name->pairs[index].value;
-
-            queue_decompilation_from_lookahead(
-                state->remaining_blocks, &visit_state->lookahead,
-                visit_state->base_language, command, arg->size);
-            break;
           }
-          default:
-            assert(false);
+          queue_decompilation_from_lookahead(
+              state->remaining_blocks, &visit_state->lookahead,
+              next_language, command, arg->size);
         }
       }
 

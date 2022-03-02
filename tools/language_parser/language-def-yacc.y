@@ -36,7 +36,7 @@ struct language_def_builder language_def;
   struct language language;
   struct command_arg_builder command_arg;
   struct parser_list_builder parser_list;
-  struct lang_or_cmd lang_or_cmd;
+  struct lang_cmd lang_cmd;
 }
 
 %token <strval> T_identifier
@@ -53,9 +53,9 @@ struct language_def_builder language_def;
 %type <language> oneshot_lang language
 %type <command_arg> arg
 %type <parser_list> parsers
-%type <strval> textval
+%type <strval> cmdeq textval
 %type <intval> byte
-%type <lang_or_cmd> as_language
+%type <lang_cmd> as_language
 
 %%
 
@@ -150,24 +150,38 @@ parsers: /*empty*/ { $$ = (struct parser_list_builder) {NULL, 0, 0}; }
        | parsers ':' error { yyerror("Bad arg parser type"); yyerrok; }
        ;
 
-as_language: /*empty*/ { $$.type = LC_TYPE_NONE; }
-            | '@' language {
-                $$.type = LC_TYPE_LANG;
-                $$.lang = $2;
+as_language: /*empty*/ {
+                $$.lang.name = strdup("");
+                $$.lang.is_prefixed = false;
+                $$.command = strdup("");
               }
-            | '@' T_identifier '=' textval {
-                if (strcmp($2, "cmd")) {
-                  yyerror("Expected @cmd=, got something else");
-                  YYERROR;
-                }
-                $$.type = LC_TYPE_COMMAND;
+            | '@' language {
+                $$.lang = $2;
+                $$.command = strdup("");
+              }
+            | '@' language ':' cmdeq {
+                $$.lang = $2;
                 $$.command = $4;
+              }
+            | '@' cmdeq {
+                $$.lang.name = strdup("");
+                $$.lang.is_prefixed = false;
+                $$.command = $2;
               }
             | '@' error { yyerror("Bad language type"); }
             ;
 
-language: T_identifier { $$.is_prefixed = false; $$.name = $1; }
-        | '*' T_identifier { $$.is_prefixed = true; $$.name = $2; }
+cmdeq: T_identifier '=' textval {
+         if (strcmp($1, "cmd")) {
+           yyerror("Expected cmd=, got something else");
+           YYERROR;
+         }
+         $$ = $3;
+       }
+     ;
+
+language: textval { $$.is_prefixed = false; $$.name = $1; }
+        | '*' textval { $$.is_prefixed = true; $$.name = $2; }
         | '*' { $$.is_prefixed = true; $$.name = strdup(""); }
         ;
 
@@ -279,16 +293,13 @@ bool sanity_check(struct language_def_builder *language, struct string_list_buil
           return false;
         }
       }
-      if (arg->as_language.type == LC_TYPE_LANG) {
-        if (strlen(arg->as_language.lang.name) > UINT32_MAX) {
-          fprintf(stderr, "Rule arg as-language name too long: \"%s\" arg %d as-language \"%s\"\n", rule->command_name, (int) j, arg->as_language.lang.name);
-          return false;
-        }
-      } else if (arg->as_language.type == LC_TYPE_COMMAND) {
-        if (strlen(arg->as_language.command) > UINT32_MAX) {
-          fprintf(stderr, "Rule arg as-command name too long: \"%s\" arg %d as-command \"%s\"\n", rule->command_name, (int) j, arg->as_language.command);
-          return false;
-        }
+      if (strlen(arg->as_language.lang.name) > UINT32_MAX) {
+        fprintf(stderr, "Rule arg as-language name too long: \"%s\" arg %d as-language \"%s\"\n", rule->command_name, (int) j, arg->as_language.lang.name);
+        return false;
+      }
+      if (strlen(arg->as_language.command) > UINT32_MAX) {
+        fprintf(stderr, "Rule arg as-command name too long: \"%s\" arg %d as-command \"%s\"\n", rule->command_name, (int) j, arg->as_language.command);
+        return false;
       }
     }
   }
@@ -313,11 +324,8 @@ struct bsearch_root *make_string_table(struct language_def_builder *language, st
         const struct language *parser = &arg->parsers.parsers[k];
         bsearch_upsert(root, parser->name, NULL);
       }
-      if (arg->as_language.type == LC_TYPE_LANG) {
-        bsearch_upsert(root, arg->as_language.lang.name, NULL);
-      } else if (arg->as_language.type == LC_TYPE_COMMAND) {
-        bsearch_upsert(root, arg->as_language.command, NULL);
-      }
+      bsearch_upsert(root, arg->as_language.lang.name, NULL);
+      bsearch_upsert(root, arg->as_language.command, NULL);
     }
   }
 
@@ -434,13 +442,9 @@ int main(int argc, char **argv) {
         putc(parser->is_prefixed, out);
       }
 
-      putc(arg->as_language.type, out);
-      if (arg->as_language.type == LC_TYPE_LANG) {
-        write_string(out, string_table, arg->as_language.lang.name);
-        putc(arg->as_language.lang.is_prefixed, out);
-      } else if (arg->as_language.type == LC_TYPE_COMMAND) {
-        write_string(out, string_table, arg->as_language.command);
-      }
+      write_string(out, string_table, arg->as_language.lang.name);
+      putc(arg->as_language.lang.is_prefixed, out);
+      write_string(out, string_table, arg->as_language.command);
     }
   }
 

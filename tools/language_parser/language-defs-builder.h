@@ -26,7 +26,7 @@ struct parser_list_builder {
 struct command_arg_builder {
   size_t size;
   struct parser_list_builder parsers;
-  struct lang_or_cmd as_language;
+  struct lang_cmd as_language;
 };
 
 struct command_args_list_builder {

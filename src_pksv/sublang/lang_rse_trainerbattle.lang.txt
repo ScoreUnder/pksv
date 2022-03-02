@@ -1,20 +1,20 @@
-[]   =  unknown 1 4:address@cmd=.text 4:address@cmd=.text
+[]   =  unknown 1 4:address@*:cmd=.text 4:address@*:cmd=.text
 
 # Single battle params: trainer id, sprite id, pre-battle speech, defeat speech
-[0]  =  single  2 2:*sprite 4:address@cmd=.text 4:address@cmd=.text
-[5]  =  rematch 2 2:*sprite 4:address@cmd=.text 4:address@cmd=.text
+[0]  =  single  2 2:*sprite 4:address@*:cmd=.text 4:address@*:cmd=.text
+[5]  =  rematch 2 2:*sprite 4:address@*:cmd=.text 4:address@*:cmd=.text
 
 # Continue-script: trainer id, sprite id, pre-battle speech, defeat speech, beaten script (for gotobeatenscript command)
-[1]  =  continue_script_no_music 2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@*
-[2]  =  continue_script          2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@*
+[1]  =  continue_script_no_music 2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*
+[2]  =  continue_script          2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*
 
 # Double: trainer id, sprite id, pre-battle speech, defeat speech, can't-battle speech
-[4]  =  double          2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text
-[7]  =  rematch_double  2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text
+[4]  =  double          2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*:cmd=.text
+[7]  =  rematch_double  2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*:cmd=.text
 
 # No-intro single battle: trainer id, sprite id, defeat speech
-[3]  =  single_no_intro 2 2:*sprite 4:address@cmd=.text
+[3]  =  single_no_intro 2 2:*sprite 4:address@*:cmd=.text
 
 # Continue-script double battles: trainer id, sprite id, pre-battle speech, defeat speech, can't-battle speech, beaten script
-[6]  =  continue_script_double           2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text  4:address@*
-[8]  =  continue_script_no_music_double  2 2:*sprite 4:address@cmd=.text  4:address@cmd=.text  4:address@cmd=.text  4:address@*
+[6]  =  continue_script_double           2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*
+[8]  =  continue_script_no_music_double  2 2:*sprite 4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*:cmd=.text  4:address@*

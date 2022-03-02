@@ -43,22 +43,13 @@ vi rules.length
             1b parser.is_prefixed
         ]
 
-        1b arg.as_language.type
-        [ if arg.as_language.type is LC_TYPE_LANG
-            vi string index = arg.as_language.lang.name
-            1b arg.as_language.lang.is_prefixed
-        ]
-        [ if arg.as_language.type is LC_TYPE_COMMAND
-            vi string index = arg.as_language.command
-        ]
+        vi string index = arg.as_language.lang.name
+        1b arg.as_language.lang.is_prefixed
+        vi string index = arg.as_language.command
     ]
 ]
 
 */
-
-#define LC_TYPE_NONE 0
-#define LC_TYPE_LANG 1
-#define LC_TYPE_COMMAND 2
 
 #define RULE_ATTR_NONE 0
 #define RULE_ATTR_END 1
@@ -95,18 +86,15 @@ struct parser_list {
   size_t length;
 };
 
-struct lang_or_cmd {
-  int type;
-  union {
-    struct language lang;
-    char *command;
-  };
+struct lang_cmd {
+  struct language lang;
+  char *command;
 };
 
 struct command_arg {
   size_t size;
   struct parser_list parsers;
-  struct lang_or_cmd as_language;
+  struct lang_cmd as_language;
 };
 
 struct command_args_list {
