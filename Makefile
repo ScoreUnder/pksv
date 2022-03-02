@@ -33,8 +33,10 @@ CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
 CPPFLAGS_PR_release = -DNDEBUG=1
 CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og
-CFLAGS_PR_release = -flto -Os
-CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic -std=c17 $(CFLAGS_PR_$(PROFILE))
+CFLAGS_PR_release = -ggdb1 -flto -O2
+CFLAGS_PGO_1=-fprofile-generate=pgo_data
+CFLAGS_PGO_2=-fprofile-use=pgo_data
+CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic -std=c17 $(CFLAGS_PR_$(PROFILE)) $(CFLAGS_PGO_$(PGO))
 CFLAGS_SH = -shared -fpic -DDLL
 
 LDFLAGS_CONSOLE_P_win = -mconsole
@@ -124,7 +126,7 @@ check: $(PKSV)
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS)
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data
 
 mostlyclean: clean-fmem
 	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
