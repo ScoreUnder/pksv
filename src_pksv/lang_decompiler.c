@@ -476,8 +476,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           visit_state->line_length++;
 
           struct parse_result result = format_for_decomp(
-              state->parser_cache, language, matched_rule->args.args[i].parsers,
-              value, &state->info);
+              state->parser_cache, visit_state->base_language,
+              matched_rule->args.args[i].parsers, value, &state->info);
 
           switch (result.type) {
             default:
