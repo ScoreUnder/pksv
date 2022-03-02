@@ -34,7 +34,7 @@ CPPFLAGS_PR_release = -DNDEBUG=1
 CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og
 CFLAGS_PR_release = -flto -Os
-CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic $(CFLAGS_PR_$(PROFILE))
+CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic -std=c17 $(CFLAGS_PR_$(PROFILE))
 CFLAGS_SH = -shared -fpic -DDLL
 
 LDFLAGS_CONSOLE_P_win = -mconsole
