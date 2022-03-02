@@ -46,6 +46,9 @@ void bsearch_deinit_root(struct bsearch_root *root);
  * number of elements. */
 void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity);
 
+/** @brief Trim the bsearch_root's capacity down to its actual size. */
+void bsearch_trim_capacity(struct bsearch_root *root);
+
 /** @brief Inserts a value into the bsearch_root at the given index.
  * No sanity checks are performed.
  * The key will be inserted as-is, not copied.

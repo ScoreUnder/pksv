@@ -226,6 +226,9 @@ struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *
         goto error;
       }
 
+      bsearch_ensure_capacity(lang->def.rules_by_bytes, lang->def.rules_by_bytes->size + parent->rules_by_bytes->size);
+      bsearch_ensure_capacity(lang->def.rules_by_command_name, lang->def.rules_by_command_name->size + parent->rules_by_command_name->size);
+
       for (size_t j = 0; j < parent->rules_by_bytes->size; j++) {
         struct rule *rule = parent->rules_by_bytes->pairs[j].value;
         bsearch_upsert(lang->def.rules_by_bytes, rule->bytes.bytes,
@@ -245,6 +248,9 @@ struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *
       }
     }
   }
+
+  bsearch_ensure_capacity(lang->def.rules_by_bytes, lang->def.rules_by_bytes->size + rules_len);
+  bsearch_ensure_capacity(lang->def.rules_by_command_name, lang->def.rules_by_command_name->size + rules_len);
 
   for (size_t i = 0; i < rules_len; i++) {
     if (feof(file)) {
@@ -318,6 +324,9 @@ struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *
       }
     }
   }
+
+  bsearch_trim_capacity(lang->def.rules_by_bytes);
+  bsearch_trim_capacity(lang->def.rules_by_command_name);
 
   return lang;
 

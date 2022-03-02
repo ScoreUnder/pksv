@@ -83,6 +83,9 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
     bsearch_unsafe_append(by_id, CAST_u32_pvoid(value), str);
   }
 
+  bsearch_trim_capacity(&result->lookup_by_name);
+  bsearch_trim_capacity(&result->lookup_by_id);
+
   if (feof(f) || ferror(f)) {
     goto error;
   }

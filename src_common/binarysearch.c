@@ -53,6 +53,11 @@ void bsearch_ensure_capacity(struct bsearch_root *root, size_t capacity) {
   }
 }
 
+void bsearch_trim_capacity(struct bsearch_root *root) {
+  root->capacity = root->size;
+  root->pairs = realloc(root->pairs, root->capacity * sizeof(struct bsearch_kv));
+}
+
 ptrdiff_t bsearch_find(struct bsearch_root const *restrict root,
                        void const *key) {
   struct bsearch_kv const *kvs = root->pairs;
