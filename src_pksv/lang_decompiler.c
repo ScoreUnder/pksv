@@ -309,27 +309,40 @@ static const struct language_def *decomp_get_next_language(
   return get_language(state->language_cache, lang.name);
 }
 
-static void queue_decompilation_from_lookahead(
-    struct bsearch_root *remaining_blocks, struct lookahead *lookahead,
-    const struct language_def *next_language, const struct rule *command,
-    size_t arg_size) {
+struct lang_and_address {
+  struct language lang;
+  uint32_t address;
+};
+
+static void specialcase_adjust_lang_and_address(struct lang_and_address *l) {
+  if (strcmp(l->lang.name, "gba_asm") == 0) {
+    l->lang.name = l->address & 1 ? "gba_thumb_asm" : "gba_arm_asm";
+    l->address &= ~1;
+  }
+}
+
+static void queue_decompilation_at(struct bsearch_root *remaining_blocks,
+                                   uint32_t next_address,
+                                   const struct language_def *next_language,
+                                   const struct rule *command) {
   struct queued_decompilation *next_decompilation =
       malloc(sizeof *next_decompilation);
   next_decompilation->language = next_language;
   next_decompilation->command = command;
 
-  size_t addr_size = 4;
-  if (arg_size < addr_size) {
-    addr_size = arg_size;
-  }
-
-  uint32_t next_address =
-      arr_get_little_endian(lookahead->bytes.bytes, addr_size);
-
   // TODO: GSC offset handling
   bsearch_upsert(remaining_blocks,
                  CAST_u32_pvoid(next_address & GBA_OFFSET_MASK),
                  next_decompilation);
+}
+
+static uint32_t read_addr_from_lookahead(struct lookahead *lookahead,
+                                         size_t arg_size) {
+  size_t addr_size = 4;
+  if (arg_size < addr_size) {
+    addr_size = arg_size;
+  }
+  return arr_get_little_endian(lookahead->bytes.bytes, addr_size);
 }
 
 static bool lang_can_split_lines(const struct decomp_visit_state *state) {
@@ -524,12 +537,20 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           const struct language_def *next_language = language;
           const struct rule *command = NULL;
 
+          struct lang_and_address next_lang_and_addr = {
+              .lang = arg->as_language.lang,
+              .address =
+                  read_addr_from_lookahead(&visit_state->lookahead, arg->size),
+          };
+
           if (has_lang) {
+            specialcase_adjust_lang_and_address(&next_lang_and_addr);
+
             next_language = decomp_get_next_language(state, visit_state,
-                                                     arg->as_language.lang);
+                                                     next_lang_and_addr.lang);
             if (next_language == NULL) {
               fprintf(stderr, "Warning: language \"%s\" not found\n",
-                      arg->as_language.lang.name);
+                      next_lang_and_addr.lang.name);
               next_language = &error_lang;
             }
           }
@@ -546,9 +567,9 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                   next_language->rules_by_command_name->pairs[index].value;
             }
           }
-          queue_decompilation_from_lookahead(state->remaining_blocks,
-                                             &visit_state->lookahead,
-                                             next_language, command, arg->size);
+          queue_decompilation_at(state->remaining_blocks,
+                                 next_lang_and_addr.address, next_language,
+                                 command);
         }
       }
 
