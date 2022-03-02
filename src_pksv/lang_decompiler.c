@@ -332,14 +332,24 @@ struct decomp_visit_state {
   bool is_new_line;
 };
 
-static bool lang_can_split_lines(const struct language_def *language) {
+static bool lang_can_split_lines(const struct decomp_visit_state *state) {
+  const struct language_def *language = state->curr_language;
   switch (language->meta_flags & METAFLAG_MASK_LANGTYPE) {
     case METAFLAG_LANGTYPE_TEXT:
-    case METAFLAG_LANGTYPE_LINE:
+    case METAFLAG_LANGTYPE_LINE: {
+      // Can't wrap a language if it would force another command
+      // and its arguments to be written when they are of non-zero length.
+      const struct rule *command = state->base_command;
+      if (command != NULL &&
+          (command->bytes.length != 0 ||
+           command->args.length != 0)) {
+        return false;
+      }
       // If we want to wrap a text or line-type language,
       // we need to have a way to suppress line terminators.
       return language->special_rules[SPECIAL_RULE_TERMINATOR] == NULL ||
              language->special_rules[SPECIAL_RULE_NO_TERMINATE] != NULL;
+    }
     default:
       return false;
   }
@@ -365,7 +375,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
   uint32_t command_start_address = visit_state->address;
   if (!visit_state->decompile &&
-      (visit_state->is_new_line || lang_can_split_lines(language))) {
+      (visit_state->is_new_line || lang_can_split_lines(visit_state))) {
     // Record this address as a visited "line"
     ptrdiff_t index =
         bsearch_find_u32(state->seen_addresses, visit_state->address);
@@ -603,7 +613,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       uint8_t attributes = matched_rule == NULL ? 0 : matched_rule->attributes;
       bool want_linewrap = visit_state->line_length >= 80 ||
                            (attributes & RULE_ATTR_PREFER_BREAK) != 0;
-      if (want_linewrap && lang_can_split_lines(language) &&
+      if (want_linewrap && lang_can_split_lines(visit_state) &&
           (language_type != METAFLAG_LANGTYPE_TEXT ||
            (attributes & RULE_ATTR_BREAK) != 0)) {
         // output no-terminate token if needed
