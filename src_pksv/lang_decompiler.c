@@ -49,7 +49,6 @@ struct decomp_internal_state {
   struct bsearch_root *remaining_blocks;
   struct bsearch_root *seen_addresses;
   struct bsearch_root *labels;
-  const struct language_def *language;
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
   struct decompiler_informative_state info;
@@ -100,7 +99,6 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
       .labels = NULL,
       .language_cache = language_cache,
       .parser_cache = parser_cache,
-      .language = start_language,
   };
 
   // Visit the initial address and any that result from decompiling it.
@@ -261,22 +259,41 @@ static const struct language_def *get_prefixed_language(
   return language;
 }
 
+struct decomp_visit_state {
+  struct lookahead lookahead;
+  size_t line_length;
+  const struct language_def *base_language;
+  const struct rule *base_command;
+  const struct language_def *curr_language;
+  const struct rule *curr_command;
+  uint32_t address;
+  uint32_t initial_address;
+  bool still_going;
+  // false = just visiting to collect block info
+  // true = decompiling
+  bool decompile;
+  // reported by decomp_visit_single: whether to continue on the same line
+  bool continue_line;
+  // informative for decomp_visit_single: whether this started on a new line
+  bool is_new_line;
+};
+
 static const struct language_def *decomp_get_next_language(
-    struct decomp_internal_state *state, struct language lang) {
+    struct decomp_internal_state *state, struct decomp_visit_state *visit_state, struct language lang) {
   if (lang.is_prefixed) {
     if (lang.name[0] == '\0') {
       // Language recursion, i.e. `@*`
-      return state->language;
+      return visit_state->base_language;
     }
 
     size_t lang_name_len = strlen(lang.name);
     const struct language_def *next = get_prefixed_language(
-        state->language_cache, state->language->name, lang.name, lang_name_len);
+        state->language_cache, visit_state->base_language->name, lang.name, lang_name_len);
     if (next != NULL) {
       return next;
     }
 
-    char **parents = state->language->parents;
+    char **parents = visit_state->base_language->parents;
     while (*parents != NULL) {
       next = get_prefixed_language(state->language_cache, *parents, lang.name,
                                    lang_name_len);
@@ -312,25 +329,6 @@ static void queue_decompilation_from_lookahead(
                  CAST_u32_pvoid(next_address & GBA_OFFSET_MASK),
                  next_decompilation);
 }
-
-struct decomp_visit_state {
-  struct lookahead lookahead;
-  size_t line_length;
-  const struct language_def *base_language;
-  const struct rule *base_command;
-  const struct language_def *curr_language;
-  const struct rule *curr_command;
-  uint32_t address;
-  uint32_t initial_address;
-  bool still_going;
-  // false = just visiting to collect block info
-  // true = decompiling
-  bool decompile;
-  // reported by decomp_visit_single: whether to continue on the same line
-  bool continue_line;
-  // informative for decomp_visit_single: whether this started on a new line
-  bool is_new_line;
-};
 
 static bool lang_can_split_lines(const struct decomp_visit_state *state) {
   const struct language_def *language = state->curr_language;
@@ -523,7 +521,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             break;
           case LC_TYPE_LANG: {
             const struct language_def *next_language =
-                decomp_get_next_language(state, arg->as_language.lang);
+                decomp_get_next_language(state, visit_state, arg->as_language.lang);
             if (next_language == NULL) {
               fprintf(stderr, "Warning: language \"%s\" not found\n",
                       arg->as_language.lang.name);
@@ -549,7 +547,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
             queue_decompilation_from_lookahead(
                 state->remaining_blocks, &visit_state->lookahead,
-                state->language, command, arg->size);
+                visit_state->base_language, command, arg->size);
             break;
           }
           default:
@@ -573,7 +571,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     // Handle oneshot language
     if (matched_rule->oneshot_lang.name[0] != '\0') {
       const struct language_def *next_language =
-          decomp_get_next_language(state, matched_rule->oneshot_lang);
+          decomp_get_next_language(state, visit_state, matched_rule->oneshot_lang);
       if (next_language == NULL) {
         if (visit_state->decompile) {
           fprintf(state->output,
