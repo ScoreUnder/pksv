@@ -1,5 +1,6 @@
 type line
 
+[    ] = raw+default 1
 [0x00] = look_down
 [0x01] = look_up
 [0x02] = look_left
@@ -70,6 +71,7 @@ type line
 [0x4b] = jumpspin_down
 [0x4c] = jumpspin_right
 [0x4d] = jumpspin_left
+[0x4e] = face_original_direction
 [0x54] = hide
 [0x55] = show
 [0x56] = alert
