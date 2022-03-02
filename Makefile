@@ -31,7 +31,7 @@ LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROF
 
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
 CPPFLAGS_PR_release = -DNDEBUG=1
-CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
+CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og
 CFLAGS_PR_release = -ggdb1 -flto -O2
 CFLAGS_PGO_1=-fprofile-generate=pgo_data
@@ -55,7 +55,7 @@ SRC_PKSV_COMMON = \
 	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
 	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
 	src_pksv/lang_parsers.c src_common/stdio_ext.c src_pksv/lang_default_parsers.c \
-	src_pksv/lang_decompiler.c src_pksv/lang_load.c src_common/binarysearch_u32.c
+	src_pksv/lang_decompiler.c src_lang/lang_load.c src_common/binarysearch_u32.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
 RES_PKSV_SHLIB = src_pksv/pksv.rc
