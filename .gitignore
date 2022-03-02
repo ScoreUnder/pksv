@@ -2,6 +2,10 @@
 *.d
 *.sh_o
 *.sh_d
+*.gcno
+*.gcda
+*.sh_gcno
+*.sh_gcda
 *.exe
 *.so
 *.dll

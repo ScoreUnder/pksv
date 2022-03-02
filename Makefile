@@ -98,7 +98,8 @@ SUBLANGS = $(subst src_pksv/,,$(SUBLANGS_SRC:.lang.txt=.dat))
 SUBLANG_DEFS_SRC = $(wildcard src_pksv/sublang/defs_*.defs.txt)
 SUBLANG_DEFS = $(subst src_pksv/,,$(SUBLANG_DEFS_SRC:.defs.txt=.dat))
 
-DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PKSVUI:.o=.d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d) $(OBJ_LANGUAGE_PARSER:.o=.d)
+OBJS = $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PKSVUI) $(OBJ_PROCESS_DEFINES) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_GPERF_REVERSE) $(OBJ_LANGUAGE_PARSER)
+DEPS = $(OBJS:o=d)
 
 PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
@@ -126,7 +127,8 @@ clean: mostlyclean
 	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS)
 
 mostlyclean: clean-fmem
-	rm -f -- $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PROCESS_DEFINES) $(OBJ_GPERF_REVERSE) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_LANGUAGE_PARSER) $(DEPS) $(GENERATED_SOURCES) $(OBJ_PKSVUI) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJS:o=gcno) $(OBJS:o=gcda)
 
 clean-fmem:
 	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
