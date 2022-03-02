@@ -29,7 +29,6 @@ size_t fputstr(const char *str, FILE *stream);
 __attribute__((malloc)) char *fgetstr(FILE *stream);
 
 /** @brief Read a variable-length string from a file, but fail if too large. */
-__attribute__((malloc))
-char *fngetstr(FILE *stream, size_t max_size);
+__attribute__((malloc)) char *fngetstr(FILE *stream, size_t max_size);
 
 #endif

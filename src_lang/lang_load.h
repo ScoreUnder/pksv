@@ -29,7 +29,8 @@ struct loaded_lang {
   char **string_table;
 };
 
-struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *file, const char *name);
+struct loaded_lang *load_language_from_file(struct language_cache *cache,
+                                            FILE *file, const char *name);
 void free_loaded_lang(struct loaded_lang *lang);
 
 #endif
