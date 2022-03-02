@@ -279,7 +279,8 @@ struct decomp_visit_state {
 };
 
 static const struct language_def *decomp_get_next_language(
-    struct decomp_internal_state *state, struct decomp_visit_state *visit_state, struct language lang) {
+    struct decomp_internal_state *state, struct decomp_visit_state *visit_state,
+    struct language lang) {
   if (lang.is_prefixed) {
     if (lang.name[0] == '\0') {
       // Language recursion, i.e. `@*`
@@ -288,7 +289,8 @@ static const struct language_def *decomp_get_next_language(
 
     size_t lang_name_len = strlen(lang.name);
     const struct language_def *next = get_prefixed_language(
-        state->language_cache, visit_state->base_language->name, lang.name, lang_name_len);
+        state->language_cache, visit_state->base_language->name, lang.name,
+        lang_name_len);
     if (next != NULL) {
       return next;
     }
@@ -339,8 +341,7 @@ static bool lang_can_split_lines(const struct decomp_visit_state *state) {
       // and its arguments to be written when they are of non-zero length.
       const struct rule *command = state->base_command;
       if (command != NULL &&
-          (command->bytes.length != 0 ||
-           command->args.length != 0)) {
+          (command->bytes.length != 0 || command->args.length != 0)) {
         return false;
       }
       // If we want to wrap a text or line-type language,
@@ -517,13 +518,15 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       } else {
         // If collecting block info, we need to follow addresses
         // Handle request for a new language
-        bool has_lang = arg->as_language.lang.name[0] != '\0' || arg->as_language.lang.is_prefixed;
+        bool has_lang = arg->as_language.lang.name[0] != '\0' ||
+                        arg->as_language.lang.is_prefixed;
         if (has_lang || arg->as_language.command[0] != '\0') {
           const struct language_def *next_language = language;
           const struct rule *command = NULL;
 
           if (has_lang) {
-            next_language = decomp_get_next_language(state, visit_state, arg->as_language.lang);
+            next_language = decomp_get_next_language(state, visit_state,
+                                                     arg->as_language.lang);
             if (next_language == NULL) {
               fprintf(stderr, "Warning: language \"%s\" not found\n",
                       arg->as_language.lang.name);
@@ -539,12 +542,13 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                       arg->as_language.command, next_language->name);
               next_language = &error_lang;
             } else {
-              command = next_language->rules_by_command_name->pairs[index].value;
+              command =
+                  next_language->rules_by_command_name->pairs[index].value;
             }
           }
-          queue_decompilation_from_lookahead(
-              state->remaining_blocks, &visit_state->lookahead,
-              next_language, command, arg->size);
+          queue_decompilation_from_lookahead(state->remaining_blocks,
+                                             &visit_state->lookahead,
+                                             next_language, command, arg->size);
         }
       }
 
@@ -563,8 +567,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
     // Handle oneshot language
     if (matched_rule->oneshot_lang.name[0] != '\0') {
-      const struct language_def *next_language =
-          decomp_get_next_language(state, visit_state, matched_rule->oneshot_lang);
+      const struct language_def *next_language = decomp_get_next_language(
+          state, visit_state, matched_rule->oneshot_lang);
       if (next_language == NULL) {
         if (visit_state->decompile) {
           fprintf(state->output,

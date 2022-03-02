@@ -79,7 +79,8 @@ static void free_loaded_lang(struct loaded_lang *lang) {
   }
   bsearch_destroy_root(lang->def.rules_by_bytes);
   bsearch_destroy_root(lang->def.rules_by_command_name);
-  if ((lang->def.meta_flags & METAFLAG_MASK_LANGTYPE) == METAFLAG_LANGTYPE_TEXT) {
+  if ((lang->def.meta_flags & METAFLAG_MASK_LANGTYPE) ==
+      METAFLAG_LANGTYPE_TEXT) {
     free(lang->def.lookup_bytes);
   }
 
@@ -148,12 +149,10 @@ void overwrite_special_rule(struct language_def *dest, struct rule *src,
 }
 
 static bool is_simple_rule(const struct rule *rule) {
-  return rule->bytes.length == 1
-    && rule->bytes.bytes[0] != 0 /* 0 is reserved */
-    && rule->args.length == 0
-    && rule->oneshot_lang.name[0] == '\0'
-    && strlen(rule->command_name) == 1
-    && rule->attributes == 0;
+  return rule->bytes.length == 1 &&
+         rule->bytes.bytes[0] != 0 /* 0 is reserved */
+         && rule->args.length == 0 && rule->oneshot_lang.name[0] == '\0' &&
+         strlen(rule->command_name) == 1 && rule->attributes == 0;
 }
 
 static struct loaded_lang *load_language(struct language_cache *cache,
@@ -263,7 +262,7 @@ static struct loaded_lang *load_language(struct language_cache *cache,
       }
 
       read_language_name(lang->string_table, string_table_len,
-                          &arg->as_language.lang, file);
+                         &arg->as_language.lang, file);
 
       arg->as_language.command =
           fgettabledstr(lang->string_table, string_table_len, file);
@@ -287,10 +286,11 @@ static struct loaded_lang *load_language(struct language_cache *cache,
     } else {
       if (rule->bytes.length > 0) {
         bsearch_upsert(lang->def.rules_by_bytes, &rule->bytes,
-                      ref_language_rule(rule));
+                       ref_language_rule(rule));
       }
       if (rule->command_name[0] != '\0') {
-        bsearch_upsert(lang->def.rules_by_command_name, rule->command_name, rule);
+        bsearch_upsert(lang->def.rules_by_command_name, rule->command_name,
+                       rule);
       } else {
         // Unref "master" copy once
         // If it wasn't inserted into the special rules tables or the

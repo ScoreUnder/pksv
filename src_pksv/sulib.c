@@ -13,7 +13,7 @@
 
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** head) {
-  char *name2 = strdup(name);
+  char* name2 = strdup(name);
   codelabel* newlabel = malloc(sizeof(codelabel));
   codelabel* tail = *head;
   if (tail)
@@ -23,8 +23,10 @@ unsigned int add_label(char* name, codeblock* c, unsigned int loc,
   newlabel->name = name2;
   newlabel->pos = loc;
   newlabel->block = c;
-  if (tail) tail->next = newlabel;
-  else *head = newlabel;
+  if (tail)
+    tail->next = newlabel;
+  else
+    *head = newlabel;
   return newlabel != NULL;
 }
 
@@ -178,7 +180,7 @@ void calc_org(codeblock* c, unsigned int start, char* file,
         b->org += b->align - (b->org % b->align);
       if ((mode == GOLD || mode == CRYSTAL) && b->size < 0x3FFF) {
         while ((OffsetToPointer(b->org) & 0xFF) !=
-                (OffsetToPointer(b->org + b->size) & 0xFF)) {
+               (OffsetToPointer(b->org + b->size) & 0xFF)) {
           ffoff -= b->size - 1;
           b->org = FindFreeSpace(file, b->size, defines);
         }
@@ -186,7 +188,7 @@ void calc_org(codeblock* c, unsigned int start, char* file,
 #ifdef WIN32
       else if (mode == GOLD || mode == CRYSTAL) {
         snprintf(buf, sizeof(buf),
-                  "Offset %s cannot be used as it is too large.", b->name);
+                 "Offset %s cannot be used as it is too large.", b->name);
         MessageBox(NULL, buf, "Error", 0x10);
       }
 #endif

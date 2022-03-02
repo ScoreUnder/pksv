@@ -192,7 +192,8 @@ int main(int argc, char **argv) {
     const struct language_def *language =
         get_language(lang_cache, decompile_lang);
 
-    FILE *script_file = script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
+    FILE *script_file =
+        script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
     decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
                   script_file);
 
