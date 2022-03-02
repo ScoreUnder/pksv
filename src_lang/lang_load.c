@@ -15,6 +15,11 @@ struct language_cache {
   char *dir;  // directory containing language files
 };
 
+__attribute__((malloc)) void *malloc_or_null(size_t size) {
+  if (size == 0) return NULL;
+  return malloc(size);
+}
+
 static int bsearch_key_cmp_bytes(const void *a, const void *b) {
   const struct bytes_list *al = a;
   const struct bytes_list *bl = b;
@@ -33,7 +38,7 @@ static int bsearch_key_cmp_bytes(const void *a, const void *b) {
 static void *bsearch_key_dup_bytes(const void *a) {
   const struct bytes_list *bytes = a;
   struct bytes_list *bytes2 = malloc(sizeof *bytes2);
-  bytes2->bytes = malloc(bytes->length);
+  bytes2->bytes = malloc_or_null(bytes->length);
   bytes2->length = bytes->length;
   memcpy(bytes2->bytes, bytes->bytes, bytes->length);
   return bytes2;
@@ -283,7 +288,7 @@ struct loaded_lang *load_language_from_file(struct language_cache *cache,
       fprintf(stderr, "Rule contained too many bytes\n");
       goto error;
     }
-    rule->bytes.bytes = malloc(rule->bytes.length);
+    rule->bytes.bytes = malloc_or_null(rule->bytes.length);
     fread(rule->bytes.bytes, 1, rule->bytes.length, file);
     rule->command_name =
         fgettabledstr(lang->string_table, string_table_len, file);
@@ -360,7 +365,7 @@ static bool load_rule_args_from_file(FILE *file, struct loaded_lang *lang,
     return false;
   }
 
-  rule->args.args = malloc(sizeof *rule->args.args * args_len);
+  rule->args.args = malloc_or_null(sizeof *rule->args.args * args_len);
   rule->args.length = args_len;
 
   size_t i;
@@ -376,7 +381,8 @@ static bool load_rule_args_from_file(FILE *file, struct loaded_lang *lang,
       ok = false;
       break;
     }
-    arg->parsers.parsers = malloc(sizeof *arg->parsers.parsers * parsers_len);
+    arg->parsers.parsers =
+        malloc_or_null(sizeof *arg->parsers.parsers * parsers_len);
     arg->parsers.length = parsers_len;
     for (size_t k = 0; k < parsers_len; k++) {
       read_language_name(lang->string_table, string_table_len,
