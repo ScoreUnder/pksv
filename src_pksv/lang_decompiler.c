@@ -368,7 +368,6 @@ static bool check_and_report_eof(struct decomp_internal_state *state,
 
 static void decomp_visit_single(struct decomp_internal_state *state,
                                 struct decomp_visit_state *visit_state) {
-  if (check_and_report_eof(state, visit_state, 1)) return;
   const struct language_def *language = visit_state->curr_language;
 
   uint32_t command_start_address = visit_state->address;
@@ -392,6 +391,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                             CAST_u32_pvoid(visit_state->initial_address));
     }
   }
+
+  if (check_and_report_eof(state, visit_state, 1)) return;
 
   unsigned int language_type = language->meta_flags & METAFLAG_MASK_LANGTYPE;
 
