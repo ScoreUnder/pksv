@@ -703,9 +703,11 @@ static void decomp_visit_address(
     visit_state.continue_line = false;
     decomp_visit_single(state, &visit_state);
 
-    if (visit_state.decompile && !visit_state.continue_line) {
-      fputs("\n", state->output);
-      visit_state.line_length = 0;
+    if (!visit_state.continue_line) {
+      if (visit_state.decompile) {
+        fputs("\n", state->output);
+        visit_state.line_length = 0;
+      }
       if (!visit_state.is_new_line) {
         // If we started this loop trying a sub-language, and now we have
         // a new line, we need to reset the language to the base language
