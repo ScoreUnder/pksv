@@ -77,3 +77,15 @@ char *fgetstr(FILE *stream) {
   str[str_length] = '\0';
   return str;
 }
+
+char *fngetstr(FILE *stream, size_t max_size) {
+  size_t str_length = fgetvarint(stream);
+  if (str_length > max_size) {
+    return NULL;
+  }
+
+  char *str = malloc(str_length + 1);
+  fread(str, 1, str_length, stream);
+  str[str_length] = '\0';
+  return str;
+}

@@ -15,11 +15,6 @@ struct language_cache {
   char *dir;  // directory containing language files
 };
 
-struct loaded_lang {
-  struct language_def def;
-  char **string_table;
-};
-
 static int bsearch_key_cmp_bytes(const void *a, const void *b) {
   const struct bytes_list *al = a;
   const struct bytes_list *bl = b;
@@ -69,7 +64,7 @@ static struct rule *ref_language_rule(struct rule *rule) {
   return rule;
 }
 
-static void free_loaded_lang(struct loaded_lang *lang) {
+void free_loaded_lang(struct loaded_lang *lang) {
   free(lang->def.name);
   free(lang->def.parents);
   for (size_t i = 0; i < NUM_SPECIAL_RULES; i++) {
@@ -85,7 +80,7 @@ static void free_loaded_lang(struct loaded_lang *lang) {
   }
 
   char **stringp = lang->string_table;
-  while (*stringp) free(*stringp++);
+  if (stringp) while (*stringp) free(*stringp++);
   free(lang->string_table);
 
   free(lang);
@@ -155,25 +150,38 @@ static bool is_simple_rule(const struct rule *rule) {
          strlen(rule->command_name) == 1 && rule->attributes == 0;
 }
 
-static struct loaded_lang *load_language(struct language_cache *cache,
-                                         const char *dir, const char *name) {
-  char *filename = get_lang_filename(dir, name);
-  FILE *file = fopen(filename, "rb");
-  free(filename);
-  if (!file) {
-    return NULL;
-  }
+static bool load_rule_args_from_file(FILE *file, struct loaded_lang *lang, struct rule *rule, size_t string_table_len);
 
+#define REASONABLY_LARGE (1024*1024)
+
+struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *file, const char *name) {
   struct loaded_lang *lang = malloc(sizeof *lang);
   lang->def.name = strdup(name);
 
+  // Initialise things early that affect how the language is freed.
+  lang->def.parents = NULL;
+  lang->string_table = NULL;
+  lang->def.meta_flags = 0;
+  memset(lang->def.special_rules, 0, sizeof lang->def.special_rules);
+
+  lang->def.rules_by_bytes =
+      bsearch_create_root(bsearch_key_cmp_bytes, bsearch_key_dup_bytes,
+                          bsearch_free_bytes, bsearch_free_language_rule);
+  lang->def.rules_by_command_name = bsearch_create_root(
+      bsearch_key_strcmp, void_identity, NULL, bsearch_free_language_rule);
+
   size_t string_table_len = fgetvarint(file);
+  if (string_table_len > REASONABLY_LARGE) {
+    fprintf(stderr, "Language file contained too many strings\n");
+    goto error;
+  }
   lang->string_table =
       malloc(sizeof *lang->string_table * (string_table_len + 1));
+  memset(lang->string_table, 0, sizeof *lang->string_table * (string_table_len + 1));
   for (size_t i = 0; i < string_table_len; i++) {
-    lang->string_table[i] = fgetstr(file);
+    lang->string_table[i] = fngetstr(file, REASONABLY_LARGE);
+    if (lang->string_table[i] == NULL || feof(file) || ferror(file)) goto error;
   }
-  lang->string_table[string_table_len] = NULL;
 
   lang->def.meta_flags = getc(file);
 
@@ -184,88 +192,99 @@ static struct loaded_lang *load_language(struct language_cache *cache,
   }
 
   size_t parents_len = fgetvarint(file);
+  if (parents_len > REASONABLY_LARGE) {
+    fprintf(stderr, "Language file contained too many parents\n");
+    goto error;
+  }
   lang->def.parents = malloc(sizeof *lang->def.parents * (parents_len + 1));
   for (size_t i = 0; i < parents_len; i++) {
     lang->def.parents[i] =
         fgettabledstr(lang->string_table, string_table_len, file);
+    if (lang->def.parents[i] == NULL) goto error;
   }
   lang->def.parents[parents_len] = NULL;
 
   size_t rules_len = fgetvarint(file);
-  lang->def.rules_by_bytes =
-      bsearch_create_root(bsearch_key_cmp_bytes, bsearch_key_dup_bytes,
-                          bsearch_free_bytes, bsearch_free_language_rule);
-  lang->def.rules_by_command_name = bsearch_create_root(
-      bsearch_key_strcmp, void_identity, NULL, bsearch_free_language_rule);
+  if (rules_len > REASONABLY_LARGE) {
+    fprintf(stderr, "Language file contained too many rules\n");
+    goto error;
+  }
 
   // Null all elements of special rules array.
   memset(&lang->def.special_rules, 0, sizeof lang->def.special_rules);
 
-  // Insert parent rules
-  for (size_t i = 0; i < parents_len; i++) {
-    const struct language_def *parent =
-        get_language(cache, lang->def.parents[i]);
-    if (!parent) {
-      fprintf(stderr,
-              "Error: could not find parent language \"%s\" of \"%s\"\n",
-              lang->def.parents[i], name);
+  if (cache != NULL) {
+    // Insert parent rules
+    for (size_t i = 0; i < parents_len; i++) {
+      const struct language_def *parent =
+          get_language(cache, lang->def.parents[i]);
+      if (!parent) {
+        fprintf(stderr,
+                "Error: could not find parent language \"%s\" of \"%s\"\n",
+                lang->def.parents[i], name);
 
-      free_loaded_lang(lang);
-      fclose(file);
-      return NULL;
-    }
+        goto error;
+      }
 
-    for (size_t j = 0; j < parent->rules_by_bytes->size; j++) {
-      struct rule *rule = parent->rules_by_bytes->pairs[j].value;
-      bsearch_upsert(lang->def.rules_by_bytes, rule->bytes.bytes,
-                     ref_language_rule(rule));
-    }
+      for (size_t j = 0; j < parent->rules_by_bytes->size; j++) {
+        struct rule *rule = parent->rules_by_bytes->pairs[j].value;
+        bsearch_upsert(lang->def.rules_by_bytes, rule->bytes.bytes,
+                      ref_language_rule(rule));
+      }
 
-    for (size_t j = 0; j < parent->rules_by_command_name->size; j++) {
-      struct rule *rule = parent->rules_by_command_name->pairs[j].value;
-      bsearch_upsert(lang->def.rules_by_command_name, rule->command_name,
-                     ref_language_rule(rule));
-    }
+      for (size_t j = 0; j < parent->rules_by_command_name->size; j++) {
+        struct rule *rule = parent->rules_by_command_name->pairs[j].value;
+        bsearch_upsert(lang->def.rules_by_command_name, rule->command_name,
+                      ref_language_rule(rule));
+      }
 
-    for (size_t j = 0; j < NUM_SPECIAL_RULES; j++) {
-      if (parent->special_rules[j]) {
-        overwrite_special_rule(&lang->def, parent->special_rules[j], j);
+      for (size_t j = 0; j < NUM_SPECIAL_RULES; j++) {
+        if (parent->special_rules[j]) {
+          overwrite_special_rule(&lang->def, parent->special_rules[j], j);
+        }
       }
     }
   }
 
   for (size_t i = 0; i < rules_len; i++) {
+    if (feof(file)) {
+      fprintf(stderr, "Error: unexpected end of file while reading language "
+                      "file\n");
+      goto error;
+    }
+
     struct rule *rule = malloc(sizeof *rule);
+    rule->args.args = NULL;
+    rule->args.length = 0;
+    rule->bytes.bytes = NULL;
+
     rule->refcnt = 1;
     rule->attributes = getc(file);
     rule->bytes.length = fgetvarint(file);
+    if (rule->bytes.length > REASONABLY_LARGE) {
+      fprintf(stderr, "Rule contained too many bytes\n");
+      goto error;
+    }
     rule->bytes.bytes = malloc(rule->bytes.length);
     fread(rule->bytes.bytes, 1, rule->bytes.length, file);
     rule->command_name =
         fgettabledstr(lang->string_table, string_table_len, file);
+    if (rule->command_name == NULL) {
+      rule_error:
+      for (size_t i = 0; i < rule->args.length; i++) {
+        free(rule->args.args[i].parsers.parsers);
+      }
+      free(rule->args.args);
+      free(rule->bytes.bytes);
+      free(rule);
+      goto error;
+    }
     read_language_name(lang->string_table, string_table_len,
                        &rule->oneshot_lang, file);
+    if (rule->oneshot_lang.name == NULL) goto error;
 
-    size_t args_len = fgetvarint(file);
-    rule->args.args = malloc(sizeof *rule->args.args * args_len);
-    rule->args.length = args_len;
-    for (size_t j = 0; j < args_len; j++) {
-      struct command_arg *arg = &rule->args.args[j];
-      arg->size = getc(file);
-
-      size_t parsers_len = fgetvarint(file);
-      arg->parsers.parsers = malloc(sizeof *arg->parsers.parsers * parsers_len);
-      arg->parsers.length = parsers_len;
-      for (size_t k = 0; k < parsers_len; k++) {
-        read_language_name(lang->string_table, string_table_len,
-                           &arg->parsers.parsers[k], file);
-      }
-
-      read_language_name(lang->string_table, string_table_len,
-                         &arg->as_language.lang, file);
-
-      arg->as_language.command =
-          fgettabledstr(lang->string_table, string_table_len, file);
+    if (!load_rule_args_from_file(file, lang, rule, string_table_len)) {
+      goto rule_error;
     }
 
     if (rule->attributes & RULE_ATTR_DEFAULT) {
@@ -299,6 +318,91 @@ static struct loaded_lang *load_language(struct language_cache *cache,
       }
     }
   }
+
+  return lang;
+
+  error:
+  fprintf(stderr, "Error: failed to load language file for \"%s\"\n", name);
+  free_loaded_lang(lang);
+  return NULL;
+}
+
+static bool load_rule_args_from_file(FILE *file, struct loaded_lang *lang, struct rule *rule, size_t string_table_len) {
+  size_t args_len = fgetvarint(file);
+  if (feof(file) || ferror(file)) {
+    return false;
+  }
+  if (args_len > REASONABLY_LARGE) {
+    fprintf(stderr, "Language file contained too many arguments\n");
+    return false;
+  }
+
+  rule->args.args = malloc(sizeof *rule->args.args * args_len);
+  rule->args.length = args_len;
+
+  size_t i;
+  bool ok = true;
+
+  for (i = 0; i < args_len; i++) {
+    struct command_arg *arg = &rule->args.args[i];
+    arg->size = getc(file);
+
+    size_t parsers_len = fgetvarint(file);
+    if (parsers_len > REASONABLY_LARGE) {
+      fprintf(stderr, "Language file contained too many parsers\n");
+      ok = false;
+      break;
+    }
+    arg->parsers.parsers = malloc(sizeof *arg->parsers.parsers * parsers_len);
+    arg->parsers.length = parsers_len;
+    for (size_t k = 0; k < parsers_len; k++) {
+      read_language_name(lang->string_table, string_table_len,
+                          &arg->parsers.parsers[k], file);
+      if (arg->parsers.parsers[k].name == NULL) {
+        ok = false;
+        free(arg->parsers.parsers);
+        break;;
+      }
+    }
+    if (!ok) break;
+
+    read_language_name(lang->string_table, string_table_len,
+                        &arg->as_language.lang, file);
+    if (arg->as_language.lang.name == NULL) {
+      ok = false;
+      free(arg->parsers.parsers);
+      break;
+    }
+
+    arg->as_language.command =
+        fgettabledstr(lang->string_table, string_table_len, file);
+    if (arg->as_language.command == NULL) {
+      ok = false;
+      free(arg->parsers.parsers);
+      break;
+    }
+  }
+
+  if (!ok) {
+    for (size_t j = 0; j < i; j++) {
+      free(rule->args.args[j].parsers.parsers);
+    }
+    rule->args.length = 0;
+  }
+
+  return ok;
+}
+
+static struct loaded_lang *load_language(struct language_cache *cache,
+                                         const char *dir, const char *name) {
+  char *filename = get_lang_filename(dir, name);
+  FILE *file = fopen(filename, "rb");
+  free(filename);
+  if (!file) {
+    return NULL;
+  }
+
+  struct loaded_lang *lang = load_language_from_file(cache, file, name);
 
   fclose(file);
   return lang;

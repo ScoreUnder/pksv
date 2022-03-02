@@ -71,6 +71,9 @@ SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c src_common/stdio_e
 SRC_LANGUAGE_PARSER = \
 	tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c \
 	src_common/binarysearch.c src_common/stdio_ext.c src_common/textutil.c
+SRC_LANGUAGE_DUMPER = \
+	tools/language-dat-dumper.c src_common/binarysearch.c src_lang/lang_load.c \
+	src_common/stdio_ext.c src_common/textutil.c
 
 GENERATED_SOURCES = \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
@@ -88,11 +91,13 @@ OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
 OBJ_LANGUAGE_PARSER = $(SRC_LANGUAGE_PARSER:.c=.o)
+OBJ_LANGUAGE_DUMPER = $(SRC_LANGUAGE_DUMPER:.c=.o)
 
 BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
 BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
 BIN_LANGUAGE_PARSER = tools/language_parser/language-parser$(EXE_EXT)
+BIN_LANGUAGE_DUMPER = tools/language-dat-dumper$(EXE_EXT)
 
 SUBLANGS_SRC = $(wildcard src_pksv/sublang/lang_*.lang.txt)
 SUBLANGS = $(subst src_pksv/,,$(SUBLANGS_SRC:.lang.txt=.dat))
@@ -113,6 +118,7 @@ DIST_OUT_WC = pksv-*.zip
 
 all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
 compat: $(PKSV) $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
+tools: $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(BIN_PROCESS_DEFINES) $(BIN_PROCESS_DEFINES_REVERSE)
 
 check: $(PKSV)
 	bunzip2 -fkq src_pksv/tests/fakerom.gba.bz2
@@ -126,7 +132,7 @@ check: $(PKSV)
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data
 
 mostlyclean: clean-fmem
 	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
@@ -165,6 +171,9 @@ $(BIN_PROCESS_DEFINES_REVERSE): $(OBJ_PROCESS_DEFINES_REVERSE)
 
 $(BIN_LANGUAGE_PARSER): $(OBJ_LANGUAGE_PARSER)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_LANGUAGE_PARSER) -o $@
+
+$(BIN_LANGUAGE_DUMPER): $(OBJ_LANGUAGE_DUMPER)
+	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_LANGUAGE_DUMPER) -o $@
 
 $(PKSV): $(OBJ_PKSV_MAIN)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PKSV_MAIN) -o $@
@@ -206,7 +215,7 @@ sublang/defs_%.dat: src_pksv/sublang/defs_%.defs.txt $(BIN_PROCESS_DEFINES) | su
 .y.tab.c:
 	$(YACC) -d -b $(@D)/$(*F) $<
 
-.PHONY: all check clean clean-fmem compat dist
+.PHONY: all check clean clean-fmem compat dist tools
 
 tools/language_parser/language-def-yacc.tab.h: tools/language_parser/language-def-yacc.tab.c
 	@:

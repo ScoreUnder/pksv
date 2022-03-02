@@ -1,6 +1,8 @@
 #ifndef PKSV_LANG_LOAD_H
 #define PKSV_LANG_LOAD_H 1
 
+#include <stdio.h>
+
 #include "language-defs.h"
 
 struct language_cache;  // opaque
@@ -20,5 +22,14 @@ const struct language_def *get_language(struct language_cache *cache,
 
 /** @brief Frees a language cache. */
 void destroy_language_cache(struct language_cache *cache);
+
+// Lower-level functions for tools that deal with language files.
+struct loaded_lang {
+  struct language_def def;
+  char **string_table;
+};
+
+struct loaded_lang *load_language_from_file(struct language_cache *cache, FILE *file, const char *name);
+void free_loaded_lang(struct loaded_lang *lang);
 
 #endif
