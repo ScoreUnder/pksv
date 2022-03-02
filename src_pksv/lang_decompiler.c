@@ -496,8 +496,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
               break;
             case PARSE_RESULT_LABEL: {
               // TODO: GSC offset handling
-              value = result.value & GBA_OFFSET_MASK;
-              ptrdiff_t label_index = bsearch_find_u32(state->labels, value);
+              uint32_t offset = result.value & GBA_OFFSET_MASK;
+              ptrdiff_t label_index = bsearch_find_u32(state->labels, offset);
               if (label_index >= 0) {
                 const char *label = state->labels->pairs[label_index].value;
                 putc(':', state->output);
