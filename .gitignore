@@ -12,6 +12,7 @@
 PokeScrE.log
 vgcore.*
 /defines.dat
+/sublang/*.dat
 # /pksv
 /tools/*
 !/tools/*.c
