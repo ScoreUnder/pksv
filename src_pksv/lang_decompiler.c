@@ -437,14 +437,6 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         visit_state->still_going = false;
         return;
       }
-
-      if (matched_rule->bytes.length != 0) {
-        fprintf(
-            stderr,
-            "Warning: default rule for \"%s\" is not empty\nThis will result "
-            "in decompilation/recompilation asymmetry.\n",
-            language->name);
-      }
     }
 
     size_t cmd_first_len;

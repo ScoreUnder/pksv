@@ -345,6 +345,15 @@ struct loaded_lang *load_language_from_file(struct language_cache *cache,
   bsearch_trim_capacity(lang->def.rules_by_bytes);
   bsearch_trim_capacity(lang->def.rules_by_command_name);
 
+  const struct rule *default_rule = lang->def.special_rules[SPECIAL_RULE_DEFAULT];
+  if (default_rule != NULL && default_rule->bytes.length != 0) {
+    fprintf(
+        stderr,
+        "Warning: default rule for \"%s\" is not empty\nThis will result "
+        "in decompilation/recompilation asymmetry.\n",
+        lang->def.name);
+  }
+
   return lang;
 
 error:
