@@ -176,6 +176,7 @@ int main(int argc, char **argv) {
         decompile_lang = "cry";
         break;
       case RUBY:
+      case EMERALD:
       default:
         decompile_lang = "rse";
         break;
@@ -191,6 +192,11 @@ int main(int argc, char **argv) {
 
     const struct language_def *language =
         get_language(lang_cache, decompile_lang);
+    if (language == NULL) {
+      fprintf(stderr, "Cannot find a language definition for \"%s\".\n",
+              decompile_lang);
+      exit(1);
+    }
 
     FILE *script_file =
         script_file_name == NULL ? stdout : fopen(script_file_name, "wt");

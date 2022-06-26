@@ -32,6 +32,7 @@ extern HWND HW_DLG;
 #define RUBY 1
 #define GOLD 2
 #define CRYSTAL 4
+#define EMERALD 5
 
 // Operation modes
 #define DECOMPILE 0

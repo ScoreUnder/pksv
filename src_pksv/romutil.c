@@ -14,8 +14,10 @@ struct rom_mode determine_mode(FILE *romfile) {
   }
   if (memcmp(buf, "BP", 2) == 0) {
     if (buf[2] == 'E') {
-      // Emerald actually has 00-byte padding at the end of the file
-      return (struct rom_mode){.type = FIRE_RED, .search = 0};
+      // Emerald actually has 00-byte padding more commonly than FF-byte
+      // padding. It seems to be removed content or something, because it still
+      // pads to the end of the file with FF bytes.
+      return (struct rom_mode){.type = EMERALD, .search = 0};
     } else {
       return (struct rom_mode){.type = FIRE_RED, .search = 0xFF};
     }
