@@ -120,7 +120,7 @@ all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBL
 compat: $(PKSV) $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
 tools: $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(BIN_PROCESS_DEFINES) $(BIN_PROCESS_DEFINES_REVERSE)
 
-check: $(PKSV)
+check: $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS)
 	bunzip2 -fkq src_pksv/tests/fakerom.gba.bz2
 	./$(PKSV) -r src_pksv/tests/test.pks src_pksv/tests/fakerom.gba
 	./$(PKSV) -d src_pksv/tests/fakerom.gba 6B09F8 src_pksv/tests/compare.pks
