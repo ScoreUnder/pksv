@@ -2294,8 +2294,8 @@ FILE* scrf;
 
 void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                  char* filename, FILE* fsend) {
-  unsigned int still_going, arg1, arg2, arg3, arg4, arg5, arg6, arg7, endat,
-      failsafe = 0, lastdata, lastdata2;
+  unsigned int still_going = 0, arg1 = 0, arg2 = 0, arg3 = 0, arg4 = 0, arg5 = 0, arg6 = 0, arg7 = 0, endat = 0,
+      failsafe = 0, lastdata = 0, lastdata2 = 0;
   unsigned char command, lastcmd;
   register FILE* fileM = fileM_;
   size_t read;
@@ -4718,7 +4718,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                                    (arg2 << 8));
             fprintf(fsend, "applymovement 0x%X 0x%X ' 0x%X\n", arg1, arg2,
                     arg3);
-            if (arg3 != -1) DoMove(arg3);
+            if (arg3 != -1U) DoMove(arg3);
             break;
           case GLD_APPLYMOVEOTHER:
             fread(&arg1, 1, 2, fileM);
@@ -4728,7 +4728,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                 fsend,
                 "applymoveother 0x%X ' 0x%X Applies movement to last talked\n",
                 arg1, arg2);
-            if (arg2 != -1) DoMove(arg2);
+            if (arg2 != -1U) DoMove(arg2);
             break;
           case GLD_VERBOSEGIVEITEM:
             fread(&arg1, 1, 1, fileM);
@@ -5033,7 +5033,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg3 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "stringtotext 0x%X 0x%X ' 0x%X\n", arg1, arg2, arg3);
-            if (arg3 != -1) {
+            if (arg3 != -1U) {
               DoText(arg3);
             }
             break;
@@ -5044,7 +5044,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg4 = PointerToOffset((arg1 << 8) | arg2);
             fprintf(fsend, "storetext 0x%X 0x%X 0x%X ' 0x%X\n", arg1, arg2,
                     arg3, arg4);
-            if (arg4 != -1) {
+            if (arg4 != -1U) {
               DoText(arg4);
             }
             break;
@@ -5068,7 +5068,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg2 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "jumptextfaceplayer 0x%X ' 0x%X\n", arg1, arg2);
-            if (arg2 != -1) DoText(arg2);
+            if (arg2 != -1U) DoText(arg2);
             still_going = 0;
             break;
           case GLD_JUMPTEXT:
@@ -5076,7 +5076,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg2 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "jumptext 0x%X ' 0x%X\n", arg1, arg2);
-            if (arg2 != -1) DoText(arg2);
+            if (arg2 != -1U) DoText(arg2);
             still_going = 0;
             break;
           case GLD_WINLOSSTEXT:
@@ -5088,8 +5088,8 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                                    (arg2 << 8));
             fprintf(fsend, "winlosstext 0x%X 0x%X ' 0x%X,0x%X\n", arg1, arg2,
                     arg3, arg4);
-            if (arg3 != -1) DoText(arg3);
-            if (arg4 != -1) DoText(arg4);
+            if (arg3 != -1U) DoText(arg3);
+            if (arg4 != -1U) DoText(arg4);
             break;
           case GLD_APPEAR:
             fread(&arg1, 1, 1, fileM);
@@ -5615,7 +5615,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                                    (arg2 << 8));
             fprintf(fsend, "applymovement 0x%X 0x%X ' 0x%X\n", arg1, arg2,
                     arg3);
-            if (arg3 != -1) DoMove(arg3);
+            if (arg3 != -1U) DoMove(arg3);
             break;
           case CRY_APPLYMOVEOTHER:
             fread(&arg1, 1, 2, fileM);
@@ -5625,7 +5625,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                 fsend,
                 "applymoveother 0x%X ' 0x%X Applies movement to last talked\n",
                 arg1, arg2);
-            if (arg2 != -1) DoMove(arg2);
+            if (arg2 != -1U) DoMove(arg2);
             break;
           case CRY_VERBOSEGIVEITEM:
             fread(&arg1, 1, 1, fileM);
@@ -5926,7 +5926,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg3 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "stringtotext 0x%X 0x%X ' 0x%X\n", arg1, arg2, arg3);
-            if (arg3 != -1) {
+            if (arg3 != -1U) {
               DoText(arg3);
             }
             break;
@@ -5937,7 +5937,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg4 = PointerToOffset((arg1 << 8) | arg2);
             fprintf(fsend, "storetext 0x%X 0x%X 0x%X ' 0x%X\n", arg1, arg2,
                     arg3, arg4);
-            if (arg4 != -1) {
+            if (arg4 != -1U) {
               DoText(arg4);
             }
             break;
@@ -5961,7 +5961,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg2 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "jumptextfaceplayer 0x%X ' 0x%X\n", arg1, arg2);
-            if (arg2 != -1) DoText(arg2);
+            if (arg2 != -1U) DoText(arg2);
             still_going = 0;
             break;
           case CRY_JUMPTEXT:
@@ -5969,7 +5969,7 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
             arg2 = PointerToOffset((OffsetToPointer(FileZoomPos) & 0xFF) |
                                    (arg1 << 8));
             fprintf(fsend, "jumptext 0x%X ' 0x%X\n", arg1, arg2);
-            if (arg2 != -1) DoText(arg2);
+            if (arg2 != -1U) DoText(arg2);
             still_going = 0;
             break;
           case CRY_WINLOSSTEXT:
@@ -5981,8 +5981,8 @@ void DecodeProc2(FILE* fileM_, unsigned int narc, unsigned int FileZoomPos,
                                    (arg2 << 8));
             fprintf(fsend, "winlosstext 0x%X 0x%X ' 0x%X,0x%X\n", arg1, arg2,
                     arg3, arg4);
-            if (arg3 != -1) DoText(arg3);
-            if (arg4 != -1) DoText(arg4);
+            if (arg3 != -1U) DoText(arg3);
+            if (arg4 != -1U) DoText(arg4);
             break;
           case CRY_APPEAR:
             fread(&arg1, 1, 1, fileM);
@@ -6542,8 +6542,7 @@ void DecodeProc(FILE* fileM, unsigned int narc, unsigned int FileZoomPos,
   }
 }
 
-void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                   FILE* fsend) {
+void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register unsigned int arg1, failsafe;
   unsigned int arg2, arg3;
   char buf[1024];
@@ -6634,7 +6633,7 @@ void DecodeProcASM(FILE* fileM, unsigned int FileZoomPos, char* fname,
   }
 }
 
-void DecodeProcText(FILE* fileM, unsigned int FileZoomPos, char* fname,
+void DecodeProcText(unsigned int FileZoomPos, char* fname,
                     FILE* fsend) {
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
@@ -6662,8 +6661,7 @@ void DecodeProcText(FILE* fileM, unsigned int FileZoomPos, char* fname,
   decompile_single_text(fsend, fname, FileZoomPos);
 }
 
-void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                       FILE* fsend) {
+void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   unsigned int arg2;
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
@@ -6702,8 +6700,7 @@ void DecodeProcPointer(FILE* fileM, unsigned int FileZoomPos, char* fname,
   }
 }
 
-void DecodeProcMoves(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                     FILE* fsend) {
+void DecodeProcMoves(unsigned int FileZoomPos, char* fname, FILE* fsend) {
   initDoneProcs();
   if (dyndec) fprintf(fsend, "#dynamic 0x%X\n", dynplace);
   if (VersionOverride) {
@@ -6735,8 +6732,7 @@ void DecodeProcMoves(FILE* fileM, unsigned int FileZoomPos, char* fname,
             transmove(FileZoomPos & 0x07ffffff, fname));
 }
 
-void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                    FILE* fsend) {
+void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register char* m;
   int arg2;
   initDoneProcs();
@@ -6783,8 +6779,7 @@ void DecodeProcMart(FILE* fileM, unsigned int FileZoomPos, char* fname,
   fprintf(fsend, "\n");
 }
 
-void DecodeProcAttacks(FILE* fileM, unsigned int FileZoomPos, char* fname,
-                       FILE* fsend) {
+void DecodeProcAttacks(FILE* fileM, unsigned int FileZoomPos, FILE* fsend) {
   register char* m;
   int arg2;
   initDoneProcs();

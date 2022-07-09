@@ -132,8 +132,10 @@ uint32_t GetHex(const char *in, pos_int *ppos) {
 
 void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
   unsigned int i = *ppos;
-  int j;  // used in rom macro
-  register int arg1, arg2, arg3;
+  // int j;  // used in rom macro
+  //note about j: it is very clearly not used, though i've left it here (commented out)
+  // just in case there's something i've missed
+  register int arg1 = 0, arg2  = 0, arg3 = 0;
   ///////////////////ASM////////////////////
   if (thumb) {
     if (!strcmp(buf, "-lsl")) {
@@ -1209,6 +1211,8 @@ struct bsearch_root *DoDefines() {
       s = "defines.dat is truncated and not fully valid\n";
     } else if (ferror(f)) {
       s = "Error reading defines.dat\n";
+    } else {
+      s = "general unknown error\n";
     }
     log_txt(s, strlen(s));
     bsearch_deinit_root(defines);  // Might not have been a valid defines.dat
@@ -1227,21 +1231,23 @@ void RecodeProc(char *script, char *romfn) {
 #endif
   FILE *IncFile = NULL, *RomFile;
 #ifdef WIN32
+#ifdef DLL
   char *strings;
+#endif
 #endif
   char *Script;  // Whoops, used the same name for the filename.
   // Use caps-lock carefully.
-  char buf[1024], buf2[1024], buf3[1024];
+  char buf[1024], buf2[2048], buf3[1024];
   void *temp_ptr;
   int buf_loc;
   unsigned int start = 0, dynu = 0,
 #ifndef DLL
                fs,
 #endif
-               fst, i, j, k, l, arg1, arg2, arg3, arg4, arg5, arg6,
-               scriptlen;  //,arg7;
+               fst= 0, i = 0, j = 0, k = 0, l = 0, arg1 = 0, arg2 = 0, arg3 = 0, arg4 = 0, arg5 = 0, arg6 = 0,
+               scriptlen = 0;  //,arg7;
   codeblock *c = NULL;
-  codeblock *d;
+  codeblock *d = NULL;
   codelabel *cl = NULL;
   codelabel *cl2;
 
@@ -2247,16 +2253,16 @@ void RecodeProc(char *script, char *romfn) {
               } else if (!strcmp(buf, "==0") || !strcmp(buf, "=0") ||
                          !strcmp(buf, "false")) {
                 BASIC(CRY_EQZERO);
-                arg1 = -1;
+                arg1 = -1U;
               } else if (!strcmp(buf, "!=0") || !strcmp(buf, "<>0") ||
                          !strcmp(buf, "true")) {
                 BASIC(CRY_NEQZERO);
-                arg1 = -1;
+                arg1 = -1U;
               } else {
                 log_txt("Incorrect arguments to IF\n", 29 - 1);
                 return;
               }
-              if (arg1 != -1) {
+              if (arg1 != -1U) {
                 arg1 = GetNum("IF");
                 if (!gffs) {
                   return;
@@ -2266,7 +2272,7 @@ void RecodeProc(char *script, char *romfn) {
               if (!gffs) {
                 return;
               }
-              if (arg1 != -1) rom(arg1, 1);
+              if (arg1 != -1U) rom(arg1, 1);
               rom(arg2, 2);
               ec();
             }
@@ -4396,13 +4402,13 @@ void RecodeProc(char *script, char *romfn) {
                 log_txt("Incorrect arguments to IF\n", 29 - 1);
                 return;
               }
-              if (arg1 != -1) {
+              if (arg1 != -1U) {
                 arg1 = GetNum("IF");
                 if (!gffs) {
                   return;
                 }
               }
-              if (arg1 != -1) rom(arg1, 1);
+              if (arg1 != -1U) rom(arg1, 1);
               arg2 = GetNum("IF");
               if (!gffs) {
                 return;
