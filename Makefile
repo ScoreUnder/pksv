@@ -20,6 +20,7 @@ CMAKE = cmake
 LEX = lex
 YACC = yacc
 TOOL_WRAPPER =  # Might be wine
+ZIP = 7z a -tzip
 
 LIB_FMEM_BASE = lib/fmem
 LIB_FMEM = $(LIB_FMEM_BASE)/build
@@ -145,7 +146,9 @@ clean-fmem:
 
 dist: $(DIST_FILES)
 	rm -f -- $(DIST_OUT_WC)
-	7z a -tzip $(DIST_OUT) $(DIST_FILES)
+	$(ZIP) $(DIST_OUT) $(DIST_FILES)
+	torrentzip $(DIST_OUT)
+	rm -v \[*\]_\[*\].log  # Torrentzip output
 
 # Lets us run pksvui from the root of the source tree
 Scintilla.dll: src_pksvui/Scintilla.dll
