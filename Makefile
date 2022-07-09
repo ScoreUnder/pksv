@@ -98,6 +98,7 @@ BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
 BIN_LANGUAGE_PARSER = tools/language_parser/language-parser$(EXE_EXT)
 BIN_LANGUAGE_DUMPER = tools/language-dat-dumper$(EXE_EXT)
+ALL_TOOLS = $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER)
 
 SUBLANGS_SRC = $(wildcard src_pksv/sublang/lang_*.lang.txt)
 SUBLANGS = $(subst src_pksv/,,$(SUBLANGS_SRC:.lang.txt=.dat))
@@ -112,8 +113,9 @@ PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
 PKSVUI = pksvui$(EXE_EXT)
 
-DIST_FILES = $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll license.txt
-DIST_OUT = pksv-"$$(git describe --long --dirty --always)".zip
+DIST_FILES_P_win = $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll
+DIST_FILES = $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS) license.txt $(ALL_TOOLS) $(DIST_FILES_P_$(PLATFORM))
+DIST_OUT = pksv-$(PLATFORM)-"$$(git describe --long --dirty --always)".zip
 DIST_OUT_WC = pksv-*.zip
 
 all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
