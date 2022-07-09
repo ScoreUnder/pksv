@@ -77,6 +77,7 @@ OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
 BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
 BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
+ALL_TOOLS = $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE)
 
 DEPS = $(OBJ_PKSV_MAIN:.o=.d) $(OBJ_PKSV_SHLIB:o=d) $(OBJ_PROCESS_DEFINES:.o=.d) $(OBJ_GPERF_REVERSE:.o=.d)
 
@@ -84,8 +85,9 @@ PKSV = pksv$(EXE_EXT)
 PKSV_SHLIB = pksv$(SHLIB_EXT)
 PKSVUI = pksvui$(EXE_EXT)
 
-DIST_FILES = $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll license.txt
-DIST_OUT = pksv-"$$(git describe --long --dirty --always)".zip
+DIST_FILES_P_win = $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll
+DIST_FILES = $(PKSV) defines.dat license.txt $(ALL_TOOLS) $(DIST_FILES_P_$(PLATFORM))
+DIST_OUT = pksv-$(PLATFORM)-"$$(git describe --long --dirty --always)".zip
 DIST_OUT_WC = pksv-*.zip
 
 all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) defines.dat Scintilla.dll
