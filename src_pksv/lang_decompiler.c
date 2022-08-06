@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "lang_decompiler.h"
 #include "lang_default_parsers.h"
@@ -52,6 +53,7 @@ struct decomp_internal_state {
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
   struct decompiler_informative_state info;
+  bool is_verbose;
 };
 
 static void decomp_visit_address(
@@ -64,7 +66,8 @@ static struct queued_decompilation *duplicate_queued_decompilation(
 void decompile_all(FILE *input_file, uint32_t start_offset,
                    const struct language_def *start_language,
                    struct language_cache *language_cache,
-                   struct parser_cache *parser_cache, FILE *output_file) {
+                   struct parser_cache *parser_cache, FILE *output_file,
+                   bool is_verbose) {
   struct bsearch_root unvisited_blocks;
   bsearch_init_root(&unvisited_blocks, bsearch_key_uint32cmp,
                     bsearch_key_nocopy, NULL, free);
@@ -99,6 +102,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
       .labels = NULL,
       .language_cache = language_cache,
       .parser_cache = parser_cache,
+      .is_verbose = is_verbose,
   };
 
   // Visit the initial address and any that result from decompiling it.
@@ -138,7 +142,11 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
 
     // Create a label for the decompiled block.
     char *label = malloc(32);
-    snprintf(label, 32, "label_%zu", label_num++);
+    if (decomp_state.is_verbose) {
+      snprintf(label, 32, "label_%" PRIx32, decomp_addr);
+    } else {
+      snprintf(label, 32, "label_%zu", label_num++);
+    }
     bsearch_upsert(&labels, CAST_u32_pvoid(decomp_addr), label);
 
     // Find the start of the decompiled block.
@@ -453,6 +461,14 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
         state->info.is_checkflag = false;
 
+      // If not a text language, we can prefix the command name with
+      // the current language name if in verbose mode.
+      if (state->is_verbose && language_type != METAFLAG_LANGTYPE_TEXT) {
+        assert(language->name[0] != '\0');
+        fputs(language->name, state->output);
+        fputc(':', state->output);
+      }
+
       fwrite(matched_rule->command_name, 1, cmd_first_len, state->output);
       visit_state->line_length += cmd_first_len;
     }
@@ -495,6 +511,17 @@ static void decomp_visit_single(struct decomp_internal_state *state,
               assert(false);  // this shouldn't be returned by a formatter
               break;
             case PARSE_RESULT_TOKEN:
+              if (state->is_verbose) {
+                const char *name;
+                if (result.parser->which == PARSER_TYPE_BUILTIN) {
+                  name = result.parser->builtin.name;
+                } else {
+                  // if result.parser->which == PARSER_TYPE_LOADED
+                  name = result.parser->loaded.name;
+                }
+                fputs(name, state->output);
+                fputc(':', state->output);
+              }
               fputs(result.token, state->output);
               visit_state->line_length += strlen(result.token);
               free(result.token);
@@ -513,6 +540,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                 assert(result.type ==
                        PARSE_RESULT_TOKEN);  // Default hex fallback parser
                                              // can't fail on us
+                if (state->is_verbose) {
+                  fputs(builtin_parser_hex.builtin.name, state->output);
+                  fputc(':', state->output);
+                }
                 fputs(result.token, state->output);
                 visit_state->line_length += strlen(result.token);
               }

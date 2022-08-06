@@ -19,6 +19,7 @@ struct parser_cache {
 void deinit_loaded_parser(struct loaded_parser *parser) {
   bsearch_deinit_root(&parser->lookup_by_name);
   bsearch_deinit_root(&parser->lookup_by_id);
+  free(parser->name);
 }
 
 void destroy_loaded_parser(struct loaded_parser *parser) {
@@ -36,7 +37,8 @@ void bsearch_destroy_loaded_or_builtin_parser(void *ptr) {
   // Builtin parsers are statically allocated.
 }
 
-struct loaded_parser *load_definitions(const char *filename, bool required) {
+struct loaded_parser *load_definitions(const char *name, const char *filename,
+                                       bool required) {
   FILE *f = fopen(filename, "rb");
   if (!f) {
     if (required) {
@@ -46,6 +48,7 @@ struct loaded_parser *load_definitions(const char *filename, bool required) {
   }
 
   struct loaded_parser *result = malloc(sizeof *result);
+  result->name = strdup(name);
   bsearch_init_root(&result->lookup_by_name, bsearch_key_strcmp,
                     bsearch_key_strdup, free, NULL);
   // Values of lookup_by_id are not freed because they are all keys in
@@ -140,7 +143,8 @@ struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
 
   char *parser_filename =
       get_definitions_file_name(cache->parser_dir, defs_name);
-  struct loaded_parser *defs = load_definitions(parser_filename, required);
+  struct loaded_parser *defs =
+      load_definitions(defs_name, parser_filename, required);
   free(parser_filename);
   if (defs) {
     struct loaded_or_builtin_parser *parser = malloc(sizeof *parser);
@@ -301,6 +305,7 @@ struct parse_result format_for_decomp(
     generic_parser = take_parser(cache, lang, parsers, &state);
     if (generic_parser != NULL) {
       result = execute_parser_format(generic_parser, value, decstate);
+      result.parser = generic_parser;
     }
   } while (generic_parser != NULL && result.type == PARSE_RESULT_FAIL);
 

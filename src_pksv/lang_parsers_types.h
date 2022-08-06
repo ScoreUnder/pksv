@@ -7,6 +7,7 @@
 #include "lang_decompiler_types.h"
 
 struct loaded_parser {
+  char *name;
   struct bsearch_root lookup_by_name;
   struct bsearch_root lookup_by_id;
 };
@@ -42,6 +43,7 @@ struct parse_result {
     char *label;     // if parser's PARSE_RESULT_LABEL
     char *token;     // if formatter's PARSE_RESULT_TOKEN
   };
+  struct loaded_or_builtin_parser *parser;
 };
 
 typedef struct parse_result builtin_parser_parse(const char *token,
@@ -50,6 +52,7 @@ typedef struct parse_result builtin_parser_format(
     uint32_t value, struct decompiler_informative_state *state);
 
 struct builtin_parser {
+  const char *name;
   builtin_parser_parse *parse;
   builtin_parser_format *format;
 };

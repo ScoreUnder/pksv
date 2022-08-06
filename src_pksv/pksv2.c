@@ -49,8 +49,15 @@ void show_help(FILE *where) {
                  " - Command line tool to compile/decompile PokeScript.\n\
 pksv -e ScriptFile.txt RomFile.gba          -- Debug compile\n\
 pksv -r ScriptFile.txt RomFile.gba          -- Compile\n\
-pksv RomFile.gba HexOffset [OutputFile.txt] -- Decompile\n\
-You can insert --lang LANGUAGE before the ROM file name in the decompile command line to decompile using that language.\n\
+pksv [-d] RomFile.gba HexOffset [OutputFile.txt] -- Decompile\n\
+\n\
+Flags:\n\
+    --lang LANGUAGE\n\
+          Select initial language for decompilation or recompilation\n\
+    -d    Decompile\n\
+    -r    (Re)compile\n\
+    -e    Debug compile (dry-run without writing to ROM)\n\
+    -v    Verbose (also affects script decompilation)\n\
 ");
 }
 
@@ -65,6 +72,7 @@ int main(int argc, char **argv) {
   bool autodetect_mode = true;
   uint32_t decompile_at;
   char *decompile_lang;
+  bool verbose = false;
 
   char *positional_arguments[MAX_POSITIONAL_ARGUMENTS];
   int positional_argument_count = 0;
@@ -119,6 +127,8 @@ int main(int argc, char **argv) {
         show_help(stderr);
         return 1;
       }
+    } else if (!strcmp(argv[i], "-v")) {
+      verbose = true;
     } else if (!strcmp(argv[i], "--help")) {
       show_help(stdout);
       return 0;
@@ -201,7 +211,7 @@ int main(int argc, char **argv) {
     FILE *script_file =
         script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
     decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
-                  script_file);
+                  script_file, verbose);
 
 #ifndef NDEBUG
     // This is to keep valgrind happy.

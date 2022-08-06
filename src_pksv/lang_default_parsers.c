@@ -219,6 +219,7 @@ struct loaded_or_builtin_parser builtin_parser_hex = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
         {
+            .name = "hex",
             .parse = default_parse_hex,
             .format = default_format_hex,
         },
@@ -228,6 +229,7 @@ struct loaded_or_builtin_parser builtin_parser_dec = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
         {
+            .name = "decimal",
             .parse = default_parse_dec,
             .format = default_format_dec,
         },
@@ -237,6 +239,7 @@ struct loaded_or_builtin_parser builtin_parser_address = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
         {
+            .name = "address",
             .parse = default_parse_address,
             .format = default_format_address,
         },
@@ -246,6 +249,7 @@ struct loaded_or_builtin_parser builtin_parser_condition = {
     .which = PARSER_TYPE_BUILTIN,
     .builtin =
         {
+            .name = "condition",
             .parse = default_parse_condition,
             .format = default_format_condition,
         },

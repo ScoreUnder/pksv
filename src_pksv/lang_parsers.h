@@ -9,7 +9,8 @@
 #include "lang_decompiler_types.h"
 #include "lang_parsers_types.h"
 
-struct loaded_parser *load_definitions(const char *filename, bool required);
+struct loaded_parser *load_definitions(const char *name, const char *filename,
+                                       bool required);
 
 struct parser_cache *create_parser_cache(const char *parser_dir);
 void destroy_parser_cache(struct parser_cache *cache);
