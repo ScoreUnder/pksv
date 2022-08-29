@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 #include "binarysearch.h"
 #include "textutil.h"

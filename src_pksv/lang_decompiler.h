@@ -6,7 +6,6 @@
 #include <stdbool.h>
 
 #include "language-defs.h"
-#include "lang_decompiler_types.h"
 #include "lang_parsers_types.h"
 #include "lang_load.h"
 

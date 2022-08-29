@@ -27,6 +27,7 @@
 #include "uint32_interval.h"
 #include "binarysearch_u32.h"
 #include "binarysearch.h"
+#include "lang_parsers_types.h"
 #include "lang_parsers.h"
 #include "recompiler.h"
 #include "textproc.h"

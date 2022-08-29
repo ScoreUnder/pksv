@@ -1,6 +1,7 @@
 #ifndef PKSV_BINARY_SEARCH_U32_H
 #define PKSV_BINARY_SEARCH_U32_H 1
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "binarysearch.h"

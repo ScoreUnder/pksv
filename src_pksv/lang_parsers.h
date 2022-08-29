@@ -1,10 +1,10 @@
 #ifndef PKSV_LANG_PARSERS_H
 #define PKSV_LANG_PARSERS_H 1
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "binarysearch.h"
 #include "language-defs.h"
 #include "lang_decompiler_types.h"
 #include "lang_parsers_types.h"

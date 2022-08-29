@@ -1,6 +1,7 @@
 #ifndef LANG_DEFAULT_PARSERS_H
 #define LANG_DEFAULT_PARSERS_H 1
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "lang_parsers_types.h"

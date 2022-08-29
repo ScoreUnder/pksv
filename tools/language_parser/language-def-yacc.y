@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include "language-defs-builder.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
 #include "textutil.h"
 
+struct string_list_builder;
 extern int yylex(void);
 extern int yylineno;
 extern FILE* yyin;

@@ -1,8 +1,7 @@
 #ifndef PKSV_CODEPROC_H
 #define PKSV_CODEPROC_H 1
 
-#include <stdio.h>
-
+#include "binarysearch.h"
 #include "sulib.h"
 
 typedef unsigned int pos_int;  // TODO: change to size_t at some point

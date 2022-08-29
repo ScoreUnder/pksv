@@ -1,5 +1,5 @@
 #include <assert.h>
-#include <limits.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -7,6 +7,7 @@
 #include <inttypes.h>
 
 #include "lang_decompiler.h"
+#include "lang_decompiler_types.h"
 #include "lang_default_parsers.h"
 #include "lang_parsers.h"
 #include "lang_load.h"

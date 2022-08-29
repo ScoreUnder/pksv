@@ -1,12 +1,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <stdio.h>
 
 #include "binarysearch_u32.h"
 #include "binarysearch.h"
-#include "lang_parsers.h"
+#include "lang_decompiler_types.h"
 #include "lang_default_parsers.h"
 #include "textutil.h"
 
