@@ -50,7 +50,7 @@ static int bsearch_key_intptrcmp(const void *a, const void *b) {
   return 0;
 }
 
-void dump_rule(FILE *f, const struct rule* rule);
+void dump_rule(FILE *f, const struct rule *rule);
 void dump_string(FILE *f, const char *str);
 
 void dump_language(FILE *f, const struct language_def *lang) {
@@ -80,7 +80,8 @@ void dump_language(FILE *f, const struct language_def *lang) {
   }
 
   struct bsearch_root seen_rules;
-  bsearch_init_root(&seen_rules, bsearch_key_intptrcmp, bsearch_key_nocopy, NULL, NULL);
+  bsearch_init_root(&seen_rules, bsearch_key_intptrcmp, bsearch_key_nocopy,
+                    NULL, NULL);
 
   for (size_t i = 0; i < NUM_SPECIAL_RULES; i++) {
     struct rule *rule = lang->special_rules[i];
@@ -120,7 +121,7 @@ void dump_language(FILE *f, const struct language_def *lang) {
       buf[0] = val;
       buf[1] = '\0';
 
-      fprintf(f, "[0x%02x] = ", (uint8_t) i);
+      fprintf(f, "[0x%02x] = ", (uint8_t)i);
       dump_string(f, buf);
       putc('\n', f);
     }
@@ -131,7 +132,7 @@ void dump_language(FILE *f, const struct language_def *lang) {
       if (val == 0) continue;
       if (decomp_table[val] == i) continue;
 
-      buf[0] = (uint8_t) i;
+      buf[0] = (uint8_t)i;
       buf[1] = '\0';
 
       fprintf(f, "[0x%02x] = ", val);
@@ -141,7 +142,7 @@ void dump_language(FILE *f, const struct language_def *lang) {
   }
 }
 
-void dump_rule(FILE *f, const struct rule* rule) {
+void dump_rule(FILE *f, const struct rule *rule) {
   putc('[', f);
   for (size_t i = 0; i < rule->bytes.length; i++) {
     if (i != 0) putc(' ', f);
@@ -188,7 +189,8 @@ void dump_rule(FILE *f, const struct rule* rule) {
       dump_string(f, parsers->parsers[j].name);
     }
 
-    bool has_language = arg->as_language.lang.name[0] != '\0' || arg->as_language.lang.is_prefixed;
+    bool has_language = arg->as_language.lang.name[0] != '\0' ||
+                        arg->as_language.lang.is_prefixed;
     bool has_command = arg->as_language.command[0] != '\0';
     if (has_language || has_command) {
       putc('@', f);
@@ -244,4 +246,3 @@ void dump_string(FILE *f, const char *str) {
     putc('"', f);
   }
 }
-

@@ -204,10 +204,14 @@
 #define CMD_RESETWEATHER 0xA3          // C,D,
 #define CMD_SETWEATHER 0xA4            // C,D,  weather(1) unk(1) (fr=2)
 #define CMD_DOWEATHER 0xA5             // C,D,
-#define CMD_SETSTEPCALLBACK 0xA6       // C,D,  id(1) [0 = none; 1 = ashy grass checker; 2 = fortree bridge swayer; 3 = pacifidlog log swayer; 4 = sootopolis gym ice cracker; 5 = something to do with truck? 6 = secret base trap/toy activator; 7 = cracked floor tracker]
-#define CMD_SETMAPFOOTER 0xA7          // C,D,  (2)
-#define CMD_INCREASESPRITELEVEL 0xA8   // C,D,  id(2)bank(1)map(1)?(1)
-#define CMD_RESETSPRITELEVEL 0xA9      // C,D,  id(2)bank(1)map(1)
+#define CMD_SETSTEPCALLBACK \
+  0xA6  // C,D,  id(1) [0 = none; 1 = ashy grass checker; 2 = fortree bridge
+        // swayer; 3 = pacifidlog log swayer; 4 = sootopolis gym ice cracker; 5
+        // = something to do with truck? 6 = secret base trap/toy activator; 7 =
+        // cracked floor tracker]
+#define CMD_SETMAPFOOTER 0xA7         // C,D,  (2)
+#define CMD_INCREASESPRITELEVEL 0xA8  // C,D,  id(2)bank(1)map(1)?(1)
+#define CMD_RESETSPRITELEVEL 0xA9     // C,D,  id(2)bank(1)map(1)
 #define CMD_CREATETEMPSPRITE 0xAA  // C,D,  spr(1)id(1)x(2)y(2)behave(1)dir(1)
 #define CMD_TEMPSPRITEFACE 0xAB    // C,D,  id(1)dir(1)
 #define CMD_SETDOOROPENED 0xAC     // C,D,  (2)(2)
@@ -273,16 +277,14 @@ offset.( var(a)==*b ) comparefarbytetovar Exactly the same, the other way round.
 ( *a==var(b) ) comparefarbytetobyte Compares a byte at an offset to another
 byte. ( *a==b ) comparefarbytetofarbyte Compares the value of 2 offsets ( *a==*b
 ) compare Compares a variable to another, or to a number. cmd_22 No idea
-callasm Calls code in ARM or THUMB format for direct access to the game. The most powerful command.
-special Calls a predefined routine
-specialvar Calls a predefined routine and stores the result in a variable.
-waitspecial Waits for either of these commands to complete (does not decompile correctly in pokescript)
-pause Waits a certain amount of time
-Setflag Sets a flag to 1 (a flag is a variable that can be only 1 or 0)
-clearflag Sets a flag to 0
-checkflag Checks if a flag is 1
-sound Plays a sound, even when BGM is turned off
-cry Makes the same sound a pokemon (that you decide) makes when it comes into battle.
+callasm Calls code in ARM or THUMB format for direct access to the game. The
+most powerful command. special Calls a predefined routine specialvar Calls a
+predefined routine and stores the result in a variable. waitspecial Waits for
+either of these commands to complete (does not decompile correctly in
+pokescript) pause Waits a certain amount of time Setflag Sets a flag to 1 (a
+flag is a variable that can be only 1 or 0) clearflag Sets a flag to 0 checkflag
+Checks if a flag is 1 sound Plays a sound, even when BGM is turned off cry Makes
+the same sound a pokemon (that you decide) makes when it comes into battle.
 fanfare Plays any pre-defined sound
 waitfanfare Waits for that command to complete
 playsound Plays a pre-defined sound.

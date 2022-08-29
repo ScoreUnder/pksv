@@ -27,23 +27,22 @@ typedef struct {
 #define DYN_UNSPECIFIED ((uint32_t)-1)
 
 void compile_line(struct compiler_internal_state *state, const char *line);
-len_string* pull_token(const char *text);
-
+len_string *pull_token(const char *text);
 
 void compile_all(FILE *input_file, FILE *output_file,
                  const struct language_def *start_language,
                  struct language_cache *language_cache,
                  struct parser_cache *parser_cache) {
   struct compiler_internal_state state = {
-    .curr_language = start_language,
-    .base_language = start_language,
-    .language_cache = language_cache,
-    .parser_cache = parser_cache,
-    .line = 1,
-    .dynamic_base = DYN_UNSPECIFIED,
+      .curr_language = start_language,
+      .base_language = start_language,
+      .language_cache = language_cache,
+      .parser_cache = parser_cache,
+      .line = 1,
+      .dynamic_base = DYN_UNSPECIFIED,
   };
 
-  const size_t buffer_size = 0x400; // Arbitrary
+  const size_t buffer_size = 0x400;  // Arbitrary
   char *buffer = malloc(buffer_size);
 
   while (fgets(buffer, buffer_size, input_file) != NULL) {
@@ -55,7 +54,7 @@ void compile_all(FILE *input_file, FILE *output_file,
   free(buffer);
 
   // TODO: write
-  (void) output_file;
+  (void)output_file;
 }
 
 #define VALID_SPACES " \t"
@@ -73,8 +72,8 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
       break;
     case '#': {
       // Compiler directive
-      cur++; // Skip '#'
-      cur += strspn(cur, VALID_SPACES); // Skip spaces
+      cur++;                             // Skip '#'
+      cur += strspn(cur, VALID_SPACES);  // Skip spaces
 
       // TODO: parse compiler directive
       len_string *token = pull_token(cur);
@@ -84,7 +83,7 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
     }
     case ':': {
       // Label
-      cur++; // Skip ':'
+      cur++;  // Skip ':'
 
       // TODO
       len_string *token = pull_token(cur);
@@ -104,7 +103,7 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
       if (*cur == ':') {
         namespace = token;
 
-        cur++; // Skip ':'
+        cur++;  // Skip ':'
         command = pull_token(cur);
         cur += command->len;
       } else {
@@ -112,8 +111,9 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
         command = token;
       }
 
-      printf("command %s:%s\n", namespace == NULL ? "<null>" : namespace->str, command->str);
-      (void) state;
+      printf("command %s:%s\n", namespace == NULL ? "<null>" : namespace->str,
+             command->str);
+      (void)state;
       free(namespace);
       free(command);
       break;
