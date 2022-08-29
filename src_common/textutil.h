@@ -23,4 +23,6 @@ __attribute__((nonnull)) size_t skip_whitespace(const char *in, size_t pos);
 __attribute__((nonnull)) size_t skip_whitespace_and_comma(const char *in,
                                                           size_t pos);
 
+__attribute__((nonnull)) void strtolower(char *restrict str);
+
 #endif

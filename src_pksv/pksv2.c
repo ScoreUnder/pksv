@@ -26,10 +26,10 @@
 #include "lang_load.h"
 #include "lang_parsers.h"
 #include "lang_decompiler.h"
+#include "lang_recompiler.h"
 #include "pksv.h"
 #include "textutil.h"
 #include "version.h"
-#include "recompiler.h"
 #include "romutil.h"
 
 bool dyndec = false;
@@ -83,17 +83,6 @@ int main(int argc, char **argv) {
   char *exename = strdup(argv[0]);
   char *exe_dirname = dirname(exename);
   size_t exe_dirlen = strlen(exe_dirname);
-
-  defines_dat_location = malloc(exe_dirlen + strlen(DEFINITIONS_FILE) + 2);
-  strcpy(defines_dat_location, exe_dirname);
-  defines_dat_location[exe_dirlen] = '/';
-  strcpy(defines_dat_location + exe_dirlen + 1, DEFINITIONS_FILE);
-
-  pokeinc_txt_location = malloc(exe_dirlen + strlen(INCLUDES_FILE) + 2);
-  strcpy(pokeinc_txt_location, exe_dirname);
-  pokeinc_txt_location[exe_dirlen] = '/';
-  strcpy(pokeinc_txt_location + exe_dirlen + 1, INCLUDES_FILE);
-
   char *language_dir = malloc(exe_dirlen + strlen(LANGUAGE_DIR_NAME) + 2);
   strcpy(language_dir, exe_dirname);
   language_dir[exe_dirlen] = '/';
@@ -162,7 +151,7 @@ int main(int argc, char **argv) {
     } else {
       script_file_name = NULL;
     }
-  } else {
+  } else /* if recompile */ {
     script_file_name = positional_arguments[0];
     rom_file_name = positional_arguments[1];
   }
@@ -196,42 +185,44 @@ int main(int argc, char **argv) {
     }
   }
 
+  struct language_cache *lang_cache = create_language_cache(language_dir);
+  struct parser_cache *parser_cache = create_parser_cache(language_dir);
+
+  const struct language_def *language =
+      get_language(lang_cache, decompile_lang);
+  if (language == NULL) {
+    fprintf(stderr, "Cannot find a language definition for \"%s\".\n",
+            decompile_lang);
+    exit(1);
+  }
+
   if (command_line == DECOMPILE) {
-    struct language_cache *lang_cache = create_language_cache(language_dir);
-    struct parser_cache *parser_cache = create_parser_cache(language_dir);
-
-    const struct language_def *language =
-        get_language(lang_cache, decompile_lang);
-    if (language == NULL) {
-      fprintf(stderr, "Cannot find a language definition for \"%s\".\n",
-              decompile_lang);
-      exit(1);
-    }
-
     FILE *script_file =
         script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
     decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
                   script_file, verbose);
 
-#ifndef NDEBUG
-    // This is to keep valgrind happy.
-    // The program is exiting, so we don't really have to free everything.
-    // But, it's also nice to know if we have any real leaks.
-    destroy_language_cache(lang_cache);
-    destroy_parser_cache(parser_cache);
-#endif
     if (script_file != stdout) {
       fclose(script_file);
     }
-    fclose(romfile);
   } else if (command_line == RECOMPILE) {
-    fclose(romfile);  // Reopened by RecodeProc
-    RecodeProc(script_file_name, rom_file_name);
+    FILE *script_file =
+        script_file_name == NULL ? stdin : fopen(script_file_name, "rt");
+    compile_all(script_file, romfile, language, lang_cache, parser_cache);
+
+    if (script_file != stdin) {
+      fclose(script_file);
+    }
   }
+  fclose(romfile);
 
 #ifndef NDEBUG
-  free(defines_dat_location);
-  free(pokeinc_txt_location);
+  // This is to keep valgrind happy.
+  // The program is exiting, so we don't really have to free everything.
+  // But, it's also nice to know if we have any real leaks.
+  destroy_language_cache(lang_cache);
+  destroy_parser_cache(parser_cache);
+
   free(language_dir);
 #endif
   return 0;

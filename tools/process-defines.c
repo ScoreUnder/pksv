@@ -9,13 +9,6 @@
 #include "stdio_ext.h"
 #include "textutil.h"
 
-void strtolower(char *str) {
-  while (*str) {
-    *str = tolower(*str);
-    str++;
-  }
-}
-
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;

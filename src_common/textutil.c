@@ -79,3 +79,10 @@ size_t skip_whitespace_and_comma(const char *in, size_t pos) {
   }
   return pos;
 }
+
+void strtolower(char *restrict str) {
+  while (*str) {
+    *str = tolower(*str);
+    str++;
+  }
+}
