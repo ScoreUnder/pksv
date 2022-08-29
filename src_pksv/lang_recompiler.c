@@ -42,7 +42,7 @@ void compile_all(FILE *input_file, FILE *output_file,
     .line = 1,
     .dynamic_base = DYN_UNSPECIFIED,
   };
-  
+
   const size_t buffer_size = 0x400; // Arbitrary
   char *buffer = malloc(buffer_size);
 
@@ -51,6 +51,8 @@ void compile_all(FILE *input_file, FILE *output_file,
     compile_line(&state, buffer);
     state.line++;
   }
+
+  free(buffer);
 
   // TODO: write
   (void) output_file;
@@ -94,9 +96,26 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
       // Any other command (not a special case)
       // TODO
       len_string *token = pull_token(cur);
-      printf("command %s\n", token->str);
+      cur += token->len;
+
+      len_string *namespace;
+      len_string *command;
+
+      if (*cur == ':') {
+        namespace = token;
+
+        cur++; // Skip ':'
+        command = pull_token(cur);
+        cur += command->len;
+      } else {
+        namespace = NULL;
+        command = token;
+      }
+
+      printf("command %s:%s\n", namespace == NULL ? "<null>" : namespace->str, command->str);
       (void) state;
-      free(token);
+      free(namespace);
+      free(command);
       break;
     }
   }
