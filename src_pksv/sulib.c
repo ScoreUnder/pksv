@@ -188,6 +188,8 @@ void calc_org(codeblock* c, unsigned int start, char* file,
         if (b->size < 0x4000) {
           if (!gsc_are_banks_equal(result, result + b->size - 1)) {
             // TODO: record skipped free space interval
+            // TODO: setting findfrom will not work if the free space is
+            // recorded in an interval
             findfrom = gsc_next_bank(result);
             goto retry_for_address;
           }
