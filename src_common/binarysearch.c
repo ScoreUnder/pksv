@@ -84,14 +84,12 @@ size_t bsearch_unsafe_insert(struct bsearch_root *restrict root,
   size_t len = root->size;
   assert(pos_index <= len);
 
-#ifndef NDEBUG
   if (pos_index < len) {
     assert(root->compare(root->pairs[pos_index].key, key) > 0);
   }
   if (pos_index > 0) {
     assert(root->compare(root->pairs[pos_index - 1].key, key) < 0);
   }
-#endif
 
   bsearch_ensure_capacity(root, len + 1);
   if (pos_index < len) {
