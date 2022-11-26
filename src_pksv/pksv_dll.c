@@ -313,7 +313,6 @@ __declspec(dllexport) __cdecl int compile(char* fname, char* to_recompile) {
   compiling = 1;
   testing = 0;
   needdlg = 0;
-  ffoff = 0;
 
   START_FMEM(log_file);
 
@@ -341,7 +340,6 @@ __declspec(dllexport) __cdecl int DebugCompile(char* fname,
   compiling = 1;
   testing = 1;
   needdlg = 0;
-  ffoff = 0;
 
   START_FMEM(log_file);
 

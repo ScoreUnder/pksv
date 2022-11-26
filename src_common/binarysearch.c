@@ -77,6 +77,15 @@ ptrdiff_t bsearch_find(struct bsearch_root const *restrict root,
   return -left - 1;
 }
 
+void *bsearch_get_val(struct bsearch_root const *restrict root, void const *key,
+                      void *default_) {
+  ptrdiff_t index = bsearch_find(root, key);
+  if (index < 0)
+    return default_;
+  else
+    return root->pairs[index].value;
+}
+
 size_t bsearch_unsafe_insert(struct bsearch_root *restrict root,
                              ptrdiff_t index, void *key, void *value) {
   assert(index < 0);
@@ -120,11 +129,30 @@ size_t bsearch_upsert(struct bsearch_root *restrict kvs, void const *key,
 }
 
 void bsearch_remove(struct bsearch_root *restrict root, size_t index) {
-  if (root->free_key) root->free_key((void *)root->pairs[index].key);
+  if (root->free_key) root->free_key(root->pairs[index].key);
   if (root->free_val) root->free_val(root->pairs[index].value);
   memmove(&root->pairs[index], &root->pairs[index + 1],
           (root->size - index - 1) * sizeof(struct bsearch_kv));
   root->size--;
+}
+
+void bsearch_replace(struct bsearch_root *restrict root, size_t index,
+                     void *key, void *value) {
+  // Ensure the key is being inserted in a sensible location
+  if (index > 0) {
+    assert(root->compare(root->pairs[index - 1].key, key) < 0);
+  }
+  if (index + 1 < root->size) {
+    assert(root->compare(key, root->pairs[index + 1].key) < 0);
+  }
+
+  // Free the old key/value pair at this location
+  if (root->free_key) root->free_key(root->pairs[index].key);
+  if (root->free_val) root->free_val(root->pairs[index].value);
+
+  // Replace the key/value pair
+  root->pairs[index].key = root->copy(key);
+  root->pairs[index].value = value;
 }
 
 // Convenience functions:

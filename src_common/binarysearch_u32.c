@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "binarysearch_u32.h"
 #include "binarysearch.h"
 

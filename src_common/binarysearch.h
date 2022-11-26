@@ -89,8 +89,21 @@ size_t bsearch_upsert(struct bsearch_root *kvs, void const *key, void *value);
  */
 ssize_t bsearch_find(struct bsearch_root const *restrict root, void const *key);
 
+/** @brief Get a value from the bsearch_root by key.
+ *  @param root The bsearch_root to perform lookups on
+ *  @param key The key to look for
+ *  @param default_ The value to return if no match is found
+ *  @return the value if found, otherwise default_.
+ */
+void *bsearch_get_val(struct bsearch_root const *restrict root, void const *key,
+                      void *default_);
+
 /** @brief Delete the key/value pair at the given index. */
 void bsearch_remove(struct bsearch_root *restrict root, size_t index);
+
+/** @brief Replace the key/value pair at the given index. */
+void bsearch_replace(struct bsearch_root *restrict root, size_t index,
+                     void *key, void *value);
 
 // Provided for convenience
 int bsearch_key_strcmp(const void *a, const void *b);

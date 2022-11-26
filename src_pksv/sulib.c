@@ -5,8 +5,10 @@
 #include "sulib.h"
 #include "codeproc.h"
 #include "binarysearch.h"
+#include "binarysearch_u32.h"
 #include "pksv.h"
 #include "textutil.h"
+#include "romutil.h"
 
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** head) {
@@ -33,7 +35,7 @@ unsigned int init_codeblock(codeblock* c, char* name, int org) {
   c->allocated = 128;
   c->size = 0;
   c->next = NULL;
-  c->align = 0;
+  c->align = 1;
   c->prev = NULL;
   if (name != NULL) {
     c->name = strdup(name);
@@ -157,33 +159,50 @@ void delete_codeblock(codeblock* c) {
   }
 }
 
-unsigned int ffoff = 0;
 void calc_org(codeblock* c, unsigned int start, char* file,
               struct bsearch_root* defines) {
-  register unsigned int a;
-  register codeblock* b;
-  char buf[1024];
-  a = start;
-  a |= 0x08000000;
-  b = rewind_codeblock(c);
+  struct bsearch_root fake_empty_bsearch = {.size = 0};
+  const char* findfrom_name =
+      (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom";
+  uint32_t findfrom =
+      CAST_pvoid_u32(bsearch_get_val(defines, findfrom_name, (void*)0));
+
+  FILE* rom_search = fopen(file, "rb");
+  if (!rom_search) {
+    perror("could not reopen rom to search for free space");
+    return 0;
+  }
+
+  uint32_t a = ROM_BASE_ADDRESS | start;
+  codeblock* b = rewind_codeblock(c);
   while (b != NULL) {
     if (b->name != NULL) {
-      b->org = FindFreeSpace(file, b->size + b->align - 1, defines);
-      if (b->align && b->org % b->align)
-        b->org += b->align - (b->org % b->align);
-      if ((mode == GOLD || mode == CRYSTAL) && b->size < 0x3FFF) {
-        while ((OffsetToPointer(b->org) & 0xFF) !=
-               (OffsetToPointer(b->org + b->size) & 0xFF)) {
-          ffoff -= b->size - 1;
-          b->org = FindFreeSpace(file, b->size, defines);
+    retry_for_address:
+      uint32_t result = FindFreeSpace(rom_search, b->size, b->align, &findfrom,
+                                      search, &fake_empty_bsearch);
+      if (result == UINT32_MAX) {
+        fprintf(stderr, "error: could not find free space for %s\n", b->name);
+        exit(1);  // TODO: report up the call stack
+      }
+      if (mode == GOLD || mode == CRYSTAL) {
+        if (b->size < 0x4000) {
+          if (!gsc_are_banks_equal(result, result + b->size - 1)) {
+            // TODO: record skipped free space interval
+            findfrom = gsc_next_bank(result);
+            goto retry_for_address;
+          }
+        } else {
+          fprintf(stderr,
+                  "Error: Offset %s cannot be written as it is too large.\n",
+                  b->name);
+          exit(1);  // TODO: report up the call stack
         }
       }
-      else if (mode == GOLD || mode == CRYSTAL) {
-        fprintf(stderr, "Error: Offset %s cannot be written as it is too large.\n", b->name);
-      }
+      b->org = result;
     }
     b = b->next;
   }
+  fclose(rom_search);
 }
 
 void process_inserts(codeblock* c,

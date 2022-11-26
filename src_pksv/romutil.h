@@ -5,6 +5,8 @@
 
 #define ROM_UNKNOWN 255
 
+#define ROM_BASE_ADDRESS 0x08000000
+
 struct rom_mode {
   unsigned type : 8;
   unsigned search : 8;

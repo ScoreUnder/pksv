@@ -15,17 +15,21 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <assert.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "codeproc.h"
 #include "binarysearch_u32.h"
+#include "uint32_interval.h"
 #include "binarysearch.h"
 #include "textutil.h"
 #include "textproc.h"
+#include "romutil.h"
 #include "sulib.h"
 #include "pksv.h"
 
@@ -121,48 +125,103 @@ void LowerCaseAndRemAll0D(char *orig) {
   }
 }
 
-unsigned int FindFreeSpace(char *romname, unsigned int len,
-                           struct bsearch_root *defines) {
-  unsigned int filepos;
-  unsigned int consecutive = 0;
-  unsigned char cr;
-  uint32_t findfrom = 0;
+uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
+                       uint32_t *offset, uint8_t search,
+                       struct bsearch_root *free_intervals) {
+  assert(rom_search != NULL);
 
-  ptrdiff_t index = bsearch_find(
-      defines, (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom");
-  if (index >= 0) {
-    findfrom = bsearch_val_u32(defines, index);
+  if (len == 0) return ROM_BASE_ADDRESS;  // Nothing requested, anything goes?
+
+  uint32_t align_mask = align - 1;
+  // Must be a power of two (easier to calculate)
+  assert(align != 0);
+  assert((align_mask & align) == 0);
+
+  // See if we already have a free interval for this; find the smallest
+  // compatible and remove it.
+  size_t smallest_index = SIZE_MAX;
+  uint32_t smallest_len = UINT32_MAX;
+  for (size_t i = 0; i < free_intervals->size; i++) {
+    uint32_t interval_start = bsearch_key_u32(free_intervals, i);
+    uint32_t interval_end = bsearch_val_u32(free_intervals, i);
+    uint32_t interval_aligned_start =
+        (interval_start + align_mask) & ~align_mask;
+    if (interval_aligned_start >= interval_end) continue;
+    uint32_t interval_len = interval_end - interval_start;
+    uint32_t interval_available_len = interval_end - interval_aligned_start;
+    if (interval_len < smallest_len && interval_available_len >= len) {
+      smallest_index = i;
+      smallest_len = interval_len;
+    }
   }
 
-  filepos = findfrom + ffoff;
-
-  FILE *RomFile = fopen(romname, "rb");
-  if (!RomFile) {
-    perror("could not reopen rom to search for free space");
-    return 0;
+  if (smallest_index != SIZE_MAX) {
+    uint32_t result = bsearch_key_u32(free_intervals, smallest_index);
+    // Correct for alignment
+    result = (result + align_mask) & ~align_mask;
+    uint32_interval_remove(free_intervals, result, result + len);
+    return ROM_BASE_ADDRESS | result;
   }
-  fseek(RomFile, filepos, SEEK_SET);
-  while (filepos < 0x1000000) {
-    cr = getc(RomFile);
+
+  uint32_t filepos = *offset;
+
+  // Text has to end in 0xFF, so request one more byte
+  // to make room for a potential terminator byte at the start
+  // of space which otherwise seems free
+  assert(len < UINT32_MAX);
+  len++;
+  // ...and cheekily wind back search start pos one byte to compensate
+  // (so that the minimum returned address is exactly *offset)
+  if (filepos > 0) filepos--;
+
+  fseek(rom_search, filepos, SEEK_SET);
+
+  int chr;
+  uint32_t consecutive = 0;
+  while ((chr = getc(rom_search)) != EOF) {
     filepos++;
 
-    if (cr == search) {
-      consecutive++;
+    bool match = chr == search;
+    if (!match) {
+      // check free intervals
+      // TODO: naive algorithm, should skip more than one byte at a time
+      ptrdiff_t index = bsearch_find(free_intervals, filepos);
+      if (index < -1) index = -index - 2;  // find the interval before
+      if (index >= 0 && index < free_intervals->size) {
+        uint32_t interval_start = bsearch_key_u32(free_intervals, index);
+        uint32_t interval_end = bsearch_val_u32(free_intervals, index);
+        if (filepos >= interval_start && filepos < interval_end) {
+          match = true;
+        }
+      }
+    }
+
+    if (match) {
+      if (++consecutive >= len) {
+        // Check alignment
+        uint32_t result = filepos + 1 - len;
+        if ((result & align_mask) == 0) break;
+        // TODO: record space before alignment as free
+      }
     } else {
       consecutive = 0;
     }
-
-    if (consecutive > len) {
-      // Yes, larger than, because text ends in 0xFF so we need one more byte
-      break;
-    }
   }
-  fclose(RomFile);
+  if (consecutive < len) return UINT32_MAX;
 
-  ffoff = filepos - findfrom;
-  filepos -= consecutive;
-  filepos++;
-  return (0x08000000 | filepos);
+  // Undo length hack
+  len--;
+
+  // Record the end position for next time
+  *offset = filepos;
+
+  // Get start position
+  filepos -= len;
+
+  // Punch a hole in the free intervals if necessary
+  uint32_interval_remove(free_intervals, filepos, filepos + len);
+
+  return ROM_BASE_ADDRESS | filepos;
 }
 
 // Gold ptr<->offset functions
@@ -181,19 +240,19 @@ signed int OffsetToPointer(unsigned int offset) {
   unsigned int pointer = 0;
   unsigned int bank = 0;
 
-  bank = ((offset & 0xFF0000) >> 14);
-  if (bank > 0xFF) {
+  if ((offset & 0xFFC00000)) {
     return -1;
   }
-  if ((offset & 0xFF000000)) {
-    return -1;
-  }
-  pointer = offset & 0xFFFF;
-  bank |= ((pointer & 0xF000) >> 14);
-  pointer &= 0x3FFF;
-  pointer |= 0x4000;
+  bank = (offset & 0x3FC000) >> 14;
+  pointer = (offset & 0x3FFF) | 0x4000;
   return (pointer << 8) | bank;
 }
+
+bool gsc_are_banks_equal(uint32_t offset1, uint32_t offset2) {
+  return ((offset1 ^ offset2) & 0x3FC000) != 0;
+}
+
+uint32_t gsc_next_bank(uint32_t offset) { return (offset & 0x3FC000) + 0x4000; }
 
 static void log_bad_int(const char *where) {
   char *format = "Unknown value in %s (Value must be integer)\n";
@@ -229,7 +288,7 @@ uint32_t GenForFunc(char *func, pos_int *ppos, char *Script,
     if (IsVerbose) log_txt(log_buf, strlen(log_buf));
     gffs = 1;
     *ppos = i;
-    return 0x08000000;
+    return ROM_BASE_ADDRESS;
   } else if ((chr >= '0' && chr <= '9') || chr == '$') {
     const char *end;
     if ((Script[i] == '0' && Script[i + 1] == 'x') || Script[i] == '$') {

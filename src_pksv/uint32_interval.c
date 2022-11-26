@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -40,6 +41,46 @@ void uint32_interval_add(struct bsearch_root *restrict root, uint32_t start,
     // No merge
     else {
       bsearch_upsert_u32(root, start, end);
+    }
+  }
+}
+
+void uint32_interval_remove(struct bsearch_root *restrict root, uint32_t start,
+                            uint32_t end) {
+  assert(end >= start);
+
+  ptrdiff_t s_index = bsearch_find_u32(root, start);
+  if (s_index >= 0) {
+    // Exact "start" match: trim start and put it back into the search tree
+    bsearch_replace(root, s_index, CAST_u32_pvoid(end),
+                    root->pairs[s_index].value);
+  } else {
+    size_t index = (size_t)(-s_index - 1);
+
+    while (index < root->size && bsearch_key_u32(root, index) < end) {
+      if (bsearch_val_u32(root, index) < end) {
+        // Overlap with entire later interval
+        bsearch_remove(root, index);
+      } else {
+        // Overlap with "start" of later interval -> set its start to our end
+        bsearch_replace(root, index, CAST_u32_pvoid(end),
+                        root->pairs[index].value);
+        break;
+      }
+    }
+
+    if (index > 0) {
+      uint32_t prev_key = bsearch_key_u32(root, index - 1);
+      uint32_t prev_value = bsearch_val_u32(root, index - 1);
+      assert(prev_key < start);
+      if (start < prev_value) {
+        // There is overlap, cut the interval at the end
+        bsearch_setval_u32(root, index - 1, start);
+        if (end < prev_value) {
+          // Overlap is not complete, restore the remainder as a new interval
+          bsearch_upsert_u32(root, end, prev_value);
+        }
+      }
     }
   }
 }

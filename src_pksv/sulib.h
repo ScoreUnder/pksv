@@ -29,8 +29,6 @@ typedef struct __label {
   struct __label* prev;
 } codelabel;
 
-extern unsigned int ffoff;
-
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** chain);
 unsigned int init_codeblock(codeblock* c, char* name, int org);
