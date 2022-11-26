@@ -159,19 +159,13 @@ void delete_codeblock(codeblock* c) {
   }
 }
 
-void calc_org(codeblock* c, unsigned int start, char* file,
+void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
               struct bsearch_root* defines) {
   struct bsearch_root fake_empty_bsearch = {.size = 0};
   const char* findfrom_name =
       (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom";
   uint32_t findfrom =
       CAST_pvoid_u32(bsearch_get_val(defines, findfrom_name, (void*)0));
-
-  FILE* rom_search = fopen(file, "rb");
-  if (!rom_search) {
-    perror("could not reopen rom to search for free space");
-    return 0;
-  }
 
   uint32_t a = ROM_BASE_ADDRESS | start;
   codeblock* b = rewind_codeblock(c);
@@ -204,7 +198,6 @@ void calc_org(codeblock* c, unsigned int start, char* file,
     }
     b = b->next;
   }
-  fclose(rom_search);
 }
 
 void process_inserts(codeblock* c,
