@@ -18,6 +18,8 @@ uint32_t bsearch_val_u32(const struct bsearch_root *root, size_t index);
 void bsearch_setval_u32(struct bsearch_root *root, size_t index,
                         uint32_t value);
 #define bsearch_find_u32(root, key) bsearch_find((root), CAST_u32_pvoid(key))
+#define bsearch_get_val_u32(root, key, default_) \
+  CAST_pvoid_u32(bsearch_get_val((root), CAST_u32_pvoid(key), CAST_u32_pvoid(default_)))
 #define bsearch_upsert_u32(root, key, value) \
   bsearch_upsert((root), CAST_u32_pvoid(key), CAST_u32_pvoid(value))
 
