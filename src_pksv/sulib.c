@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 #include "sulib.h"
 #include "codeproc.h"
@@ -45,13 +42,9 @@ unsigned int init_codeblock(codeblock* c, char* name, int org) {
   }
   c->insert = NULL;
   c->org = org;
-#ifdef WIN32
   if (c->data == NULL) {
-    MessageBox(NULL, "The computer appears to be out of memory.", "Error",
-               0x10);
-    ExitProcess(0);
+    fputs("Out of memory\n", stderr);
   }
-#endif
   return (c->data != NULL);
 }
 
@@ -185,13 +178,9 @@ void calc_org(codeblock* c, unsigned int start, char* file,
           b->org = FindFreeSpace(file, b->size, defines);
         }
       }
-#ifdef WIN32
       else if (mode == GOLD || mode == CRYSTAL) {
-        snprintf(buf, sizeof(buf),
-                 "Offset %s cannot be used as it is too large.", b->name);
-        MessageBox(NULL, buf, "Error", 0x10);
+        fprintf(stderr, "Error: Offset %s cannot be written as it is too large.\n", b->name);
       }
-#endif
     }
     b = b->next;
   }
