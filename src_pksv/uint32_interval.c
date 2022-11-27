@@ -11,58 +11,55 @@ void uint32_interval_init_bsearch_root(struct bsearch_root *root) {
                     NULL);
 }
 
+static void uint32_interval_merge_ends(struct bsearch_root *restrict root,
+                                       size_t index, uint32_t start,
+                                       uint32_t end) {
+  uint32_t merged_end = bsearch_val_u32(root, index);
+  if (merged_end < end) {
+    merged_end = end;
+  }
+  // Remove and merge with anything that's now covered by the new interval
+  while (index + 1 < root->size &&
+         merged_end >= bsearch_key_u32(root, index + 1)) {
+    uint32_t next_end = bsearch_val_u32(root, index + 1);
+    if (next_end > merged_end) merged_end = next_end;
+    bsearch_remove(root, index + 1);
+  }
+  bsearch_setval_u32(root, index, merged_end);
+}
+
 void uint32_interval_add(struct bsearch_root *restrict root, uint32_t start,
                          uint32_t end) {
+  if (end == start) return;
+  assert(end > start);
+
   ptrdiff_t s_index = bsearch_find_u32(root, start);
+  size_t index;
 
   if (s_index >= 0) {
-    // overwriting? this is user error
-    // but let's handle it anyway
-    if (bsearch_val_u32(root, s_index) < end)
-      bsearch_setval_u32(root, s_index, end);
+    index = (size_t)s_index;
   } else {
-    size_t index = (size_t)(-s_index - 1);
+    index = (size_t)(-s_index - 1);
+  }
 
-    // Can merge left?
-    if (index > 0 && bsearch_val_u32(root, index - 1) >= start) {
-      uint32_t new_end = end;
-
-      // Can merge right?
-      if (index < root->size && bsearch_key_u32(root, index) <= new_end) {
-        new_end = bsearch_val_u32(root, index);
-        bsearch_remove(root, index);
-      }
-      bsearch_setval_u32(root, index - 1, new_end);
-    }
-    // Can merge right?
-    else if (index < root->size && bsearch_key_u32(root, index) <= end) {
-      root->pairs[index].key = CAST_u32_pvoid(start);
-      uint32_t real_end = bsearch_val_u32(root, index);
-      if (real_end < end) {
-        bsearch_setval_u32(root, index, end);
-        real_end = end;
-      }
-      // Remove anything that's now covered by the new interval
-      while (index + 1 < root->size &&
-             real_end >= bsearch_key_u32(root, index + 1)) {
-        uint32_t next_end = bsearch_val_u32(root, index + 1);
-        bsearch_remove(root, index + 1);
-        if (next_end > real_end) {
-          bsearch_setval_u32(root, index, next_end);
-          break;  // no more to remove (otherwise, intervals are already
-                  // malformed)
-        }
-      }
-    }
-    // No merge
-    else {
-      bsearch_upsert_u32(root, start, end);
-    }
+  // Can merge end with the interval before?
+  if (index > 0 && bsearch_val_u32(root, index - 1) >= start) {
+    uint32_interval_merge_ends(root, index - 1, start, end);
+  }
+  // Can merge beginning with the interval after?
+  else if (index < root->size && bsearch_key_u32(root, index) <= end) {
+    root->pairs[index].key = CAST_u32_pvoid(start);
+    uint32_interval_merge_ends(root, index, start, end);
+  }
+  // No merge
+  else {
+    bsearch_upsert_u32(root, start, end);
   }
 }
 
 void uint32_interval_remove(struct bsearch_root *restrict root, uint32_t start,
                             uint32_t end) {
+  if (end == start) return;
   assert(end >= start);
 
   ptrdiff_t s_index = bsearch_find_u32(root, start);
