@@ -77,9 +77,9 @@ SRC_LANGUAGE_DUMPER = \
 	tools/language-dat-dumper.c src_common/binarysearch.c src_lang/lang_load.c \
 	src_common/stdio_ext.c src_common/textutil.c
 
-SRC_TEST_SUITE = \
-	src_common/tests/test_binarysearch.c src_common/binarysearch.c \
-	src_common/binarysearch_u32.c src_common/textutil.c
+SRC_COMMON_TEST_SUITE = \
+	src_common/tests/tests.c src_common/tests/test_binarysearch.c \
+	src_common/binarysearch.c src_common/binarysearch_u32.c src_common/textutil.c
 
 GENERATED_SOURCES = \
 	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
@@ -93,14 +93,14 @@ OBJ_PKSVUI = $(SRC_PKSVUI:.c=.o) $(OBJ_PKSVUI_P_$(PLATFORM))
 
 OBJ_PKSV_MAIN = $(SRC_PKSV_MAIN:.c=.o)
 OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o) $(RES_PKSV_SHLIB:.rc=.o)
-OBJ_TEST_SUITE = $(SRC_TEST_SUITE:.c=.o)
+OBJ_COMMON_TEST_SUITE = $(SRC_COMMON_TEST_SUITE:.c=.o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
 OBJ_GPERF_REVERSE = $(SRC_GPERF_REVERSE:.c=.o)
 OBJ_PROCESS_DEFINES_REVERSE = $(SRC_PROCESS_DEFINES_REVERSE:.c=.o)
 OBJ_LANGUAGE_PARSER = $(SRC_LANGUAGE_PARSER:.c=.o)
 OBJ_LANGUAGE_DUMPER = $(SRC_LANGUAGE_DUMPER:.c=.o)
 
-BIN_TEST_SUITE = test-suite$(EXE_EXT)
+BIN_COMMON_TEST_SUITE = src_common/tests/tests$(EXE_EXT)
 BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
 BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
@@ -114,7 +114,7 @@ SUBLANGS = $(subst src_pksv/,,$(SUBLANGS_SRC:.lang.txt=.dat))
 SUBLANG_DEFS_SRC = $(wildcard src_pksv/sublang/defs_*.defs.txt)
 SUBLANG_DEFS = $(subst src_pksv/,,$(SUBLANG_DEFS_SRC:.defs.txt=.dat))
 
-OBJS = $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PKSVUI) $(OBJ_PROCESS_DEFINES) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_GPERF_REVERSE) $(OBJ_LANGUAGE_PARSER) $(OBJ_TEST_SUITE)
+OBJS = $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PKSVUI) $(OBJ_PROCESS_DEFINES) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_GPERF_REVERSE) $(OBJ_LANGUAGE_PARSER) $(OBJ_COMMON_TEST_SUITE)
 DEPS = $(OBJS:o=d)
 
 PKSV = pksv$(EXE_EXT)
@@ -130,7 +130,8 @@ all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBL
 compat: $(PKSV) $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
 tools: $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(BIN_PROCESS_DEFINES) $(BIN_PROCESS_DEFINES_REVERSE)
 
-check: $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS)
+check: $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS) $(BIN_COMMON_TEST_SUITE)
+	./$(BIN_COMMON_TEST_SUITE)
 	bunzip2 -fkq src_pksv/tests/fakerom.gba.bz2
 	./$(PKSV) -r src_pksv/tests/test.pks src_pksv/tests/fakerom.gba
 	./$(PKSV) -d src_pksv/tests/fakerom.gba 6B09F8 src_pksv/tests/compare.pks
@@ -208,8 +209,8 @@ sublang/lang_%.dat: src_pksv/sublang/lang_%.lang.txt $(BIN_LANGUAGE_PARSER) | su
 sublang/defs_%.dat: src_pksv/sublang/defs_%.defs.txt $(BIN_PROCESS_DEFINES) | sublang
 	$(TOOL_WRAPPER) $(BIN_PROCESS_DEFINES) $< $@
 
-$(BIN_TEST_SUITE): $(OBJ_TEST_SUITE)
-	$(LINK.c) $$(pkg-config --libs check) $(LDFLAGS_CONSOLE) $(OBJ_TEST_SUITE) -o $@
+$(BIN_COMMON_TEST_SUITE): $(OBJ_COMMON_TEST_SUITE)
+	$(LINK.c) $$(pkg-config --libs check) $(LDFLAGS_CONSOLE) $(OBJ_COMMON_TEST_SUITE) -o $@
 
 .SUFFIXES: .sh_o .o .c .gperf .rc .y .l .c .tab.c
 .c.sh_o:
