@@ -174,7 +174,7 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
   codeblock* b = rewind_codeblock(c);
   while (b != NULL) {
     if (b->name != NULL) {
-    retry_for_address:
+    retry_for_address : {
       uint32_t min_address = 0;
       uint32_t result = FindFreeSpace(rom_search, b->size, b->align, &findfrom,
                                       &min_address, search, &free_space);
@@ -204,6 +204,7 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
         }
       }
       b->org = result;
+    }
     }
     b = b->next;
   }
