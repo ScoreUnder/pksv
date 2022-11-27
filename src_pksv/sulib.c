@@ -6,6 +6,7 @@
 #include "codeproc.h"
 #include "binarysearch.h"
 #include "binarysearch_u32.h"
+#include "uint32_interval.h"
 #include "pksv.h"
 #include "textutil.h"
 #include "romutil.h"
@@ -161,7 +162,9 @@ void delete_codeblock(codeblock* c) {
 
 void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
               struct bsearch_root* defines) {
-  struct bsearch_root fake_empty_bsearch = {.size = 0};
+  struct bsearch_root free_space;  // TODO: make parameter
+  uint32_interval_init_bsearch_root(&free_space);
+
   const char* findfrom_name =
       (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom";
   uint32_t findfrom =
@@ -172,8 +175,9 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
   while (b != NULL) {
     if (b->name != NULL) {
     retry_for_address:
+      uint32_t min_address = 0;
       uint32_t result = FindFreeSpace(rom_search, b->size, b->align, &findfrom,
-                                      search, &fake_empty_bsearch);
+                                      &min_address, search, &free_space);
       if (result == UINT32_MAX) {
         fprintf(stderr, "error: could not find free space for %s\n", b->name);
         exit(1);  // TODO: report up the call stack
@@ -181,10 +185,15 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
       if (mode == GOLD || mode == CRYSTAL) {
         if (b->size < 0x4000) {
           if (!gsc_are_banks_equal(result, result + b->size - 1)) {
-            // TODO: record skipped free space interval
-            // TODO: setting findfrom will not work if the free space is
-            // recorded in an interval
+            // Record the discarded free space interval (we didn't use it)
+            uint32_interval_add(&free_space, result, result + b->size);
+
+            // Not enough space in this bank, try the next bank
             findfrom = gsc_next_bank(result);
+            min_address = findfrom;
+
+            // TODO: Record skipped free space interval as a result of bank
+            // change needs raw rom search to know true extent of free space
             goto retry_for_address;
           }
         } else {

@@ -37,13 +37,15 @@ char *WhatIs2(int thing);
  *  @param len The length of the returned block of free space
  *  @param align The alignment of the returned block of free space
  *  @param offset Where to start searching for free space
+ *  @param min_address The minimum address to return (even if earlier free space
+ *                     is known)
  *  @param search The byte value considered to be free space
  *  @param free_intervals A collection of definitely-free-space intervals
  *  @return The ROM address of a block of free space of length `len`,
  *          or UINT32_MAX on error.
  */
 uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
-                       uint32_t *offset, uint8_t search,
+                       uint32_t *offset, uint32_t *min_address, uint8_t search,
                        struct bsearch_root *free_intervals);
 
 void LowerCaseAndRemAll0D(char *orig);

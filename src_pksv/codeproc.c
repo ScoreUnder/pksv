@@ -126,9 +126,12 @@ void LowerCaseAndRemAll0D(char *orig) {
 }
 
 uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
-                       uint32_t *offset, uint8_t search,
+                       uint32_t *offset, uint32_t *min_address, uint8_t search,
                        struct bsearch_root *free_intervals) {
   assert(rom_search != NULL);
+  // If we let *offset get > *min_address, we might skip potential free space
+  // That would need extra logic to handle, so for now...
+  assert(*offset <= *min_address);
 
   if (len == 0) return ROM_BASE_ADDRESS;  // Nothing requested, anything goes?
 
@@ -143,6 +146,7 @@ uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
   uint32_t smallest_len = UINT32_MAX;
   for (size_t i = 0; i < free_intervals->size; i++) {
     uint32_t interval_start = bsearch_key_u32(free_intervals, i);
+    if (interval_start < *min_address) continue;
     uint32_t interval_end = bsearch_val_u32(free_intervals, i);
     uint32_t interval_aligned_start =
         (interval_start + align_mask) & ~align_mask;
