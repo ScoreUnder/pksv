@@ -3,6 +3,7 @@
 
 #include "binarysearch.h"
 #include "binarysearch_u32.h"
+#include "textutil.h"
 
 START_TEST(test_binary_search_upsert_u32) {
   struct bsearch_root root;
