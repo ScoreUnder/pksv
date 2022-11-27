@@ -8,8 +8,8 @@ static struct bsearch_root root;
 void setup(void) {
   uint32_interval_init_bsearch_root(&root);
 
-  uint32_interval_add(&root, 1,
-                      10);  // starting at 1 so still room to move left
+  // starting at 1 so still room to move left
+  uint32_interval_add(&root, 1, 10);
   uint32_interval_add(&root, 20, 30);
 
   ck_assert_uint_eq(root.size, 2);
@@ -26,6 +26,19 @@ void setup(void) {
 }
 
 void teardown(void) { bsearch_deinit_root(&root); }
+
+START_TEST(test_intervals_add) {
+  uint32_interval_add(&root, 14, 16);
+
+  ck_assert_uint_eq(root.size, 6);
+  ck_assert_uint_eq(bsearch_key_u32(&root, 0), 1);
+  ck_assert_uint_eq(bsearch_val_u32(&root, 0), 10);
+  ck_assert_uint_eq(bsearch_key_u32(&root, 1), 14);
+  ck_assert_uint_eq(bsearch_val_u32(&root, 1), 16);
+  ck_assert_uint_eq(bsearch_key_u32(&root, 2), 20);
+  ck_assert_uint_eq(bsearch_val_u32(&root, 2), 30);
+}
+END_TEST
 
 START_TEST(test_intervals_extend) {
   // Overlap with first interval
@@ -402,6 +415,7 @@ Suite *uint32_interval_suite(void) {
   TCase *tc_core = tcase_create("Core");
 
   tcase_add_checked_fixture(tc_core, setup, teardown);
+  tcase_add_test(tc_core, test_intervals_add);
   tcase_add_test(tc_core, test_intervals_extend);
   tcase_add_test(tc_core, test_intervals_merge);
   tcase_add_test(tc_core, test_intervals_merge_all_1);
