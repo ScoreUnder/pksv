@@ -4,10 +4,10 @@
 #include "binarysearch.h"
 #include "binarysearch_u32.h"
 
-START_TEST(test_binary_search_upsert_u32)
-{
+START_TEST(test_binary_search_upsert_u32) {
   struct bsearch_root root;
-  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL, NULL);
+  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
+                    NULL);
 
   // Initial state
   bsearch_upsert_u32(&root, 100, 1234);
@@ -44,10 +44,10 @@ START_TEST(test_binary_search_upsert_u32)
 }
 END_TEST
 
-START_TEST(test_binary_search_delete_u32)
-{
+START_TEST(test_binary_search_delete_u32) {
   struct bsearch_root root;
-  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL, NULL);
+  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
+                    NULL);
 
   // Initial state
   bsearch_upsert_u32(&root, 100, 1234);
@@ -84,10 +84,10 @@ START_TEST(test_binary_search_delete_u32)
 }
 END_TEST
 
-START_TEST(test_binary_search_find_u32)
-{
+START_TEST(test_binary_search_find_u32) {
   struct bsearch_root root;
-  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL, NULL);
+  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
+                    NULL);
 
   // Initial state
   bsearch_upsert_u32(&root, 100, 0);
@@ -109,16 +109,131 @@ START_TEST(test_binary_search_find_u32)
 }
 END_TEST
 
+START_TEST(test_binary_search_string_keys) {
+  struct bsearch_root root;
+  bsearch_init_root(&root, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+
+  bsearch_upsert(&root, "cowabunga", "dude");
+  // Insert before, at start
+  bsearch_upsert(&root, "cow", "moo");
+  // Insert after, at end
+  bsearch_upsert(&root, "frog", "ribbit");
+  // Insert in middle
+  bsearch_upsert(&root, "dog", "woof");
+
+  // Check final results
+  ck_assert_str_eq(bsearch_get_val(&root, "cow", NULL), "moo");
+  ck_assert_str_eq(bsearch_get_val(&root, "cowabunga", NULL), "dude");
+  ck_assert_str_eq(bsearch_get_val(&root, "dog", NULL), "woof");
+  ck_assert_str_eq(bsearch_get_val(&root, "frog", NULL), "ribbit");
+  ck_assert_int_eq(root.size, 4);
+
+  // Check order
+  ck_assert_int_eq(bsearch_find(&root, "cow"), 0);
+  ck_assert_int_eq(bsearch_find(&root, "cowabunga"), 1);
+  ck_assert_int_eq(bsearch_find(&root, "dog"), 2);
+  ck_assert_int_eq(bsearch_find(&root, "frog"), 3);
+
+  bsearch_deinit_root(&root);
+}
+END_TEST
+
+START_TEST(test_binary_search_resize) {
+  struct bsearch_root root;
+  bsearch_init_root(&root, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
+                    NULL);
+
+  for (uint32_t i = 0; i < 1000; i++) {
+    void* val = CAST_u32_pvoid(i);
+    bsearch_unsafe_append(&root, val, val);
+  }
+
+  ck_assert_int_eq(root.size, 1000);
+  ck_assert_int_eq(root.capacity, 1024);
+  bsearch_trim_capacity(&root);
+  ck_assert_int_eq(root.capacity, 1000);
+
+  ck_assert_int_eq(bsearch_get_val_u32(&root, 20, 0), 20);
+  ck_assert_int_eq(bsearch_find_u32(&root, 20), 20);
+  ck_assert_int_eq(bsearch_find_u32(&root, 2000), -1001);
+
+  bsearch_deinit_root(&root);
+}
+
+START_TEST(test_binary_search_free_keys) {
+  struct bsearch_root root;
+  bsearch_init_root(&root, bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+
+  bsearch_upsert(&root, "dog", "woof");
+  bsearch_upsert(&root, "cow", "moo");
+  bsearch_upsert(&root, "frog", "ribbit");
+
+  bsearch_remove(&root, 0);
+  bsearch_replace(&root, 0, "cat", "meow");
+
+  ck_assert_int_eq(root.size, 2);
+  ck_assert_pstr_eq(bsearch_get_val(&root, "cat", NULL), "meow");
+  ck_assert_pstr_eq(bsearch_get_val(&root, "frog", NULL), "ribbit");
+
+  ck_assert_pstr_eq(bsearch_get_val(&root, "dog", NULL), NULL);
+  ck_assert_pstr_eq(bsearch_get_val(&root, "cow", NULL), NULL);
+
+  bsearch_deinit_root(&root);
+}
+
+START_TEST(test_binary_search_root_ptr) {
+  struct bsearch_root* root =
+      bsearch_create_root(bsearch_key_strcmp, bsearch_key_strdup, free, NULL);
+  ck_assert_ptr_ne(root, NULL);
+
+  bsearch_upsert(root, "dog", "woof");
+  bsearch_upsert(root, "cow", "moo");
+  bsearch_upsert(root, "frog", "ribbit");
+
+  ck_assert_int_eq(root->size, 3);
+  ck_assert_pstr_eq(bsearch_get_val(root, "dog", NULL), "woof");
+  ck_assert_pstr_eq(bsearch_get_val(root, "cow", NULL), "moo");
+  ck_assert_pstr_eq(bsearch_get_val(root, "frog", NULL), "ribbit");
+
+  bsearch_destroy_root(root);
+}
+
+START_TEST(test_binary_search_free_values) {
+  struct bsearch_root root;
+  bsearch_init_root(&root, bsearch_key_strcmp, bsearch_key_nocopy, NULL, free);
+
+  bsearch_upsert(&root, "dog", strdup("woof"));
+  bsearch_upsert(&root, "cow", strdup("moo"));
+  bsearch_upsert(&root, "frog", strdup("ribbit"));
+
+  bsearch_replace(&root, 2, "giraffe", strdup("neigh"));
+  bsearch_remove(&root, 0);
+  bsearch_upsert(&root, "dog", strdup("bark"));
+
+  ck_assert_int_eq(root.size, 2);
+  ck_assert_pstr_eq(bsearch_get_val(&root, "dog", NULL), "bark");
+  ck_assert_pstr_eq(bsearch_get_val(&root, "giraffe", NULL), "neigh");
+  ck_assert_pstr_eq(bsearch_get_val(&root, "cow", NULL), NULL);
+  ck_assert_pstr_eq(bsearch_get_val(&root, "frog", NULL), NULL);
+
+  bsearch_deinit_root(&root);
+}
+
 Suite* bsearch_suite(void) {
   Suite* s;
   TCase* tc_core;
 
   s = suite_create("Binary Search");
-  tc_core = tcase_create("Core");
 
+  tc_core = tcase_create("Core");
   tcase_add_test(tc_core, test_binary_search_upsert_u32);
   tcase_add_test(tc_core, test_binary_search_delete_u32);
   tcase_add_test(tc_core, test_binary_search_find_u32);
+  tcase_add_test(tc_core, test_binary_search_string_keys);
+  tcase_add_test(tc_core, test_binary_search_resize);
+  tcase_add_test(tc_core, test_binary_search_free_keys);
+  tcase_add_test(tc_core, test_binary_search_root_ptr);
+  tcase_add_test(tc_core, test_binary_search_free_values);
   suite_add_tcase(s, tc_core);
 
   return s;
@@ -132,7 +247,7 @@ int main(void) {
   s = bsearch_suite();
   sr = srunner_create(s);
 
-  srunner_run_all(sr, CK_NORMAL);
+  srunner_run_all(sr, CK_ENV);
   number_failed = srunner_ntests_failed(sr);
   srunner_free(sr);
   return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
