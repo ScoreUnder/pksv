@@ -37,6 +37,22 @@ void uint32_interval_add(struct bsearch_root *restrict root, uint32_t start,
     // Can merge right?
     else if (index < root->size && bsearch_key_u32(root, index) <= end) {
       root->pairs[index].key = CAST_u32_pvoid(start);
+      uint32_t real_end = bsearch_val_u32(root, index);
+      if (real_end < end) {
+        bsearch_setval_u32(root, index, end);
+        real_end = end;
+      }
+      // Remove anything that's now covered by the new interval
+      while (index + 1 < root->size &&
+             real_end >= bsearch_key_u32(root, index + 1)) {
+        uint32_t next_end = bsearch_val_u32(root, index + 1);
+        bsearch_remove(root, index + 1);
+        if (next_end > real_end) {
+          bsearch_setval_u32(root, index, next_end);
+          break;  // no more to remove (otherwise, intervals are already
+                  // malformed)
+        }
+      }
     }
     // No merge
     else {
