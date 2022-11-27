@@ -5,6 +5,7 @@
 #include <string.h>
 #include <limits.h>
 #include "textutil.h"
+#include "language-defs-builder.h"
 #include "language-def-yacc.tab.h"
 
 _Static_assert(sizeof(long) >= 4, "Need 32-bit longs at least for this grammar to make sense");
