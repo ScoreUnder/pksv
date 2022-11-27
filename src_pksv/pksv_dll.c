@@ -135,7 +135,7 @@ __declspec(dllexport) __cdecl void SetDynamic(int dyn, int place) {
   dynplace = place;
 }
 
-void pksv_reset_all() {
+void pksv_reset_all(void) {
   pksv_codeproc_reset();
   pksv_decompiler_reset();
 }

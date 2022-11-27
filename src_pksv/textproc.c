@@ -924,7 +924,7 @@ char *transbackstr(char *scrfn, unsigned int pos, codeblock *c) {
   return ret;
 }
 
-static const char *get_romtype_name() {
+static const char *get_romtype_name(void) {
   switch (mode) {
     case GOLD:
       return "Gold/Silver";
