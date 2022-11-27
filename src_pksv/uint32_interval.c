@@ -12,8 +12,7 @@ void uint32_interval_init_bsearch_root(struct bsearch_root *root) {
 }
 
 static void uint32_interval_merge_ends(struct bsearch_root *restrict root,
-                                       size_t index, uint32_t start,
-                                       uint32_t end) {
+                                       size_t index, uint32_t end) {
   uint32_t merged_end = bsearch_val_u32(root, index);
   if (merged_end < end) {
     merged_end = end;
@@ -44,12 +43,12 @@ void uint32_interval_add(struct bsearch_root *restrict root, uint32_t start,
 
   // Can merge end with the interval before?
   if (index > 0 && bsearch_val_u32(root, index - 1) >= start) {
-    uint32_interval_merge_ends(root, index - 1, start, end);
+    uint32_interval_merge_ends(root, index - 1, end);
   }
   // Can merge beginning with the interval after?
   else if (index < root->size && bsearch_key_u32(root, index) <= end) {
     root->pairs[index].key = CAST_u32_pvoid(start);
-    uint32_interval_merge_ends(root, index, start, end);
+    uint32_interval_merge_ends(root, index, end);
   }
   // No merge
   else {
