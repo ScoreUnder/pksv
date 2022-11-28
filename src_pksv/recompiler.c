@@ -33,6 +33,7 @@
 #include "textproc.h"
 #include "codeproc.h"
 #include "textutil.h"
+#include "romutil.h"
 #include "pokedef.h"
 #include "golddef.h"
 #include "sulib.h"
@@ -8590,7 +8591,7 @@ void RecodeProc(char *script, char *romfn) {
 
     for (codeblock *curr = rewind_codeblock(c); curr != NULL;
          curr = curr->next) {
-      curr->org &= 0x07FFFFFF;
+      curr->org &= ~ROM_BASE_ADDRESS;
       uint32_interval_add(&root, curr->org, curr->org + curr->size);
     }
 
@@ -8606,12 +8607,12 @@ void RecodeProc(char *script, char *romfn) {
     bsearch_deinit_root(&root);
 
     vlog_txt("\n#ORG: data\n");
+    if (c != NULL) c = rewind_codeblock(c);
     calc_org(c, start, RomFile, defines);
     process_inserts(c, cl);
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");
 #endif
-    if (c != NULL) c = rewind_codeblock(c);
     d = c;
     while (c) {
       c->org &= 0x07FFFFFF;
@@ -8681,15 +8682,7 @@ void RecodeProc(char *script, char *romfn) {
     }
   }
   fclose(RomFile);
-  c = d;
-  while (c) {
-    d = c->next;
-    delete_inserts(c);
-    if (c->data) free(c->data);
-    if (c->name) free(c->name);
-    free(c);
-    c = d;
-  }
+  delete_all_codeblocks(d);
   while (cl) {
     cl2 = cl->next;
     if (cl->name) free(cl->name);

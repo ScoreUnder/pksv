@@ -35,10 +35,10 @@ unsigned int add_label(char* name, codeblock* c, unsigned int loc,
 unsigned int init_codeblock(codeblock* c, char* name, int org);
 codeblock* rewind_codeblock(codeblock* c);
 unsigned int add_insert(codeblock* c, unsigned int p, char* n);
-void delete_inserts(codeblock* c);
-void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
+void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
               struct bsearch_root* defines);
 void process_inserts(codeblock* c, codelabel* cl);
 void add_data(codeblock* c, char* data, unsigned int len);
+void delete_all_codeblocks(codeblock* first);
 
 #endif

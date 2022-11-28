@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,24 +62,6 @@ codeblock* rewind_codeblock(codeblock* c) {
   return z;
 }
 
-codeblock* end_codeblock(codeblock* c) {
-  codeblock* z;
-  z = c;
-  while (z->next != NULL) {
-    z = z->next;
-  }
-  return z;
-}
-
-codeinsert* rewind_insert(codeinsert* c) {
-  codeinsert* z;
-  z = c;
-  while (z->prev != NULL) {
-    z = z->prev;
-  }
-  return z;
-}
-
 codeinsert* end_insert(codeinsert* c) {
   codeinsert* z;
   z = c;
@@ -88,54 +71,31 @@ codeinsert* end_insert(codeinsert* c) {
   return z;
 }
 unsigned int add_insert(codeblock* c, unsigned int p, char* n) {
-  codeinsert* z;
-  z = c->insert;
-  if (z != NULL) {
-    z = end_insert(z);
-    z->next = malloc(sizeof(codeinsert));
-    z = z->next;
-    z->pos = p;
-    z->next = NULL;
-    z->prev = NULL;
-    z->name = malloc(strlen(n) + 1);
-    strcpy(z->name, n);
-    if (z == NULL) return 0;
+  codeinsert* newinsert = malloc(sizeof(codeinsert));
+  if (newinsert == NULL) return 0;
+  codeinsert* last = c->insert;
+  if (last != NULL) {
+    last = end_insert(last);
+    last->next = newinsert;
+  } else {
+    // Create the first insert if needed
+    c->insert = newinsert;
   }
-  if (z == NULL)  // Create the first insert if needed
-  {
-    c->insert = malloc(sizeof(codeinsert));
-    z = c->insert;
-    z->pos = p;
-    z->next = NULL;
-    z->prev = NULL;
-    z->name = malloc(strlen(n) + 1);
-    strcpy(z->name, n);
-    if (z == NULL) return 0;
-  }
+  newinsert->pos = p;
+  newinsert->next = NULL;
+  newinsert->prev = NULL;
+  newinsert->name = strdup(n);
   return 1;
 }
 
-void delete_inserts(codeblock* c) {
-  codeinsert* i;
-  codeinsert* n;
-  i = c->insert;
-  c->insert = NULL;
-  while (i != NULL) {
-    n = i->next;
-    free(i->name);
-    free(i);
-    i = n;
+static void delete_inserts(codeblock* block) {
+  codeinsert* next;
+  for (codeinsert* curr = block->insert; curr != NULL; curr = next) {
+    next = curr->next;
+    free(curr->name);
+    free(curr);
   }
-}
-
-void add_insert_name(codeinsert* i, char* x) {
-  i->name = malloc(strlen(x) + 1);
-  strcpy(i->name, x);
-}
-
-void add_code_name(codeblock* i, char* x) {
-  i->name = malloc(strlen(x) + 1);
-  strcpy(i->name, x);
+  block->insert = NULL;
 }
 
 void delete_codeblock(codeblock* c) {
@@ -160,7 +120,7 @@ void delete_codeblock(codeblock* c) {
   }
 }
 
-void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
+void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
               struct bsearch_root* defines) {
   struct bsearch_root free_space;  // TODO: make parameter
   uint32_interval_init_bsearch_root(&free_space);
@@ -170,23 +130,23 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
   uint32_t findfrom =
       CAST_pvoid_u32(bsearch_get_val(defines, findfrom_name, (void*)0));
 
-  uint32_t a = ROM_BASE_ADDRESS | start;
-  codeblock* b = rewind_codeblock(c);
-  while (b != NULL) {
-    if (b->name != NULL) {
+  for (codeblock* block = root_block; block != NULL; block = block->next) {
+    if (block->name != NULL) {
     retry_for_address : {
       uint32_t min_address = 0;
-      uint32_t result = FindFreeSpace(rom_search, b->size, b->align, &findfrom,
-                                      &min_address, search, &free_space);
+      uint32_t result =
+          FindFreeSpace(rom_search, block->size, block->align, &findfrom,
+                        &min_address, search, &free_space);
       if (result == UINT32_MAX) {
-        fprintf(stderr, "error: could not find free space for %s\n", b->name);
+        fprintf(stderr, "error: could not find free space for %s\n",
+                block->name);
         exit(1);  // TODO: report up the call stack
       }
       if (mode == GOLD || mode == CRYSTAL) {
-        if (b->size < 0x4000) {
-          if (!gsc_are_banks_equal(result, result + b->size - 1)) {
+        if (block->size < 0x4000) {
+          if (!gsc_are_banks_equal(result, result + block->size - 1)) {
             // Record the discarded free space interval (we didn't use it)
-            uint32_interval_add(&free_space, result, result + b->size);
+            uint32_interval_add(&free_space, result, result + block->size);
 
             // Not enough space in this bank, try the next bank
             findfrom = gsc_next_bank(result);
@@ -199,64 +159,54 @@ void calc_org(codeblock* c, unsigned int start, FILE* rom_search,
         } else {
           fprintf(stderr,
                   "Error: Offset %s cannot be written as it is too large.\n",
-                  b->name);
+                  block->name);
           exit(1);  // TODO: report up the call stack
         }
       }
-      b->org = result;
+      block->org = result;
     }
     }
-    b = b->next;
   }
 }
 
-void process_inserts(codeblock* c,
+void process_inserts(codeblock* root_block,
                      codelabel* cl)  // process inserts for everything.
 {
-  register codeblock* z;
-  register codeblock* y;
-  register codeinsert* x;
-  register codelabel* cl2;
-  unsigned int j;
-  y = rewind_codeblock(c);
-  while (y != NULL) {
-    x = y->insert;
-    while (x != NULL) {
-      if (*(x->name) == ':') {
-        cl2 = cl;
-        while (cl2) {
-          if (cl2->name)
+  for (codeblock* y = root_block; y != NULL; y = y->next) {
+    for (codeinsert* x = y->insert; x != NULL; x = x->next) {
+      if (x->name[0] == ':') {
+        // Insert is requesting a label
+        for (codelabel* cl2 = cl; cl2 != NULL; cl2 = cl2->next) {
+          if (cl2->name != NULL) {  // TODO: why would a label have no name?
             if (!strcmp(cl2->name, x->name)) {
               if (mode == GOLD || mode == CRYSTAL) {
-                j = OffsetToPointer((cl2->pos + cl2->block->org) &
-                                    0x07FFFFFF) >>
-                    8;
-                memcpy((void*)(y->data + x->pos), &j, 2);
+                uint32_t j = OffsetToPointer((cl2->pos + cl2->block->org) &
+                                             ~ROM_BASE_ADDRESS) >>
+                             8;
+                memcpy(y->data + x->pos, &j, 2);
               } else {
-                j = (cl2->pos + cl2->block->org) | 0x08000000;
-                memcpy((void*)(y->data + x->pos), &j, 4);
+                uint32_t j = (cl2->pos + cl2->block->org) | ROM_BASE_ADDRESS;
+                memcpy(y->data + x->pos, &j, 4);
               }
             }
-          cl2 = cl2->next;
+          }
         }
       } else {
-        z = rewind_codeblock(c);
-        while (z) {
-          if (z->name)
+        // Insert is requesting a dynamic offset
+        for (codeblock* z = root_block; z != NULL; z = z->next) {
+          if (z->name != NULL) {
             if (!strcmp(z->name, x->name)) {
               if (mode == GOLD || mode == CRYSTAL) {
-                j = OffsetToPointer(z->org & 0x07FFFFFF);
-                memcpy((void*)(y->data + x->pos), &j, 3);
+                uint32_t j = OffsetToPointer(z->org & ~ROM_BASE_ADDRESS);
+                memcpy(y->data + x->pos, &j, 3);
               } else
-                memcpy((void*)(y->data + x->pos), &(z->org), 4);
+                memcpy(y->data + x->pos, &z->org, 4);
             }
-          z = z->next;
+          }
         }
       }
-      x = x->next;
     }
     delete_inserts(y);
-    y = y->next;
   }
 }
 
@@ -267,4 +217,18 @@ void add_data(codeblock* c, char* data, unsigned int len) {
   }
   memcpy(&c->data[c->size], data, len);
   c->size += len;
+}
+
+void delete_all_codeblocks(codeblock* first) {
+  if (first == NULL) return;
+  assert(first->prev == NULL);
+
+  codeblock* next;
+  for (codeblock* curr = first; curr != NULL; curr = next) {
+    next = curr->next;
+    delete_inserts(curr);
+    if (curr->data) free(curr->data);
+    if (curr->name) free(curr->name);
+    free(curr);
+  }
 }
