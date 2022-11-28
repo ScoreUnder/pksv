@@ -274,9 +274,11 @@ struct loaded_or_builtin_parser *take_parser(
     state->parser_idx++;
     return &builtin_parser_hex;
   }
-  state->parser_idx = 0;
-  state->prefix_idx = 0;
-  return &builtin_parser_dec;
+  if (state->parser_idx == parsers.length + 1){
+    state->parser_idx++;
+    return &builtin_parser_dec;
+  }
+  return NULL;
 }
 
 struct parse_result parse_for_recomp(struct parser_cache *cache,
