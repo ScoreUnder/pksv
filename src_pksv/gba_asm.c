@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "romutil.h"
 #include "isdone.h"
 
 char asm_buf[200];
@@ -221,7 +222,7 @@ int dec_thumb(short opcode, int place) {
           sprintf(asm_buf, "-LDR   R%u,[PC,%X] '%X", (opcode >> 8) & 7,
                   (4 * (opcode & 0xFF)),
                   (4 * (opcode & 0xFF)) + ((place + 4) & (~2)));
-          DoDword(((4 * (opcode & 0xFF)) + ((place + 4) & (~2))) & 0x07FFFFFF);
+          DoDword(((4 * (opcode & 0xFF)) + ((place + 4) & (~2))) & ~ROM_BASE_ADDRESS);
           break;
       }
       break;
