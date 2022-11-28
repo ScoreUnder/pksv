@@ -2,44 +2,44 @@
 #define PKSV_SULIB_H 1
 
 #include <stdio.h>
+#include <stdint.h>
 #include "binarysearch.h"
 
 typedef struct __insert {
-  unsigned int pos;
+  uint32_t pos;
   char* name;
   struct __insert* next;
   struct __insert* prev;
 } codeinsert;
 
 typedef struct __block {
-  unsigned int allocated, size;
+  size_t allocated, size;
   char* data;
   struct __block* next;
   struct __block* prev;
   char* name;
   struct __insert* insert;
-  unsigned int org;
-  unsigned int align;
+  uint32_t org;
+  uint32_t align;
 } codeblock;
 
 typedef struct __label {
-  unsigned int pos;
+  uint32_t pos;
   char* name;
   codeblock* block;
   struct __label* next;
   struct __label* prev;
 } codelabel;
 
-unsigned int add_label(char* name, codeblock* c, unsigned int loc,
-                       codelabel** chain);
-unsigned int init_codeblock(codeblock* c, char* name, int org);
-codeblock* add_codeblock(codeblock* tail, char* name, int org);
+unsigned int add_label(const char* name, codeblock* c, uint32_t loc,
+                       codelabel** head);
+codeblock* add_codeblock(codeblock* tail, const char* name, uint32_t org);
 codeblock* rewind_codeblock(codeblock* c);
-unsigned int add_insert(codeblock* c, unsigned int p, char* n);
+void add_insert(codeblock* block, uint32_t pos, const char* name);
 void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
               struct bsearch_root* defines);
 void process_inserts(codeblock* c, codelabel* cl);
-void add_data(codeblock* c, char* data, unsigned int len);
+void add_data(codeblock* block, const void* data, size_t len);
 void delete_all_codeblocks(codeblock* first);
 
 #endif

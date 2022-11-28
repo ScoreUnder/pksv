@@ -85,3 +85,5 @@ msgbox test
 callstd MSG_LOCK
 call @deterministic-erased-area
 end
+#raw 0x101 ' Should warn about an oversized byte
+#raw -1 ' Should not warn

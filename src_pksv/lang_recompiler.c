@@ -59,6 +59,10 @@ static struct parse_result pull_and_parse(
     const struct parser_list default_parsers, const char **const cur);
 static len_string *pull_token(const char *text);
 static void cleanup_parse_result(struct parse_result result);
+static void write_int_to_codeblock(struct compiler_internal_state *state,
+                                   uint32_t data, size_t len);
+static void warn_if_truncated(struct compiler_internal_state *state,
+                              uint32_t value, size_t len);
 
 void compile_all(FILE *input_file, FILE *output_file,
                  const struct language_def *start_language,
@@ -233,8 +237,16 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     free(name_token);
     // } else if (strcmp(directive, "include") == 0) {
     // TODO: include
-    // } else if (strcmp(directive, "raw") == 0) {
-    // TODO: raw
+  } else if (strcmp(directive, "raw") == 0) {
+    struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
+    if (result.type == PARSE_RESULT_VALUE) {
+      write_int_to_codeblock(state, result.value, 1);
+    } else {
+      cleanup_parse_result(result);
+      fprintf(stderr, "Error: Could not parse value for #raw at line %zu\n",
+              state->line);
+      exit(1);
+    }
     // } else if (strcmp(directive, "erase") == 0) {
     // TODO: erase
     // } else if (strcmp(directive, "pragma") == 0) {
@@ -372,5 +384,43 @@ len_string *pull_token(const char *text) {
 void cleanup_parse_result(struct parse_result result) {
   if (result.type == PARSE_RESULT_LABEL) {
     free(result.label);
+  }
+}
+
+void write_int_to_codeblock(struct compiler_internal_state *state,
+                            uint32_t data, size_t len) {
+  assert(len != 0);
+  assert(len <= 4);
+  warn_if_truncated(state, data, len);
+
+  codeblock *block = state->tail_block;
+  if (block == NULL) {
+    fprintf(stderr, "Error: Writing code before #org on line %zu\n",
+            state->line);
+    exit(1);
+  }
+
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+  // On little endian systems, the bytes are already in the correct order
+  void *raw_data = &data;
+#else
+  // On other endiannesses, emulate little endian byte order
+  uint8_t raw_data[4];
+  for (size_t i = 0; i < len; i++) {
+    raw_data[i] = (data >> (i * 8)) & 0xFF;
+  }
+#endif
+  add_data(block, raw_data, len);
+}
+
+void warn_if_truncated(struct compiler_internal_state *state, uint32_t value,
+                       size_t len) {
+  int32_t signed_value = (int32_t)value;
+  signed_value >>= len * 8;
+  if (signed_value != 0 && signed_value != -1) {
+    fprintf(stderr,
+            "Warning: Truncating value 0x%08" PRIx32
+            " to %zu bytes on line %zu\n",
+            value, len, state->line);
   }
 }

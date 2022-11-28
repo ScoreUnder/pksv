@@ -12,8 +12,12 @@
 #include "textutil.h"
 #include "romutil.h"
 
-unsigned int add_label(char* name, codeblock* c, unsigned int loc,
+unsigned int add_label(const char* name, codeblock* block, uint32_t loc,
                        codelabel** head) {
+  assert(name != NULL);
+  assert(block != NULL);
+  assert(head != NULL);
+
   char* name2 = strdup(name);
   codelabel* newlabel = malloc(sizeof(codelabel));
   codelabel* tail = *head;
@@ -23,7 +27,7 @@ unsigned int add_label(char* name, codeblock* c, unsigned int loc,
   newlabel->next = NULL;
   newlabel->name = name2;
   newlabel->pos = loc;
-  newlabel->block = c;
+  newlabel->block = block;
   if (tail)
     tail->next = newlabel;
   else
@@ -31,8 +35,8 @@ unsigned int add_label(char* name, codeblock* c, unsigned int loc,
   return newlabel != NULL;
 }
 
-unsigned int init_codeblock(codeblock* c, char* name, int org) {
-  if (c == NULL) return 0;
+static void init_codeblock(codeblock* c, const char* name, uint32_t org) {
+  assert(c != NULL);
   c->data = malloc(128);
   c->allocated = 128;
   c->size = 0;
@@ -48,11 +52,11 @@ unsigned int init_codeblock(codeblock* c, char* name, int org) {
   c->org = org;
   if (c->data == NULL) {
     fputs("Out of memory\n", stderr);
+    exit(1);
   }
-  return (c->data != NULL);
 }
 
-codeblock* add_codeblock(codeblock* tail, char* name, int org) {
+codeblock* add_codeblock(codeblock* tail, const char* name, uint32_t org) {
   codeblock* newblock = malloc(sizeof(codeblock));
   init_codeblock(newblock, name, org);
   newblock->prev = tail;
@@ -81,22 +85,25 @@ codeinsert* end_insert(codeinsert* c) {
   }
   return z;
 }
-unsigned int add_insert(codeblock* c, unsigned int p, char* n) {
+
+void add_insert(codeblock* block, uint32_t pos, const char* name) {
   codeinsert* newinsert = malloc(sizeof(codeinsert));
-  if (newinsert == NULL) return 0;
-  codeinsert* last = c->insert;
+  if (newinsert == NULL) {
+    fputs("Out of memory\n", stderr);
+    exit(1);
+  }
+  codeinsert* last = block->insert;
   if (last != NULL) {
     last = end_insert(last);
     last->next = newinsert;
   } else {
     // Create the first insert if needed
-    c->insert = newinsert;
+    block->insert = newinsert;
   }
-  newinsert->pos = p;
+  newinsert->pos = pos;
   newinsert->next = NULL;
-  newinsert->prev = NULL;
-  newinsert->name = strdup(n);
-  return 1;
+  newinsert->prev = last;
+  newinsert->name = strdup(name);
 }
 
 static void delete_inserts(codeblock* block) {
@@ -203,13 +210,13 @@ void process_inserts(codeblock* root_block, codelabel* cl) {
   }
 }
 
-void add_data(codeblock* c, char* data, unsigned int len) {
-  if (c->size + len > c->allocated) {
-    c->allocated = (2 * c->allocated) + len;
-    c->data = realloc(c->data, c->allocated);
+void add_data(codeblock* block, const void* data, size_t len) {
+  if (block->size + len > block->allocated) {
+    block->allocated = (2 * block->allocated) + len;
+    block->data = realloc(block->data, block->allocated);
   }
-  memcpy(&c->data[c->size], data, len);
-  c->size += len;
+  memcpy(&block->data[block->size], data, len);
+  block->size += len;
 }
 
 void delete_all_codeblocks(codeblock* first) {
