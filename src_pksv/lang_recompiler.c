@@ -30,7 +30,15 @@ typedef struct {
   char str[];
 } len_string;
 
-static const struct parser_list empty_parser_list = {0};
+static const struct language lang_defines = {
+    .name = "defines",
+    .is_prefixed = false,
+};
+
+static const struct parser_list normal_parsers = {
+    .length = 1,
+    .parsers = &lang_defines,
+};
 
 #define DYN_UNSPECIFIED ((uint32_t)-1)
 
@@ -174,8 +182,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
       // Number
       org_name = NULL;
       cur -= org_token->len;
-      struct parse_result result =
-          pull_and_parse(state, empty_parser_list, &cur);
+      struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
       if (result.type == PARSE_RESULT_VALUE) {
         org_address = result.value;
       } else {
@@ -200,7 +207,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
   } else if (strcmp(directive, "dynamic") == 0 ||
              strcmp(directive, "dyn") == 0) {
     // TODO: disallow reassignment
-    struct parse_result result = pull_and_parse(state, empty_parser_list, &cur);
+    struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
     if (result.type == PARSE_RESULT_VALUE) {
       state->dynamic_base = result.value;
     } else {
@@ -214,7 +221,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     cur += name_token->len;
     cur += strspn(cur, VALID_SPACES);  // Skip spaces
 
-    struct parse_result result = pull_and_parse(state, empty_parser_list, &cur);
+    struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
     if (result.type == PARSE_RESULT_VALUE) {
       set_define_from_value(state, name_token->str, result.value);
     } else {
@@ -303,26 +310,22 @@ struct parse_result parse_from_token(struct compiler_internal_state *state,
                                      const char *token_lang,
                                      const struct parser_list default_parsers,
                                      const len_string *token) {
-  bool is_prefixed = token_lang != NULL && token_lang[0] == '*';
-  if (is_prefixed) {
-    token_lang++;
-  }
-
   struct parser_list parsers;
   if (token_lang == NULL) {
     parsers = default_parsers;
   } else {
     parsers = (struct parser_list){
-        .length = default_parsers.length + 1,
-        .parsers =
-            malloc(sizeof(struct language) * (default_parsers.length + 1)),
+        .length = 1,
+        .parsers = malloc(sizeof(struct language)),
     };
+    bool is_prefixed = token_lang != NULL && token_lang[0] == '*';
+    if (is_prefixed) {
+      token_lang++;
+    }
     parsers.parsers[0] = (struct language){
         .name = token_lang,
         .is_prefixed = is_prefixed,
     };
-    memcpy(parsers.parsers + 1, default_parsers.parsers,
-           sizeof(struct language) * default_parsers.length);
   }
 
   struct parse_result result =
