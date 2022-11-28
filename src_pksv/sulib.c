@@ -52,6 +52,17 @@ unsigned int init_codeblock(codeblock* c, char* name, int org) {
   return (c->data != NULL);
 }
 
+codeblock* add_codeblock(codeblock* tail, char* name, int org) {
+  codeblock* newblock = malloc(sizeof(codeblock));
+  init_codeblock(newblock, name, org);
+  newblock->prev = tail;
+  if (tail != NULL) {
+    assert(tail->next == NULL);
+    tail->next = newblock;
+  }
+  return newblock;
+}
+
 codeblock* rewind_codeblock(codeblock* c) {
   codeblock* z;
   if (!c) return NULL;
@@ -96,28 +107,6 @@ static void delete_inserts(codeblock* block) {
     free(curr);
   }
   block->insert = NULL;
-}
-
-void delete_codeblock(codeblock* c) {
-  codeblock* p;
-  codeblock* n;
-  if (c == NULL) return;
-  delete_inserts(c);
-  p = c->prev;
-  n = c->next;
-  if (p == NULL && n != NULL) {
-    memcpy(c, n, sizeof(codeblock));
-    delete_inserts(n);
-    free(n->data);
-    free(n->name);
-    free(n);
-  } else if (p != NULL) {
-    p->next = n;
-    if (n != NULL) n->prev = p;
-    free(c->data);
-    free(c->name);
-    free(c);
-  }
 }
 
 void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
@@ -175,8 +164,7 @@ static uint32_t get_address_for_insert(codeblock* root_block,
   if (insert->name[0] == ':') {
     // Insert is requesting a label
     for (codelabel* label = root_label; label != NULL; label = label->next) {
-      // TODO: why would a label have no name?
-      if (label->name != NULL && !strcmp(label->name, insert->name)) {
+      if (!strcmp(label->name, insert->name)) {
         return label->pos + label->block->org;
       }
     }

@@ -44,7 +44,7 @@
 #define aa(x) else if (!strcmp(buf, x))
 #define ec() end_command(Script, &i)
 
-// TODO: when is c==NULL? is that acceptable?
+// TODO: when is tail_block==NULL? is that acceptable?
 #define rom(x, s)                                                            \
   do {                                                                       \
     uint32_t rom_m_data;                                                     \
@@ -52,7 +52,7 @@
       rom_m_data = search | (search << 8) | (search << 16) | (search << 24); \
     else                                                                     \
       rom_m_data = (x);                                                      \
-    if (c != NULL) add_data(c, (char *)&rom_m_data, (s));                    \
+    if (tail_block != NULL) add_data(tail_block, (char *)&rom_m_data, (s));  \
   } while (0)
 
 #define BASIC(x) rom((x), 1)
@@ -134,7 +134,8 @@ uint32_t GetHex(const char *in, pos_int *ppos) {
 }
 #define HEX() GetHex(Script, &i)
 
-void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
+void try_asm_x(const char *Script, pos_int *ppos, char *buf,
+               codeblock *tail_block) {
   unsigned int i = *ppos;
   int j;  // used in rom macro
   register int arg1, arg2, arg3;
@@ -1154,7 +1155,7 @@ void try_asm_x(const char *Script, pos_int *ppos, char *buf, codeblock *c) {
   *ppos = i;
 }
 
-#define try_asm() try_asm_x(Script, &i, buf, c)
+#define try_asm() try_asm_x(Script, &i, buf, tail_block)
 struct bsearch_root *DoDefines(void) {
   struct loaded_parser *defines =
       load_definitions("defines", defines_dat_location, false);
@@ -1188,8 +1189,7 @@ void RecodeProc(char *script, char *romfn) {
 #endif
                fst, i, j, k, l, arg1, arg2, arg3, arg4, arg5, arg6,
                scriptlen;  //,arg7;
-  codeblock *c = NULL;
-  codeblock *d;
+  codeblock *tail_block = NULL;
   codelabel *cl = NULL;
   codelabel *cl2;
 
@@ -1368,20 +1368,14 @@ void RecodeProc(char *script, char *romfn) {
                 buf[j] = 0;
                 sprintf(buf2, "   -> %s\n", buf);
                 vlog_txt(buf2);
+                tail_block = add_codeblock(tail_block, buf, start);
               } else {
                 k = GetNum("#ORG");
                 if (!gffs) {
                   return;
                 }
+                tail_block = add_codeblock(tail_block, NULL, k);
               }
-              d = malloc(sizeof(codeblock));
-              if (*buf == 0)
-                init_codeblock(d, NULL, k);
-              else
-                init_codeblock(d, buf, start);
-              d->prev = c;
-              if (c != NULL) c->next = d;
-              c = d;
               ec();
             }
             aa("#eorg") {
@@ -1399,20 +1393,14 @@ void RecodeProc(char *script, char *romfn) {
                 buf[j] = 0;
                 sprintf(buf2, "   -> %s\n", buf);
                 vlog_txt(buf2);
+                tail_block = add_codeblock(tail_block, buf, start);
               } else {
                 k = GetNum("#EORG");
                 if (!gffs) {
                   return;
                 }
+                tail_block = add_codeblock(tail_block, NULL, k);
               }
-              d = malloc(sizeof(codeblock));
-              if (*buf == 0)
-                init_codeblock(d, NULL, k);
-              else
-                init_codeblock(d, buf, start);
-              d->prev = c;
-              if (c != NULL) c->next = d;
-              c = d;
               ec();
             }
             aa("#quiet") {
@@ -3305,12 +3293,12 @@ void RecodeProc(char *script, char *romfn) {
             }
             try_asm();
             if (*buf == ':') {
-              if (c) add_label(buf, c, c->size, &cl);
+              if (tail_block) add_label(buf, tail_block, tail_block->size, &cl);
               ec();
             }
             aa("m") {
               vlog_txt("Movement data...\n");
-              add_data(c, trans, transbackmove(Script, &i));
+              add_data(tail_block, trans, transbackmove(Script, &i));
               ec();
             }
             aa("=") {
@@ -3320,7 +3308,7 @@ void RecodeProc(char *script, char *romfn) {
               } else {
                 log_txt("Should have a space after the =\n", 33 - 1);
               }
-              temp_ptr = transbackstr(script, i - fst, c);
+              temp_ptr = transbackstr(script, i - fst, tail_block);
               while (chr != '\n' && chr != 0) {
                 i++;
               }
@@ -3464,20 +3452,14 @@ void RecodeProc(char *script, char *romfn) {
                 buf[j] = 0;
                 sprintf(buf2, "   -> %s\n", buf);
                 vlog_txt(buf2);
+                tail_block = add_codeblock(tail_block, buf, start);
               } else {
                 k = GetNum("#ORG");
                 if (!gffs) {
                   return;
                 }
+                tail_block = add_codeblock(tail_block, NULL, k);
               }
-              d = malloc(sizeof(codeblock));
-              if (*buf == 0)
-                init_codeblock(d, NULL, k);
-              else
-                init_codeblock(d, buf, start);
-              d->prev = c;
-              if (c != NULL) c->next = d;
-              c = d;
               ec();
             }
             aa("#eorg") {
@@ -3495,20 +3477,14 @@ void RecodeProc(char *script, char *romfn) {
                 buf[j] = 0;
                 sprintf(buf2, "   -> %s\n", buf);
                 vlog_txt(buf2);
+                tail_block = add_codeblock(tail_block, buf, start);
               } else {
                 k = GetNum("#EORG");
                 if (!gffs) {
                   return;
                 }
+                tail_block = add_codeblock(tail_block, NULL, k);
               }
-              d = malloc(sizeof(codeblock));
-              if (*buf == 0)
-                init_codeblock(d, NULL, k);
-              else
-                init_codeblock(d, buf, start);
-              d->prev = c;
-              if (c != NULL) c->next = d;
-              c = d;
               ec();
             }
             aa("#quiet") {
@@ -5441,12 +5417,12 @@ void RecodeProc(char *script, char *romfn) {
             }
             else if (*buf == '-') try_asm();
             else if (*buf == ':') {
-              if (c) add_label(buf, c, c->size, &cl);
+              if (tail_block) add_label(buf, tail_block, tail_block->size, &cl);
               ec();
             }
             aa("m") {
               vlog_txt("Movement data...\n");
-              add_data(c, trans, transbackmove(Script, &i));
+              add_data(tail_block, trans, transbackmove(Script, &i));
               ec();
             }
             aa("=") {
@@ -5456,7 +5432,7 @@ void RecodeProc(char *script, char *romfn) {
               } else {
                 log_txt("Should have a space after the =\n", 33 - 1);
               }
-              temp_ptr = transbackstr(script, i - fst, c);
+              temp_ptr = transbackstr(script, i - fst, tail_block);
               while (chr != '\n' && chr != 0) {
                 i++;
               }
@@ -5606,18 +5582,12 @@ void RecodeProc(char *script, char *romfn) {
                     buf[j] = 0;
                     sprintf(buf2, "   -> %s\n", buf);
                     vlog_txt(buf2);
+                    tail_block = add_codeblock(tail_block, buf, start);
                   } else {
                     k = GetNum("#ORG");
                     if (!gffs) return;
+                    tail_block = add_codeblock(tail_block, NULL, k);
                   }
-                  d = malloc(sizeof(codeblock));
-                  if (*buf == 0)
-                    init_codeblock(d, NULL, k);
-                  else
-                    init_codeblock(d, buf, start);
-                  d->prev = c;
-                  if (c != NULL) c->next = d;
-                  c = d;
                 }
                 aa("#orgal") {
                   eorg = 0;
@@ -5640,19 +5610,13 @@ void RecodeProc(char *script, char *romfn) {
                     buf[j] = 0;
                     sprintf(buf2, "   -> %s\n", buf);
                     vlog_txt(buf2);
+                    tail_block = add_codeblock(tail_block, buf, start);
                   } else {
                     k = GetNum("#ORGAL");
                     if (!gffs) return;
+                    tail_block = add_codeblock(tail_block, NULL, k);
                   }
-                  d = malloc(sizeof(codeblock));
-                  if (*buf == 0)
-                    init_codeblock(d, NULL, k);
-                  else
-                    init_codeblock(d, buf, start);
-                  d->prev = c;
-                  if (c != NULL) c->next = d;
-                  c = d;
-                  c->align = GetNum("#ORGAL");
+                  tail_block->align = GetNum("#ORGAL");
                   if (!gffs) return;
                 }
                 aa("#eorg") {
@@ -5671,20 +5635,14 @@ void RecodeProc(char *script, char *romfn) {
                     buf[j] = 0;
                     sprintf(buf2, "   -> %s\n", buf);
                     vlog_txt(buf2);
+                    tail_block = add_codeblock(tail_block, buf, start);
                   } else {
                     k = GetNum("#EORG");
                     if (!gffs) {
                       return;
                     }
+                    tail_block = add_codeblock(tail_block, NULL, k);
                   }
-                  d = malloc(sizeof(codeblock));
-                  if (*buf == 0)
-                    init_codeblock(d, NULL, k);
-                  else
-                    init_codeblock(d, buf, start);
-                  d->prev = c;
-                  if (c != NULL) c->next = d;
-                  c = d;
                 }
                 aa("#quiet") { IsVerbose = 0; }
                 aa("#loud") { IsVerbose = 1; }
@@ -7228,7 +7186,7 @@ void RecodeProc(char *script, char *romfn) {
                 }
                 aa("m") {
                   vlog_txt("Movement data...\n");
-                  add_data(c, trans, transbackmove(Script, &i));
+                  add_data(tail_block, trans, transbackmove(Script, &i));
                 }
                 else goto unk_cmd_fr;
                 ec();
@@ -8497,7 +8455,8 @@ void RecodeProc(char *script, char *romfn) {
                 try_asm();
                 break;
               case ':':
-                if (c) add_label(buf, c, c->size, &cl);
+                if (tail_block)
+                  add_label(buf, tail_block, tail_block->size, &cl);
                 ec();
                 break;
               case '=':
@@ -8508,7 +8467,7 @@ void RecodeProc(char *script, char *romfn) {
                 } else {
                   log_txt("Should have a space after the =\n", 33 - 1);
                 }
-                temp_ptr = transbackstr(script, i - fst, c);
+                temp_ptr = transbackstr(script, i - fst, tail_block);
                 while (chr != '\n' && chr != 0) {
                   i++;
                 }
@@ -8582,6 +8541,11 @@ void RecodeProc(char *script, char *romfn) {
   SendMessage(GetDlgItem(HW_DLG, 3), LB_RESETCONTENT, 0, 0);
 #endif
 #endif
+  codeblock *root_block;
+  if (tail_block != NULL)
+    root_block = rewind_codeblock(tail_block);
+  else
+    root_block = NULL;
   if (dynu && start == 0) {
     log_txt("Error: No #dyn used with dynamic offsets!\n", 43 - 1);
   } else {
@@ -8589,7 +8553,7 @@ void RecodeProc(char *script, char *romfn) {
     struct bsearch_root root;
     uint32_interval_init_bsearch_root(&root);
 
-    for (codeblock *curr = rewind_codeblock(c); curr != NULL;
+    for (codeblock *curr = root_block; curr != NULL;
          curr = curr->next) {
       curr->org &= ~ROM_BASE_ADDRESS;
       uint32_interval_add(&root, curr->org, curr->org + curr->size);
@@ -8607,35 +8571,34 @@ void RecodeProc(char *script, char *romfn) {
     bsearch_deinit_root(&root);
 
     vlog_txt("\n#ORG: data\n");
-    if (c != NULL) c = rewind_codeblock(c);
-    calc_org(c, start, RomFile, defines);
-    process_inserts(c, cl);
+    calc_org(root_block, start, RomFile, defines);
+    process_inserts(root_block, cl);
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");
 #endif
-    d = c;
-    while (c) {
-      c->org &= 0x07FFFFFF;
-      if (c->name) {
+    for (codeblock *block = root_block; block != NULL; block = block->next) {
+      block->org &= 0x07FFFFFF;
+      if (block->name) {
         if (mode != GOLD && mode != CRYSTAL)
-          sprintf(buf, "   -> %s <-> 0x%X (0x%X bytes)\n", c->name, c->org,
-                  c->size);
+          sprintf(buf, "   -> %s <-> 0x%X (0x%X bytes)\n", block->name,
+                  block->org, block->size);
         else {
-          j = OffsetToPointer(c->org);
-          sprintf(buf, "   -> %s <-> 0x%X -> %02X:%04X (0x%X bytes)\n", c->name,
-                  c->org, j & 0xFF, (j >> 8) & 0xFFFF, c->size);
+          j = OffsetToPointer(block->org);
+          sprintf(buf, "   -> %s <-> 0x%X -> %02X:%04X (0x%X bytes)\n",
+                  block->name, block->org, j & 0xFF, (j >> 8) & 0xFFFF,
+                  block->size);
         }
         log_txt(buf, strlen(buf));
 #ifdef WIN32
 #ifdef DLL
-        strings = LocalAlloc(LPTR, strlen(c->name) + 60);
+        strings = LocalAlloc(LPTR, strlen(block->name) + 60);
         if (mode != GOLD && mode != CRYSTAL)
-          sprintf(strings, "%s <-> 0x%X (0x%X bytes)", c->name, c->org,
-                  c->size);
+          sprintf(strings, "%s <-> 0x%X (0x%X bytes)", block->name, block->org,
+                  block->size);
         else {
-          j = OffsetToPointer(c->org);
-          sprintf(strings, "%s <-> 0x%X -> %02X:%04X (0x%X bytes)", c->name,
-                  c->org, j & 0xFF, (j >> 8) & 0xFFFF, c->size);
+          j = OffsetToPointer(block->org);
+          sprintf(strings, "%s <-> 0x%X -> %02X:%04X (0x%X bytes)", block->name,
+                  block->org, j & 0xFF, (j >> 8) & 0xFFFF, block->size);
         }
         SendMessage(GetDlgItem(HW_DLG, 3), LB_ADDSTRING, 0, (LPARAM)strings);
         LocalFree(strings);
@@ -8643,29 +8606,30 @@ void RecodeProc(char *script, char *romfn) {
 #endif
 #endif
       } else {
-        sprintf(buf, "   -> 0x%X (0x%X bytes)\n", c->org, c->size);
+        sprintf(buf, "   -> 0x%X (0x%X bytes)\n", block->org, block->size);
         log_txt(buf, strlen(buf));
       }
       for (cl2 = cl; cl2; cl2 = cl2->next) {
-        if (cl2->block == c) {
+        if (cl2->block == block) {
           if (mode != GOLD && mode != CRYSTAL)
             sprintf(buf, "      -> %s <-> 0x%X\n", cl2->name,
-                    c->org + cl2->pos);
+                    block->org + cl2->pos);
           else {
-            j = OffsetToPointer(c->org + cl2->pos);
+            j = OffsetToPointer(block->org + cl2->pos);
             sprintf(buf, "      -> %s <-> 0x%X -> %02X:%04X\n", cl2->name,
-                    c->org + cl2->pos, j & 0xFF, (j >> 8) & 0xFFFF);
+                    block->org + cl2->pos, j & 0xFF, (j >> 8) & 0xFFFF);
           }
           log_txt(buf, strlen(buf));
 #ifdef WIN32
 #ifdef DLL
           strings = LocalAlloc(LPTR, strlen(cl2->name) + 60);
           if (mode != GOLD && mode != CRYSTAL)
-            sprintf(strings, "-> %s <-> 0x%X", cl2->name, c->org + cl2->pos);
+            sprintf(strings, "-> %s <-> 0x%X", cl2->name,
+                    block->org + cl2->pos);
           else {
-            j = OffsetToPointer(c->org + cl2->pos);
+            j = OffsetToPointer(block->org + cl2->pos);
             sprintf(strings, "-> %s <-> 0x%X -> %02X:%04X", cl2->name,
-                    c->org + cl2->pos, j & 0xFF, (j >> 8) & 0xFFFF);
+                    block->org + cl2->pos, j & 0xFF, (j >> 8) & 0xFFFF);
           }
           SendMessage(GetDlgItem(HW_DLG, 3), LB_ADDSTRING, 0, (LPARAM)strings);
           LocalFree(strings);
@@ -8675,14 +8639,13 @@ void RecodeProc(char *script, char *romfn) {
         }
       }
       if (!testing) {
-        fseek(RomFile, c->org, SEEK_SET);
-        fwrite(c->data, 1, c->size, RomFile);
+        fseek(RomFile, block->org, SEEK_SET);
+        fwrite(block->data, 1, block->size, RomFile);
       }
-      c = c->next;
     }
   }
   fclose(RomFile);
-  delete_all_codeblocks(d);
+  delete_all_codeblocks(root_block);
   while (cl) {
     cl2 = cl->next;
     if (cl->name) free(cl->name);

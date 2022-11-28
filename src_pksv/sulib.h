@@ -33,6 +33,7 @@ typedef struct __label {
 unsigned int add_label(char* name, codeblock* c, unsigned int loc,
                        codelabel** chain);
 unsigned int init_codeblock(codeblock* c, char* name, int org);
+codeblock* add_codeblock(codeblock* tail, char* name, int org);
 codeblock* rewind_codeblock(codeblock* c);
 unsigned int add_insert(codeblock* c, unsigned int p, char* n);
 void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,

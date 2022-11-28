@@ -23,7 +23,7 @@ extern unsigned int fail;
 void pksv_codeproc_reset(void);
 
 #define Defined2(thing) (WhatIs2(thing), !fail)
-#define GetNum(x) GenForFunc(x, &i, Script, defines, c)
+#define GetNum(x) GenForFunc(x, &i, Script, defines, tail_block)
 
 extern unsigned char gffs;
 unsigned int GenForFunc(char *func, unsigned int *ii, char *Script,
