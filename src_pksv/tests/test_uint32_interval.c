@@ -375,6 +375,7 @@ START_TEST(test_intervals_delete_overlap_5) {
 
   ck_assert_uint_eq(root.size, 0);
 }
+END_TEST
 
 START_TEST(test_intervals_delete_overlap_6) {
   // Delete overlapping a single interval
@@ -390,6 +391,7 @@ START_TEST(test_intervals_delete_overlap_6) {
   ck_assert_uint_eq(bsearch_key_u32(&root, 2), 60);
   ck_assert_uint_eq(bsearch_val_u32(&root, 2), 70);
 }
+END_TEST
 
 START_TEST(test_intervals_delete_redundant) {
   // Delete overlapping multiple intervals
@@ -409,6 +411,25 @@ START_TEST(test_intervals_delete_redundant) {
   ck_assert_uint_eq(bsearch_key_u32(&root, 1), 20);
   ck_assert_uint_eq(bsearch_val_u32(&root, 1), 30);
 }
+END_TEST
+
+START_TEST(test_intervals_intersect) {
+  ck_assert(!uint32_interval_intersects(&root, 0, 1));
+  ck_assert(uint32_interval_intersects(&root, 1, 2));
+
+  ck_assert(uint32_interval_intersects(&root, 9, 10));
+  ck_assert(!uint32_interval_intersects(&root, 10, 11));
+
+  ck_assert(uint32_interval_intersects(&root, 0, 2));
+  ck_assert(uint32_interval_intersects(&root, 9, 11));
+
+  ck_assert(uint32_interval_intersects(&root, 0, 11));
+  ck_assert(uint32_interval_intersects(&root, 5, 6));
+
+  ck_assert(!uint32_interval_intersects(&root, 13, 14));
+  ck_assert(!uint32_interval_intersects(&root, 10, 20));
+}
+END_TEST
 
 Suite *uint32_interval_suite(void) {
   Suite *s = suite_create("uint32_interval");
@@ -436,6 +457,7 @@ Suite *uint32_interval_suite(void) {
   tcase_add_test(tc_core, test_intervals_delete_overlap_5);
   tcase_add_test(tc_core, test_intervals_delete_overlap_6);
   tcase_add_test(tc_core, test_intervals_delete_redundant);
+  tcase_add_test(tc_core, test_intervals_intersect);
   suite_add_tcase(s, tc_core);
 
   return s;

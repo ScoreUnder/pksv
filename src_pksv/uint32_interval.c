@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "uint32_interval.h"
 #include "binarysearch_u32.h"
@@ -95,4 +96,22 @@ void uint32_interval_remove(struct bsearch_root *restrict root, uint32_t start,
       }
     }
   }
+}
+
+bool uint32_interval_intersects(struct bsearch_root *restrict root,
+                                uint32_t start, uint32_t end) {
+  if (end == start) return false;  // Empty interval, no intersection
+  assert(end > start);
+
+  ptrdiff_t s_index = bsearch_find_u32(root, start);
+  size_t index;
+  if (s_index >= 0) {
+    index = (size_t)s_index;
+  } else {
+    index = (size_t)(-s_index - 1);
+  }
+
+  if (index > 0 && bsearch_val_u32(root, index - 1) > start) return true;
+  if (index < root->size && bsearch_key_u32(root, index) < end) return true;
+  return false;
 }
