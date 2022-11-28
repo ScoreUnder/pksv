@@ -37,6 +37,16 @@ void bsearch_destroy_loaded_or_builtin_parser(void *ptr) {
   // Builtin parsers are statically allocated.
 }
 
+void init_loaded_parser(struct loaded_parser *parser, const char *name) {
+  parser->name = strdup(name);
+  bsearch_init_root(&parser->lookup_by_name, bsearch_key_strcmp,
+                    bsearch_key_strdup, free, NULL);
+  // Values of lookup_by_id are not freed because they are all keys in
+  // lookup_by_name.
+  bsearch_init_root(&parser->lookup_by_id, bsearch_key_uint32cmp,
+                    bsearch_key_nocopy, NULL, NULL);
+}
+
 struct loaded_parser *load_definitions(const char *name, const char *filename,
                                        bool required) {
   FILE *f = fopen(filename, "rb");
@@ -48,13 +58,7 @@ struct loaded_parser *load_definitions(const char *name, const char *filename,
   }
 
   struct loaded_parser *result = malloc(sizeof *result);
-  result->name = strdup(name);
-  bsearch_init_root(&result->lookup_by_name, bsearch_key_strcmp,
-                    bsearch_key_strdup, free, NULL);
-  // Values of lookup_by_id are not freed because they are all keys in
-  // lookup_by_name.
-  bsearch_init_root(&result->lookup_by_id, bsearch_key_uint32cmp,
-                    bsearch_key_nocopy, NULL, NULL);
+  init_loaded_parser(result, name);
 
   size_t num_defines = fgetvarint(f);
   struct bsearch_root *by_name = &result->lookup_by_name;
@@ -320,13 +324,22 @@ struct parser_cache *create_parser_cache(const char *parser_dir) {
                     bsearch_key_strdup, free,
                     bsearch_destroy_loaded_or_builtin_parser);
 
-  // Populate cache with builtin parsers.
+  // Populate cache with builtin parsers and the mutable "defines".
+  // The mutable "defines" are not actually loaded from a file, but are
+  // provided by the user in the script.
+  struct loaded_or_builtin_parser *defines_parser =
+      malloc(sizeof *defines_parser);
+  defines_parser->which = PARSER_TYPE_LOADED;
+  init_loaded_parser(&defines_parser->loaded, "defines");
+
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("address"),
                         &builtin_parser_address);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("condition"),
                         &builtin_parser_condition);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("dec"),
                         &builtin_parser_dec);
+  bsearch_unsafe_append(&cache->loaded_parsers, strdup("defines"),
+                        defines_parser);
   bsearch_unsafe_append(&cache->loaded_parsers, strdup("hex"),
                         &builtin_parser_hex);
 

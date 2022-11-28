@@ -73,3 +73,15 @@ end
 
 #org test
 = Testing
+
+#erase 0x6b0d90 0x6c0000
+#org @deterministic-erased-area
+setvar 0x8000 0
+special NAME_POKEMON
+return
+
+#org @deterministic-2
+msgbox test
+callstd MSG_LOCK
+call @deterministic-erased-area
+end

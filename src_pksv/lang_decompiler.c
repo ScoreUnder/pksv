@@ -547,6 +547,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
                 }
                 fputs(result.token, state->output);
                 visit_state->line_length += strlen(result.token);
+                free(result.token);
               }
               break;
             }
