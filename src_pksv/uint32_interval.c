@@ -115,3 +115,26 @@ bool uint32_interval_intersects(struct bsearch_root *restrict root,
   if (index < root->size && bsearch_key_u32(root, index) < end) return true;
   return false;
 }
+
+bool uint32_interval_contains(struct bsearch_root *restrict root,
+                              uint32_t start, uint32_t end) {
+  if (end == start) return true;  // Empty interval, always contained
+  assert(end > start);
+
+  ptrdiff_t s_index = bsearch_find_u32(root, start);
+  size_t index;
+  if (s_index >= 0) {
+    index = (size_t)s_index;
+    if (bsearch_val_u32(root, index) >= end) return true;
+    return false;
+  } else {
+    index = (size_t)(-s_index - 1);
+    if (index == 0) return false;
+    // The previous interval is the only one that could possibly overlap fully,
+    // because they are ordered by start
+    index--;
+    if (bsearch_val_u32(root, index) < end) return false;
+    if (bsearch_key_u32(root, index) > start) return false;
+    return true;
+  }
+}

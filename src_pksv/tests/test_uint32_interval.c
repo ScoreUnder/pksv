@@ -431,6 +431,24 @@ START_TEST(test_intervals_intersect) {
 }
 END_TEST
 
+START_TEST(test_intervals_contain) {
+  ck_assert(!uint32_interval_contains(&root, 0, 1));
+  ck_assert(uint32_interval_contains(&root, 1, 2));
+
+  ck_assert(uint32_interval_contains(&root, 9, 10));
+  ck_assert(!uint32_interval_contains(&root, 10, 11));
+
+  ck_assert(!uint32_interval_contains(&root, 0, 2));
+  ck_assert(!uint32_interval_contains(&root, 9, 11));
+
+  ck_assert(!uint32_interval_contains(&root, 0, 11));
+  ck_assert(uint32_interval_contains(&root, 5, 6));
+
+  ck_assert(!uint32_interval_contains(&root, 13, 14));
+  ck_assert(!uint32_interval_contains(&root, 10, 20));
+}
+END_TEST
+
 Suite *uint32_interval_suite(void) {
   Suite *s = suite_create("uint32_interval");
   TCase *tc_core = tcase_create("Core");
@@ -458,6 +476,7 @@ Suite *uint32_interval_suite(void) {
   tcase_add_test(tc_core, test_intervals_delete_overlap_6);
   tcase_add_test(tc_core, test_intervals_delete_redundant);
   tcase_add_test(tc_core, test_intervals_intersect);
+  tcase_add_test(tc_core, test_intervals_contain);
   suite_add_tcase(s, tc_core);
 
   return s;
