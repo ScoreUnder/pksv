@@ -7,6 +7,7 @@
 
 #include "binarysearch.h"
 #include "binarysearch_u32.h"
+#include "uint32_interval.h"
 #include "lang_recompiler.h"
 #include "lang_default_parsers.h"
 #include "lang_parsers.h"
@@ -254,6 +255,9 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     //       pragma no-project-file (maybe?)
     //       pragma verbose [on|off]
     //       pragma warnings [on|off]
+  } else if (directive[0] == '!') {
+    // Shebang, do nothing
+    cur += strlen(cur);
   } else {
     fprintf(stderr, "Error: Unknown compiler directive '#%s' on line %zu\n",
             directive, state->line);
