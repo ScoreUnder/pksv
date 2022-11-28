@@ -10,6 +10,13 @@ __attribute__((nonnull, returns_nonnull)) const char *hex_to_uint32(
 __attribute__((nonnull, returns_nonnull)) const char *dec_to_uint32(
     const char *c, size_t maxlen, uint32_t *out);
 
+__attribute__((nonnull, returns_nonnull))
+const char *hex_to_int32(const char *c, size_t maxlen, int32_t *out);
+
+__attribute__((nonnull, returns_nonnull))
+const char *dec_to_int32(const char *c, size_t maxlen, int32_t *out);
+
+
 __attribute__((malloc, nonnull, warn_unused_result)) char *
 extract_text_interval(const char *start, const char *end);
 

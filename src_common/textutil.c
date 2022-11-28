@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -50,6 +51,66 @@ const char *dec_to_uint32(const char *c, size_t maxlen, uint32_t *out) {
   }
   *out = result;
   return c;
+}
+
+const char *hex_to_int32(const char *c, size_t maxlen, int32_t *out) {
+  bool negative = false;
+  if (*c == '-') {
+    negative = true;
+    c++;
+    maxlen--;
+  } else if (*c == '+') {
+    c++;
+    maxlen--;
+  }
+
+  uint32_t result;
+  const char *end = hex_to_uint32(c, maxlen, &result);
+  if (end == c) return c;
+  if (negative) {
+    if (result > INT32_MAX + 1) {
+      // Check for overflow.
+      return end - 1;
+    }
+    *out = -result;
+  } else {
+    if (result > INT32_MAX) {
+      return end - 1;
+    }
+    *out = result;
+  }
+
+  return end;
+}
+
+const char *dec_to_int32(const char *c, size_t maxlen, int32_t *out) {
+  bool negative = false;
+  if (*c == '-') {
+    negative = true;
+    c++;
+    maxlen--;
+  } else if (*c == '+') {
+    c++;
+    maxlen--;
+  }
+
+  uint32_t result;
+  const char *end = dec_to_uint32(c, maxlen, &result);
+  if (end == c) return c;
+  if (negative) {
+    if (result > INT32_MAX + 1) {
+      // Check for overflow.
+      return end - 1;
+    }
+    *out = -result;
+  } else {
+    if (result > INT32_MAX) {
+      return end - 1;
+    }
+    *out = result;
+  }
+
+  return end;
 }
 
 char *extract_text_interval(const char *start, const char *end) {

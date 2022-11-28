@@ -60,6 +60,13 @@ struct parse_result default_parse_hex(const char *token, size_t token_len) {
           .value = result,
       };
     }
+    end = hex_to_int32(start, token_len, &result);
+    if (end == token + token_len) {
+      return (struct parse_result){
+          .type = PARSE_RESULT_VALUE,
+          .value = result,
+      };
+    }
   }
   return (struct parse_result){
       .type = PARSE_RESULT_FAIL,
@@ -85,6 +92,13 @@ struct parse_result default_parse_dec(const char *token, size_t token_len) {
     return (struct parse_result){
         .type = PARSE_RESULT_VALUE,
         .value = result,
+    };
+  }
+  end = dec_to_int32(token, token_len, &result);
+  if (end == token + token_len) {
+    return (struct parse_result){
+       .type = PARSE_RESULT_VALUE,
+       .value = result,
     };
   }
   return (struct parse_result){
