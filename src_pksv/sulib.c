@@ -169,42 +169,47 @@ void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
   }
 }
 
-void process_inserts(codeblock* root_block,
-                     codelabel* cl)  // process inserts for everything.
-{
+static uint32_t get_address_for_insert(codeblock* root_block,
+                                       codelabel* root_label,
+                                       codeinsert* insert) {
+  if (insert->name[0] == ':') {
+    // Insert is requesting a label
+    for (codelabel* label = root_label; label != NULL; label = label->next) {
+      // TODO: why would a label have no name?
+      if (label->name != NULL && !strcmp(label->name, insert->name)) {
+        return label->pos + label->block->org;
+      }
+    }
+  } else {
+    // Insert is requesting a dynamic offset
+    for (codeblock* block = root_block; block != NULL; block = block->next) {
+      if (block->name != NULL && !strcmp(block->name, insert->name)) {
+        return block->org;
+      }
+    }
+  }
+  fprintf(stderr, "error: could not find address for %s\n", insert->name);
+  exit(1);  // TODO: report up the call stack
+}
+
+void process_inserts(codeblock* root_block, codelabel* cl) {
   for (codeblock* y = root_block; y != NULL; y = y->next) {
     for (codeinsert* x = y->insert; x != NULL; x = x->next) {
-      if (x->name[0] == ':') {
-        // Insert is requesting a label
-        for (codelabel* cl2 = cl; cl2 != NULL; cl2 = cl2->next) {
-          if (cl2->name != NULL) {  // TODO: why would a label have no name?
-            if (!strcmp(cl2->name, x->name)) {
-              if (mode == GOLD || mode == CRYSTAL) {
-                uint32_t j = OffsetToPointer((cl2->pos + cl2->block->org) &
-                                             ~ROM_BASE_ADDRESS) >>
-                             8;
-                memcpy(y->data + x->pos, &j, 2);
-              } else {
-                uint32_t j = (cl2->pos + cl2->block->org) | ROM_BASE_ADDRESS;
-                memcpy(y->data + x->pos, &j, 4);
-              }
-            }
-          }
-        }
-      } else {
-        // Insert is requesting a dynamic offset
-        for (codeblock* z = root_block; z != NULL; z = z->next) {
-          if (z->name != NULL) {
-            if (!strcmp(z->name, x->name)) {
-              if (mode == GOLD || mode == CRYSTAL) {
-                uint32_t j = OffsetToPointer(z->org & ~ROM_BASE_ADDRESS);
-                memcpy(y->data + x->pos, &j, 3);
-              } else
-                memcpy(y->data + x->pos, &z->org, 4);
-            }
-          }
+      uint32_t address = get_address_for_insert(root_block, cl, x);
+      size_t address_width = 4;
+      if (mode == GOLD || mode == CRYSTAL) {
+        address = OffsetToPointer(address & ~ROM_BASE_ADDRESS);
+        // TODO: better way to tell these apart?
+        // maybe put the address width in the insert?
+        if (x->name[0] == ':') {
+          // Label; use 2-byte syntax
+          address_width = 2;
+        } else {
+          // Dynamic offset; use 3-byte syntax
+          address_width = 3;
         }
       }
+      memcpy(y->data + x->pos, &address, address_width);
     }
     delete_inserts(y);
   }
