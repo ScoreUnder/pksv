@@ -282,8 +282,8 @@ struct loaded_or_builtin_parser *take_parser(
 }
 
 struct parse_result parse_for_recomp(struct parser_cache *cache,
-                                     struct language_def *lang,
-                                     struct parser_list parsers, char *token,
+                                     const struct language_def *lang,
+                                     const struct parser_list parsers, const char *token,
                                      size_t token_len) {
   struct parse_result result = {PARSE_RESULT_FAIL};
   struct take_parser_state state = {0, 0, false};

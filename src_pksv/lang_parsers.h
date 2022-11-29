@@ -20,8 +20,8 @@ struct loaded_or_builtin_parser *get_parser(struct parser_cache *cache,
                                             bool required);
 
 struct parse_result parse_for_recomp(struct parser_cache *cache,
-                                     struct language_def *lang,
-                                     struct parser_list parsers, char *token,
+                                     const struct language_def *lang,
+                                     const struct parser_list parsers, const char *token,
                                      size_t token_len);
 struct parse_result format_for_decomp(
     struct parser_cache *cache, const struct language_def *lang,

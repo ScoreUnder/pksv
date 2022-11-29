@@ -49,7 +49,7 @@ static const struct parser_list normal_parsers = {
 static void compile_line(struct compiler_internal_state *state,
                          const char *line);
 static char *parse_compiler_directive(struct compiler_internal_state *state,
-                                      const char *directive, char *cur);
+                                      const char *directive, const char *cur);
 static void set_language_from_token(struct compiler_internal_state *state,
                                     const char *token);
 static void set_define_from_value(struct compiler_internal_state *state,
@@ -57,7 +57,7 @@ static void set_define_from_value(struct compiler_internal_state *state,
 static struct parse_result parse_from_token(
     struct compiler_internal_state *state, const char *token_lang,
     const struct parser_list default_parsers, const len_string *token);
-static void end_command(struct compiler_internal_state *state, char *cur);
+static void end_command(struct compiler_internal_state *state, const char *cur);
 static struct parse_result pull_and_parse(
     struct compiler_internal_state *state,
     const struct parser_list default_parsers, const char **const cur);
@@ -176,7 +176,7 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
 }
 
 char *parse_compiler_directive(struct compiler_internal_state *state,
-                               const char *directive, char *cur) {
+                               const char *directive, const char *cur) {
   printf("compiler directive #%s\n", directive);
   // TODO: use gperf to generate a hash table for this
   if (strcmp(directive, "language") == 0 || strcmp(directive, "lang") == 0) {
@@ -320,7 +320,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
   return cur;
 }
 
-void end_command(struct compiler_internal_state *state, char *cur) {
+void end_command(struct compiler_internal_state *state, const char *cur) {
   cur += strspn(cur, VALID_SPACES);  // Skip spaces
   if (*cur == '\'') {
     // Comment, always valid
@@ -393,7 +393,7 @@ struct parse_result parse_from_token(struct compiler_internal_state *state,
       token_lang++;
     }
     parsers.parsers[0] = (struct language){
-        .name = token_lang,
+        .name = (char*) token_lang,
         .is_prefixed = is_prefixed,
     };
   }
