@@ -225,6 +225,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     len_string *lang_token = pull_token(cur);
     if (lang_token->len != 0) {
       set_language_from_token(state, lang_token->str);
+      cur += lang_token->len;
     }
     free(lang_token);
   } else if (strcmp(directive, "dynamic") == 0 ||
