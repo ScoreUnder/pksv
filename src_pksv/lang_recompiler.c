@@ -111,6 +111,10 @@ void compile_all(FILE *input_file, FILE *output_file,
   // TODO: erase what remains
   // TODO: write
   (void)output_file;
+
+  bsearch_deinit_root(&state.free_space);
+  bsearch_deinit_root(&state.erased_space);
+  delete_all_codeblocks(rewind_codeblock(state.tail_block));
 }
 
 #define VALID_SPACES " \t"

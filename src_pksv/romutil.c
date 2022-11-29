@@ -8,7 +8,8 @@ struct rom_mode determine_mode(FILE *romfile) {
   char buf[4];
   // Determine (de)compilation mode
   fseek(romfile, 0xAC, SEEK_SET);
-  fread(buf, 1, 3, romfile);
+  size_t read = fread(buf, 1, 3, romfile);
+  if (read != 3) goto unknown;
   if (memcmp(buf, "AX", 2) == 0) {
     return (struct rom_mode){.type = RUBY, .search = 0xFF};
   }
@@ -23,12 +24,14 @@ struct rom_mode determine_mode(FILE *romfile) {
     }
   }
   fseek(romfile, 0x13F, SEEK_SET);
-  fread(buf, 1, 2, romfile);
+  read = fread(buf, 1, 2, romfile);
+  if (read != 2) goto unknown;
   if (memcmp(buf, "AA", 2) == 0 || memcmp(buf, "SM", 2) == 0) {
     return (struct rom_mode){.type = GOLD, .search = 0};
   }
   if (memcmp(buf, "BY", 2) == 0) {
     return (struct rom_mode){.type = CRYSTAL, .search = 0};
   }
+unknown:
   return (struct rom_mode){.type = ROM_UNKNOWN, .search = 0};
 }
