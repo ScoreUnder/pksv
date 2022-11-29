@@ -15,6 +15,7 @@
 #include "language-defs.h"
 #include "textutil.h"
 #include "codeproc.h"
+#include "romutil.h"
 
 struct compiler_internal_state {
   const struct language_def *curr_language;
@@ -22,6 +23,8 @@ struct compiler_internal_state {
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
   codeblock *tail_block;
+  struct bsearch_root free_space;
+  struct bsearch_root erased_space;
   size_t line;
   uint32_t dynamic_base;
 };
@@ -79,6 +82,9 @@ void compile_all(FILE *input_file, FILE *output_file,
       .dynamic_base = DYN_UNSPECIFIED,
   };
 
+  uint32_interval_init_bsearch_root(&state.free_space);
+  uint32_interval_init_bsearch_root(&state.erased_space);
+
   const size_t buffer_size = 0x400;  // Arbitrary
   char *buffer = malloc(buffer_size);
 
@@ -90,6 +96,12 @@ void compile_all(FILE *input_file, FILE *output_file,
 
   free(buffer);
 
+  for (codeblock *c = state.tail_block; c != NULL; c = c->prev) {
+    // TODO: handle dynamic offsets before this loop
+    if (c->name != NULL) continue;
+    uint32_interval_remove(&state.erased_space, c->org, c->org + c->size);
+  }
+  // TODO: erase what remains
   // TODO: write
   (void)output_file;
 }
@@ -248,8 +260,50 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
               state->line);
       exit(1);
     }
-    // } else if (strcmp(directive, "erase") == 0) {
-    // TODO: erase
+  } else if (strcmp(directive, "erase") == 0) {
+    struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
+    uint32_t erase_begin, erase_end;
+    if (result.type == PARSE_RESULT_VALUE) {
+      erase_begin = result.value;
+    } else {
+      cleanup_parse_result(result);
+      fprintf(stderr,
+              "Error: Could not parse start value for #erase at line %zu\n",
+              state->line);
+      exit(1);
+    }
+
+    cur += strspn(cur, VALID_SPACES);  // Skip spaces
+    result = pull_and_parse(state, normal_parsers, &cur);
+    if (result.type == PARSE_RESULT_VALUE) {
+      erase_end = result.value;
+    } else {
+      cleanup_parse_result(result);
+      fprintf(stderr,
+              "Error: Could not parse end value for #erase at line %zu\n",
+              state->line);
+      exit(1);
+    }
+
+    if (erase_begin > erase_end) {
+      fprintf(stderr,
+              "Error: erase start (0x%08x) must come before erase end (0x%08x) "
+              "at line %zu\n"
+              "Did you mean: #erase 0x%08x 0x%08x\n",
+              erase_begin, erase_end, state->line, erase_begin,
+              erase_begin + erase_end);
+      exit(1);
+    }
+
+    if (erase_end > GBA_MAX_ROM_SIZE) {
+      fprintf(stderr,
+              "Warning: Erase end (0x%08x) is larger than the maximum ROM size "
+              "(0x%08x) at line %zu\n",
+              erase_end, GBA_MAX_ROM_SIZE, state->line);
+    }
+
+    uint32_interval_add(&state->free_space, erase_begin, erase_end);
+    uint32_interval_add(&state->erased_space, erase_begin, erase_end);
     // } else if (strcmp(directive, "pragma") == 0) {
     // TODO: pragma freespace START END
     //       pragma no-project-file (maybe?)
