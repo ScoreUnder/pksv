@@ -8571,7 +8571,9 @@ void RecodeProc(char *script, char *romfn) {
     bsearch_deinit_root(&root);
 
     vlog_txt("\n#ORG: data\n");
-    calc_org(root_block, start, RomFile, defines);
+    struct bsearch_root free_space;
+    uint32_interval_init_bsearch_root(&free_space);
+    calc_org(root_block, RomFile, &free_space);
     process_inserts(root_block, cl);
 #ifdef WIN32
     OutputDebugString("Calculated ORGs, processed inserts");

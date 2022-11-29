@@ -44,8 +44,6 @@ static const struct parser_list normal_parsers = {
     .parsers = &lang_defines,
 };
 
-#define DYN_UNSPECIFIED ((uint32_t)-1)
-
 static void compile_line(struct compiler_internal_state *state,
                          const char *line);
 static char *parse_compiler_directive(struct compiler_internal_state *state,
@@ -67,6 +65,7 @@ static void write_int_to_codeblock(struct compiler_internal_state *state,
                                    uint32_t data, size_t len);
 static void warn_if_truncated(struct compiler_internal_state *state,
                               uint32_t value, size_t len);
+static struct bsearch_root *get_defines(struct compiler_internal_state *state);
 
 void compile_all(FILE *input_file, FILE *output_file,
                  const struct language_def *start_language,
@@ -79,8 +78,16 @@ void compile_all(FILE *input_file, FILE *output_file,
       .parser_cache = parser_cache,
       .tail_block = NULL,
       .line = 1,
-      .dynamic_base = DYN_UNSPECIFIED,
   };
+
+  // XXX: Bit of a hack because I don't want to inspect the ROM file again
+  // people should be using #dynamic anyway
+  if (strcmp(start_language->name, "gs") == 0 ||
+      strcmp(start_language->name, "cry") == 0) {
+    state.dynamic_base = FREESPACE_START_GBC;
+  } else {
+    state.dynamic_base = FREESPACE_START_GBA;
+  }
 
   uint32_interval_init_bsearch_root(&state.free_space);
   uint32_interval_init_bsearch_root(&state.erased_space);
@@ -193,7 +200,6 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     if (org_token->str[0] == '@') {
       // Label
       org_name = org_token->str + 1;
-      // TODO: look up findfroms to set dynamic base if necessary
       org_address = state->dynamic_base;
     } else {
       // Number
@@ -223,7 +229,6 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     free(lang_token);
   } else if (strcmp(directive, "dynamic") == 0 ||
              strcmp(directive, "dyn") == 0) {
-    // TODO: disallow reassignment
     struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
     if (result.type == PARSE_RESULT_VALUE) {
       state->dynamic_base = result.value;
@@ -353,26 +358,15 @@ void set_language_from_token(struct compiler_internal_state *state,
 
 void set_define_from_value(struct compiler_internal_state *state,
                            const char *name, uint32_t value_int) {
-  if (strcmp(name, "findfrom") == 0 || strcmp(name, "findfromgold") == 0) {
-    fprintf(stderr,
-            "Warning: redefining %s on line %zu. "
-            "Use \"#dynamic 0x%08" PRIx32 "\" instead.\n",
-            name, state->line, value_int);
-  } else {
-    struct loaded_or_builtin_parser *defines_parser =
-        get_parser(state->parser_cache, "defines", false);
-    assert(defines_parser != NULL);
-    assert(defines_parser->which == PARSER_TYPE_LOADED);
-    struct bsearch_root *defines_root = &defines_parser->loaded.lookup_by_name;
+  struct bsearch_root *defines_root = get_defines(state);
 
-    ptrdiff_t index = bsearch_find(defines_root, name);
-    if (index >= 0) {
-      fprintf(stderr, "Warning: redefining %s on line %zu.", name, state->line);
-      bsearch_setval_u32(defines_root, index, value_int);
-    } else {
-      bsearch_unsafe_insert(defines_root, index, defines_root->copy(name),
-                            CAST_u32_pvoid(value_int));
-    }
+  ptrdiff_t index = bsearch_find(defines_root, name);
+  if (index >= 0) {
+    fprintf(stderr, "Warning: redefining %s on line %zu.", name, state->line);
+    bsearch_setval_u32(defines_root, index, value_int);
+  } else {
+    bsearch_unsafe_insert(defines_root, index, defines_root->copy(name),
+                          CAST_u32_pvoid(value_int));
   }
 }
 
@@ -393,7 +387,7 @@ struct parse_result parse_from_token(struct compiler_internal_state *state,
       token_lang++;
     }
     parsers.parsers[0] = (struct language){
-        .name = (char*) token_lang,
+        .name = (char *)token_lang,
         .is_prefixed = is_prefixed,
     };
   }
@@ -481,4 +475,12 @@ void warn_if_truncated(struct compiler_internal_state *state, uint32_t value,
             " to %zu bytes on line %zu\n",
             value, len, state->line);
   }
+}
+
+struct bsearch_root *get_defines(struct compiler_internal_state *state) {
+  struct loaded_or_builtin_parser *defines_parser =
+      get_parser(state->parser_cache, "defines", false);
+  assert(defines_parser != NULL);
+  assert(defines_parser->which == PARSER_TYPE_LOADED);
+  return &defines_parser->loaded.lookup_by_name;
 }

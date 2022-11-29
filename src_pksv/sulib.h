@@ -36,8 +36,8 @@ unsigned int add_label(const char* name, codeblock* c, uint32_t loc,
 codeblock* add_codeblock(codeblock* tail, const char* name, uint32_t org);
 codeblock* rewind_codeblock(codeblock* c);
 void add_insert(codeblock* block, uint32_t pos, const char* name);
-void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
-              struct bsearch_root* defines);
+void calc_org(codeblock* root_block, FILE* rom_search,
+              struct bsearch_root* free_space);
 void process_inserts(codeblock* c, codelabel* cl);
 void add_data(codeblock* block, const void* data, size_t len);
 void delete_all_codeblocks(codeblock* first);

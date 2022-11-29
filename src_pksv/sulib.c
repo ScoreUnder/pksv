@@ -116,23 +116,18 @@ static void delete_inserts(codeblock* block) {
   block->insert = NULL;
 }
 
-void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
-              struct bsearch_root* defines) {
-  struct bsearch_root free_space;  // TODO: make parameter
-  uint32_interval_init_bsearch_root(&free_space);
-
-  const char* findfrom_name =
-      (mode == GOLD || mode == CRYSTAL) ? "findfromgold" : "findfrom";
-  uint32_t findfrom =
-      CAST_pvoid_u32(bsearch_get_val(defines, findfrom_name, (void*)0));
-
+void calc_org(codeblock* root_block, FILE* rom_search,
+              struct bsearch_root* free_space) {
+  if (root_block == NULL) return;
+  // TODO: individual findfrom values (track used space)
+  uint32_t findfrom = root_block->org;
   for (codeblock* block = root_block; block != NULL; block = block->next) {
     if (block->name != NULL) {
     retry_for_address : {
       uint32_t min_address = 0;
       uint32_t result =
           FindFreeSpace(rom_search, block->size, block->align, &findfrom,
-                        &min_address, search, &free_space);
+                        &min_address, search, free_space);
       if (result == UINT32_MAX) {
         fprintf(stderr, "error: could not find free space for %s\n",
                 block->name);
@@ -142,7 +137,7 @@ void calc_org(codeblock* root_block, unsigned int start, FILE* rom_search,
         if (block->size < 0x4000) {
           if (!gsc_are_banks_equal(result, result + block->size - 1)) {
             // Record the discarded free space interval (we didn't use it)
-            uint32_interval_add(&free_space, result, result + block->size);
+            uint32_interval_add(free_space, result, result + block->size);
 
             // Not enough space in this bank, try the next bank
             findfrom = gsc_next_bank(result);
