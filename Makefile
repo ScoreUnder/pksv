@@ -147,7 +147,7 @@ clean: mostlyclean
 	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data $(ALL_TEST_SUITES)
 
 mostlyclean: clean-fmem
-	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
+	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/compare.pks src_pksv/tests/compare2.pks src_pksv/tests/compare3.pks src_pksv/tests/fakegold.gbc PokeScrE.log
 	rm -f -- $(OBJS:o=gcno) $(OBJS:o=gcda)
 
 clean-fmem:
