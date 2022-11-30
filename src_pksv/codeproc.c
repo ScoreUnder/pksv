@@ -32,102 +32,6 @@
 #include "sulib.h"
 #include "pksv.h"
 
-const char ARG_END_CHARS[] = "\' ,\n";
-
-unsigned int fail;
-
-int *basedef2 = NULL;
-char **defnames2 = NULL;
-
-int def_alloc2 = 0;
-int def_size2 = 0;
-
-int codenum = 0;
-int levelnum = 0;
-int textnum = 0;
-int movenum = 0;
-int martnum = 0;
-int thumbnum = 0;
-int dwordnum = 0;
-
-void log_txt(const char *str, size_t length) {
-  fwrite(str, 1, length, LogFile ? LogFile : stderr);
-}
-
-void pksv_codeproc_reset(void) {
-  // Reset @dynamic numberings
-  codenum = 0;
-  levelnum = 0;
-  textnum = 0;
-  movenum = 0;
-  martnum = 0;
-  thumbnum = 0;
-  dwordnum = 0;
-
-  // Reset associative arrays
-  free(basedef2);
-  basedef2 = NULL;
-
-  for (size_t i = 0; i < def_size2; i++) {
-    free(defnames2[i]);
-  }
-  free(defnames2);
-  defnames2 = NULL;
-  def_size2 = 0;
-  def_alloc2 = 0;
-}
-
-void Define2(unsigned int otherthing, char *thing) {
-  char *m, *m2;
-
-  if (def_alloc2 > (def_size2 << 2)) {
-    def_size2++;
-  } else {
-    m = malloc(def_alloc2 + 512 * 4);
-    m2 = malloc(def_alloc2 + 512 * 4);
-    // memcpy(edi,esi,ecx);
-    memcpy(m, basedef2, def_alloc2);
-    memcpy(m2, defnames2, def_alloc2);
-    def_size2++;
-    def_alloc2 += 512 * 4;
-    if (basedef2) free(basedef2);
-    if (defnames2) free(defnames2);
-    basedef2 = (int *)m;
-    defnames2 = (char **)m2;
-  }
-  m = malloc(strlen(thing) + 1);
-  strcpy(m, thing);
-  defnames2[def_size2 - 1] = m;
-  basedef2[def_size2 - 1] = otherthing;
-  return;
-}
-unsigned int fail2;
-char *WhatIs2(int thing) {
-  register int i;
-  fail = 0;
-  for (i = 0; i < def_size2; i++)
-    if (thing == basedef2[i]) return defnames2[i];
-  fail = 1;
-  return 0;
-}
-
-void LowerCaseAndRemAll0D(char *orig) {
-  unsigned char a;
-
-  while ((a = *orig)) {
-    if (a >= 'A' && a <= 'Z') {
-      *orig += 0x20;
-    } else if (a == '\r') {
-      *orig = '\n';
-    } else if (a == '\t') {
-      *orig = ' ';
-    } else if (a == '/' && orig[1] == '/') {
-      *orig = '\'';
-    }
-    orig++;
-  }
-}
-
 uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
                        uint32_t *offset, uint32_t *min_address, uint8_t search,
                        struct bsearch_root *free_intervals) {
@@ -192,9 +96,9 @@ uint32_t FindFreeSpace(FILE *rom_search, uint32_t len, uint32_t align,
     if (!match) {
       // check free intervals
       // TODO: naive algorithm, should skip more than one byte at a time
-      ptrdiff_t index = bsearch_find(free_intervals, filepos);
+      ptrdiff_t index = bsearch_find_u32(free_intervals, filepos);
       if (index < -1) index = -index - 2;  // find the interval before
-      if (index >= 0 && index < free_intervals->size) {
+      if (index >= 0 && (size_t)index < free_intervals->size) {
         uint32_t interval_start = bsearch_key_u32(free_intervals, index);
         uint32_t interval_end = bsearch_val_u32(free_intervals, index);
         if (filepos >= interval_start && filepos < interval_end) {
@@ -260,93 +164,3 @@ bool gsc_are_banks_equal(uint32_t offset1, uint32_t offset2) {
 }
 
 uint32_t gsc_next_bank(uint32_t offset) { return (offset & 0x3FC000) + 0x4000; }
-
-static void log_bad_int(const char *where) {
-  char *format = "Unknown value in %s (Value must be integer)\n";
-  char *buf = malloc(strlen(where) + strlen(format) + 1);
-  sprintf(buf, format, where);
-  log_txt(buf, strlen(buf));
-  free(buf);
-}
-
-#define Defined(thing) ((WhatIs(thing) & 0) | !fail)
-#define chr Script[i]
-/// GenForFunc Success
-unsigned char gffs;
-
-/** @brief Gets a numeric value for a given pokescript function. */
-uint32_t GenForFunc(char *func, pos_int *ppos, char *Script,
-                    struct bsearch_root *defines, codeblock *c) {
-  uint32_t result = 0;
-  char buf[1024], log_buf[1024];
-  gffs = 0;
-  pos_int i = skip_whitespace(Script, *ppos);
-
-  if (chr == '@' || chr == ':') {
-    size_t j = 0;
-    while (chr != ' ' && chr != '\n' && chr != 0 && chr != '\'') {
-      buf[j] = chr;
-      i++;
-      j++;
-    }
-    buf[j] = 0;
-    add_insert(c, c->size, buf);
-    sprintf(log_buf, "DYN-> %s\n", buf);
-    if (IsVerbose) log_txt(log_buf, strlen(log_buf));
-    gffs = 1;
-    *ppos = i;
-    return ROM_BASE_ADDRESS;
-  } else if ((chr >= '0' && chr <= '9') || chr == '$') {
-    const char *end;
-    if ((Script[i] == '0' && Script[i + 1] == 'x') || Script[i] == '$') {
-      if (Script[i] == '$')
-        i++;
-      else
-        i += 2;
-
-      end = hex_to_uint32(&Script[i], SIZE_MAX, &result);
-    } else {
-      end = dec_to_uint32(&Script[i], SIZE_MAX, &result);
-    }
-
-    i += end - &Script[i];
-
-    if (strchr(ARG_END_CHARS, *end) == NULL && *end != '\0') {
-      *ppos = i;
-      log_bad_int(func);
-      return 0;
-    }
-
-    if (IsVerbose) {
-      sprintf(log_buf, "   -> 0x%X\n", result);
-      log_txt(log_buf, strlen(log_buf));
-    }
-
-    gffs = 1;
-    *ppos = i;
-    return result;
-  } else {
-    size_t j = 0;
-    while (chr != ' ' && chr != '\n' && chr != '\'' && chr != 0) {
-      buf[j] = chr;
-      i++;
-      j++;
-    }
-    buf[j] = 0;
-    *ppos = i;
-
-    ptrdiff_t index = bsearch_find(defines, buf);
-    if (index >= 0) {
-      gffs = 1;
-      uint32_t value = bsearch_val_u32(defines, index);
-      if (IsVerbose) {
-        sprintf(log_buf, "   -> %s\n      -> 0x%X\n", buf, value);
-        log_txt(log_buf, strlen(log_buf));
-      }
-      return value;
-    } else {
-      log_bad_int(func);
-      return 0;
-    }
-  }
-}
