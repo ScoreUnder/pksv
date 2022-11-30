@@ -31,8 +31,7 @@ typedef struct __label {
   struct __label* prev;
 } codelabel;
 
-unsigned int add_label(const char* name, codeblock* c, uint32_t loc,
-                       codelabel** head);
+void add_label(const char* name, codeblock* c, codelabel** head);
 codeblock* add_codeblock(codeblock* tail, const char* name, uint32_t org);
 codeblock* rewind_codeblock(codeblock* c);
 void add_insert(codeblock* block, uint32_t pos, const char* name);

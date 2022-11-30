@@ -7,6 +7,7 @@
 
 #include "binarysearch.h"
 #include "binarysearch_u32.h"
+#include "sulib.h"
 #include "uint32_interval.h"
 #include "lang_recompiler.h"
 #include "lang_default_parsers.h"
@@ -23,6 +24,7 @@ struct compiler_internal_state {
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
   codeblock *tail_block;
+  codelabel *label_head;
   struct bsearch_root free_space;
   struct bsearch_root erased_space;
   size_t line;
@@ -66,6 +68,8 @@ static void write_int_to_codeblock(struct compiler_internal_state *state,
 static void warn_if_truncated(struct compiler_internal_state *state,
                               uint32_t value, size_t len);
 static struct bsearch_root *get_defines(struct compiler_internal_state *state);
+static void add_label_here(struct compiler_internal_state *state,
+                           const char *label);
 
 void compile_all(FILE *input_file, FILE *output_file,
                  const struct language_def *start_language,
@@ -77,6 +81,7 @@ void compile_all(FILE *input_file, FILE *output_file,
       .language_cache = language_cache,
       .parser_cache = parser_cache,
       .tail_block = NULL,
+      .label_head = NULL,
       .line = 1,
   };
 
@@ -145,14 +150,10 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
     case ':': {
       // Label
       cur++;  // Skip ':'
-
-      // TODO
       len_string *token = pull_token(cur);
       cur += token->len;
-
-      printf("label :%s\n", token->str);
+      add_label_here(state, token->str);
       free(token);
-
       end_command(state, cur);
       break;
     }
@@ -488,4 +489,15 @@ struct bsearch_root *get_defines(struct compiler_internal_state *state) {
   assert(defines_parser != NULL);
   assert(defines_parser->which == PARSER_TYPE_LOADED);
   return &defines_parser->loaded.lookup_by_name;
+}
+
+void add_label_here(struct compiler_internal_state *state, const char *label) {
+  codeblock *block = state->tail_block;
+  if (block == NULL) {
+    fprintf(stderr, "Error: Adding label before #org on line %zu\n",
+            state->line);
+    exit(1);
+  }
+
+  add_label(label, block, &state->label_head);
 }

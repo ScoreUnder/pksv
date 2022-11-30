@@ -12,11 +12,12 @@
 #include "textutil.h"
 #include "romutil.h"
 
-unsigned int add_label(const char* name, codeblock* block, uint32_t loc,
-                       codelabel** head) {
+void add_label(const char* name, codeblock* block, codelabel** head) {
   assert(name != NULL);
   assert(block != NULL);
   assert(head != NULL);
+
+  uint32_t loc = block->size;
 
   char* name2 = strdup(name);
   codelabel* newlabel = malloc(sizeof(codelabel));
@@ -32,7 +33,6 @@ unsigned int add_label(const char* name, codeblock* block, uint32_t loc,
     tail->next = newlabel;
   else
     *head = newlabel;
-  return newlabel != NULL;
 }
 
 static void init_codeblock(codeblock* c, const char* name, uint32_t org) {

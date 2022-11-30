@@ -3293,7 +3293,7 @@ void RecodeProc(char *script, char *romfn) {
             }
             try_asm();
             if (*buf == ':') {
-              if (tail_block) add_label(buf, tail_block, tail_block->size, &cl);
+              if (tail_block) add_label(buf, tail_block, &cl);
               ec();
             }
             aa("m") {
@@ -5417,7 +5417,7 @@ void RecodeProc(char *script, char *romfn) {
             }
             else if (*buf == '-') try_asm();
             else if (*buf == ':') {
-              if (tail_block) add_label(buf, tail_block, tail_block->size, &cl);
+              if (tail_block) add_label(buf, tail_block, &cl);
               ec();
             }
             aa("m") {
@@ -8455,8 +8455,7 @@ void RecodeProc(char *script, char *romfn) {
                 try_asm();
                 break;
               case ':':
-                if (tail_block)
-                  add_label(buf, tail_block, tail_block->size, &cl);
+                if (tail_block) add_label(buf, tail_block, &cl);
                 ec();
                 break;
               case '=':
@@ -8553,8 +8552,7 @@ void RecodeProc(char *script, char *romfn) {
     struct bsearch_root root;
     uint32_interval_init_bsearch_root(&root);
 
-    for (codeblock *curr = root_block; curr != NULL;
-         curr = curr->next) {
+    for (codeblock *curr = root_block; curr != NULL; curr = curr->next) {
       curr->org &= ~ROM_BASE_ADDRESS;
       uint32_interval_add(&root, curr->org, curr->org + curr->size);
     }
