@@ -13,5 +13,7 @@ void uint32_interval_remove(struct bsearch_root *restrict root, uint32_t start,
                             uint32_t end);
 bool uint32_interval_intersects(struct bsearch_root *restrict root,
                                 uint32_t start, uint32_t end);
+bool uint32_interval_contains(struct bsearch_root *restrict root,
+                              uint32_t start, uint32_t end);
 
 #endif

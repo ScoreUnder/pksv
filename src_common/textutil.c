@@ -68,7 +68,7 @@ const char *hex_to_int32(const char *c, size_t maxlen, int32_t *out) {
   const char *end = hex_to_uint32(c, maxlen, &result);
   if (end == c) return c;
   if (negative) {
-    if (result > INT32_MAX + 1) {
+    if (result > INT32_MAX + 1U) {
       // Check for overflow.
       return end - 1;
     }
@@ -98,7 +98,7 @@ const char *dec_to_int32(const char *c, size_t maxlen, int32_t *out) {
   const char *end = dec_to_uint32(c, maxlen, &result);
   if (end == c) return c;
   if (negative) {
-    if (result > INT32_MAX + 1) {
+    if (result > INT32_MAX + 1U) {
       // Check for overflow.
       return end - 1;
     }
