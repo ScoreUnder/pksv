@@ -112,20 +112,22 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
   //   1. Gets all the blocks that need to be decompiled.
   //   2. Associates addresses with decompiled blocks.
   while (unvisited_blocks.size != 0) {
-    uint32_t decompilation_addr = bsearch_key_u32(&unvisited_blocks, 0);
+    // Taking last is faster on removal
+    size_t index = unvisited_blocks.size - 1;
+    uint32_t decompilation_addr = bsearch_key_u32(&unvisited_blocks, index);
 
     if (bsearch_find_u32(&decomp_blocks, decompilation_addr) >= 0) {
       // Already queued for decompilation.
-      bsearch_remove(&unvisited_blocks, 0);
+      bsearch_remove(&unvisited_blocks, index);
       continue;
     }
 
     struct queued_decompilation *decompilation_type =
-        duplicate_queued_decompilation(unvisited_blocks.pairs[0].value);
+        duplicate_queued_decompilation(unvisited_blocks.pairs[index].value);
     bsearch_upsert(&decomp_blocks, CAST_u32_pvoid(decompilation_addr),
                    decompilation_type);
 
-    bsearch_remove(&unvisited_blocks, 0);
+    bsearch_remove(&unvisited_blocks, index);
 
     decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
                          false);
