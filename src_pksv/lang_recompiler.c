@@ -43,12 +43,12 @@ static const struct language lang_defines = {
 
 static const struct parser_list normal_parsers = {
     .length = 1,
-    .parsers = &lang_defines,
+    .parsers = (struct language*) &lang_defines,
 };
 
 static void compile_line(struct compiler_internal_state *state,
                          const char *line);
-static char *parse_compiler_directive(struct compiler_internal_state *state,
+static const char *parse_compiler_directive(struct compiler_internal_state *state,
                                       const char *directive, const char *cur);
 static void set_language_from_token(struct compiler_internal_state *state,
                                     const char *token);
@@ -70,6 +70,7 @@ static void warn_if_truncated(struct compiler_internal_state *state,
 static struct bsearch_root *get_defines(struct compiler_internal_state *state);
 static void add_label_here(struct compiler_internal_state *state,
                            const char *label);
+static void advance_after_argument(const char **cur);
 
 void compile_all(FILE *input_file, FILE *output_file,
                  const struct language_def *start_language,
@@ -123,7 +124,7 @@ void compile_all(FILE *input_file, FILE *output_file,
 }
 
 #define VALID_SPACES " \t"
-#define TOKEN_SEPARATORS " \t\r\n:\'"
+#define TOKEN_SEPARATORS " \t\r\n:,\'"
 
 void compile_line(struct compiler_internal_state *state, const char *line) {
   const char *cur = line;
@@ -141,7 +142,7 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
       cur += strspn(cur, VALID_SPACES);  // Skip spaces
       len_string *token = pull_token(cur);
       cur += token->len;
-      cur += strspn(cur, VALID_SPACES);  // Skip spaces
+      advance_after_argument(&cur);
       cur = parse_compiler_directive(state, token->str, cur);
       free(token);
       end_command(state, cur);
@@ -187,8 +188,8 @@ void compile_line(struct compiler_internal_state *state, const char *line) {
   }
 }
 
-char *parse_compiler_directive(struct compiler_internal_state *state,
-                               const char *directive, const char *cur) {
+const char *parse_compiler_directive(struct compiler_internal_state *state,
+                                     const char *directive, const char *cur) {
   printf("compiler directive #%s\n", directive);
   // TODO: use gperf to generate a hash table for this
   if (strcmp(directive, "language") == 0 || strcmp(directive, "lang") == 0) {
@@ -226,7 +227,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
     state->tail_block = add_codeblock(state->tail_block, org_name, org_address);
     free(org_token);
 
-    cur += strspn(cur, VALID_SPACES);  // Skip spaces
+    advance_after_argument(&cur);
     len_string *lang_token = pull_token(cur);
     if (lang_token->len != 0) {
       set_language_from_token(state, lang_token->str);
@@ -247,7 +248,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
   } else if (strcmp(directive, "define") == 0 || strcmp(directive, "d") == 0) {
     len_string *name_token = pull_token(cur);
     cur += name_token->len;
-    cur += strspn(cur, VALID_SPACES);  // Skip spaces
+    advance_after_argument(&cur);
 
     struct parse_result result = pull_and_parse(state, normal_parsers, &cur);
     if (result.type == PARSE_RESULT_VALUE) {
@@ -284,7 +285,7 @@ char *parse_compiler_directive(struct compiler_internal_state *state,
       exit(1);
     }
 
-    cur += strspn(cur, VALID_SPACES);  // Skip spaces
+    advance_after_argument(&cur);
     result = pull_and_parse(state, normal_parsers, &cur);
     if (result.type == PARSE_RESULT_VALUE) {
       erase_end = result.value;
@@ -500,4 +501,11 @@ void add_label_here(struct compiler_internal_state *state, const char *label) {
   }
 
   add_label(label, block, &state->label_head);
+}
+
+void advance_after_argument(const char **const cur) {
+  if (**cur == ',') {
+    (*cur)++;
+  }
+  *cur += strspn(*cur, VALID_SPACES);
 }
