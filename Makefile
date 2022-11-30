@@ -49,14 +49,11 @@ LDFLAGS_SH = -L$(LIB_FMEM)
 LDLIBS_SH = -lfmem
 
 SRC_PKSV_COMMON = \
-	src_pksv/codeproc.c src_pksv/gba_asm.c src_pksv/isdone.c \
-	src_pksv/recompiler.c src_pksv/sulib.c src_pksv/textproc.c src_common/binarysearch.c \
-	src_pksv/romutil.c src_common/textutil.c src_pksv/uint32_interval.c \
-	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
-	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
-	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
-	src_pksv/lang_parsers.c src_common/stdio_ext.c src_pksv/lang_default_parsers.c \
-	src_pksv/lang_decompiler.c src_lang/lang_load.c src_common/binarysearch_u32.c \
+	src_pksv/codeproc.c src_pksv/gba_asm.c src_pksv/isdone.c src_pksv/sulib.c \
+	src_common/binarysearch.c src_pksv/romutil.c src_common/textutil.c \
+	src_pksv/uint32_interval.c src_pksv/lang_parsers.c src_common/stdio_ext.c \
+	src_pksv/lang_default_parsers.c src_pksv/lang_decompiler.c \
+	src_lang/lang_load.c src_common/binarysearch_u32.c \
 	src_pksv/lang_recompiler.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
@@ -68,7 +65,6 @@ RES_PKSVUI = src_pksvui/vcpksv2.rc
 SRC_PROCESS_DEFINES = \
 	tools/process-defines.c src_common/binarysearch.c src_common/stdio_ext.c \
 	src_common/textutil.c src_common/binarysearch_u32.c
-SRC_GPERF_REVERSE = tools/gperf-but-in-reverse.c
 SRC_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse.c src_common/stdio_ext.c
 SRC_LANGUAGE_PARSER = \
 	tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c \
@@ -87,9 +83,6 @@ SRC_PKSV_TEST_SUITE = \
 	src_pksv/uint32_interval.c
 
 GENERATED_SOURCES = \
-	src_pksv/sublang/gsc_moves.c src_pksv/sublang/gsc_moves_reverse.c \
-	src_pksv/sublang/frlg_moves.c src_pksv/sublang/frlg_moves_reverse.c \
-	src_pksv/sublang/rse_moves.c src_pksv/sublang/rse_moves_reverse.c \
 	tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.c \
 	tools/language_parser/language-def-yacc.tab.h
 
@@ -109,7 +102,6 @@ OBJ_LANGUAGE_DUMPER = $(SRC_LANGUAGE_DUMPER:.c=.o)
 BIN_COMMON_TEST_SUITE = src_common/tests/tests$(EXE_EXT)
 BIN_PKSV_TEST_SUITE = src_pksv/tests/tests$(EXE_EXT)
 BIN_PROCESS_DEFINES = tools/process-defines$(EXE_EXT)
-BIN_GPERF_REVERSE = tools/gperf-but-in-reverse$(EXE_EXT)
 BIN_PROCESS_DEFINES_REVERSE = tools/process-defines-reverse$(EXE_EXT)
 BIN_LANGUAGE_PARSER = tools/language_parser/language-parser$(EXE_EXT)
 BIN_LANGUAGE_DUMPER = tools/language-dat-dumper$(EXE_EXT)
@@ -205,9 +197,6 @@ $(PKSV_SHLIB): $(OBJ_PKSV_SHLIB) $(LIB_FMEM_A)
 
 $(PKSVUI): $(OBJ_PKSVUI)
 	$(LINK.c) $(OBJ_PKSVUI) $(LIBS_PKSVUI) -o $@
-
-%_reverse.c: %.gperf $(BIN_GPERF_REVERSE)
-	$(TOOL_WRAPPER) $(BIN_GPERF_REVERSE) < $< > $@ || { rm -f -- $@; false; }
 
 sublang:
 	mkdir -p sublang

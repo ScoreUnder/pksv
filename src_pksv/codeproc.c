@@ -28,7 +28,6 @@
 #include "uint32_interval.h"
 #include "binarysearch.h"
 #include "textutil.h"
-#include "textproc.h"
 #include "romutil.h"
 #include "sulib.h"
 #include "pksv.h"
@@ -50,6 +49,10 @@ int movenum = 0;
 int martnum = 0;
 int thumbnum = 0;
 int dwordnum = 0;
+
+void log_txt(const char *str, size_t length) {
+  fwrite(str, 1, length, LogFile ? LogFile : stderr);
+}
 
 void pksv_codeproc_reset(void) {
   // Reset @dynamic numberings
