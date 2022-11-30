@@ -144,7 +144,7 @@ check: $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS) $(ALL_TEST_SUITES)
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data
+	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data $(ALL_TEST_SUITES)
 
 mostlyclean: clean-fmem
 	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/fakegold.gbc PokeScrE.log
