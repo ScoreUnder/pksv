@@ -5,13 +5,7 @@ PLATFORM = any
 TOOLCHAIN_PREFIX =
 
 EXE_EXT_P_win = .exe
-SHLIB_EXT_P_win = .dll
-SHLIB_EXT_P_mac = .dylib
-SHLIB_EXT_P_lin = .so
-SHLIB_EXT_P_any = .so
-
 EXE_EXT = $(EXE_EXT_P_$(PLATFORM))
-SHLIB_EXT = $(SHLIB_EXT_P_$(PLATFORM))
 
 CC = $(TOOLCHAIN_PREFIX)gcc
 WINDRES = $(TOOLCHAIN_PREFIX)windres
@@ -22,31 +16,24 @@ YACC = yacc
 TOOL_WRAPPER =  # Might be wine
 ZIP = 7z a -tzip
 
-LIB_FMEM_BASE = lib/fmem
-LIB_FMEM = $(LIB_FMEM_BASE)/build
-LIB_FMEM_A = $(LIB_FMEM)/libfmem.a
-
 LIBS_PKSVUI_P_win_PR_release = -lwsock32
 LIBS_PKSVUI_P_win = -lcomdlg32 -lgdi32 -lcomctl32
 LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROFILE))
 
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
 CPPFLAGS_PR_release = -DNDEBUG=1
-CPPFLAGS = -I$(LIB_FMEM)/gen -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
+CPPFLAGS = -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og
 CFLAGS_PR_release = -ggdb1 -flto -O2
 CFLAGS_PGO_1=-fprofile-generate=pgo_data
 CFLAGS_PGO_2=-fprofile-use=pgo_data
 CFLAGS = -ggdb -Wall -Wextra -Wpedantic -pedantic -std=c17 $(CFLAGS_PR_$(PROFILE)) $(CFLAGS_PGO_$(PGO))
-CFLAGS_SH = -shared -fpic -DDLL
 
 LDFLAGS_CONSOLE_P_win = -mconsole
 LDFLAGS_P_win = -mwindows
 
 LDFLAGS_CONSOLE = $(LDFLAGS_CONSOLE_P_$(PLATFORM))
 LDFLAGS = $(LDFLAGS_P_$(PLATFORM))
-LDFLAGS_SH = -L$(LIB_FMEM)
-LDLIBS_SH = -lfmem
 
 SRC_PKSV_COMMON = \
 	src_pksv/codeproc.c src_pksv/gba_asm.c src_pksv/isdone.c src_pksv/sulib.c \
@@ -56,8 +43,6 @@ SRC_PKSV_COMMON = \
 	src_lang/lang_load.c src_common/binarysearch_u32.c \
 	src_pksv/lang_recompiler.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
-SRC_PKSV_SHLIB = src_pksv/pksv_dll.c $(SRC_PKSV_COMMON)
-RES_PKSV_SHLIB = src_pksv/pksv.rc
 
 SRC_PKSVUI = src_pksvui/pksvui.c src_pksvui/windows_portability.c
 RES_PKSVUI = src_pksvui/vcpksv2.rc
@@ -90,7 +75,6 @@ OBJ_PKSVUI_P_win = $(RES_PKSVUI:.rc=.o)
 OBJ_PKSVUI = $(SRC_PKSVUI:.c=.o) $(OBJ_PKSVUI_P_$(PLATFORM))
 
 OBJ_PKSV_MAIN = $(SRC_PKSV_MAIN:.c=.o)
-OBJ_PKSV_SHLIB = $(SRC_PKSV_SHLIB:.c=.sh_o) $(RES_PKSV_SHLIB:.rc=.o)
 OBJ_COMMON_TEST_SUITE = $(SRC_COMMON_TEST_SUITE:.c=.o)
 OBJ_PKSV_TEST_SUITE = $(SRC_PKSV_TEST_SUITE:.c=.o)
 OBJ_PROCESS_DEFINES = $(SRC_PROCESS_DEFINES:.c=.o)
@@ -115,19 +99,18 @@ SUBLANGS = $(subst src_pksv/,,$(SUBLANGS_SRC:.lang.txt=.dat))
 SUBLANG_DEFS_SRC = $(wildcard src_pksv/sublang/defs_*.defs.txt)
 SUBLANG_DEFS = $(subst src_pksv/,,$(SUBLANG_DEFS_SRC:.defs.txt=.dat))
 
-OBJS = $(OBJ_PKSV_MAIN) $(OBJ_PKSV_SHLIB) $(OBJ_PKSVUI) $(OBJ_PROCESS_DEFINES) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_GPERF_REVERSE) $(OBJ_LANGUAGE_PARSER) $(OBJ_LANGUAGE_DUMPER) $(OBJ_COMMON_TEST_SUITE) $(OBJ_PKSV_TEST_SUITE)
+OBJS = $(OBJ_PKSV_MAIN) $(OBJ_PKSVUI) $(OBJ_PROCESS_DEFINES) $(OBJ_PROCESS_DEFINES_REVERSE) $(OBJ_GPERF_REVERSE) $(OBJ_LANGUAGE_PARSER) $(OBJ_LANGUAGE_DUMPER) $(OBJ_COMMON_TEST_SUITE) $(OBJ_PKSV_TEST_SUITE)
 DEPS = $(OBJS:o=d)
 
 PKSV = pksv$(EXE_EXT)
-PKSV_SHLIB = pksv$(SHLIB_EXT)
 PKSVUI = pksvui$(EXE_EXT)
 
-DIST_FILES_P_win = $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll
+DIST_FILES_P_win = $(PKSVUI) Scintilla.dll
 DIST_FILES = $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS) license.txt $(ALL_TOOLS) $(DIST_FILES_P_$(PLATFORM))
 DIST_OUT = pksv-$(PLATFORM)-"$$(git describe --long --dirty --always)".zip
 DIST_OUT_WC = pksv-*.zip
 
-all: $(PKSV) $(PKSV_SHLIB) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
+all: $(PKSV) $(PKSVUI) Scintilla.dll $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
 compat: $(PKSV) $(BIN_LANGUAGE_PARSER) $(SUBLANGS) $(SUBLANG_DEFS)
 tools: $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(BIN_PROCESS_DEFINES) $(BIN_PROCESS_DEFINES_REVERSE)
 
@@ -144,14 +127,11 @@ check: $(PKSV) $(SUBLANGS) $(SUBLANG_DEFS) $(ALL_TEST_SUITES)
 	echo '6146a2f980bcaacc6ae89ef89813b115  src_pksv/tests/fakegold.gbc' | md5sum -c
 
 clean: mostlyclean
-	rm -f -- $(PKSV) $(PKSV_SHLIB) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data $(ALL_TEST_SUITES)
+	rm -f -- $(PKSV) $(PKSVUI) $(BIN_PROCESS_DEFINES) $(BIN_GPERF_REVERSE) $(BIN_PROCESS_DEFINES_REVERSE) $(BIN_LANGUAGE_PARSER) $(BIN_LANGUAGE_DUMPER) $(DIST_OUT_WC) Scintilla.dll $(SUBLANGS) $(SUBLANG_DEFS) pgo_data $(ALL_TEST_SUITES)
 
-mostlyclean: clean-fmem
+mostlyclean:
 	rm -f -- $(OBJS) $(DEPS) $(GENERATED_SOURCES) src_pksv/tests/fakerom.gba src_pksv/tests/compare.pks src_pksv/tests/compare2.pks src_pksv/tests/compare3.pks src_pksv/tests/fakegold.gbc PokeScrE.log
 	rm -f -- $(OBJS:o=gcno) $(OBJS:o=gcda)
-
-clean-fmem:
-	rm -rf -- $(LIB_FMEM) $(LIB_FMEM_A)
 
 dist: $(DIST_FILES)
 	rm -f -- $(DIST_OUT_WC)
@@ -162,17 +142,6 @@ dist: $(DIST_FILES)
 # Lets us run pksvui from the root of the source tree
 Scintilla.dll: src_pksvui/Scintilla.dll
 	ln -s src_pksvui/Scintilla.dll Scintilla.dll
-
-$(LIB_FMEM)/gen/fmem.h $(LIB_FMEM_A): $(LIB_FMEM)/Makefile
-	$(MAKE) -C $(LIB_FMEM) VERBOSE=1
-
-$(LIB_FMEM)/Makefile: $(LIB_FMEM_BASE)/CMakeLists.txt
-	mkdir -p $(LIB_FMEM)
-	cd $(LIB_FMEM) && $(CMAKE) -DBUILD_TESTING=false ..
-
-$(LIB_FMEM_BASE)/CMakeLists.txt:
-	# Git repo not checked out properly
-	git submodule update --init --force --recursive
 
 $(BIN_PROCESS_DEFINES): $(OBJ_PROCESS_DEFINES)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PROCESS_DEFINES) -o $@
@@ -192,9 +161,6 @@ $(BIN_LANGUAGE_DUMPER): $(OBJ_LANGUAGE_DUMPER)
 $(PKSV): $(OBJ_PKSV_MAIN)
 	$(LINK.c) $(LDFLAGS_CONSOLE) $(OBJ_PKSV_MAIN) -o $@
 
-$(PKSV_SHLIB): $(OBJ_PKSV_SHLIB) $(LIB_FMEM_A)
-	$(LINK.c) $(CFLAGS_SH) $(LDFLAGS_SH) $(OBJ_PKSV_SHLIB) $(LDLIBS_SH) -o $@
-
 $(PKSVUI): $(OBJ_PKSVUI)
 	$(LINK.c) $(OBJ_PKSVUI) $(LIBS_PKSVUI) -o $@
 
@@ -213,10 +179,7 @@ $(BIN_COMMON_TEST_SUITE): $(OBJ_COMMON_TEST_SUITE)
 $(BIN_PKSV_TEST_SUITE): $(OBJ_PKSV_TEST_SUITE)
 	$(LINK.c) $$(pkg-config --libs check) $(LDFLAGS_CONSOLE) $(OBJ_PKSV_TEST_SUITE) -o $@
 
-.SUFFIXES: .sh_o .o .c .gperf .rc .y .l .c .tab.c
-.c.sh_o:
-	$(CC) $(CFLAGS) $(CFLAGS_SH) $(CPPFLAGS) -MD -MF $(@:o=d) -c $< -o $@
-
+.SUFFIXES: .o .c .gperf .rc .y .l .c .tab.c
 .c.o:
 	$(CC) $(CFLAGS) $(CPPFLAGS) -MD -MF $(@:o=d) -c $< -o $@
 
@@ -232,12 +195,10 @@ $(BIN_PKSV_TEST_SUITE): $(OBJ_PKSV_TEST_SUITE)
 .y.tab.c:
 	$(YACC) -d -b $(@D)/$(*F) $<
 
-.PHONY: all check clean clean-fmem compat dist tools
+.PHONY: all check clean compat dist tools
 
 tools/language_parser/language-def-yacc.tab.h: tools/language_parser/language-def-yacc.tab.c
 	@:
-
-src_pksv/pksv_dll.c: $(LIB_FMEM)/gen/fmem.h
 
 tools/language_parser/language-def-lex.o: tools/language_parser/language-def-lex.c tools/language_parser/language-def-yacc.tab.h
 

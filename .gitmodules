@@ -1,3 +1,0 @@
-[submodule "lib/fmem"]
-	path = lib/fmem
-	url = https://github.com/Snaipe/fmem.git
