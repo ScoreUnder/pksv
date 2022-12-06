@@ -16,8 +16,7 @@
 #include "binarysearch_u32.h"
 #include "binarysearch.h"
 #include "stdio_ext.h"
-
-#define GBA_OFFSET_MASK 0x1FFFFFF
+#include "romutil.h"
 
 struct language_def error_lang = {
     .rules_by_bytes = &(struct bsearch_root){0},
@@ -347,7 +346,7 @@ static void queue_decompilation_at(struct bsearch_root *remaining_blocks,
 
   // TODO: GSC offset handling
   bsearch_upsert(remaining_blocks,
-                 CAST_u32_pvoid(next_address & GBA_OFFSET_MASK),
+                 CAST_u32_pvoid(next_address & ~ROM_BASE_ADDRESS),
                  next_decompilation);
 }
 
@@ -555,7 +554,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
               break;
             case PARSE_RESULT_LABEL: {
               // TODO: GSC offset handling
-              uint32_t offset = result.value & GBA_OFFSET_MASK;
+              uint32_t offset = result.value & ~ROM_BASE_ADDRESS;
               ptrdiff_t label_index = bsearch_find_u32(state->labels, offset);
               if (label_index >= 0) {
                 const char *label = state->labels->pairs[label_index].value;
