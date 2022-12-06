@@ -50,7 +50,8 @@ struct decomp_internal_state {
   FILE *input;
   FILE *output;
   struct bsearch_root *remaining_blocks;
-  struct bsearch_root *seen_addresses;
+  struct bsearch_root *explored_blocks;
+  struct bsearch_root *label_blocks;
   struct bsearch_root *labels;
   struct language_cache *language_cache;
   struct parser_cache *parser_cache;
@@ -58,10 +59,16 @@ struct decomp_internal_state {
   bool is_verbose;
 };
 
-static void decomp_visit_address(
+enum decompilation_stage {
+  STAGE_FINDING_BLOCKS,
+  STAGE_FINDING_LABELS,
+  STAGE_DECOMPILING,
+};
+
+static uint32_t decomp_visit_address(
     struct decomp_internal_state *state,
     struct queued_decompilation *decompilation_type, uint32_t initial_address,
-    bool decompile);
+    enum decompilation_stage decomp_stage);
 static struct queued_decompilation *duplicate_queued_decompilation(
     struct queued_decompilation *queued_decompilation);
 
@@ -74,6 +81,11 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
   bsearch_init_root(&unvisited_blocks, bsearch_key_uint32cmp,
                     bsearch_key_nocopy, NULL, free);
 
+  // Map of block start addresses to larger containing block start addresses
+  struct bsearch_root label_blocks;
+  bsearch_init_root(&label_blocks, bsearch_key_uint32cmp, bsearch_key_nocopy,
+                    NULL, NULL);
+
   struct queued_decompilation *initial_decompilation =
       malloc(sizeof *initial_decompilation);
   *initial_decompilation = (struct queued_decompilation){
@@ -82,14 +94,6 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
   };
   bsearch_upsert(&unvisited_blocks, CAST_u32_pvoid(start_offset),
                  initial_decompilation);
-
-  // Individual addresses seen by decompiler.
-  // Used to determine if an address is already decompiled.
-  // Key: address seen by decompiler
-  // Value: address of start of decompiled block
-  struct bsearch_root decomp_seen_addresses;
-  bsearch_init_root(&decomp_seen_addresses, bsearch_key_uint32cmp,
-                    bsearch_key_nocopy, NULL, NULL);
 
   // Addresses that are to be decompiled.
   struct bsearch_root decomp_blocks;
@@ -100,7 +104,8 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
       .input = input_file,
       .output = output_file,
       .remaining_blocks = &unvisited_blocks,
-      .seen_addresses = &decomp_seen_addresses,
+      .explored_blocks = NULL,
+      .label_blocks = NULL,
       .labels = NULL,
       .language_cache = language_cache,
       .parser_cache = parser_cache,
@@ -130,54 +135,54 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
     bsearch_remove(&unvisited_blocks, index);
 
     decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
-                         false);
+                         STAGE_FINDING_BLOCKS);
   }
   bsearch_deinit_root(&unvisited_blocks);
   decomp_state.remaining_blocks = NULL;
+
+  // Find blocks that labels belong to
+  decomp_state.explored_blocks = &decomp_blocks;
+  decomp_state.label_blocks = &label_blocks;
+  for (size_t i = 0; i < decomp_blocks.size; i++) {
+    uint32_t decompilation_addr = bsearch_key_u32(&decomp_blocks, i);
+    struct queued_decompilation *decompilation_type =
+        decomp_blocks.pairs[i].value;
+
+    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
+                         STAGE_FINDING_LABELS);
+  }
+  decomp_state.explored_blocks = NULL;
+  decomp_state.label_blocks = NULL;
 
   struct bsearch_root labels;
   bsearch_init_root(&labels, bsearch_key_uint32cmp, bsearch_key_nocopy, NULL,
                     free);
 
-  // Assign labels to decompiled blocks, remove any which overlap.
+  // Name labels and ensure overlapped labels are not queued for their own
+  // decompilation
   size_t label_num = 0;
-  for (size_t i = 0; i < decomp_blocks.size; i++) {
-    uint32_t decomp_addr = bsearch_key_u32(&decomp_blocks, i);
+  for (size_t i = 0; i < label_blocks.size; i++) {
+    uint32_t label_addr = bsearch_key_u32(&label_blocks, i);
+    uint32_t block_addr = bsearch_val_u32(&label_blocks, i);
 
-    // Create a label for the decompiled block.
+    if (label_addr != block_addr) {
+      // Label is overlapped by another block, so don't decompile it.
+      ptrdiff_t index = bsearch_find_u32(&decomp_blocks, label_addr);
+      assert(index >= 0);
+      bsearch_remove(&decomp_blocks, (size_t)index);
+    }
+
+    // Name the label
     char *label = malloc(32);
     if (decomp_state.is_verbose) {
-      snprintf(label, 32, "label_%" PRIx32, decomp_addr);
+      snprintf(label, 32, "label_%" PRIx32, label_addr);
     } else {
       snprintf(label, 32, "label_%zu", label_num++);
     }
-    bsearch_upsert(&labels, CAST_u32_pvoid(decomp_addr), label);
-
-    // Find the start of the decompiled block.
-    ptrdiff_t decomp_block_index =
-        bsearch_find_u32(&decomp_seen_addresses, decomp_addr);
-    assert(decomp_block_index >= 0);
-
-    // Remove this block from decompilation queue if it overlaps with another
-    // of the same decompilation type.
-    uint32_t decomp_block_start =
-        bsearch_val_u32(&decomp_seen_addresses, decomp_block_index);
-    if (decomp_block_start != decomp_addr) {
-      struct queued_decompilation *decompilation_type =
-          decomp_blocks.pairs[i].value;
-      ptrdiff_t other_decomp_info_index =
-          bsearch_find_u32(&decomp_blocks, decomp_block_start);
-      assert(other_decomp_info_index >= 0);
-      struct queued_decompilation *other_decomp_info =
-          decomp_blocks.pairs[other_decomp_info_index].value;
-      if (decompilation_type->language == other_decomp_info->language) {
-        bsearch_remove(&decomp_blocks, i);
-        i--;
-      }
-    }
+    bsearch_upsert(&labels, CAST_u32_pvoid(label_addr), label);
   }
-  bsearch_deinit_root(&decomp_seen_addresses);
-  decomp_state.seen_addresses = NULL;
+
+  bsearch_deinit_root(&label_blocks);
 
   ptrdiff_t start_label_index = bsearch_find_u32(&labels, start_offset);
   assert(start_label_index >= 0);
@@ -194,7 +199,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
         decomp_blocks.pairs[i].value;
 
     decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
-                         true);
+                         STAGE_DECOMPILING);
   }
 
   bsearch_deinit_root(&decomp_blocks);
@@ -281,9 +286,7 @@ struct decomp_visit_state {
   uint32_t address;
   uint32_t initial_address;
   bool still_going;
-  // false = just visiting to collect block info
-  // true = decompiling
-  bool decompile;
+  enum decompilation_stage decomp_stage;
   // reported by decomp_visit_single: whether to continue on the same line
   bool continue_line;
   // informative for decomp_visit_single: whether this started on a new line
@@ -383,7 +386,7 @@ static bool check_and_report_eof(struct decomp_internal_state *state,
                                  struct decomp_visit_state *visit_state,
                                  size_t needed_bytes) {
   if (visit_state->lookahead.bytes.length < needed_bytes) {
-    if (visit_state->decompile) {
+    if (visit_state->decomp_stage == STAGE_DECOMPILING) {
       fputs("\n' EOF\n", state->output);
     }
     visit_state->still_going = false;
@@ -392,31 +395,51 @@ static bool check_and_report_eof(struct decomp_internal_state *state,
   return false;
 }
 
+static void label_visited_address(struct decomp_internal_state *state,
+                                  struct decomp_visit_state *visit_state) {
+  // Check if we need to label this address
+  assert(visit_state->decomp_stage == STAGE_FINDING_LABELS);
+  assert(state->explored_blocks != NULL);
+  ptrdiff_t address_pos =
+      bsearch_find_u32(state->explored_blocks, visit_state->address);
+  if (address_pos < 0) {
+    // No label necessary as this isn't part of another block
+    return;
+  }
+
+  // Ensure the address can be labelled by this block
+  struct queued_decompilation *decompilation =
+      state->explored_blocks->pairs[address_pos].value;
+
+  if (decompilation->language != visit_state->curr_language ||
+      decompilation->command != visit_state->curr_command) {
+    // This address cannot be labelled by this block
+    // (Because it would be represented incorrectly)
+    return;
+  }
+
+  // Take ownership of the label, minimum start address wins
+  ptrdiff_t index = bsearch_find_u32(state->label_blocks, visit_state->address);
+  if (index >= 0) {
+    if (bsearch_val_u32(state->label_blocks, index) >
+        visit_state->initial_address) {
+      // We have visited this address before, but this time we have a fuller
+      // view of the block
+      bsearch_setval_u32(state->label_blocks, index,
+                         visit_state->initial_address);
+    }
+  } else {
+    // Newly visited address
+    bsearch_unsafe_insert(state->label_blocks, index,
+                          CAST_u32_pvoid(visit_state->address),
+                          CAST_u32_pvoid(visit_state->initial_address));
+  }
+}
+
 static void decomp_visit_single(struct decomp_internal_state *state,
                                 struct decomp_visit_state *visit_state) {
   const struct language_def *language = visit_state->curr_language;
-
   uint32_t command_start_address = visit_state->address;
-  if (!visit_state->decompile &&
-      (visit_state->is_new_line || lang_can_split_lines(visit_state))) {
-    // Record this address as a visited "line"
-    ptrdiff_t index =
-        bsearch_find_u32(state->seen_addresses, visit_state->address);
-    if (index >= 0) {
-      if (bsearch_val_u32(state->seen_addresses, index) >
-          visit_state->initial_address) {
-        // We have visited this address before, but this time we have a fuller
-        // view of the block
-        bsearch_setval_u32(state->seen_addresses, index,
-                           visit_state->initial_address);
-      }
-    } else {
-      // Newly visited address
-      bsearch_unsafe_insert(state->seen_addresses, index,
-                            CAST_u32_pvoid(visit_state->address),
-                            CAST_u32_pvoid(visit_state->initial_address));
-    }
-  }
 
   if (check_and_report_eof(state, visit_state, 1)) return;
 
@@ -436,7 +459,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     // Special case: if we're decompiling a text language, and we have a
     // "simple" (byte table lookup) rule, we can just use the byte as-is.
     // This lets us skip a lot of logic and saves on memory too.
-    if (visit_state->decompile) {
+    if (visit_state->decomp_stage == STAGE_DECOMPILING) {
       putc(translated_byte, state->output);
       visit_state->line_length++;
     }
@@ -459,7 +482,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       cmd_first_len = strcspn(matched_rule->command_name, " ");
     }
 
-    if (visit_state->decompile) {
+    if (visit_state->decomp_stage == STAGE_DECOMPILING) {
       if (matched_rule->attributes & RULE_ATTR_CMP_FLAG)
         state->info.is_checkflag = true;
       else if (matched_rule->attributes & RULE_ATTR_CMP_INT)
@@ -489,7 +512,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       struct command_arg *arg = &matched_rule->args.args[i];
       if (check_and_report_eof(state, visit_state, arg->size)) return;
 
-      if (visit_state->decompile) {
+      if (visit_state->decomp_stage == STAGE_DECOMPILING) {
         uint32_t value = arr_get_little_endian(
             visit_state->lookahead.bytes.bytes, arg->size);
 
@@ -556,7 +579,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
             }
           }
         }
-      } else {
+      } else if (visit_state->decomp_stage == STAGE_FINDING_BLOCKS) {
         // If collecting block info, we need to follow addresses
         // Handle request for a new language
         bool has_lang = arg->as_language.lang.name[0] != '\0' ||
@@ -606,7 +629,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
 
       // Special case for commands with spaces in (insert second half after
       // first argument)
-      if (i == 0 && visit_state->decompile &&
+      if (i == 0 && visit_state->decomp_stage == STAGE_DECOMPILING &&
           matched_rule->command_name[cmd_first_len] == ' ') {
         fputs(&matched_rule->command_name[cmd_first_len], state->output);
         visit_state->line_length +=
@@ -619,7 +642,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       const struct language_def *next_language = decomp_get_next_language(
           state, visit_state, matched_rule->oneshot_lang);
       if (next_language == NULL) {
-        if (visit_state->decompile) {
+        if (visit_state->decomp_stage == STAGE_DECOMPILING) {
           fprintf(state->output,
                   "  ' Can't find language \"%s\" for the rest of this command",
                   matched_rule->oneshot_lang.name);
@@ -635,7 +658,8 @@ static void decomp_visit_single(struct decomp_internal_state *state,
         return;
       }
 
-      if (visit_state->decompile && language_type != METAFLAG_LANGTYPE_TEXT) {
+      if (visit_state->decomp_stage == STAGE_DECOMPILING &&
+          language_type != METAFLAG_LANGTYPE_TEXT) {
         putc(' ', state->output);
         visit_state->line_length++;
       }
@@ -647,7 +671,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
     }
   }
 
-  if (visit_state->decompile) {
+  if (visit_state->decomp_stage == STAGE_DECOMPILING) {
     // Only need concatenated command lines if decompiling
     if (visit_state->still_going && (language_type == METAFLAG_LANGTYPE_LINE ||
                                      language_type == METAFLAG_LANGTYPE_TEXT)) {
@@ -680,10 +704,10 @@ static void decomp_visit_single(struct decomp_internal_state *state,
   }
 }
 
-static void decomp_visit_address(
+static uint32_t decomp_visit_address(
     struct decomp_internal_state *restrict state,
     struct queued_decompilation *restrict decompilation_type,
-    uint32_t initial_address, bool decompile) {
+    uint32_t initial_address, enum decompilation_stage decomp_stage) {
   const struct language_def *language = decompilation_type->language;
   const size_t LOOKAHEAD_SIZE = 16;  // TODO: record maximum bytes_list length
                                      // per language, max with arg sizes
@@ -701,7 +725,7 @@ static void decomp_visit_address(
       .address = initial_address,
       .initial_address = initial_address,
       .still_going = true,
-      .decompile = decompile,
+      .decomp_stage = decomp_stage,
       .line_length = 0,
       .base_language = language,
       .base_command = decompilation_type->command,
@@ -715,14 +739,14 @@ static void decomp_visit_address(
   fseek(state->input, initial_address, SEEK_SET);
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
 
-  if (decompile) {
+  if (visit_state.decomp_stage == STAGE_DECOMPILING) {
     fprintf(state->output, "#org 0x%08x %s\n", initial_address, language->name);
   }
 
   uint32_t next_label_address = UINT32_MAX;
   ptrdiff_t next_label_index = PTRDIFF_MAX;
 
-  if (decompile) {
+  if (visit_state.decomp_stage == STAGE_DECOMPILING) {
     next_label_index = bsearch_find_u32(state->labels, initial_address);
     if (next_label_index < 0) {
       next_label_index = -next_label_index - 1;
@@ -733,8 +757,9 @@ static void decomp_visit_address(
   }
 
   while (visit_state.still_going) {
-    if (decompile && visit_state.is_new_line &&
-        visit_state.address == next_label_address &&
+    // Insert labels if needed
+    if (visit_state.decomp_stage == STAGE_DECOMPILING &&
+        visit_state.is_new_line && visit_state.address == next_label_address &&
         (size_t)next_label_index < state->labels->size) {
       fprintf(state->output, ":%s\n",
               (char *)state->labels->pairs[next_label_index].value);
@@ -744,11 +769,17 @@ static void decomp_visit_address(
       }
     }
 
+    // Discover labels
+    if (visit_state.decomp_stage == STAGE_FINDING_LABELS &&
+        (visit_state.is_new_line || lang_can_split_lines(&visit_state))) {
+      label_visited_address(state, &visit_state);
+    }
+
     visit_state.continue_line = false;
     decomp_visit_single(state, &visit_state);
 
     if (!visit_state.continue_line) {
-      if (visit_state.decompile) {
+      if (visit_state.decomp_stage == STAGE_DECOMPILING) {
         fputs("\n", state->output);
         visit_state.line_length = 0;
       }
@@ -763,4 +794,5 @@ static void decomp_visit_address(
   }
 
   free(visit_state.lookahead.bytes.bytes);
+  return visit_state.address;
 }
