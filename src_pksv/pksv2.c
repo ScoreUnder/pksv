@@ -58,6 +58,7 @@ Flags:\n\
     -r    (Re)compile\n\
     -e    Debug compile (dry-run without writing to ROM)\n\
     -v    Verbose (also affects script decompilation)\n\
+    -m    Merge adjacent decompiled blocks\n\
 ");
 }
 
@@ -73,6 +74,7 @@ int main(int argc, char **argv) {
   uint32_t decompile_at;
   char *decompile_lang;
   bool verbose = false;
+  bool aggressive_block_merging = false;
 
   char *positional_arguments[MAX_POSITIONAL_ARGUMENTS];
   int positional_argument_count = 0;
@@ -118,6 +120,8 @@ int main(int argc, char **argv) {
       }
     } else if (!strcmp(argv[i], "-v")) {
       verbose = true;
+    } else if (!strcmp(argv[1], "-m")) {
+      aggressive_block_merging = true;
     } else if (!strcmp(argv[i], "--help")) {
       show_help(stdout);
       return 0;
@@ -200,7 +204,7 @@ int main(int argc, char **argv) {
     FILE *script_file =
         script_file_name == NULL ? stdout : fopen(script_file_name, "wt");
     decompile_all(romfile, decompile_at, language, lang_cache, parser_cache,
-                  script_file, verbose);
+                  script_file, verbose, aggressive_block_merging);
 
     if (script_file != stdout) {
       fclose(script_file);

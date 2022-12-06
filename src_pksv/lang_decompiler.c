@@ -79,7 +79,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
                    const struct language_def *start_language,
                    struct language_cache *language_cache,
                    struct parser_cache *parser_cache, FILE *output_file,
-                   bool is_verbose) {
+                   bool is_verbose, bool aggressive_block_merging) {
   struct bsearch_root unvisited_blocks;
   bsearch_init_root(&unvisited_blocks, bsearch_key_uint32cmp,
                     bsearch_key_nocopy, NULL, free);
@@ -211,6 +211,8 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
   bsearch_deinit_root(&erase_intervals);
 
   decomp_state.labels = &labels;
+  uint32_t last_end_offset = 0;
+  const struct language_def *last_language = NULL;
   // Decompile the blocks.
   for (size_t i = 0; i < decomp_blocks.size; i++) {
     putc('\n', decomp_state.output);
@@ -219,9 +221,19 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
     struct queued_decompilation *decompilation_type =
         decomp_blocks.pairs[i].value;
 
-    fprintf(output_file, "#org 0x%08x %s\n", decompilation_addr, decompilation_type->language->name);
-    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
-                         STAGE_DECOMPILING);
+    if (!aggressive_block_merging || last_end_offset != decompilation_addr ||
+        last_end_offset == 0) {
+      fprintf(output_file, "#org 0x%08x %s\n", decompilation_addr,
+              decompilation_type->language->name);
+    } else if (aggressive_block_merging &&
+               last_language != decompilation_type->language) {
+      fprintf(output_file, "#language %s\n",
+              decompilation_type->language->name);
+    }
+    last_end_offset =
+        decomp_visit_address(&decomp_state, decompilation_type,
+                             decompilation_addr, STAGE_DECOMPILING);
+    last_language = decompilation_type->language;
   }
 
   bsearch_deinit_root(&decomp_blocks);
