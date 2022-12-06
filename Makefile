@@ -23,7 +23,7 @@ LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROF
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
 CPPFLAGS_PR_release = -DNDEBUG=1
 CPPFLAGS = -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
-CFLAGS_PR_debug = -ggdb3 -Og
+CFLAGS_PR_debug = -ggdb3 -Og -fno-omit-frame-pointer
 CFLAGS_PR_release = -ggdb1 -flto -O2
 CFLAGS_PGO_1=-fprofile-generate=pgo_data
 CFLAGS_PGO_2=-fprofile-use=pgo_data
