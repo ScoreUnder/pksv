@@ -15,6 +15,7 @@
 #include "language-defs.h"
 #include "binarysearch_u32.h"
 #include "binarysearch.h"
+#include "uint32_interval.h"
 #include "stdio_ext.h"
 #include "romutil.h"
 
@@ -43,6 +44,7 @@ struct queued_decompilation {
   const struct language_def *language;
   const struct rule *command;  // NULL if no forced command
   // TODO: hardcoded languages (ASM)
+  uint32_t end_offset;
 };
 
 struct decomp_internal_state {
@@ -70,6 +72,8 @@ static uint32_t decomp_visit_address(
     enum decompilation_stage decomp_stage);
 static struct queued_decompilation *duplicate_queued_decompilation(
     struct queued_decompilation *queued_decompilation);
+static void merge_block_intervals(struct bsearch_root *decomp_blocks,
+                                  struct bsearch_root *block_intervals);
 
 void decompile_all(FILE *input_file, uint32_t start_offset,
                    const struct language_def *start_language,
@@ -133,8 +137,10 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
 
     bsearch_remove(&unvisited_blocks, index);
 
-    decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
-                         STAGE_FINDING_BLOCKS);
+    uint32_t end_address =
+        decomp_visit_address(&decomp_state, decompilation_type,
+                             decompilation_addr, STAGE_FINDING_BLOCKS);
+    decompilation_type->end_offset = end_address;
   }
   bsearch_deinit_root(&unvisited_blocks);
   decomp_state.remaining_blocks = NULL;
@@ -183,10 +189,26 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
 
   bsearch_deinit_root(&label_blocks);
 
+  // Merge block intervals for #erase
+  struct bsearch_root erase_intervals;
+  uint32_interval_init_bsearch_root(&erase_intervals);
+  merge_block_intervals(&decomp_blocks, &erase_intervals);
+
   ptrdiff_t start_label_index = bsearch_find_u32(&labels, start_offset);
   assert(start_label_index >= 0);
   fprintf(output_file, "' Script starts at :%s\n",
           (char *)labels.pairs[start_label_index].value);
+
+  // Output #erase commands
+  fprintf(output_file,
+          "\n' Erase previous script on recompile (to reclaim space):\n");
+  for (size_t i = 0; i < erase_intervals.size; i++) {
+    uint32_t start = bsearch_key_u32(&erase_intervals, i);
+    uint32_t end = bsearch_val_u32(&erase_intervals, i);
+    fprintf(output_file, "#erase 0x%" PRIx32 " 0x%" PRIx32 "\n", start, end);
+  }
+
+  bsearch_deinit_root(&erase_intervals);
 
   decomp_state.labels = &labels;
   // Decompile the blocks.
@@ -197,6 +219,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
     struct queued_decompilation *decompilation_type =
         decomp_blocks.pairs[i].value;
 
+    fprintf(output_file, "#org 0x%08x %s\n", decompilation_addr, decompilation_type->language->name);
     decomp_visit_address(&decomp_state, decompilation_type, decompilation_addr,
                          STAGE_DECOMPILING);
   }
@@ -210,6 +233,18 @@ static struct queued_decompilation *duplicate_queued_decompilation(
   struct queued_decompilation *duplicate = malloc(sizeof *duplicate);
   *duplicate = *queued_decompilation;
   return duplicate;
+}
+
+void merge_block_intervals(struct bsearch_root *decomp_blocks,
+                           struct bsearch_root *block_intervals) {
+  for (size_t i = 0; i < decomp_blocks->size; i++) {
+    uint32_t decompilation_addr = bsearch_key_u32(decomp_blocks, i);
+    struct queued_decompilation *decompilation_type =
+        decomp_blocks->pairs[i].value;
+    uint32_t end_address = decompilation_type->end_offset;
+
+    uint32_interval_add(block_intervals, decompilation_addr, end_address);
+  }
 }
 
 struct lookahead {
@@ -462,6 +497,7 @@ static void decomp_visit_single(struct decomp_internal_state *state,
       putc(translated_byte, state->output);
       visit_state->line_length++;
     }
+    visit_state->address++;
     consume_and_refill_lookahead(&visit_state->lookahead, 1);
   } else {
     if (matched_rule == NULL) {
@@ -737,10 +773,6 @@ static uint32_t decomp_visit_address(
   // TODO: GSC offset handling
   fseek(state->input, initial_address, SEEK_SET);
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
-
-  if (visit_state.decomp_stage == STAGE_DECOMPILING) {
-    fprintf(state->output, "#org 0x%08x %s\n", initial_address, language->name);
-  }
 
   uint32_t next_label_address = UINT32_MAX;
   ptrdiff_t next_label_index = PTRDIFF_MAX;
