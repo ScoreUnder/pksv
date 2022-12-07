@@ -331,6 +331,8 @@ struct decomp_visit_state {
   const struct rule *curr_command;
   uint32_t address;
   uint32_t initial_address;
+  size_t next_label_index;
+  uint32_t next_label_address;
   bool still_going;
   enum decompilation_stage decomp_stage;
   // reported by decomp_visit_single: whether to continue on the same line
@@ -441,44 +443,127 @@ static bool check_and_report_eof(struct decomp_internal_state *state,
   return false;
 }
 
+static void initialise_label_search(
+    struct decomp_internal_state *restrict state,
+    struct decomp_visit_state *restrict visit_state) {
+  switch (visit_state->decomp_stage) {
+    case STAGE_FINDING_BLOCKS:
+      // No labels this early on
+      break;
+    case STAGE_FINDING_LABELS: {
+      // TODO
+      ptrdiff_t next_label_index = bsearch_find_u32(
+          state->explored_blocks, visit_state->initial_address);
+      // We should always be looking through a block already found by
+      // STAGE_FINDING_BLOCKS, so next_label_index should always be >= 0
+      assert(next_label_index >= 0);
+      assert((size_t)next_label_index < state->explored_blocks->size);
+      visit_state->next_label_index = (size_t)next_label_index;
+      visit_state->next_label_address =
+          bsearch_key_u32(state->explored_blocks, (size_t)next_label_index);
+      break;
+    }
+    case STAGE_DECOMPILING: {
+      ptrdiff_t next_label_index =
+          bsearch_find_u32(state->labels, visit_state->initial_address);
+      if (next_label_index < 0) {
+        next_label_index = -next_label_index - 1;
+      }
+      visit_state->next_label_index = (size_t)next_label_index;
+      if ((size_t)next_label_index < state->labels->size) {
+        visit_state->next_label_address =
+            bsearch_key_u32(state->labels, (size_t)next_label_index);
+      }
+      break;
+    }
+  }
+}
+
 static void label_visited_address(struct decomp_internal_state *state,
                                   struct decomp_visit_state *visit_state) {
-  // Check if we need to label this address
-  assert(visit_state->decomp_stage == STAGE_FINDING_LABELS);
-  assert(state->explored_blocks != NULL);
-  ptrdiff_t address_pos =
-      bsearch_find_u32(state->explored_blocks, visit_state->address);
-  if (address_pos < 0) {
-    // No label necessary as this isn't part of another block
-    return;
-  }
+  switch (visit_state->decomp_stage) {
+    case STAGE_FINDING_BLOCKS:
+      // No labels this early on
+      break;
+    case STAGE_FINDING_LABELS:
+      assert(state->explored_blocks != NULL);
 
-  // Ensure the address can be labelled by this block
-  struct queued_decompilation *decompilation =
-      state->explored_blocks->pairs[address_pos].value;
+      // If we want to label something, we first need to be able start a new
+      // line
+      if (!visit_state->is_new_line && !lang_can_split_lines(visit_state))
+        break;
 
-  if (decompilation->language != visit_state->curr_language ||
-      decompilation->command != visit_state->curr_command) {
-    // This address cannot be labelled by this block
-    // (Because it would be represented incorrectly)
-    return;
-  }
+      // Skip over any block addresses we have already passed
+      while (visit_state->address > visit_state->next_label_address &&
+             visit_state->next_label_index < state->explored_blocks->size) {
+        visit_state->next_label_index++;
+        if (visit_state->next_label_index < state->explored_blocks->size) {
+          visit_state->next_label_address = bsearch_key_u32(
+              state->explored_blocks, visit_state->next_label_index);
+        } else {
+          visit_state->next_label_address = UINT32_MAX;
+        }
+      }
 
-  // Take ownership of the label, minimum start address wins
-  ptrdiff_t index = bsearch_find_u32(state->label_blocks, visit_state->address);
-  if (index >= 0) {
-    if (bsearch_val_u32(state->label_blocks, index) >
-        visit_state->initial_address) {
-      // We have visited this address before, but this time we have a fuller
-      // view of the block
-      bsearch_setval_u32(state->label_blocks, index,
-                         visit_state->initial_address);
-    }
-  } else {
-    // Newly visited address
-    bsearch_unsafe_insert(state->label_blocks, index,
-                          CAST_u32_pvoid(visit_state->address),
-                          CAST_u32_pvoid(visit_state->initial_address));
+      // Check that we have reached the point where we may want to label
+      if (visit_state->address != visit_state->next_label_address) break;
+
+      // Ensure the address can be labelled by this block
+      struct queued_decompilation *decompilation =
+          state->explored_blocks->pairs[visit_state->next_label_index].value;
+
+      if (decompilation->language != visit_state->curr_language ||
+          decompilation->command != visit_state->curr_command) {
+        // This address cannot be labelled by this block
+        // (Because it would be represented incorrectly)
+        return;
+      }
+
+      // Take ownership of the label, minimum start address wins
+      ptrdiff_t index =
+          bsearch_find_u32(state->label_blocks, visit_state->address);
+      if (index >= 0) {
+        if (bsearch_val_u32(state->label_blocks, index) >
+            visit_state->initial_address) {
+          // We have visited this address before, but this time we have a
+          // fuller view of the block
+          bsearch_setval_u32(state->label_blocks, index,
+                             visit_state->initial_address);
+        }
+      } else {
+        // Newly visited address
+        bsearch_unsafe_insert(state->label_blocks, index,
+                              CAST_u32_pvoid(visit_state->address),
+                              CAST_u32_pvoid(visit_state->initial_address));
+      }
+      break;
+    case STAGE_DECOMPILING:
+      // Insert labels if needed
+
+      // Labels must be their own line
+      // (And we can't ask for another split, that should have happened
+      // already)
+      // TODO: do we actually split lines for labels? check with text or
+      // something
+      // TODO: handle case where label is passed without inserting
+      // TODO: ensure we advance only to an applicable label (i.e. check
+      // ownership)
+      if (!visit_state->is_new_line) return;
+
+      if (visit_state->address == visit_state->next_label_address &&
+          visit_state->next_label_index < state->labels->size) {
+        fprintf(
+            state->output, ":%s\n",
+            (char *)state->labels->pairs[visit_state->next_label_index].value);
+        visit_state->next_label_index++;
+        if (visit_state->next_label_index < state->labels->size) {
+          visit_state->next_label_address =
+              bsearch_key_u32(state->labels, visit_state->next_label_index);
+        }
+      }
+      break;
+    default:
+      assert(false);
   }
 }
 
@@ -578,11 +663,12 @@ static void decomp_visit_single(struct decomp_internal_state *state,
           switch (result.type) {
             default:
             case PARSE_RESULT_FAIL:
-              assert(
-                  false);  // should always be able to parse at least fallbacks
+              // should always be able to parse at least fallbacks
+              assert(false);
               break;
             case PARSE_RESULT_VALUE:
-              assert(false);  // this shouldn't be returned by a formatter
+              // this shouldn't be returned by a formatter
+              assert(false);
               break;
             case PARSE_RESULT_TOKEN:
               if (state->is_verbose) {
@@ -780,43 +866,19 @@ static uint32_t decomp_visit_address(
       .curr_command = decompilation_type->command,
       .continue_line = false,
       .is_new_line = true,
+      .next_label_address = UINT32_MAX,
+      .next_label_index = SIZE_MAX,
   };
 
   // TODO: GSC offset handling
   fseek(state->input, initial_address, SEEK_SET);
   consume_and_refill_lookahead(&visit_state.lookahead, 0);
 
-  uint32_t next_label_address = UINT32_MAX;
-  ptrdiff_t next_label_index = PTRDIFF_MAX;
-
-  if (visit_state.decomp_stage == STAGE_DECOMPILING) {
-    next_label_index = bsearch_find_u32(state->labels, initial_address);
-    if (next_label_index < 0) {
-      next_label_index = -next_label_index - 1;
-    }
-    if ((size_t)next_label_index < state->labels->size) {
-      next_label_address = bsearch_key_u32(state->labels, next_label_index);
-    }
-  }
+  initialise_label_search(state, &visit_state);
 
   while (visit_state.still_going) {
-    // Insert labels if needed
-    if (visit_state.decomp_stage == STAGE_DECOMPILING &&
-        visit_state.is_new_line && visit_state.address == next_label_address &&
-        (size_t)next_label_index < state->labels->size) {
-      fprintf(state->output, ":%s\n",
-              (char *)state->labels->pairs[next_label_index].value);
-      next_label_index++;
-      if ((size_t)next_label_index < state->labels->size) {
-        next_label_address = bsearch_key_u32(state->labels, next_label_index);
-      }
-    }
-
-    // Discover labels
-    if (visit_state.decomp_stage == STAGE_FINDING_LABELS &&
-        (visit_state.is_new_line || lang_can_split_lines(&visit_state))) {
-      label_visited_address(state, &visit_state);
-    }
+    // Insert or discover labels if needed
+    label_visited_address(state, &visit_state);
 
     visit_state.continue_line = false;
     decomp_visit_single(state, &visit_state);
