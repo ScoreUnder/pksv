@@ -180,6 +180,7 @@ static uint32_t get_address_for_insert(codeblock* root_block,
   }
   fprintf(stderr, "error: could not find address for %s\n", insert->name);
   exit(1);  // TODO: report up the call stack
+  return 0; // unreachable
 }
 
 void process_inserts(codeblock* root_block, codelabel* cl) {

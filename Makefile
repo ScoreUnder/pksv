@@ -22,7 +22,7 @@ LIBS_PKSVUI = $(LIBS_PKSVUI_P_$(PLATFORM)) $(LIBS_PKSVUI_P_$(PLATFORM)_PR_$(PROF
 
 CPPFLAGS_PR_debug = -DDOES_NOT_UPDATE=1
 CPPFLAGS_PR_release = -DNDEBUG=1
-CPPFLAGS = -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 $(CPPFLAGS_PR_$(PROFILE))
+CPPFLAGS = -Isrc_common -Isrc_lang -D_FILE_OFFSET_BITS=64 -D_POSIX_C_SOURCE=200112L $(CPPFLAGS_PR_$(PROFILE))
 CFLAGS_PR_debug = -ggdb3 -Og -fno-omit-frame-pointer
 CFLAGS_PR_release = -ggdb1 -flto -O2
 CFLAGS_PGO_1=-fprofile-generate=pgo_data
@@ -41,7 +41,7 @@ SRC_PKSV_COMMON = \
 	src_pksv/uint32_interval.c src_pksv/lang_parsers.c src_common/stdio_ext.c \
 	src_pksv/lang_default_parsers.c src_pksv/lang_decompiler.c \
 	src_lang/lang_load.c src_common/binarysearch_u32.c \
-	src_pksv/lang_recompiler.c
+	src_pksv/lang_recompiler.c src_pksv/abstract_io.c
 SRC_PKSV_MAIN = src_pksv/pksv2.c $(SRC_PKSV_COMMON)
 
 SRC_PKSVUI = src_pksvui/pksvui.c src_pksvui/windows_portability.c

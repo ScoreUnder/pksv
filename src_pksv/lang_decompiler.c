@@ -51,6 +51,7 @@ struct decomp_internal_state {
   FILE *input;
   FILE *output;
   struct bsearch_root *remaining_blocks;
+  struct bsearch_root *block_previews;
   struct bsearch_root *explored_blocks;
   struct bsearch_root *label_blocks;
   struct bsearch_root *labels;
@@ -89,6 +90,11 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
   bsearch_init_root(&label_blocks, bsearch_key_uint32cmp, bsearch_key_nocopy,
                     NULL, NULL);
 
+  // Map of block start addresses to short textual previews
+  struct bsearch_root block_previews;
+  bsearch_init_root(&block_previews, bsearch_key_uint32cmp, bsearch_key_nocopy,
+                    NULL, free);
+
   struct queued_decompilation *initial_decompilation =
       malloc(sizeof *initial_decompilation);
   *initial_decompilation = (struct queued_decompilation){
@@ -107,6 +113,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
       .input = input_file,
       .output = output_file,
       .remaining_blocks = &unvisited_blocks,
+      .block_previews = &block_previews,
       .explored_blocks = NULL,
       .label_blocks = NULL,
       .labels = NULL,
@@ -238,6 +245,7 @@ void decompile_all(FILE *input_file, uint32_t start_offset,
 
   bsearch_deinit_root(&decomp_blocks);
   bsearch_deinit_root(&labels);
+  bsearch_deinit_root(&block_previews);
 }
 
 static struct queued_decompilation *duplicate_queued_decompilation(
